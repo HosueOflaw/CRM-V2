@@ -1,0 +1,62 @@
+<div class="p-6 space-y-6" style="direction: rtl;">
+  <!-- 🔍 Date Filters -->
+  <form class="grid grid-cols-4 gap-4 bg-white p-4 rounded-2xl shadow mb-4">
+    <div>
+      <label class="block text-sm font-medium mb-1">من تاريخ</label>
+      <input type="date" class="w-full border rounded-lg p-2" [(ngModel)]="filters.fromDate" name="fromDate"/>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">إلى تاريخ</label>
+      <input type="date" class="w-full border rounded-lg p-2" [(ngModel)]="filters.toDate" name="toDate"/>
+    </div>
+
+    <div class="col-span-2 flex gap-3 items-end">
+      <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" (click)="searchBy('judgmentDate')">
+        بحث بتاريخ صدور الحكم
+      </button>
+      <button type="button" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700" (click)="searchBy('alertDate')">
+        بحث بتاريخ التنبيه
+      </button>
+      <button type="button" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700" (click)="searchBy('appealDate')">
+        بحث بتاريخ موعد الطعن
+      </button>
+    </div>
+  </form>
+
+  <!-- 🔖 Tabs -->
+  <div class="flex border-b mb-4">
+<button *ngFor="let tab of tabs"
+        (click)="activeTab = tab.key"
+        class="px-4 py-2 cursor-pointer"
+        [class.border-b-2]="activeTab === tab.key"
+        [class.border-blue-600]="activeTab === tab.key">
+  {{ tab.label }}
+</button>
+
+  </div>
+
+  <!-- 📋 Table -->
+  <div class="bg-white p-4 rounded-2xl shadow">
+    <table class="w-full border text-sm">
+      <thead class="bg-gray-100">
+        <tr>
+          <th *ngFor="let col of columns[activeTab]" class="p-2 border text-right">
+            {{ col }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of activeTableData" class="hover:bg-gray-50 border-b">
+          <td *ngFor="let col of columns[activeTab]" class="p-2 border text-right">
+            {{ row[col] || '-' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="activeTableData.length === 0" class="text-center text-gray-500 py-8">
+      لا توجد بيانات
+    </div>
+  </div>
+</div>

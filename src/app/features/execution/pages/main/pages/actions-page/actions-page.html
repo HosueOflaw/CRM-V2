@@ -1,0 +1,120 @@
+<div class="p-6 bg-base-200 min-h-screen">
+  <!-- 🔹 العنوان + الفلاتر -->
+  <div class="flex flex-col justify-center mb-4 gap-2">
+
+    <div class="flex items-center gap-2 mb-3">
+      <input
+        type="date"
+        class="input input-bordered input-sm"
+        [(ngModel)]="startDate"
+      />
+      <input
+        type="date"
+        class="input input-bordered input-sm"
+        [(ngModel)]="endDate"
+      />
+
+      <!-- 🔸 حقل المحكمة -->
+      <input
+        type="text"
+        placeholder="اختر المحكمة..."
+        class="input input-bordered input-sm w-48"
+        [(ngModel)]="selectedCourt"
+        readonly
+        (click)="openCourtsModal()"
+      />
+
+      <!-- 🔸 الأزرار -->
+      <button class="btn btn-sm btn-primary" (click)="applyFilters()">استعلام</button>
+      <button class="btn btn-sm btn-outline" (click)="printTable()">طباعة</button>
+      <button class="btn btn-sm btn-success" (click)="exportToExcel()">Excel</button>
+      <button class="btn btn-sm btn-warning" (click)="filterUnuploaded()">إجراءات لم ترفع</button>
+    </div>
+
+    <!-- 🔍 البحث -->
+    <div>
+      <input
+        type="text"
+        placeholder="ابحث بالاسم أو الكود أو المحكمة..."
+        class="input input-bordered w-full"
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+      />
+    </div>
+  </div>
+
+  <!-- الجدول -->
+  <div class="overflow-x-auto bg-base-100 rounded-xl shadow">
+    <table class="table table-sm w-full text-sm">
+      <thead class="bg-base-300 text-base font-semibold">
+        <tr>
+          <th>الكود</th>
+          <th>الاسم</th>
+          <th>الحالة</th>
+          <th>سبب المديونية</th>
+          <th>المدني</th>
+          <th>الآلي</th>
+          <th>الجنسية</th>
+          <th>رقم الباتش</th>
+          <th>الموكل</th>
+          <th>التاريخ</th>
+          <th>تاريخ الإجراء</th>
+          <th>تاريخ المراجعة</th>
+          <th>ملاحظات</th>
+          <th>الـ ID</th>
+          <th>الإجراء</th>
+          <th>الإجراء القادم</th>
+          <th>مكان الملف</th>
+          <th>المحكمة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let record of paginatedRecords" class="hover:bg-base-200 transition-all">
+          <td>{{ record.code }}</td>
+          <td>{{ record.name }}</td>
+          <td>{{ record.status }}</td>
+          <td>{{ record.debtReason }}</td>
+          <td>{{ record.civilId }}</td>
+          <td>{{ record.autoId }}</td>
+          <td>{{ record.nationality }}</td>
+          <td>{{ record.batchNumber }}</td>
+          <td>{{ record.agent }}</td>
+          <td>{{ record.date | date : 'yyyy-MM-dd' }}</td>
+          <td>{{ record.actionDate | date : 'yyyy-MM-dd' }}</td>
+          <td>{{ record.reviewDate | date : 'yyyy-MM-dd' }}</td>
+          <td>{{ record.notes }}</td>
+          <td>{{ record.id }}</td>
+          <td>{{ record.action }}</td>
+          <td>{{ record.nextAction }}</td>
+          <td>{{ record.location }}</td>
+          <td>{{ record.court }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex justify-between items-center mt-4">
+    <button
+      class="btn btn-sm btn-outline"
+      (click)="prevPage()"
+      [disabled]="currentPage === 1"
+    >
+      السابق
+    </button>
+    <span class="font-semibold text-primary">
+      الصفحة {{ currentPage }} من
+      {{ Math.ceil(filteredRecords.length / pageSize) }}
+    </span>
+    <button
+      class="btn btn-sm btn-outline"
+      (click)="nextPage()"
+      [disabled]="currentPage * pageSize >= filteredRecords.length"
+    >
+      التالي
+    </button>
+  </div>
+
+  <!-- المودال -->
+  <app-lookup-modal (itemSelected)="onCourtSelected($event)"></app-lookup-modal>
+</div>

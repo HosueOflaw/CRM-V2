@@ -1,0 +1,68 @@
+<div
+  class="fixed right-0 h-screen w-64 bg-base-200 shadow-xl flex flex-col justify-center items-center transition-all duration-300 z-50 md:translate-x-0"
+  [class.translate-x-full]="isSidebarHidden"
+>
+  <!-- العنوان -->
+  <div class="absolute top-8 text-center w-full px-4">
+    <a [routerLink]="['/']" class="text-lg font-semibold text-primary">
+      🏛️ نظام الشركة
+    </a>
+  </div>
+
+  <!-- القوائم -->
+  <ul class="menu w-full px-4 text-right space-y-2 mt-10">
+    <li *ngFor="let dept of departments">
+      <a
+        [routerLink]="dept.route"
+        routerLinkActive="active"
+        class="flex items-center justify-between hover:bg-base-300 rounded-lg px-3 py-2 transition-all"
+      >
+        <span class="text-xl">{{ dept.icon }}</span>
+        <span class="font-medium">{{ dept.name }}</span>
+      </a>
+    </li>
+  </ul>
+
+  <!-- الوضع الليلي/النهاري -->
+  <div class="absolute bottom-16 w-full px-4 text-center">
+    <button
+      (click)="toggleTheme()"
+      class="w-full flex justify-between items-center bg-base-300 px-3 py-2 rounded-lg hover:bg-primary hover:text-white transition"
+    >
+      <span class="text-lg">
+        {{ currentTheme === 'dark' ? '☀️' : '🌙' }}
+      </span>
+      <span class="font-medium">
+        {{ currentTheme === 'dark' ? 'الوضع النهاري' : 'الوضع الليلي' }}
+      </span>
+    </button>
+  </div>
+
+  <!-- الإعدادات -->
+  <div class="settings absolute bottom-4 w-full px-4">
+    <a
+      routerLink="/settings"
+      routerLinkActive="active"
+      class="flex items-center justify-between hover:bg-error hover:text-white px-3 py-2 rounded-lg transition"
+    >
+      <span>⚙️</span>
+      <span class="font-medium">الإعدادات</span>
+    </a>
+  </div>
+</div>
+
+<!-- زر الموبايل -->
+<button
+  (click)="toggleSidebar()"
+  class="md:hidden fixed top-4 right-4 z-50 
+         w-9 h-9 flex items-center justify-center
+         rounded-full shadow-lg transition-all duration-300
+         bg-primary text-white hover:scale-110 hover:bg-primary-focus">
+  
+  <span
+    [class.rotate-90]="!isSidebarHidden"
+    class="transition-transform duration-300 text-2xl">
+    {{ isSidebarHidden ? '☰' : '✕' }}
+  </span>
+
+</button>

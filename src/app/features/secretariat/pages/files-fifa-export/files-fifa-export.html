@@ -1,0 +1,106 @@
+<div class="flex flex-col h-screen bg-gray-50 font-sans text-sm" >
+
+  <!-- ========================================== -->
+  <!-- 1. شريط العنوان والتبويبات (Header & Tabs) -->
+  <!-- ========================================== -->
+  <div class="bg-white border-b border-gray-300 flex justify-between items-end px-2 pt-2 shadow-sm" >
+    
+    <!-- العنوان -->
+    <div class="font-bold text-gray-700 pb-2 px-2">
+      {{title}}
+    </div>
+
+    <!-- التبويبات (Tabs) -->
+    <div class="tabs tabs-lifted tabs-sm -mb-px" style="direction: rtl;">
+      <!-- تبويب الرئيسية -->
+      <a class="tab tab-bordered" 
+         [class.tab-active]="activeTab === 1"
+         [class.font-bold]="activeTab === 1"
+         [class.bg-white]="activeTab === 1"
+         (click)="setActiveTab(1)">
+         الرئيسية
+      </a>
+      
+      <!-- تبويب الاخطاء -->
+      <a class="tab tab-bordered" 
+         [class.tab-active]="activeTab === 2"
+         [class.font-bold]="activeTab === 2"
+         [class.bg-white]="activeTab === 2"
+         (click)="setActiveTab(2)">
+         الاخطاء
+      </a>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. محتوى التبويب النشط (Toolbar Area)    -->
+  <!-- ========================================== -->
+  
+  <!-- A. شريط أدوات "الرئيسية" -->
+  <div *ngIf="activeTab === 1" class="bg-gray-100 border-b border-gray-300 p-2 flex justify-between items-center">
+    
+    <!-- الجهة اليسرى (كما في الصورة): زر Find وحقل البحث -->
+    <!-- استخدمنا ltr هنا لعكس الترتيب ليطابق الصورة تماماً (Find ثم الحقل) -->
+    <div class="flex items-center gap-1" dir="ltr">
+        <button class="btn btn-xs btn-outline bg-white px-4 rounded-none font-normal" (click)="searchMain()">
+            Find
+        </button>
+        
+        <div class="relative w-64">
+            <input type="text" 
+                   [(ngModel)]="mainSearchText"
+                   class="input input-xs input-bordered w-full rounded-none focus:outline-none pr-6" 
+                   placeholder="...Enter text to search" />
+            <!-- زر المسح X -->
+            <button *ngIf="mainSearchText" 
+                    class="absolute right-1 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+                    (click)="mainSearchText = ''">
+                ✕
+            </button>
+        </div>
+    </div>
+
+    <!-- الجهة اليمنى: التاريخ -->
+    <div class="flex items-center gap-2">
+        <input type="date" [(ngModel)]="selectedDate" class="input input-xs input-bordered rounded-none bg-white" />
+    </div>
+  </div>
+
+
+  <!-- B. شريط أدوات "الاخطاء" -->
+  <div *ngIf="activeTab === 2" class="bg-gray-100 border-b border-gray-300 p-2 flex items-center gap-2">
+    
+    <!-- الأزرار (على اليسار كما في الصورة) - نستخدم ltr لترتيبهم من اليسار -->
+    <div class="flex items-center gap-2 w-full" dir="ltr">
+        
+        <button class="btn btn-xs btn-outline bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 rounded-none font-normal border-gray-400" (click)="exportExcel()">
+            تصدير اكسيل
+        </button>
+
+        <button class="btn btn-xs btn-outline bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 rounded-none font-normal border-gray-400" (click)="deleteErrors()">
+            حذف الاخطاء
+        </button>
+
+        <button class="btn btn-xs btn-outline bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 rounded-none font-normal border-gray-400" (click)="showErrors()">
+            الاخطاء
+        </button>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- 3. شريط التجميع (Grouping Bar) -->
+  <!-- ========================================== -->
+  <div class="bg-gray-200 border-b border-gray-300 p-1 px-2 text-xs text-gray-500 flex items-center gap-2">
+    <!-- أيقونة البحث الصغيرة التي ظهرت في تبويب الأخطاء -->
+    <svg  xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+    
+    <span>Drag a column header here to group by that column</span>
+  </div>
+
+
+
+</div>

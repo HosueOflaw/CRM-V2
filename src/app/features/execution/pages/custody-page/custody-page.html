@@ -1,0 +1,33 @@
+<div class="page-container">
+  <app-go-back></app-go-back>
+  
+  <div class="page-header">
+    <h2>ادخال العهدة</h2>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs tabs-boxed">
+    <a class="tab" [class.tab-active]="activeTab === 'add'" (click)="setActiveTab('add')">إضافة كشف جديد</a>
+    <a class="tab" [class.tab-active]="activeTab === 'stopped'" (click)="setActiveTab('stopped')">الاستعلام عن الموقوف</a>
+    <a class="tab" [class.tab-active]="activeTab === 'report'" (click)="setActiveTab('report')">الاستعلام عن كشف</a>
+  </div>
+
+  <!-- Page Content -->
+  <div class="page-content">
+    <div class="flex flex-col lg:flex-row gap-6">
+
+      <!-- Left side (File Preview) -->
+      <div *ngIf="activeTab === 'add'" class="hidden lg:flex flex-col items-center justify-center w-1/3 page-section">
+        <h3 class="section-title">📄 معاينة الملف</h3>
+        <img src="assets/sample-file-preview.png" alt="File Preview" class="rounded-lg shadow-md max-h-96 object-contain" />
+      </div>
+
+      <!-- Right side (Dynamic content) -->
+      <div class="flex-1">
+        <app-add-a-statement *ngIf="activeTab === 'add'"></app-add-a-statement>
+        <app-inquiry-about-rejected *ngIf="activeTab === 'stopped'"></app-inquiry-about-rejected>
+        <app-inquiry-about-statement *ngIf="activeTab === 'report'"></app-inquiry-about-statement>
+      </div>
+    </div>
+  </div>
+</div>

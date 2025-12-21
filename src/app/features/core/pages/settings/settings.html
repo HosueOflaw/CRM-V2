@@ -1,0 +1,332 @@
+
+<div class="settings-page max-w-5xl mx-auto p-6">
+  <!-- العنوان -->
+  <div class="header flex items-center justify-between mb-6">
+      <app-go-back></app-go-back>
+
+    <div>
+      <h2 class="text-2xl font-bold" style="color: var(--primary-color);">الإعدادات</h2>
+      <p class="text-sm" style="color: var(--text-color-secondary);">تحكم في إعدادات حسابك وتفضيلات التطبيق</p>
+    </div>
+
+    <div class="meta text-sm" style="color: var(--text-color-secondary);">
+      <div *ngIf="savedAt">آخر حفظ: {{ savedAt }}</div>
+    </div>
+  </div>
+
+  <!-- الأزرار -->
+  <div class="flex justify-end gap-3 mb-6">
+    <button
+      type="button"
+      (click)="toggleNewUserForm()"
+      class="btn-primary px-4 py-2 rounded-lg transition"
+    >
+      + مستخدم جديد
+    </button>
+
+    <button
+      type="button"
+      (click)="toggleEditUserForm()"
+      class="btn-primary px-4 py-2 rounded-lg transition"
+    >
+      ✏️ تعديل المستخدم
+    </button>
+
+    <button
+  (click)="showPermissions = true"
+  class="btn-primary px-4 py-2 rounded-md transition"
+>
+  الصلاحيات
+    </button>
+
+  </div>
+  <!-- للصلاحيات المودال -->
+<div
+  *ngIf="showPermissions"
+  class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+>
+  <div class="rounded-xl shadow-lg w-[700px] p-6 relative" style="background: var(--surface-card); color: var(--text-color);">
+    <!-- رأس المودال -->
+    <h2 class="text-lg font-bold mb-4 text-center">الصلاحيات</h2>
+
+    <!-- نموذج الصلاحيات -->
+    <div class="grid grid-cols-3 gap-3 items-center mb-4">
+      <label class="col-span-1 text-sm font-semibold text-right">الموظف</label>
+      <input
+        type="text"
+        placeholder="اختر الموظف"
+        class="col-span-1 border rounded px-2 py-1"
+      />
+      <button class="bg-gray-300 px-3 py-1 rounded">...</button>
+
+      <label class="col-span-1 text-sm font-semibold text-right mt-2">القسم</label>
+      <select class="col-span-2 border rounded px-2 py-1 mt-2">
+        <option value="">اختر القسم</option>
+        <option value="admin">ADMIN</option>
+        <option value="etisal">الاتصالات</option>
+        <option value="mtdawel">المتداول</option>
+        <option value="malia">الادارة المالية</option>
+        <option value="mas2ol">المسئولين</option>
+        <option value="secretary">السكرتارية</option>
+        <option value="executive">التنفيذ</option>
+      </select>
+    </div>
+
+    <!-- أزرار البحث والإضافة -->
+    <div class="flex justify-end gap-2 mb-4">
+      <button class="btn-outline px-3 py-1 rounded">بحث</button>
+      <button class="btn-primary px-3 py-1 rounded">إضافة</button>
+    </div>
+
+    <!-- الجدول -->
+    <table class="w-full border text-sm text-center mb-4">
+      <thead style="background: var(--surface-section);">
+        <tr>
+          <th class="border px-2 py-1">إلغاء</th>
+          <th class="border px-2 py-1">القسم</th>
+          <th class="border px-2 py-1">الصلاحية</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of permissions">
+          <td class="border px-2 py-1">
+            <button class="text-red-500 hover:text-red-700">❌</button>
+          </td>
+          <td class="border px-2 py-1">{{ row.department }}</td>
+          <td class="border px-2 py-1">{{ row.role }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- الأزرار السفلية -->
+    <div class="flex justify-end gap-3">
+      <button
+        (click)="showPermissions = false"
+        class="btn-outline px-4 py-2 rounded"
+      >
+        إلغاء
+      </button>
+      <button
+        class="btn-primary px-4 py-2 rounded"
+      >
+        حفظ
+      </button>
+    </div>
+  </div>
+</div>
+
+  <!-- ⚙️ فورم الإعدادات العامة -->
+  <form (ngSubmit)="save()" [formGroup]="form" class="grid gap-6" *ngIf="!showNewUserForm && !showEditUserForm">
+    <section class="card p-4 rounded-xl bg-white shadow-sm">
+      <h3 class="text-lg font-semibold mb-3">معلومات الحساب</h3>
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">الاسم الظاهر</label>
+          <input
+            pInputText
+            formControlName="displayName"
+            type="text"
+            placeholder="اسمك"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">البريد الإلكتروني</label>
+          <input
+            pInputText
+            formControlName="email"
+            type="email"
+            placeholder="email@example.com"
+            class="form-input"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="card p-4 rounded-xl bg-white shadow-sm">
+      <h3 class="text-lg font-semibold mb-3">التفضيلات</h3>
+
+      <div class="grid gap-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="font-medium">الوضع الداكن</div>
+            <div class="text-sm" style="color: var(--text-color-secondary);">تبديل بين الوضع الفاتح والداكن</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" formControlName="darkMode" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="font-medium">الإشعارات</div>
+            <div class="text-sm" style="color: var(--text-color-secondary);">تفعيل أو تعطيل الإشعارات</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" formControlName="notifications" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">اللغة</label>
+          <select formControlName="language" class="form-select">
+            <option *ngFor="let option of languageOptions" [value]="option.value">{{ option.label }}</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <div class="form-actions">
+      <p-button
+        label="إعادة الافتراضي"
+        icon="pi pi-refresh"
+        severity="secondary"
+        (onClick)="reset()"
+      ></p-button>
+
+      <p-button
+        label="حفظ"
+        icon="pi pi-save"
+        type="submit"
+        severity="success"
+      ></p-button>
+    </div>
+  </form>
+
+  <!-- ✅ مودال إضافة مستخدم جديد -->
+  <div
+    *ngIf="showNewUserForm"
+    class="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50"
+  >
+    <div class="rounded-xl shadow-lg p-6 w-full max-w-2xl relative" style="background: var(--surface-card); color: var(--text-color);">
+      <button (click)="toggleNewUserForm()" class="absolute top-3 right-3 text-xl transition" style="color: var(--text-color-secondary);" onmouseover="this.style.color='var(--red-500, #ef4444)'" onmouseout="this.style.color='var(--text-color-secondary)'">
+        ×
+      </button>
+      <h3 class="text-xl font-bold mb-4 text-center" style="color: var(--primary-color);">إضافة موظف جديد</h3>
+
+      <form [formGroup]="newUserForm" (ngSubmit)="saveNewUser()" class="grid md:grid-cols-2 gap-4">
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">الاسم اللاتيني</span>
+          <input formControlName="latinName" type="text" class="input" />
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">الاسم العربي</span>
+          <input formControlName="arabicName" type="text" class="input" />
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">الرقم السري</span>
+          <input formControlName="password" type="password" class="input" />
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">Group</span>
+          <select formControlName="group" class="input">
+            <option *ngFor="let g of groups" [value]="g">{{ g }}</option>
+          </select>
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1" style="color: var(--text-color-secondary);">البريد الإلكتروني</span>
+          <input formControlName="email" type="email" placeholder="email@example.com" class="input" />
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">البدالة</span>
+          <select formControlName="active" class="input">
+            <option value="active">Active</option>
+            <option value="unactive">Unactive</option>
+          </select>
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">الهاتف</span>
+          <input formControlName="phone" type="text" class="input" />
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">تاريخ التوظيف</span>
+          <input formControlName="hireDate" type="date" class="input" />
+        </label>
+
+        <div class="flex justify-end gap-3 mt-4 md:col-span-2">
+          <button type="button" (click)="toggleNewUserForm()" class="btn-outline px-4 py-2 rounded-lg">
+            إلغاء
+          </button>
+          <button type="submit" class="btn-primary px-4 py-2 rounded-lg">حفظ المستخدم</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ✅ مودال تعديل المستخدم -->
+  <div
+    *ngIf="showEditUserForm"
+    class="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50"
+  >
+    <div class="rounded-xl shadow-lg p-6 w-full max-w-2xl relative" style="background: var(--surface-card); color: var(--text-color);">
+      <button (click)="toggleEditUserForm()" class="absolute top-3 right-3 text-xl transition" style="color: var(--text-color-secondary);" onmouseover="this.style.color='var(--red-500, #ef4444)'" onmouseout="this.style.color='var(--text-color-secondary)'">
+        ×
+      </button>
+
+      <h3 class="text-xl font-bold mb-4 text-center" style="color: var(--primary-color);">تعديل بيانات المستخدم</h3>
+
+      <form [formGroup]="editUserForm" (ngSubmit)="saveEditUser()" class="grid md:grid-cols-2 gap-4">
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">الاسم العربي</span>
+          <input formControlName="arabicName" type="text" class="input" />
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">كلمة المرور القديمة</span>
+          <input formControlName="oldPassword" type="password" class="input" />
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">كلمة المرور الجديدة</span>
+          <input formControlName="newPassword" type="password" class="input" />
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">تأكيد كلمة المرور</span>
+          <input formControlName="confirmPassword" type="password" class="input" />
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">الهاتف</span>
+          <input formControlName="phone" type="text" class="input" />
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">البدالة</span>
+          <input formControlName="internal" type="text" class="input" />
+        </label>
+
+        <!-- رفع PDF -->
+        <div class="flex flex-col md:col-span-2 mt-2">
+          <label
+            class="upload-box cursor-pointer border rounded-lg p-3 text-center transition"
+            style="border-color: var(--surface-border); background: var(--surface-ground);"
+          >
+            📄 اضغط هنا لرفع ملف PDF
+            <input type="file" (change)="onFileSelected($event)" accept="application/pdf" hidden />
+          </label>
+          <p *ngIf="uploadedFileName" class="text-sm mt-1" style="color: var(--text-color-secondary);">
+            الملف المحدد: {{ uploadedFileName }}
+          </p>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-4 md:col-span-2">
+          <button type="button" (click)="toggleEditUserForm()" class="btn-outline px-4 py-2 rounded-lg">
+            إلغاء
+          </button>
+          <button type="submit" class="btn-primary px-4 py-2 rounded-lg">تأكيد التعديل</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

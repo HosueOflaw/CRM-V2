@@ -1,0 +1,12 @@
+.page-container {
+  direction: rtl;
+}
+
+button {
+  font-weight: 500;
+}
+
+table {
+  border-radius: 8px;
+  overflow: hidden;
+}

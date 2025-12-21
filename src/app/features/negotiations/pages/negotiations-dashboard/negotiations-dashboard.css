@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  direction: rtl;
+}
+
+h1 {
+  margin-bottom: 1rem;
+}
+.search label,
+select,
+.table td,
+.table td li a{
+    background-color: var(--card-bg);
+  color: var(--text);
+}
+
+  

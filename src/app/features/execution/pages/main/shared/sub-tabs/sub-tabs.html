@@ -1,0 +1,10 @@
+<div class="tabs">
+  <a
+    *ngFor="let tab of tabs"
+    (click)="selectTab(tab)"
+    class="tab tab-bordered"
+    [class.tab-active]="tab === selectedTab"
+  >
+    {{ tab }}
+  </a>
+</div>

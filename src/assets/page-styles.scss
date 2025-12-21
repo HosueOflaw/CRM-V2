@@ -1,0 +1,165 @@
+/* Page Container Styles - Unified Layout */
+
+.page-container {
+  padding: 1.5rem;
+  min-height: calc(100vh - 8rem);
+  background: var(--surface-ground);
+  direction: rtl;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--surface-border);
+  
+  h1, h2, h3 {
+    margin: 0;
+    color: var(--text-color);
+    font-weight: 600;
+  }
+  
+  .page-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+}
+
+.page-content {
+  background: var(--surface-card);
+  border-radius: var(--content-border-radius);
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.page-section {
+  margin-bottom: 2rem;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  .section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--surface-border);
+  }
+}
+
+/* Card Styles */
+.card {
+  background: var(--surface-card);
+  border-radius: var(--content-border-radius);
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--surface-border);
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--surface-border);
+    
+    h3, h4 {
+      margin: 0;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+  }
+  
+  .card-body {
+    margin-bottom: 1rem;
+  }
+  
+  .card-footer {
+    padding-top: 1rem;
+    border-top: 1px solid var(--surface-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+}
+
+/* Table Container */
+.table-container {
+  overflow-x: auto;
+  border-radius: var(--content-border-radius);
+  border: 1px solid var(--surface-border);
+  
+  .table {
+    width: 100%;
+    min-width: 600px;
+  }
+}
+
+/* Search/Filter Section */
+.search-section {
+  background: var(--surface-card);
+  border-radius: var(--content-border-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  .search-filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .search-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 1rem;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    
+    .page-actions {
+      width: 100%;
+      flex-direction: column;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+  
+  .page-content {
+    padding: 1rem;
+  }
+  
+  .search-section {
+    padding: 1rem;
+    
+    .search-filters {
+      grid-template-columns: 1fr;
+    }
+    
+    .search-actions {
+      flex-direction: column;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+

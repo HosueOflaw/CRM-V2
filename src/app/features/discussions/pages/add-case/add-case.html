@@ -1,0 +1,12 @@
+<div class="flex h-screen bg-base-200 p-4 gap-4">
+  <!-- Left: Parties Table -->
+  <div class="flex-1 bg-base-100 shadow rounded-2xl p-4 overflow-y-auto">
+    <app-case-parties-table [showTransferTabs]="showTransferTabs"></app-case-parties-table>
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- Right: Case Form -->
+  <div class="w-1/2 bg-base-100 shadow rounded-2xl p-4 flex flex-col right-form">
+    <app-case-form></app-case-form>
+  </div>
+</div>

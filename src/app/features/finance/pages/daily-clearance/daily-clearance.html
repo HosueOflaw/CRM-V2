@@ -1,0 +1,150 @@
+<div class="p-6" style="direction: rtl;">
+
+  <!-- عنوان + زر رجوع -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">استعلام عن الكشوف المستلمة</h2>
+    <button class="btn btn-outline btn-error" (click)="goBack()">رجوع</button>
+  </div>
+
+  <!-- Row: Input + Search -->
+  <div class="flex items-center gap-3 mb-6">
+    <input type="text"
+           placeholder="رقم العهدة"
+           class="input input-bordered w-64 text-right"
+           [(ngModel)]="custodyNumber">
+
+    <button class="btn btn-primary" (click)="search()">بحث</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="grid grid-cols-4 gap-4">
+
+    <!-- Table Section (3/4 width) -->
+    <div class="col-span-3 border rounded-xl p-3 h-[600px] overflow-auto bg-white">
+      
+      <!-- Search inside table -->
+      <div class="flex justify-end mb-3">
+        <input class="input input-bordered w-64 text-right"
+               [(ngModel)]="tableSearch"
+               placeholder="بحث داخل الجدول">
+      </div>
+
+      <!-- Table -->
+      <table class="table table-zebra text-right">
+        <thead>
+          <tr>
+            <th>م</th>
+            <th>الشركة / الموكل</th>
+            <th>رقم الكشف</th>
+            <th>تاريخ الكشف</th>
+            <th>المبلغ</th>
+            <th>تتحمله الشركة</th>
+            <th>يتحمله المكتب</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let row of filteredRows; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ row.company }}</td>
+            <td>{{ row.sheetNumber }}</td>
+            <td>{{ row.date }}</td>
+            <td>{{ row.amount }}</td>
+            <td>{{ row.companyPay }}</td>
+            <td>{{ row.officePay }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+    <!-- Total Summary Right -->
+    <div class="border rounded-xl p-4 bg-gray-50">
+
+      <p class="text-lg font-bold mb-2">البيانات المالية</p>
+
+      <div class="space-y-2 text-right">
+        <p>تاريخ الاستلام: <span class="font-bold">{{ receiveDate }}</span></p>
+        <p>صافي العهدة المستلمة: <span class="font-bold">{{ netReceived }}</span></p>
+        <p>اجمالي المصروف: <span class="font-bold">{{ totalExpenses }}</span></p>
+
+        <hr class="my-3">
+
+        <p class="text-xl font-bold">المستحق: {{ dueAmount }}</p>
+      </div>
+
+      <hr class="my-4">
+
+      <button class="btn btn-success w-full"  (click)="openPrintDialog()">
+        طباعة التقرير
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+<!-- REPORT Component / Modal -->
+<dialog #printModal class="modal">
+  <div class="modal-box w-full max-w-6xl p-6">
+    
+    <!-- Header -->
+    <div class="text-center mb-6">
+      <img src="Logo.png" alt="Logo" class="w-full h-full object-contain mb-2">
+      <h1 class="text-3xl font-bold">كشف تصفية عهدة</h1>
+    </div>
+
+    <!-- Employee Info -->
+    <div class="flex justify-between mb-4 text-right">
+      <div>الاسم: <span class="font-bold">{{ selectedEmployee.name || '---' }}</span></div>
+      <div>قيد رقم: <span class="font-bold">{{ custodyNumber }}</span></div>
+      <div>التاريخ: <span class="font-bold">{{ receiveDate }}</span></div>
+    </div>
+
+    <!-- Table Header -->
+    <table class="table w-full table-zebra mb-4 text-right">
+      <thead>
+        <tr>
+          <th>م</th>
+          <th>اسم الشركة</th>
+          <th>رقم الكشف</th>
+          <th>التاريخ</th>
+          <th>المبلغ</th>
+          <th>تتحملها الشركة</th>
+          <th>يتحملها المكتب</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of filteredRows; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ row.company }}</td>
+          <td>{{ row.sheetNumber }}</td>
+          <td>{{ row.date }}</td>
+          <td>{{ row.amount }}</td>
+          <td>{{ row.companyPay }}</td>
+          <td>{{ row.officePay }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div class="grid grid-cols-3 text-right mb-6">
+      <div>اجمالى المصروفات: <span class="font-bold">{{ totalExpenses }}</span></div>
+      <div>صافى العهدة المستلمة: <span class="font-bold">{{ netReceived }}</span></div>
+      <div>المستحق: <span class="font-bold">{{ dueAmount }}</span></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="grid grid-cols-3 text-right mt-12">
+      <div>الادارة</div>
+      <div>روجع</div>
+      <div>الموظف</div>
+    </div>
+
+    <div class="modal-action mt-4">
+      <button class="btn btn-outline" (click)="closePrintDialog()">إغلاق</button>
+      <button class="btn btn-primary" (click)="printModalContent()">طباعة</button>
+    </div>
+
+  </div>
+</dialog>

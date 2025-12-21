@@ -1,0 +1,41 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-base-200 to-base-300">
+  <div class="card w-full max-w-sm shadow-2xl bg-blue-900 text-white rounded-2xl p-6 relative">
+   <app-go-back></app-go-back>
+
+    <h2 class="text-center text-lg font-semibold mb-2">
+      مصادقة هويتى
+    </h2>
+    <p class="text-center text-sm text-blue-100 mb-4">
+      بيت القانون
+    </p>
+
+    <form (ngSubmit)="onSubmit()" class="space-y-3">
+      <label class="block text-sm mb-1">الرقم المدني</label>
+      <input
+        type="text"
+        maxlength="12"
+        type="text"
+        class="input input-bordered w-full text-center tracking-widest text-lg text-black rounded-lg"
+        [(ngModel)]="civilId"
+        name="civilId"
+        required
+      />
+
+
+      <label class="flex items-center space-x-2 mt-2">
+        <input type="checkbox" class="checkbox checkbox-sm" [(ngModel)]="personalLogin" name="personalLogin" />
+        <span class="text-sm">دخول شخصي؟</span>
+      </label>
+
+      <button type="submit" class="btn btn-info w-full text-base font-semibold mt-3 rounded-full">
+        إرسال طلب المصادقة
+      </button>
+
+      <div class="bg-yellow-100 text-yellow-800 text-sm p-2 rounded-lg mt-2 text-center">
+        سيتم إرسال طلب مصادقة إلى تطبيق هويتي، للتمكن من الدخول لبوابة الخدمة يجب المصادقة.
+      </div>
+    </form>
+
+
+  </div>
+</div>

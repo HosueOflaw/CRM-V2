@@ -1,0 +1,5 @@
+:host {
+  --main-color: #007bff;
+  --main-hover: #0056b3;
+  --bg-gradient: linear-gradient(135deg, #1a237e, #3949ab);
+}

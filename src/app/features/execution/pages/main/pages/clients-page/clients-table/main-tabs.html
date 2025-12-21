@@ -1,0 +1,109 @@
+<div class="card">
+  <div class="card-header">
+    <h3>تفاصيل الملف</h3>
+  </div>
+  
+  <div class="card-body">
+    <!-- Tabs -->
+    <div class="tabs">
+      <a
+        class="tab tab-bordered"
+        [class.tab-active]="activeTab === 'procedures'"
+        (click)="activeTab = 'procedures'"
+      >الاجراءات</a>
+      <a
+        class="tab tab-bordered"
+        [class.tab-active]="activeTab === 'statement'"
+        (click)="activeTab = 'statement'"
+      >الافادات</a>
+      <a
+        class="tab tab-bordered"
+        [class.tab-active]="activeTab === 'comm_statements'"
+        (click)="activeTab = 'comm_statements'"
+      >افادات الاتصالات</a>
+      <a
+        class="tab tab-bordered"
+        [class.tab-active]="activeTab === 'trader_statements'"
+        (click)="activeTab = 'trader_statements'"
+      >افادات المتداول</a>
+      <a
+        class="tab tab-bordered"
+        [class.tab-active]="activeTab === 'autoNumbers'"
+        (click)="activeTab = 'autoNumbers'"
+      >الارقام الالية</a>
+      <a
+        class="tab tab-bordered"
+        [class.tab-active]="activeTab === 'results_search'"
+        (click)="activeTab = 'results_search'"
+      >نتائج البحث</a>
+      <a
+        class="tab tab-bordered"
+        [class.tab-active]="activeTab === 'records'"
+        (click)="activeTab = 'records'"
+      >السجل</a>
+      <a
+        class="tab tab-bordered"
+        [class.tab-active]="activeTab === 'secrtaria_records'"
+        (click)="activeTab = 'secrtaria_records'"
+      >سجل السكرتارية</a>
+      <a
+        class="tab tab-bordered"
+        [class.tab-active]="activeTab === 'justice_gate'"
+        (click)="activeTab = 'justice_gate'"
+      >بوابة العدل</a>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="mt-4">
+      <div *ngIf="activeTab === 'statement' || activeTab === 'procedures'">
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>التاريخ</th>
+                <th>آخر إجراء</th>
+                <th>تاريخ آخر إجراء</th>
+                <th>الإجراء القادم</th>
+                <th>تاريخ الإجراء القادم</th>
+                <th>مكان الملف</th>
+                <th>ملاحظات</th>
+                <th>المستخدم</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div *ngIf="activeTab === 'comm_statements'" class="page-section">
+        <p>افادات الاتصالات</p>
+      </div>
+
+      <div *ngIf="activeTab === 'trader_statements'" class="page-section">
+        <p>افادات المتداول</p>
+      </div>
+      
+      <div *ngIf="activeTab === 'autoNumbers'" class="page-section">
+        <p>الارقام الالية</p>
+      </div>
+      
+      <div *ngIf="activeTab === 'results_search'" class="page-section">
+        <p>نتائج البحث</p>
+      </div>
+      
+      <div *ngIf="activeTab === 'records'" class="page-section">
+        <p>السجل</p>
+      </div>
+      
+      <div *ngIf="activeTab === 'secrtaria_records'" class="page-section">
+        <p>سجل السكرتارية</p>
+      </div>
+      
+      <div *ngIf="activeTab === 'justice_gate'" class="page-section">
+        <p>بوابة العدل</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,120 @@
+<div class="p-6 bg-base-200 min-h-screen">
+  <h1 class="text-2xl font-bold mb-6 text-center text-primary">
+    مراجعة الملفات
+  </h1>
+
+  <!-- Filters Section -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div>
+      <label class="block font-semibold mb-1">تاريخ الإدخال</label>
+      <input
+        type="date"
+        class="input input-bordered w-full"
+        [(ngModel)]="startDate"
+        (change)="applyFilters()"
+      />
+    </div>
+    <div>
+      <label class="block font-semibold mb-1">تاريخ الإجراء</label>
+      <input
+        type="date"
+        class="input input-bordered w-full"
+        [(ngModel)]="endDate"
+        (change)="applyFilters()"
+      />
+    </div>
+    <div>
+      <label class="block font-semibold mb-1">تاريخ المراجعة</label>
+      <input
+        type="date"
+        class="input input-bordered w-full"
+        [(ngModel)]="reviewDate"
+      />
+    </div>
+    <div>
+      <label class="block font-semibold mb-1">بحث</label>
+      <input
+        type="text"
+        placeholder="ابحث بالاسم أو الكود أو الوكيل..."
+        class="input input-bordered w-full"
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+      />
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="overflow-x-auto bg-base-100 rounded-xl shadow">
+    <table class="table w-full text-sm">
+      <thead class="bg-base-300 text-base font-semibold">
+        <tr>
+          <th>الكود</th>
+          <th>الاسم</th>
+          <th>الحالة</th>
+          <th>سبب المديونية</th>
+          <th>المدني</th>
+          <th>الآلي</th>
+          <th>الجنسية</th>
+          <th>رقم الباتش</th>
+          <th>الموكّل</th>
+          <th>التاريخ</th>
+          <th>تاريخ الإجراء</th>
+          <th>تاريخ المراجعة</th>
+          <th>ملاحظات</th>
+          <th>ID</th>
+          <th>الإجراء</th>
+          <th>الإجراء القادم</th>
+          <th>مكان الملف</th>
+          <th>المحكمة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let record of paginatedRecords"
+          class="hover:bg-base-200 transition-all"
+        >
+          <td>{{ record.code }}</td>
+          <td>{{ record.name }}</td>
+          <td>{{ record.status }}</td>
+          <td>{{ record.debtReason }}</td>
+          <td>{{ record.civilId }}</td>
+          <td>{{ record.systemNo }}</td>
+          <td>{{ record.nationality }}</td>
+          <td>{{ record.batchNo }}</td>
+          <td>{{ record.agent }}</td>
+          <td>{{ record.date | date : 'yyyy-MM-dd' }}</td>
+          <td>{{ record.actionDate | date : 'yyyy-MM-dd' }}</td>
+          <td>{{ record.reviewDate | date : 'yyyy-MM-dd' }}</td>
+          <td>{{ record.notes }}</td>
+          <td>{{ record.id }}</td>
+          <td>{{ record.action }}</td>
+          <td>{{ record.nextAction }}</td>
+          <td>{{ record.fileLocation }}</td>
+          <td>{{ record.court }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex justify-between items-center mt-4">
+    <button
+      class="btn btn-sm btn-outline"
+      (click)="prevPage()"
+      [disabled]="currentPage === 1"
+    >
+      السابق
+    </button>
+    <span class="font-semibold text-primary"
+      >الصفحة {{ currentPage }} من
+      {{ 1 }}</span
+    >
+    <button
+      class="btn btn-sm btn-outline"
+      (click)="nextPage()"
+      [disabled]="currentPage * pageSize >= filteredRecords.length"
+    >
+      التالي
+    </button>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="p-8 bg-white shadow-xl max-w-4xl mx-auto print-area" dir="rtl">
+  <div class="border-4 border-double border-gray-800 p-6">
+    
+    <!-- Header Section -->
+    <header class="flex justify-between items-center border-b-2 border-gray-800 pb-4 mb-6">
+      <div class="text-right">
+        <h1 class="text-2xl font-bold text-gray-800">{{ lawFirmName }}</h1>
+        <p class="text-sm text-gray-600">Lawyer & Legal Consultancy</p>
+      </div>
+      <div class="text-left">
+        <!-- Placeholder for Logo -->
+        <div class="text-4xl font-serif text-gray-800">بيت القانون</div>
+      </div>
+    </header>
+
+    <!-- Document Title and Date -->
+    <div class="flex justify-between items-start mb-8">
+      <div class="bg-green-700 text-white text-xl font-bold p-3 rounded-lg shadow-lg">
+        تكليف بالوفاء
+      </div>
+      <div class="text-sm text-gray-700">
+        مسجل: {{ currentDate }}
+      </div>
+    </div>
+
+    <!-- Recipient Information -->
+    <div class="text-right mb-6">
+      <p class="text-lg font-semibold">المحترم،</p>
+      <p class="text-xl font-bold mt-4">السيد / {{ clientData.clientName || 'اسم العميل' }}</p>
+      <p class="text-md">المبولة - قطعة 6 - قسيمة 254</p>
+    </div>
+
+    <!-- Subject and Amounts -->
+    <div class="text-right mb-8 leading-loose">
+      <p class="text-lg font-bold">الموضوع : مطالبة بمبلغ {{ (clientData.claimValue ?? 0) | number:'1.3-3' }} د.ك</p>
+      <p>بما أنكم مدينون لموكلينـا السادة / **{{ clientData.agentName || 'stc - شركة الاتصالات الكويتية' }}**</p>
+      <p>بمبلغ وقدره {{ (clientData.claimValue ?? 0) | number:'1.3-3' }} (فقط صفر لاغير) المستحقة للشركة بموجب العقد رقم **{{ clientData.contractNumber || '1000173537' }}**</p>
+    </div>
+
+    <!-- Body Text -->
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-extrabold text-gray-900">لذلك</h2>
+    </div>
+
+    <div class="text-justify text-lg leading-relaxed space-y-4">
+      <p>وحرصاً على استمرار العلاقة الطيبة التي تربطكم بـ **{{ clientData.agentName || 'stc - شركة الاتصالات الكويتية' }}** ولحمايتكم من الإجراءات القضائية والتنفيذية نرجوا أن تتفضلوا بالسداد في أقرب فرع إليكم أو التواصل معنا من أجل الاتفاق على تسوية مناسبة بعيداً عن ساحات المحاكم علماً بأنه قد تم تسجيل طلب استصدار حكم ضدكم برقم آلي **{{ clientData.caseNumber || '140268930' }}** وفي حالة عدم السداد خلال خمسة أيام من تاريخه سنضطر آسفين لاتخاذ الإجراءات القانونية ضدكم ومن ذلك استصدار حكم ضدكم (أمر أداء) وإلزامكم بأداء المبلغ المستحق عليكم.</p>
+      <p>اتخاذ كافة الإجراءات التنفيذية التي منها على سبيل المثال لا الحصر:</p>
+      <ul class="list-disc list-inside mr-4">
+        <li>منعكم من السفر خارج الكويت.</li>
+        <li>الحجز على أرصدتكم في كافة البنوك.</li>
+        <li>الحجز على جميع السيارات المسجلة باسمكم لدى الإدارة العامة للمرور.</li>
+      </ul>
+      <p>وذلك وفقاً للمبلغ المستحق عليكم ومع تحميلكم بالإضافة إلى أصل المبلغ المستحق عليكم .. كافة الرسوم والمصروفات. راجين عدم إرغامنا على مباشرة هذه الإجراءات.</p>
+    </div>
+
+    <!-- Signature and Note -->
+    <div class="flex justify-between items-end mt-12">
+      <div class="text-right">
+        <p class="text-sm">ملاحظة: في حالة وصول هذا الخطاب بعد سداد المبلغ المطلوب نرجو قبول اعتذارنا واعتبار الخطاب كأن لم يكن.</p>
+      </div>
+      <div class="text-center">
+        <p class="text-lg font-semibold">مع تحيات،</p>
+        <p class="text-xl font-bold border-t border-gray-800 pt-1">أسرة بيت القانون</p>
+      </div>
+    </div>
+
+    <!-- Footer Contact -->
+    <footer class="text-center mt-12 pt-4 border-t-2 border-gray-800">
+      <p class="text-sm mb-2">للمراجعة يرجى الاتصال على :</p>
+      <p class="text-3xl font-extrabold text-gray-800 mb-4">{{ lawFirmPhone }}</p>
+      <p class="text-xs">{{ lawFirmAddress }}</p>
+      <p class="text-xs">www.HouseofLaw.com.kw</p>
+    </footer>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+<div dir="rtl" class="flex flex-col h-screen bg-gray-50 font-sans text-sm">
+
+  <!-- ========================================== -->
+  <!-- 1. الشريط العلوي (العنوان والأدوات)      -->
+  <!-- ========================================== -->
+  <div class="bg-white border-b border-gray-300 p-2 flex justify-between items-center shadow-sm">
+    
+    <!-- العنوان (يمين الشاشة) -->
+    <div class="font-bold text-gray-700 px-2 border-l border-gray-300">
+      طباعة تكاليف بالوفاء
+    </div>
+
+    <!-- الأدوات (يسار الشاشة) -->
+    <div class="flex items-center gap-2">
+      
+      <!-- التاريخ -->
+      <div class="flex items-center gap-2 bg-gray-100 px-2 py-1 rounded border border-gray-200">
+        <label class="font-bold text-gray-600 text-xs">تاريخ البعثية</label>
+        <input type="date" 
+               [(ngModel)]="selectedDate" 
+               class="input input-xs input-ghost focus:bg-white h-6 p-0" />
+      </div>
+
+      <!-- زر إكسل -->
+      <button class="btn btn-sm btn-outline bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 font-normal border-gray-300 rounded-sm h-8 min-h-0" 
+              (click)="exportExcel()">
+        اكسيل
+      </button>
+
+      <!-- زر تكاليف -->
+      <button class="btn btn-sm btn-outline bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 font-normal border-gray-300 rounded-sm h-8 min-h-0" 
+              (click)="showCosts()">
+        تكاليف
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. شريط البحث (ممتد بالعرض)              -->
+  <!-- ========================================== -->
+  <div class="bg-white p-1 border-b border-gray-300">
+    <div class="relative w-full">
+      <!-- أيقونة البحث -->
+      <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <!-- حقل البحث -->
+      <input type="text" 
+             [(ngModel)]="searchText"
+             class="input input-sm input-bordered w-full pr-10 bg-white focus:outline-none rounded-none border-gray-300" 
+             placeholder="" />
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 3. شريط التجميع (Grouping Bar)           -->
+  <!-- ========================================== -->
+  <div class="bg-gray-200 border-b border-gray-300 p-1 px-4 text-xs text-gray-500 select-none">
+    Drag a column header here to group by that column
+  </div>
+</div>

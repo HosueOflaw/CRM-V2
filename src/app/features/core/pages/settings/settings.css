@@ -1,0 +1,106 @@
+/* عام */
+.settings-page {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+  min-height: calc(100vh - 120px);
+  background: var(--surface-ground);
+  color: var(--text-color);
+}
+
+/* card */
+.card {
+  border-radius: 12px;
+  background: var(--surface-card);
+  color: var(--text-color);
+  border: 1px solid var(--surface-border);
+}
+
+/* input base */
+.input {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface-card);
+  color: var(--text-color);
+  outline: none;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+
+.input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 59, 130, 246), 0.1);
+}
+
+/* Daisy-like buttons (light weight) */
+.btn-primary {
+  background: var(--primary-color);
+  color: var(--primary-contrast-color, #ffffff);
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid var(--surface-border);
+  color: var(--text-color);
+  transition: all 0.2s;
+}
+
+.btn-outline:hover {
+  background: var(--surface-hover);
+}
+
+/* switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 26px;
+}
+.switch input {
+  display: none;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: var(--surface-300, #cbd5e1);
+  border-radius: 999px;
+  inset: 0;
+  transition: background-color .2s ease;
+}
+.slider::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: 18px;
+  height: 18px;
+  background: var(--surface-card, #ffffff);
+  border-radius: 50%;
+  transition: transform .2s ease;
+}
+/* when checked */
+.switch input:checked + .slider {
+  background: var(--primary-color);
+}
+.switch input:checked + .slider::after {
+  transform: translateX(20px);
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .settings-page { padding: 1.5rem; }
+  .header { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+}

@@ -1,0 +1,31 @@
+<dialog #modal class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg mb-3">🕓 اختر آخر إجراء</h3>
+
+    <div *ngFor="let act of actions" class="flex items-center gap-2 mb-2">
+      <input type="radio" name="action" [value]="act.id" [(ngModel)]="selectedActionId" />
+      <span>{{ act.name }}</span>
+    </div>
+
+    <div *ngIf="selectedActionId" class="mt-4">
+      <table class="table table-sm w-full">
+        <thead>
+          <tr>
+            <th>الوصف</th>
+            <th>الموظف</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of selectedData" (click)="selectRow(row)" class="cursor-pointer hover:bg-gray-100">
+            <td>{{ row.desc }}</td>
+            <td>{{ row.officer }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal-action">
+      <button class="btn" (click)="close()">إغلاق</button>
+    </div>
+  </div>
+</dialog>

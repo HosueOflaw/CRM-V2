@@ -1,0 +1,65 @@
+<app-go-back></app-go-back>
+<div class="p-6 bg-base-200 min-h-screen flex flex-col gap-6">
+  <h2 class="text-2xl font-bold text-center text-primary">{{ title }}</h2>
+
+  <form [formGroup]="filterForm" class="bg-white p-6 rounded-xl shadow flex flex-wrap gap-4 justify-center items-end">
+    <div>
+      <label class="label text-gray-700 font-semibold">{{ filterLabel }}</label>
+      <div class="flex gap-2">
+        <input
+          type="text"
+          formControlName="court"
+          class="input input-bordered w-64"
+          placeholder="اختر..."
+          readonly
+        />
+        <button type="button" class="btn btn-outline" (click)="openModal()">📋 اختيار</button>
+      </div>
+    </div>
+
+    <div class="flex gap-2 mt-4">
+      <button type="button" class="btn btn-primary" (click)="searchByCourt()">🔍 بحث</button>
+      <button type="button" class="btn btn-outline" (click)="reset()">↩️ تراجع</button>
+    </div>
+  </form>
+
+  <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow">
+    <input
+      [(ngModel)]="searchText"
+      (input)="autoSearch()"
+      [placeholder]="searchPlaceholder"
+      class="input input-bordered w-1/2"
+    />
+    <button class="btn btn-success" (click)="exportToExcel()">📥 تحميل Excel</button>
+  </div>
+
+  <div class="overflow-x-auto bg-white rounded-xl shadow">
+    <table class="table table-zebra w-full text-sm">
+      <thead>
+        <tr class="bg-base-100 text-gray-700">
+          <th *ngFor="let col of columns">{{ col.header }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of filteredResults">
+          <td *ngFor="let col of columns">{{ r[col.field] }}</td>
+        </tr>
+
+        <tr *ngIf="filteredResults.length === 0">
+          <td [attr.colspan]="columns.length" class="text-center text-gray-500 py-6">
+            لا توجد بيانات مطابقة 🔍
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 🔹 Lookup Modal -->
+  <app-lookup-modal
+    #lookup
+    [title]="lookupConfig.title"
+    [columns]="lookupConfig.columns"
+    [data]="lookupConfig.data"
+    (itemSelected)="handleSelect($event)"
+  ></app-lookup-modal>
+</div>

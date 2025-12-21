@@ -1,0 +1,144 @@
+<div class="p-4 space-y-6">
+  <!-- البحث -->
+  <form class="grid grid-cols-6 gap-4 bg-white p-4 rounded-2xl shadow" style="
+    direction: rtl;
+">
+    <!-- المحكمة -->
+    <div class="col-span-2">
+      <label class="block text-sm font-medium mb-1">المحكمة</label>
+      <select
+        class="w-full border rounded-lg p-2"
+        [(ngModel)]="formData.court"
+        name="court"
+      >
+        <option value="">اختر المحكمة</option>
+        <option *ngFor="let court of courts" [value]="court.id">
+          {{ court.name }}
+        </option>
+      </select>
+    </div>
+
+    <!-- الصفة -->
+    <div >
+      <label class="block text-sm font-medium mb-1">الصفة</label>
+      <select
+        class="w-full border rounded-lg p-2"
+        [(ngModel)]="formData.role"
+        name="role"
+        [disabled]="!formData.court"
+      >
+        <option value="">اختر الصفة</option>
+        <option *ngFor="let role of roles" [value]="role.id">
+          {{ role.name }}
+        </option>
+      </select>
+    </div>
+
+    <!-- القرار -->
+    <div>
+      <label class="block text-sm font-medium mb-1">القرار</label>
+      <select
+        class="w-full border rounded-lg p-2"
+        [(ngModel)]="formData.decision"
+        name="decision"
+      >
+        <option value="">اختر القرار</option>
+        <option *ngFor="let d of decisions" [value]="d.id">
+          {{ d.name }}
+        </option>
+      </select>
+    </div>
+
+    <!-- نوع الجلسة -->
+    <div>
+      <label class="block text-sm font-medium mb-1">نوع الجلسة</label>
+      <select
+        class="w-full border rounded-lg p-2"
+        [(ngModel)]="formData.sessionType"
+        name="sessionType"
+      >
+        <option value="">اختر نوع الجلسة</option>
+        <option *ngFor="let s of sessionTypes" [value]="s.id">
+          {{ s.name }}
+        </option>
+      </select>
+    </div>
+
+    <!-- من تاريخ -->
+    <div>
+      <label class="block text-sm font-medium mb-1">من تاريخ</label>
+      <input
+        type="date"
+        class="w-full border rounded-lg p-2"
+        [(ngModel)]="formData.fromDate"
+        name="fromDate"
+      />
+    </div>
+
+    <!-- إلى تاريخ -->
+    <div>
+      <label class="block text-sm font-medium mb-1">إلى تاريخ</label>
+      <input
+        type="date"
+        class="w-full border rounded-lg p-2"
+        [(ngModel)]="formData.toDate"
+        name="toDate"
+      />
+    </div>
+
+    <!-- الأزرار -->
+    <div class="col-span-6 flex flex-wrap gap-2 justify-end mt-2">
+      <button
+        type="button"
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        (click)="search('محكمة')"
+      >
+        جلسات المحكمة
+      </button>
+      <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg" (click)="search('خبراء')">جلسات الخبراء</button>
+      <button class="bg-teal-600 text-white px-4 py-2 rounded-lg" (click)="search('إدارية')">الأعمال الإدارية</button>
+      <button class="bg-orange-600 text-white px-4 py-2 rounded-lg" (click)="search('نيابة')">رول النيابة العامة</button>
+      <button class="bg-red-600 text-white px-4 py-2 rounded-lg" (click)="search('مخافر')">رول المخافر</button>
+      <button class="bg-gray-500 text-white px-4 py-2 rounded-lg" type="reset">تراجع</button>
+    </div>
+  </form>
+
+  <!-- Tabs -->
+  <div style="direction: rtl;">
+    <ul class="flex border-b">
+      <li
+        *ngFor="let tab of tabs"
+        (click)="activeTab = tab.key"
+        class="cursor-pointer px-4 py-2"
+        [class.border-b-2]="activeTab === tab.key"
+        [class.border-blue-600]="activeTab === tab.key"
+      >
+        {{ tab.label }}
+      </li>
+    </ul>
+
+    <!-- المحتوى -->
+    <div class="mt-4 bg-white p-4 rounded-xl shadow">
+      <table *ngIf="activeTabData.length" class="w-full text-sm border">
+        <thead class="bg-gray-100">
+          <tr>
+            <th *ngFor="let col of columns" class="p-2 border text-right">
+              {{ col }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of activeTabData" class="border-b hover:bg-gray-50">
+            <td *ngFor="let col of columns" class="p-2 border text-right">
+              {{ row[col] || '-' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="!activeTabData.length" class="text-center text-gray-500 py-8">
+        لا توجد بيانات
+      </div>
+    </div>
+  </div>
+</div>

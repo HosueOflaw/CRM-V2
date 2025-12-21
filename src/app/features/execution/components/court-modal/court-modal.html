@@ -1,0 +1,39 @@
+<dialog #courtModal class="modal">
+  <div class="modal-box w-11/12 max-w-3xl">
+    <h3 class="font-bold text-lg mb-4">🏛️ اختر المحكمة</h3>
+
+    <input
+      [(ngModel)]="courtSearch"
+      (input)="filterCourts()"
+      placeholder="ابحث باسم المحكمة..."
+      class="input input-bordered w-full mb-4"
+    />
+
+    <div class="max-h-80 overflow-y-auto">
+      <table class="table w-full text-sm">
+        <thead>
+          <tr>
+            <th>اسم المحكمة</th>
+            <th>المدينة</th>
+            <th>النوع</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of filteredCourts">
+            <td>{{ c.name }}</td>
+            <td>{{ c.city }}</td>
+            <td>{{ c.type }}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" (click)="selectCourt(c)">اختيار</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal-action">
+      <button class="btn btn-outline" (click)="close()">إغلاق</button>
+    </div>
+  </div>
+</dialog>

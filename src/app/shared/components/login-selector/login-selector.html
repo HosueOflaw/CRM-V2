@@ -1,0 +1,19 @@
+<div class="selector-container">
+  <div class="selector-box">
+    <h2>اختر نوع تسجيل الدخول</h2>
+
+    <div class="options">
+      <button class="btn employee" (click)="goTo('/employee-login')">
+         دخول الموظفين
+      </button>
+
+      <button class="btn client" (click)="goTo('/client-login')">
+         دخول العملاء
+      </button>
+
+      <button class="btn public" (click)="goTo('/public-login')">
+         دخول الجمهور
+      </button>
+    </div>
+  </div>
+</div>

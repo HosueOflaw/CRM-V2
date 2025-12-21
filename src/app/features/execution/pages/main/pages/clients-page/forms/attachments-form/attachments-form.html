@@ -1,0 +1,39 @@
+<div class="p-6 bg-white rounded-xl shadow-md">
+  <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+    📎 المرفقات
+  </h2>
+
+  <!-- 📊 جدول عرض المرفقات -->
+  <div class="overflow-x-auto mt-8">
+    <table class="table table-zebra w-full text-center">
+      <thead class="bg-gray-100">
+        <tr class="text-gray-700">
+          <th>الإجراء</th>
+          <th>تاريخ الإجراء</th>
+          <th>المرفق</th>
+          <th>التحكم</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let attachment of attachments; let i = index">
+          <td>{{ attachment.action }}</td>
+          <td>{{ attachment.date | date: 'dd/MM/yyyy' }}</td>
+          <td>
+            <a
+              *ngIf="attachment.file"
+              [href]="attachment.file"
+              target="_blank"
+              class="text-blue-600 hover:underline"
+              >📂 عرض</a
+            >
+          </td>
+          <td>
+            <button class="btn btn-sm btn-error" (click)="deleteAttachment(i)">
+              🗑️ حذف
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

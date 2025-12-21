@@ -1,0 +1,11 @@
+.radio {
+  accent-color: #2563eb; /* لون أزرق جميل */
+}
+
+.modal-box {
+  transition: all 0.3s ease-in-out;
+}
+
+p {
+  white-space: pre-line;
+}

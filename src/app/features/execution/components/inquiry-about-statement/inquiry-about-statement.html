@@ -1,0 +1,27 @@
+<div class="flex flex-col lg:flex-row gap-6">
+  <!-- Left document -->
+  <div class="hidden lg:flex flex-col items-center justify-center w-1/3 bg-base-100 rounded-xl p-4 border">
+    <h3 class="text-lg font-semibold mb-3 text-gray-700">📄 الملف</h3>
+    <img src="assets/sample-file-preview.png" alt="File Preview" class="rounded-lg shadow-md max-h-96 object-contain" />
+  </div>
+
+  <!-- Right side -->
+  <div class="rightSide flex-1 flex flex-col gap-4">
+    <div class="flex gap-3 items-end">
+      <input [(ngModel)]="reportNumber" placeholder="رقم الكشف" class="input input-bordered flex-1" />
+      <button class="btn btn-primary" (click)="search()">بحث</button>
+      <button class="btn btn-outline">🖨️ طباعة</button>
+    </div>
+
+    <div class="bg-base-100 border rounded-xl p-5 mt-4 shadow-sm">
+      <h3 class="text-lg font-semibold text-primary mb-3">نتائج الكشف</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <p><span class="font-semibold text-gray-700">الاسم:</span> {{reportData?.name}}</p>
+        <p><span class="font-semibold text-gray-700">رقم القضية:</span> {{reportData?.caseNumber}}</p>
+        <p><span class="font-semibold text-gray-700">المبلغ:</span> {{reportData?.amount}}</p>
+        <p><span class="font-semibold text-gray-700">المحكمة:</span> {{reportData?.court}}</p>
+        <p><span class="font-semibold text-gray-700">التاريخ:</span> {{reportData?.date}}</p>
+      </div>
+    </div>
+  </div>
+</div>

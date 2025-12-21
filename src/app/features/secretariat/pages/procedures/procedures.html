@@ -1,0 +1,241 @@
+<div dir="rtl" class="flex flex-col h-screen bg-base-100 p-2 font-sans text-sm">
+
+  <div role="tablist" class="tabs tabs-lifted tabs-sm mb-0">
+    <a role="tab" class="tab" 
+       [class.tab-active]="activeTab === 1" 
+       [class.font-bold]="activeTab === 1"
+       (click)="setActiveTab(1)">
+       رفع الإجراءات
+    </a>
+    <a role="tab" class="tab" 
+       [class.tab-active]="activeTab === 2"
+       [class.font-bold]="activeTab === 2"
+       (click)="setActiveTab(2)">
+       التقارير
+    </a>
+    <a role="tab" class="tab flex-grow cursor-default bg-base-100 border-b-base-300 border-b"></a>
+  </div>
+
+  <div class="bg-base-100 border border-base-300 border-t-0 p-3 rounded-b-box flex-grow flex flex-col overflow-hidden">
+
+    <div *ngIf="activeTab === 1" class="flex flex-col h-full gap-3">
+      
+      <div class="bg-base-200 p-3 rounded-lg border border-base-300">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+          
+          <div class="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+            
+          <div class="form-control flex-row items-center gap-2">
+              <label class="label-text w-20 font-bold">الكود</label>
+              <div class="join w-full">
+                <button class="btn btn-xs btn-square join-item btn-primary" (click)="searchByCode()" title="بحث">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
+                </button>
+                <input type="text" 
+                       class="input input-bordered input-xs join-item w-full bg-white focus:outline-none" 
+                       [(ngModel)]="formData.code" 
+                       (keydown.enter)="searchByCode()" 
+                       placeholder="اضغط Enter للبحث"/>
+              </div>
+            </div>
+
+              <div class="form-control flex-row items-center gap-2">
+              <label class="label-text w-20 font-bold">الموكل</label>
+              <input type="text" class="input input-bordered input-xs w-full bg-white"  [(ngModel)]="formData.client"/>
+            </div>
+
+            
+            <div class="form-control flex-row items-center gap-2">
+              <label class="label-text w-20 font-bold">الاسم</label>
+              <input type="text" class="input input-bordered input-xs w-full bg-white" [(ngModel)]="formData.name" />
+            </div>
+
+             <div class="form-control flex-row items-center gap-2">
+              <label class="label-text w-20 font-bold">المدعي القانوني</label>
+              <input type="text" class="input input-bordered input-xs w-full bg-white"  [(ngModel)]="formData.legal_prosecutor"/>
+            </div>
+
+                <div class="form-control flex-row items-center gap-2">
+              <label class="label-text w-20 font-bold">الرقم المدني</label>
+              <input type="text" class="input input-bordered input-xs w-full bg-white" [(ngModel)]="formData.civilId" />
+            </div>
+
+                   <div class="form-control flex-row items-center gap-2">
+              <label class="label-text w-20 font-bold">المحكمة</label>
+              <input type="text" class="input input-bordered input-xs w-full bg-white"  [(ngModel)]="formData.court"/>
+            </div>
+            
+             <div class="form-control flex-row items-center gap-2">
+              <label class="label-text w-20 font-bold">العقد</label>
+              <input type="text" class="input input-bordered input-xs w-full bg-white" [(ngModel)]="formData.contract" />
+            </div>
+
+            <div class="form-control flex-row items-center gap-2">
+              <label class="label-text w-20 font-bold">الرقم الآلي</label>
+              <input type="text" class="input input-bordered input-xs w-full bg-white"  [(ngModel)]="formData.autoNumber" />
+            </div>
+
+                    <div class="form-control flex-row items-center gap-2">
+              <label class="label-text w-20 font-bold">المديونية</label>
+              <input type="text" class="input input-bordered input-xs w-full bg-white" [(ngModel)]="formData.amount" />
+            </div>
+
+        
+    
+            <div class="form-control flex-row items-center gap-2">
+              <label class="label-text w-20 font-bold">الموكل الفرعي</label>
+              <input type="text" class="input input-bordered input-xs w-full bg-white" [(ngModel)]="formData.subClient" />
+            </div>
+          </div>
+
+          <div class="md:col-span-4 flex flex-col gap-2 border-r border-gray-300 pr-4">
+             
+             <div class="flex items-center gap-2">
+                <label class="label-text w-16 font-bold">الإجراء</label>
+                <select class="select select-bordered select-xs w-full bg-white" [(ngModel)]="formData.procedure">
+                  <option>حفظ</option>
+                  <option>منع سفر</option>
+                  <option>ضبط واحضار</option>
+                  <option>حجز السيارات</option>
+                  <option>جميع الاجراءات</option>
+                  <option>رفع حجز ما للمدين لدي الغير</option>
+                  <option>صرف</option>
+                  <option>طلب حكم</option>
+                  <option>اثبات حالة</option>
+                  <option>اعلان</option>
+                  <option>اعلان و اغلاق</option>
+                  <option>ايميل من الشركة</option>
+                  <option>اغلاق</option>
+                  <option>تم التنفيذ</option>
+                  <option>مطلوب برنت رفع</option>
+                  <option>اخري</option>
+                </select>
+             </div>
+
+             <div class="flex items-center gap-2">
+                <label class="label-text w-16 font-bold">سبب الرفع</label>
+                <select class="select select-bordered select-xs w-full bg-white" [(ngModel)]="formData.reason">
+                  <option>تسوية</option>
+                  <option>سداد</option>
+                  <option>أخري</option>
+                </select>
+             </div>
+
+             <div class="flex items-start gap-2 h-full">
+                <label class="label-text w-16 font-bold mt-1">ملاحظات</label>
+                <textarea class="textarea textarea-bordered textarea-xs w-full bg-white h-full resize-none" [(ngModel)]="formData.notes"></textarea>
+             </div>
+
+             <div class="flex gap-2 justify-end mt-2">
+                <button class="btn btn-xs btn-neutral w-20">حفظ</button>
+                <button class="btn btn-xs btn-outline w-20" (click)="resetForm()">تراجع</button>
+                <button class="btn btn-xs btn-active w-auto">تسليم الكشف للمندوب</button>
+             </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+    <div *ngIf="activeTab === 2" class="flex flex-col h-full">
+      
+      <div class="bg-base-200 p-2 rounded border border-base-300 mb-2 flex flex-wrap justify-between items-center gap-2" style="direction: ltr;">
+          
+          <button class="btn btn-sm btn-outline btn-success gap-2" (click)="exportToExcel()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="16" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            XLSX
+          </button>
+
+          <div class="flex items-center gap-2">
+            <div class="join">
+                <button class="btn btn-sm join-item btn-neutral">...</button>
+                <input class="input input-sm input-bordered join-item w-16 text-center" placeholder="0" [(ngModel)]="reportFilters.lookup" />
+            </div>
+            <div class="flex items-center bg-white border rounded px-1">
+                <span class="text-xs font-bold px-1">من:</span>
+                <input type="date" class="input input-xs input-ghost" [(ngModel)]="reportFilters.fromDate">
+            </div>
+
+            <div class="flex items-center bg-white border rounded px-1">
+                <span class="text-xs font-bold px-1">إلى:</span>
+                <input type="date" class="input input-xs input-ghost" [(ngModel)]="reportFilters.toDate">
+            </div>
+
+            <button class="btn btn-sm btn-neutral px-4" (click)="searchReports()">بحث</button>
+            
+            <div class="join border border-base-300">
+                <button class="btn btn-sm join-item" 
+                        [class.btn-active]="reportFilters.status === 'not_uploaded'"
+                        (click)="reportFilters.status = 'not_uploaded'; searchReports()">لم يتم الرفع</button>
+                <button class="btn btn-sm join-item" 
+                        [class.btn-active]="reportFilters.status === 'uploaded'"
+                        (click)="reportFilters.status = 'uploaded'; searchReports()">تم الرفع</button>
+            </div>
+          </div>
+      </div>
+
+      <div class="flex-grow overflow-auto border border-base-300 rounded shadow-sm bg-white relative">
+        <table class="table table-xs table-pin-rows table-zebra w-full whitespace-nowrap text-right">
+          <thead>
+            <tr class="bg-gray-100 text-gray-700 font-bold">
+              <th>ID</th>
+              <th>الكود</th>
+              <th>الاسم</th>
+              <th>تاريخ الرفع</th>
+              <th>الاجراء</th>
+              <th>الملاحظات</th>
+              <th>الموكل</th>
+              <th>الحالة</th>
+              <th>السكرتارية</th>
+              <th>استلام المندوب</th>
+              <th>الرقم الآلي</th>
+              <th>تاريخ استلام المندوب</th> <th>الرفع</th>
+              <th>المراجع</th>
+              <th>تاريخ المراجعة</th>
+              <th>سبب الرفع</th>
+              <th>المحكمة</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of filteredReports" class="hover">
+              <td>{{ row.id }}</td>
+              <td class="font-mono">{{ row.code }}</td>
+              <td class="font-medium text-blue-900 max-w-[150px] truncate" title="{{row.name}}">{{ row.name }}</td>
+              <td>{{ row.date }}</td>
+              <td>{{ row.action }}</td>
+              <td class="max-w-[200px] truncate" title="{{row.notes}}">{{ row.notes }}</td>
+              <td class="max-w-[150px] truncate">{{ row.client }}</td>
+              <td>{{ row.status }}</td>
+              <td>{{ row.secretary }}</td>
+              <td>{{ row.delegateStatus }}</td>
+              <td class="font-mono">{{ row.autoNumber }}</td>
+              <td>--</td> <td>
+                <span class="badge badge-xs" [ngClass]="row.uploadDate === 'تم الرفع' ? 'badge-success' : 'badge-ghost'">
+                    {{ row.uploadDate }}
+                </span>
+              </td>
+              <td>{{ row.reference }}</td>
+              <td>{{ row.reviewDate }}</td>
+              <td>{{ row.debtReason }}</td>
+              <td>{{ row.court }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="bg-gray-50 p-1 text-xs text-left px-2 border-t">
+          العدد: {{ filteredReports.length }}
+      </div>
+
+    </div>
+
+      <div class="flex-grow bg-white border border-base-200 rounded flex items-center justify-center text-gray-400">
+        مساحة عرض التقرير
+      </div>
+
+    </div>
+
+  </div>
+

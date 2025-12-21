@@ -1,0 +1,77 @@
+
+
+
+
+<div class="case-parties w-full">
+  <!-- Tabs Header -->
+  <h2 class="text-lg font-bold text-primary text-center mb-3">الأطراف في القضية</h2>
+  <div role="tablist" class="tabs tabs-bordered">
+    <input type="radio" name="caseTabs" role="tab" class="tab" aria-label="الأطراف" checked />
+    <div role="tabpanel" class="tab-content p-4">
+      <div *ngIf="!showTransferTabs">
+
+      <!-- Table الأطراف -->
+      <ng-container *ngIf="selectedTab === 'parties'">
+        <!-- هنا هنضيف جدول الأطراف بعد ما تبعته -->    
+        <div class="overflow-x-auto">
+          <table class="table table-sm table-zebra w-full text-center">
+            <thead>
+              <tr class="bg-base-300">
+                <th>الكود</th>
+                <th>الاسم</th>
+                <th>الصفة</th>
+                <th>الحالة</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let party of parties">
+                <td>{{ party.code }}</td>
+                <td>{{ party.name }}</td>
+                <td>{{ party.role }}</td>
+                <td>{{ party.status }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+      </div>
+    </div>
+
+    <input type="radio" name="caseTabs" role="tab" class="tab" aria-label="الرسوم" />
+          <div *ngIf="showTransferTabs">
+
+
+          </div>
+          <div role="tabpanel" class="tab-content p-4">
+            <!-- Table الرسوم -->
+            <table class="table table-zebra w-full text-center">
+              <thead>
+                <tr>
+                  <th>المصروف</th>
+                  <th>المبلغ</th>
+                  <th>رقم الكشف</th>
+                  <th>التاريخ</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let fee of fees">
+                  <td>{{ fee.expense }}</td>
+                  <td>{{ fee.amount }}</td>
+                  <td>{{ fee.reportNumber }}</td>
+                  <td>{{ fee.date | date:'dd/MM/yyyy' }}</td>
+                  <td>
+                    <button class="btn btn-outline btn-sm">فتح</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+
+    <input type="radio" name="caseTabs" role="tab" class="tab" aria-label="القضايا المرتبطة" />
+    <div role="tabpanel" class="tab-content p-4">
+      <p class="text-gray-500 text-center">سيتم إضافة القضايا المرتبطة لاحقًا...</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,61 @@
+<div class="bg-white rounded-2xl shadow-lg p-6 max-w-2xl mx-auto">
+  <h3 class="text-xl font-bold text-center text-gray-700 mb-6">
+    🏢 نموذج جهة العمل
+  </h3>
+
+  <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- اسم جهة العمل -->
+    <div class="form-control md:col-span-2">
+      <label class="label font-semibold text-gray-600">اسم جهة العمل</label>
+      <input
+        type="text"
+        [(ngModel)]="workForm.name"
+        name="name"
+        placeholder="أدخل اسم جهة العمل"
+        class="input input-bordered w-full focus:ring-2 focus:ring-primary/50"
+      />
+    </div>
+
+    <!-- عنوان جهة العمل -->
+    <div class="form-control md:col-span-2">
+      <label class="label font-semibold text-gray-600">عنوان جهة العمل</label>
+      <input
+        type="text"
+        [(ngModel)]="workForm.address"
+        name="address"
+        placeholder="أدخل عنوان جهة العمل"
+        class="input input-bordered w-full focus:ring-2 focus:ring-primary/50"
+      />
+    </div>
+
+    <!-- الرقم العسكري -->
+    <div class="form-control md:col-span-2">
+      <label class="label font-semibold text-gray-600">الرقم العسكري</label>
+      <input
+        type="text"
+        [(ngModel)]="workForm.militaryNumber"
+        name="militaryNumber"
+        placeholder="أدخل الرقم العسكري إن وجد"
+        class="input input-bordered w-full focus:ring-2 focus:ring-primary/50"
+      />
+    </div>
+  </form>
+
+  <!-- الأزرار -->
+  <div class="flex justify-center gap-4 mt-8">
+    <button
+      type="button"
+      class="btn btn-primary px-10 py-2 text-base rounded-xl"
+      (click)="save()"
+    >
+      💾 حفظ
+    </button>
+    <button
+      type="button"
+      class="btn btn-outline px-10 py-2 text-base rounded-xl"
+      (click)="cancel()"
+    >
+      ↩️ إلغاء
+    </button>
+  </div>
+</div>

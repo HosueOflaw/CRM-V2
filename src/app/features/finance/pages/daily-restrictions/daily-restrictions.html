@@ -1,0 +1,117 @@
+<div class="p-4 bg-base-200 h-screen overflow-hidden flex flex-col" style="direction: rtl;">
+
+  <!-- الصف العلوي -->
+  <div class="grid grid-cols-5 gap-4 bg-base-100 p-4 rounded shadow mb-3">
+
+    <!-- رقم القيد -->
+    <div class="col-span-1">
+      <label class="label text-sm">رقم القيد</label>
+      <input class="input input-bordered w-full bg-base-100" value="D-2025-12199" readonly />
+    </div>
+
+    <!-- التاريخ -->
+    <div class="col-span-1">
+      <label class="label text-sm">التاريخ</label>
+      <input type="date" class="input input-bordered w-full" [(ngModel)]="today" />
+    </div>
+
+    <!-- مركز التكلفة -->
+    <div class="col-span-1">
+      <label class="label text-sm">مركز التكلفة</label>
+
+      <div class="flex gap-2">
+        <input class="input input-bordered w-full" [value]="selectedCostCenter" readonly />
+        <button class="btn btn-primary" (click)="openCostCenterForm()">اختيار</button>
+      </div>
+    </div>
+
+    <!-- الفلتر -->
+    <div class="col-span-1">
+      <label class="label text-sm">الفلتر</label>
+      <select class="select select-bordered w-full"></select>
+    </div>
+
+    <!-- ملاحظات -->
+    <div class="col-span-1">
+      <label class="label text-sm">ملاحظات</label>
+      <input class="input input-bordered w-full" />
+    </div>
+
+  </div>
+
+  <!-- إحصائيات -->
+  <div class="grid grid-cols-3 gap-4 bg-base-100 p-3 rounded shadow mb-3 text-center">
+    <div>
+      <p class="text-xs text-gray-500">إجمالي المدين</p>
+      <p class="text-lg font-bold text-red-600">0</p>
+    </div>
+    <div>
+      <p class="text-xs text-gray-500">إجمالي الدائن</p>
+      <p class="text-lg font-bold text-green-600">0</p>
+    </div>
+    <div>
+      <p class="text-xs text-gray-500">الفرق</p>
+      <p class="text-lg font-bold">0</p>
+    </div>
+  </div>
+
+  <!-- الجريد -->
+  <div class="flex-1 overflow-auto bg-white rounded shadow">
+    <table class="table table-zebra w-full text-center">
+
+      <thead>
+        <tr class="bg-base-300 text-black">
+          <th>رقم الحساب</th>
+          <th>اسم الحساب</th>
+          <th>مدين</th>
+          <th>دائن</th>
+          <th>البيان</th>
+          <th>مركز التكلفة</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let row of rows">
+          <td><input class="input input-bordered w-full" [(ngModel)]="row.accountNo" /></td>
+          <td><input class="input input-bordered w-full" [(ngModel)]="row.accountName" /></td>
+          <td><input class="input input-bordered w-full" [(ngModel)]="row.debit" /></td>
+          <td><input class="input input-bordered w-full" [(ngModel)]="row.credit" /></td>
+          <td><input class="input input-bordered w-full" [(ngModel)]="row.description" /></td>
+          <td><input class="input input-bordered w-full" [(ngModel)]="row.costCenter" /></td>
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+
+  <div class="flex justify-end gap-3 mt-4">
+    <button class="btn btn-primary" (click)="saveRecord()">حفظ</button>
+    <button class="btn btn-accent" (click)="editRecord()">تعديل</button>
+    <button class="btn btn-info" (click)="printRecord()">طباعة</button>
+    <button class="btn btn-success" (click)="newRecord()">جديد</button>
+  </div>
+
+</div>
+
+<!-- مودال اختيار مركز التكلفة -->
+<div *ngIf="showCostCenterForm"
+     class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+  <div class="bg-white p-6 rounded-lg shadow-xl w-80">
+
+    <h2 class="text-lg font-bold mb-4">اختر مركز التكلفة</h2>
+
+    <ul class="max-h-60 overflow-auto border rounded">
+      <li 
+        *ngFor="let center of costCenters"
+        class="p-2 hover:bg-gray-200 cursor-pointer border-b last:border-0"
+        (click)="selectCostCenter(center)"
+      >
+        {{ center }}
+      </li>
+    </ul>
+
+    <button class="btn mt-4 w-full" (click)="closeCostCenterForm()">إغلاق</button>
+
+  </div>
+</div>

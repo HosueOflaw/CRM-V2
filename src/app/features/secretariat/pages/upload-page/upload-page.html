@@ -1,0 +1,56 @@
+<div dir="rtl" class="flex flex-col h-screen bg-gray-50 font-sans text-sm">
+
+  <div class="bg-base-100 border-b border-gray-300 p-2 flex justify-between items-center shadow-sm">
+    
+    <div class="flex items-center gap-3">
+        <h1 class="text-lg font-bold text-gray-700 px-2 border-l border-gray-300">
+            رفع افادات
+        </h1>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 cursor-pointer hover:text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+    </div>
+
+    <div class="flex gap-2">
+        <input type="file" #fileInput (change)="onFileChange($event)" hidden accept=".xlsx, .xls" />
+
+        <button class="btn btn-sm btn-outline btn-info px-6 rounded-none" (click)="downloadTemplate()">
+            EXCEL
+        </button>
+
+        <button class="btn btn-sm bg-gray-200 hover:bg-gray-300 border-gray-300 text-gray-700 px-6 rounded-none" (click)="triggerFileUpload()">
+            UPLOAD
+        </button>
+    </div>
+  </div>
+
+  <div class="bg-gray-100 border-b border-gray-300 p-1 text-xs text-gray-500 text-left px-4">
+    Drag a column header here to group by that column
+  </div>
+
+  <div class="flex-grow overflow-auto bg-white p-4">
+      
+      <div *ngIf="excelData.length === 0" class="h-full flex flex-col items-center justify-center text-gray-300">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <p>الرجاء رفع ملف Excel لعرض البيانات</p>
+      </div>
+
+      <table *ngIf="excelData.length > 0" class="table table-xs table-pin-rows table-zebra w-full border border-base-300">
+        <thead>
+          <tr class="bg-gray-100">
+             <th *ngFor="let header of tableHeaders">{{ header }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of excelData">
+            <td *ngFor="let header of tableHeaders">
+                {{ row[header] }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+  </div>
+</div>

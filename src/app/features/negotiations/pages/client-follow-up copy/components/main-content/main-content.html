@@ -1,0 +1,1565 @@
+<!-- Main Page Tabs -->
+<div class="tabs tabs-boxed">
+  <button class="tab"
+          [class.tab-active]="activeMainTab === 'clients'"
+          (click)="setMainTab('clients')">
+    العملاء
+  </button>
+  <button class="tab"
+          [class.tab-active]="activeMainTab === 'main'"
+          (click)="setMainTab('main')">
+    الرئيسية
+  </button>
+  <button class="tab"
+          [class.tab-active]="activeMainTab === 'searchNumbers'"
+          (click)="setMainTab('searchNumbers')">
+    بحث أرقام
+  </button>
+  <button class="tab"
+          [class.tab-active]="activeMainTab === 'menuSearch'"
+          (click)="setMainTab('menuSearch')">
+    قائمة البحث
+  </button>
+  <button class="tab"
+          [class.tab-active]="activeMainTab === 'FeesAndCollection'"
+          (click)="setMainTab('FeesAndCollection')">
+    الرسوم والتحصيل
+  </button>
+  <button class="tab"
+          [class.tab-active]="activeMainTab === 'notes'"
+          (click)="setMainTab('notes')">
+    ملاحظات
+  </button>
+  <button class="tab"
+          [class.tab-active]="activeMainTab === 'preview'"
+          (click)="setMainTab('preview')">
+    Preview
+  </button>
+  <button class="tab"
+          [class.tab-active]="activeMainTab === 'newFiles'"
+          (click)="setMainTab('newFiles')">
+    الملفات الجديدة
+  </button>
+  <button class="tab"
+          [class.tab-active]="activeMainTab === 'statements'"
+          (click)="setMainTab('statements')">
+    الافادات
+  </button>
+  <button class="tab"
+          [class.tab-active]="activeMainTab === 'searchStatements'"
+          (click)="setMainTab('searchStatements')">
+    بحث الافادات
+  </button>
+  <button class="tab"
+          [class.tab-active]="activeMainTab === 'stats'"
+          (click)="setMainTab('stats')">
+    الاحصائيات
+  </button>
+</div>
+
+<!-- clients -->
+<div *ngIf="activeMainTab === 'clients'" class="page-content">
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>الكود</th>
+          <th>الاسم</th>
+          <th>حالة الملف</th>
+          <th>سبب المديونية</th>
+          <th>رقم الباتش</th>
+          <th>رقم العقد</th>
+          <th>الجنسية</th>
+          <th>الرقم المدني</th>
+          <th>المدفوع</th>
+          <th>قيمة المطالبة</th>
+          <th>المتبقي</th>
+          <th>العنوان</th>
+          <th>الموكل</th>
+          <th>حالة المتابعة</th>
+          <th>حالة العميل</th>
+          <th>حالة التواصل</th>
+          <th>حالة التعاون</th>
+          <th>حالة المدنية</th>
+          <th>حالة الداخلية</th>
+          <th>اخر سداد</th>
+          <th>تاريخ اخر سداد</th>
+          <th>اخر افادة</th>
+          <th>تاريخ اخر افادة</th>
+          <th>تاريخ المراجعة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of clientRows; let i = index">
+          <td class="text-center">{{ i + 1 }}</td>
+          <td>{{row.code}}</td>
+          <td style="font-weight: 600; color: var(--primary-color);">{{row.name}}</td>
+          <td>{{row.fileStatus}}</td>
+          <td>{{row.debtReason}}</td>
+          <td>{{row.batch}}</td>
+          <td>{{row.contractNum}}</td>
+          <td>{{row.nationality}}</td>
+          <td>{{row.civilId}}</td>
+          <td style="color: var(--green-500); font-weight: 600;">{{row.paid | number}}</td>
+          <td style="color: var(--red-500); font-weight: 600;">{{row.claim | number}}</td>
+          <td>{{row.remaining | number}}</td>
+          <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{row.address}}</td>
+          <td style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [title]="row.client">{{row.client}}</td>
+          <td>{{row.followUpStatus}}</td>
+          <td>{{row.clientStatus}}</td>
+          <td>{{row.contactStatus}}</td>
+          <td>{{row.cooperationStatus}}</td>
+          <td>{{row.civilStatus}}</td>
+          <td>{{row.internalStatus}}</td>
+          <td>{{row.lastPaymentAmount | number}}</td>
+          <td>{{row.lastPaymentDate}}</td>
+          <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [title]="row.lastStatement">{{row.lastStatement}}</td>
+          <td>{{row.lastStatementDate}}</td>
+          <td>{{row.reviewDate}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- main -->
+<div *ngIf="activeMainTab === 'main'" class="page-content">
+  <div class="flex flex-col gap-4">
+    <!-- Top Section: Client Info & Financial -->
+    <div class="grid grid-cols-12 gap-4">
+      <!-- Client Details Card -->
+      <div class="col-span-4 card">
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label">الموكل</label>
+              <input type="text" class="form-input" value="pruip" readonly />
+            </div>
+            <div class="form-field">
+              <label class="form-label">العميل</label>
+              <input type="text" class="form-input" value="محمد جمعان" readonly />
+            </div>
+            <div class="form-field">
+              <label class="form-label">المدني</label>
+              <input type="text" class="form-input" value="285110604288" readonly />
+            </div>
+            <div class="form-field">
+              <label class="form-label">الحالة</label>
+              <input type="text" class="form-input" value="حفظ" readonly />
+            </div>
+            <div class="form-field">
+              <label class="form-label">الجنسية</label>
+              <input type="text" class="form-input" value="سريلانكي" readonly />
+            </div>
+            <div class="form-field">
+              <label class="form-label">التصنيف</label>
+              <input type="text" class="form-input" readonly />
+            </div>
+            <div class="form-field">
+              <label class="form-label">العقد</label>
+              <input type="text" class="form-input" value="1000173537" readonly />
+            </div>
+            <div class="form-field">
+              <label class="form-label">المديونية</label>
+              <input type="text" class="form-input" value="51085012" readonly />
+            </div>
+            <div class="form-field">
+              <label class="form-label">الأرقام الآلية</label>
+              <input type="text" class="form-input" value="140268930" readonly />
+            </div>
+            <div class="form-field">
+              <label class="form-label">الباتش</label>
+              <input type="text" class="form-input" value="R1" readonly />
+            </div>
+            <div class="form-field form-field-full">
+              <label class="form-label">العنوان</label>
+              <input type="text" class="form-input" value="المهبولة - قطعة 6 - قسيمة 254" readonly />
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Main Content Card -->
+      <div class="col-span-6 card">
+        <div class="card-body">
+
+          <div class="tabs">
+            <a class="tab tab-bordered"
+               [class.tab-active]="activeSubTab === 'main'"
+               (click)="changeTab('main')">
+              الرئيسية
+            </a>
+            <a class="tab tab-bordered"
+               [class.tab-active]="activeSubTab === 'classification'"
+               (click)="changeTab('classification')">
+              تصنيف
+            </a>
+            <a class="tab tab-bordered"
+               [class.tab-active]="activeSubTab === 'files'"
+               (click)="changeTab('files')">
+              اجمالي الملفات
+            </a>
+            <a class="tab tab-bordered"
+               [class.tab-active]="activeSubTab === 'company-link'"
+               (click)="changeTab('company-link')">
+              رابط الشركة
+            </a>
+            <a class="tab tab-bordered"
+               [class.tab-active]="activeSubTab === 'fees'"
+               (click)="changeTab('fees')">
+              الرسوم
+            </a>
+            <a class="tab tab-bordered"
+               [class.tab-active]="activeSubTab === 'details'"
+               (click)="changeTab('details')">
+              تفاصيل المطالبة
+            </a>
+            <a class="tab tab-bordered"
+               [class.tab-active]="activeSubTab === 'checks'"
+               (click)="changeTab('checks')">
+              الشيكات
+            </a>
+            <a class="tab tab-bordered"
+               [class.tab-active]="activeSubTab === 'attachments'"
+               (click)="changeTab('attachments')">
+              المرفقات
+            </a>
+            <a class="tab tab-bordered"
+               [class.tab-active]="activeSubTab === 'categories'"
+               (click)="changeTab('categories')">
+              التصنيفات
+            </a>
+          </div>
+
+           <div *ngIf="activeSubTab === 'main'">
+
+            <div class="grid grid-cols-12 gap-6 p-4" dir="rtl">
+
+  <!-- ========================= -->
+  <!-- 🟦 اليمين (النص الأول) -->
+  <!-- ========================= -->
+  <div class="col-span-12 lg:col-span-8 space-y-6">
+
+    <!-- القطاع + المحامي + اسم المدعي -->
+    <div class="form-grid form-grid-2">
+      <div class="form-field">
+        <label class="form-label">القطاع</label>
+        <input type="text" class="form-input" />
+      </div>
+      <div class="form-field">
+        <label class="form-label">المحامي</label>
+        <input type="text" class="form-input" />
+      </div>
+      <div class="form-field form-field-full">
+        <label class="form-label">اسم المدعي القانوني</label>
+        <input type="text" class="form-input" />
+      </div>
+    </div>
+
+    <!-- الملاحظات Tabs -->
+    <div>
+      <div class="tabs">
+        <button class="tab tab-bordered" [class.tab-active]="activeNoteTab===1" (click)="activeNoteTab=1">ملاحظات</button>
+        <button class="tab tab-bordered" [class.tab-active]="activeNoteTab===2" (click)="activeNoteTab=2">ملاحظات 2</button>
+        <button class="tab tab-bordered" [class.tab-active]="activeNoteTab===3" (click)="activeNoteTab=3">ملاحظات 3</button>
+        <button class="tab tab-bordered" [class.tab-active]="activeNoteTab===4" (click)="activeNoteTab=4">ملاحظات 4</button>
+        <button class="tab tab-bordered" [class.tab-active]="activeNoteTab===5" (click)="activeNoteTab=5">ملاحظات السكرتارية</button>
+        <button class="tab tab-bordered" [class.tab-active]="activeNoteTab===6" (click)="activeNoteTab=6">ملاحظات 6</button>
+      </div>
+
+      <textarea *ngIf="activeNoteTab===1" class="form-textarea" rows="4"></textarea>
+      <textarea *ngIf="activeNoteTab===2" class="form-textarea" rows="4"></textarea>
+      <textarea *ngIf="activeNoteTab===3" class="form-textarea" rows="4"></textarea>
+      <textarea *ngIf="activeNoteTab===4" class="form-textarea" rows="4"></textarea>
+      <textarea *ngIf="activeNoteTab===5" class="form-textarea" rows="4"></textarea>
+      <textarea *ngIf="activeNoteTab===6" class="form-textarea" rows="4"></textarea>
+    </div>
+
+      <div class="flex justify-between gap-6">
+        <!-- التواريخ -->
+        <div class="card" style="flex: 1;">
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label">تاريخ الورود</label>
+                <input type="date" class="form-input" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">تاريخ الاستلام</label>
+                <input type="date" class="form-input" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">تاريخ السحب</label>
+                <input type="date" class="form-input" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">تاريخ أول ورود</label>
+                <input type="date" class="form-input" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- النوع + اللغة -->
+        <div class="flex flex-col gap-4" style="flex: 1;">
+          <div class="card">
+            <div class="card-body">
+              <label class="form-label">لغة التواصل</label>
+              <div class="radio-group">
+                <label>
+                  <input type="radio" name="lang" class="radio" />
+                  <span>عربي</span>
+                </label>
+                <label>
+                  <input type="radio" name="lang" class="radio" />
+                  <span>إنجليزي</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <label class="form-label">النوع</label>
+              <div class="radio-group">
+                <label>
+                  <input type="radio" name="gender" class="radio" />
+                  <span>ذكر</span>
+                </label>
+                <label>
+                  <input type="radio" name="gender" class="radio" />
+                  <span>أنثى</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+  </div>
+
+  <!-- ========================= -->
+  <!-- 🟥 الشمال (النص الثاني) -->
+  <!-- ========================= -->
+  <div class="col-span-12 lg:col-span-4 space-y-6">
+
+ 
+
+    <!-- المحكمة + الداخلية + المدنية -->
+    <div class="form-grid">
+      <div class="form-field">
+        <label class="form-label">المحكمة</label>
+        <div class="form-row">
+          <input type="text" class="form-input" style="flex: 1;" [(ngModel)]="courtValue" name="courtValue" />
+          <button class="form-button form-button-outline" (click)="openLookup('court')">...</button>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">حالة الداخلية</label>
+        <div class="form-row">
+          <input type="text" class="form-input" style="flex: 1;" [(ngModel)]="internalStatus" name="internalStatus" />
+          <button class="form-button form-button-outline" (click)="openLookup('interior')">...</button>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">حالة المدنية</label>
+        <div class="form-row">
+          <input type="text" class="form-input" style="flex: 1;" [(ngModel)]="civilStatus" name="civilStatus" />
+          <button class="form-button form-button-outline" (click)="openLookup('civil')">...</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- أزرار الإجراءات -->
+    <div class="form-actions">
+      <button class="form-button form-button-success">حفظ</button>
+      <button class="form-button form-button-success">كشف حساب سيارات</button>
+      <button class="form-button form-button-success">براءة ذمة</button>
+      <button class="form-button form-button-success">استمارة العميل</button>
+      <button class="form-button form-button-success">تصنيف العميل</button>
+    </div>
+
+  </div>
+
+</div>
+
+                 
+            </div>
+            <div *ngIf="activeSubTab === 'classification'">
+              <div class="form-grid form-grid-3">
+                <!-- Main Classification -->
+                <div class="form-field">
+                  <label class="form-label">حالة العميل</label>
+                  <select class="form-select">
+                    <option selected>حالة العميل</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">حالة المطالبة</label>
+                  <select class="form-select">
+                    <option selected>حالة المطالبة</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">حالة السداد</label>
+                  <select class="form-select">
+                    <option selected>حالة السداد</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">حالة الملف</label>
+                  <select class="form-select">
+                    <option selected>حالة الملف</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">حالة الإجراءات</label>
+                  <select class="form-select">
+                    <option selected>حالة الإجراءات</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">حالة المتابعة</label>
+                  <select class="form-select">
+                    <option selected>حالة المتابعة</option>
+                  </select>
+                </div>
+                
+                <!-- Discount Box -->
+                <div class="card form-field-full">
+                  <div class="card-header">
+                    <h3>الخصم</h3>
+                  </div>
+                  <div class="card-body">
+                    <div class="form-grid">
+                      <div class="form-field">
+                        <label class="form-label">الخصم</label>
+                        <select class="form-select">
+                          <option selected>الخصم</option>
+                        </select>
+                      </div>
+                      <div class="form-field">
+                        <label class="form-label">القبول</label>
+                        <select class="form-select">
+                          <option selected>القبول</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="card-footer">
+                      <button class="form-button form-button-secondary">حفظ</button>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Income Source Box -->
+                <div class="card form-field-full">
+                  <div class="card-header">
+                    <h3>مصدر الدخل</h3>
+                  </div>
+                  <div class="card-body">
+                    <div class="form-grid">
+                      <div class="form-field">
+                        <label class="form-label">الدوام</label>
+                        <select class="form-select">
+                          <option selected>الدوام</option>
+                        </select>
+                      </div>
+                      <div class="form-field">
+                        <label class="form-label">ملاحظات</label>
+                        <input type="text" class="form-input" placeholder="ملاحظات" />
+                      </div>
+                      <div class="form-field">
+                        <label class="form-label">التاريخ</label>
+                        <input type="date" class="form-input" />
+                      </div>
+                    </div>
+                    <div class="card-footer">
+                      <button class="form-button form-button-secondary">حفظ</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Other Statuses -->
+                <div class="form-field">
+                  <label class="form-label">حالة الداخلية</label>
+                  <select class="form-select">
+                    <option selected>حالة الداخلية</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">حالة المدنية</label>
+                  <select class="form-select">
+                    <option selected>حالة المدنية</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">حالة التواصل</label>
+                  <select class="form-select">
+                    <option selected>حالة التواصل</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">حالة التعاون</label>
+                  <select class="form-select">
+                    <option selected>حالة التعاون</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button class="form-button form-button-primary">حفظ</button>
+              </div>
+            </div>
+
+            <div *ngIf="activeSubTab === 'files'">
+              <div class="form-grid form-grid-2">
+                <!-- المطالبة -->
+                <div class="form-field">
+                  <label class="form-label">المطالبة لكل الملفات</label>
+                  <input type="number" class="form-input" [(ngModel)]="files.claimAll" name="claimAll" />
+                </div>
+                <div class="form-field">
+                  <label class="form-label">المطالبة للشركة الحالية</label>
+                  <input type="number" class="form-input" [(ngModel)]="files.claimCurrent" name="claimCurrent" />
+                </div>
+
+                <!-- المسدد -->
+                <div class="form-field">
+                  <label class="form-label">المسدد لكل الملفات</label>
+                  <input type="number" class="form-input" [(ngModel)]="files.paidAll" name="paidAll" />
+                </div>
+                <div class="form-field">
+                  <label class="form-label">المسدد للشركة الحالية</label>
+                  <input type="number" class="form-input" [(ngModel)]="files.paidCurrent" name="paidCurrent" />
+                </div>
+
+                <!-- المتبقي -->
+                <div class="form-field">
+                  <label class="form-label">المتبقي لكل الملفات</label>
+                  <input type="number" class="form-input" [(ngModel)]="files.remainingAll" name="remainingAll" />
+                </div>
+                <div class="form-field">
+                  <label class="form-label">المتبقي للشركة الحالية</label>
+                  <input type="number" class="form-input" [(ngModel)]="files.remainingCurrent" name="remainingCurrent" />
+                </div>
+
+                <!-- الرسوم -->
+                <div class="form-field">
+                  <label class="form-label">الرسوم لكل الملفات</label>
+                  <input type="number" class="form-input" [(ngModel)]="files.feesAll" name="feesAll" />
+                </div>
+                <div class="form-field">
+                  <label class="form-label">الرسوم للشركة الحالية</label>
+                  <input type="number" class="form-input" [(ngModel)]="files.feesCurrent" name="feesCurrent" />
+                </div>
+
+                <!-- المتبقي شامل الرسوم -->
+                <div class="form-field">
+                  <label class="form-label">المتبقي شامل الرسوم لكل الملفات</label>
+                  <input type="number" class="form-input" [(ngModel)]="files.remainingWithFeesAll" name="remainingWithFeesAll" />
+                </div>
+                <div class="form-field">
+                  <label class="form-label">المتبقي شامل الرسوم للشركة الحالية</label>
+                  <input type="number" class="form-input" [(ngModel)]="files.remainingWithFeesCurrent" name="remainingWithFeesCurrent" />
+                </div>
+
+                <!-- الإجراءات -->
+                <div class="form-field">
+                  <label class="form-label">الإجراءات لكل الملفات</label>
+                  <input type="number" class="form-input" [(ngModel)]="files.actionsAll" name="actionsAll" />
+                </div>
+                <div class="form-field">
+                  <label class="form-label">الإجراءات للشركة الحالية</label>
+                  <input type="number" class="form-input" [(ngModel)]="files.actionsCurrent" name="actionsCurrent" />
+                </div>
+              </div>
+            </div>
+            <div *ngIf="activeSubTab === 'company-link'">
+              <div class="form-grid">
+                <div class="form-field form-field-full">
+                  <label class="form-label">رابط الشركة للدفع</label>
+                  <input type="text" class="form-input" [(ngModel)]="companyLink" name="companyLink" placeholder="https://company-payment-link" />
+                </div>
+                <div class="form-field form-field-full">
+                  <label class="form-label">سيتم إرسال الرابط على الواتس على الرقم التالي</label>
+                  <input type="text" class="form-input" [(ngModel)]="whatsAppNumber" name="whatsAppNumber" placeholder="مثال: 9665XXXXXXXX" />
+                </div>
+              </div>
+
+              <!-- الأزرار -->
+              <div class="form-actions">
+                <button class="form-button form-button-primary" (click)="setOfficeLink()">رابط المكتب</button>
+                <button class="form-button form-button-secondary" (click)="setCompanyLink()">رابط الشركة</button>
+                <button class="form-button form-button-outline" (click)="copyLink()">نسخ</button>
+                <button class="form-button form-button-success" (click)="sendWhatsApp()">إرسال رابط الشركة بالواتس</button>
+              </div>
+            </div>
+            <div *ngIf="activeSubTab === 'fees'">fees</div>
+            <div *ngIf="activeSubTab === 'details'">
+              <div class="table-container">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>البيان</th>
+                      <th>المبلغ</th>
+                      <th>Open</th>
+                      <th>BTN</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of detailsList">
+                      <td>{{ item.description }}</td>
+                      <td>{{ item.amount | number }}</td>
+                      <td>
+                        <button class="form-button form-button-outline" style="padding: 0.25rem 0.75rem;" (click)="openItem(item)">
+                          Open
+                        </button>
+                      </td>
+                      <td>
+                        <button class="form-button form-button-primary" style="padding: 0.25rem 0.75rem;" (click)="action(item)">
+                          BTN
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div *ngIf="activeSubTab === 'checks'">
+              <p style="color: var(--text-color-secondary);">checks</p>
+            </div>
+            <div *ngIf="activeSubTab === 'attachments'">
+              <div class="table-container">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>اسم المرفق</th>
+                      <th>تاريخ الإضافة</th>
+                      <th>المرفق</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let file of attachments">
+                      <td>{{ file.id }}</td>
+                      <td>{{ file.name }}</td>
+                      <td>{{ file.date | date: 'yyyy-MM-dd' }}</td>
+                      <td>
+                        <button class="form-button form-button-primary" style="padding: 0.25rem 0.75rem;" (click)="openAttachment(file)">
+                          فتح
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div *ngIf="activeSubTab === 'categories'">categories</div>
+       </div>
+
+       </div>
+       <!-- Financial Summary -->
+       <div class="col-span-2 card" style="background: var(--primary-color); color: var(--primary-contrast-color);">
+         <div class="card-body">
+           <div class="space-y-2 text-sm">
+             <div class="flex justify-between"><span>قيمة المطالبة:</span><span>45.712</span></div>
+             <div class="flex justify-between"><span>الرسوم:</span><span>0</span></div>
+             <div class="flex justify-between"><span>أتعاب المحاماة:</span><span>0</span></div>
+           </div>
+           <div style="border-top: 1px solid rgba(255,255,255,0.3); margin: 0.5rem 0;"></div>
+           <div style="background: rgba(0,0,0,0.2); padding: 0.75rem; border-radius: var(--content-border-radius);">
+             <div class="flex justify-between font-bold"><span>المسدد:</span><span>45.712</span></div>
+             <div class="flex justify-between text-xs"><span>التاريخ:</span><span>9/26/2011</span></div>
+           </div>
+           <div class="mt-2 space-y-2 text-sm">
+             <div class="flex justify-between"><span>إجمالي المسدد:</span><span>45.712</span></div>
+             <div class="flex justify-between"><span>إجمالي التخفيض:</span><span>0.000</span></div>
+             <div class="flex justify-between font-bold"><span>المتبقي:</span><span>0.000</span></div>
+           </div>
+         </div>
+       </div>
+     </div>
+   
+   
+     <!-- ===================================== -->
+     <!--  Middle Section: Negotiation          -->
+     <!-- ===================================== -->
+     <div class="grid grid-cols-12 gap-4">
+       
+    <div class="col-span-12 lg:col-span-3 card">
+      <div class="card-body">
+        <div class="form-grid">
+          <button class="form-button form-button-primary" routerLink="/report/add-number">
+            ➕ اضافة كشف
+          </button>
+          <button class="form-button form-button-secondary" routerLink="/report/numbers">
+            🔍 بحث أرقام
+          </button>
+          <div class="form-field form-field-full">
+            <input type="text" class="form-input" placeholder="ادخل رقم الكشف للبحث" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-span-12 lg:col-span-10">
+      <div class="w-full space-y-6">
+        <div class="tabs">
+          <a class="tab tab-bordered"
+             [class.tab-active]="activeTab === 'numbers'"
+             (click)="activeTab = 'numbers'">
+            الرقم
+          </a>
+          <a class="tab tab-bordered"
+             [class.tab-active]="activeTab === 'add'"
+             (click)="activeTab = 'add'">
+            اضافة رقم
+          </a>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="card">
+          <div class="card-body">
+            <!-- TAB (1) الرقم -->
+            <div *ngIf="activeTab === 'numbers'">
+              <div class="table-container">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>الرقم</th>
+                      <th>المستخدم</th>
+                      <th>الحالة</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let row of numbers">
+                      <td>{{ row.number }}</td>
+                      <td>{{ row.user }}</td>
+                      <td>{{ row.status }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- TAB (2) اضافة رقم -->
+            <div *ngIf="activeTab === 'add'" class="form-grid">
+              <div class="form-field">
+                <label class="form-label">مستخدم الرقم</label>
+                <input type="text" class="form-input" [(ngModel)]="addForm.user" name="user" />
+              </div>
+              <div class="form-field">
+                <label class="form-label">المصدر</label>
+                <input type="text" class="form-input" [(ngModel)]="addForm.source" name="source" />
+              </div>
+              <div class="form-actions">
+                <button class="form-button form-button-primary" (click)="saveNumber()">💾 حفظ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Negotiation Method & Review -->
+  <div class="col-span-12 lg:col-span-3 card">
+    <div class="card-header">
+      <h3>وسيلة التفاوض</h3>
+    </div>
+    <div class="card-body">
+      <div class="grid grid-cols-2 gap-2">
+        <button *ngFor="let method of negotiationMethods"
+                class="form-button form-button-outline"
+                style="padding: 0.5rem; font-size: 0.875rem;"
+                (click)="selectAction(method)">
+          {{ method }}
+        </button>
+      </div>
+      <div class="mt-2">
+        <button class="form-button form-button-outline" style="width: 100%;">تحليل الإفادات</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-span-12 lg:col-span-7">
+    <div class="col-span-12 lg:col-span-2 card">
+      <div class="card-body">
+        <h3 class="card-header">المراجعة</h3>
+        <div class="form-grid">
+          <div class="form-field">
+            <label class="form-label">تاريخ المراجعة</label>
+            <input type="date" class="form-input" />
+          </div>
+          <div class="form-actions">
+            <button class="form-button form-button-primary" style="flex: 1;">حفظ</button>
+            <button class="form-button form-button-outline" style="flex: 1;">تراجع</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Negotiation Outcome -->
+    <div class="col-span-12 lg:col-span-4 card">
+      <div class="card-header">
+        <h3>نتيجة التفاوض</h3>
+      </div>
+      <div class="card-body">
+        <div class="grid grid-cols-3 md:grid-cols-4 gap-2">
+          <button *ngFor="let result of negotiationResults"
+                  class="form-button"
+                  [class.form-button-success]="result === 'وعد بالسداد' || result === 'تقسيط'"
+                  [class.form-button-warning]="result === 'طلب مهلة' || result === 'شكوى'"
+                  [class.form-button-danger]="result === 'رفض السداد' || result === 'غير معترف' || result === 'أنكر نفسه'"
+                  [class.form-button-outline]="result === 'مراجعة' || result === 'لا يوجد رقم' || result === 'مطلوب رقم 2' || result === 'رقم خطأ'"
+                  [class.form-button-secondary]="result === 'مطلوب إجراء' || result === 'تأجيل متابعة' || result === 'رفع الإجراءات' || result === 'خصم'"
+                  style="padding: 0.5rem; font-size: 0.875rem;"
+                  (click)="selectedResult = result">
+            {{ result }}
+          </button>
+        </div>
+
+        <div class="card mt-4" style="background: var(--surface-hover);">
+          <div class="card-body">
+            <h3 style="font-weight: 700; margin-bottom: 0.5rem;">نتيجة التفاوض</h3>
+            <div style="font-size: 0.875rem; color: var(--text-color-secondary);">
+              {{ selectedAction ? 'وسيلة التفاوض: ' + selectedAction : 'اختر وسيلة التفاوض' }}
+            </div>
+            <div style="font-size: 0.875rem; color: var(--text-color-secondary); margin-top: 0.25rem;">
+              {{ selectedResult ? 'نتيجة التفاوض: ' + selectedResult : 'اختر نتيجة التفاوض' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+            </div>
+       </div>
+   
+     </div>
+     
+    
+   
+     <!-- ===================================== -->
+     <!--  Bottom Section: Data Grid            -->
+     <!-- ===================================== -->
+     <div class="card bg-base-100 shadow-md">
+       <div class="card-body p-4">
+         <div role="tablist" class="tabs tabs-lifted">
+         
+      <a role="tab" 
+         class="tab"
+         [class.tab-active]="activeSubTabLower === 'notes'"
+         (click)="setSubActiveLower('notes')">
+         الملاحظات
+      </a>
+
+      <a role="tab" 
+         class="tab"
+         [class.tab-active]="activeSubTabLower === 'efada'"
+         (click)="setSubActiveLower('efada')">
+         الإفادة
+      </a>
+
+      <a role="tab" 
+         class="tab"
+         [class.tab-active]="activeSubTabLower === 'record'"
+         (click)="setSubActiveLower('record')">
+         السجل
+      </a>
+
+      <a role="tab" 
+         class="tab"
+         [class.tab-active]="activeSubTabLower === 'executions'"
+         (click)="setSubActiveLower('executions')">
+         إفادات التنفيذ
+      </a>
+
+      <a role="tab" 
+         class="tab"
+         [class.tab-active]="activeSubTabLower === 'trader'"
+         (click)="setSubActiveLower('trader')">
+         إفادات المتداول
+      </a>
+
+      <a role="tab" 
+         class="tab"
+         [class.tab-active]="activeSubTabLower === 'link'"
+         (click)="setSubActiveLower('link')">
+         الرابط
+      </a>
+
+      <a role="tab" 
+         class="tab"
+         [class.tab-active]="activeSubTabLower === 'files'"
+         (click)="setSubActiveLower('files')">
+         ملفات أخرى
+      </a>
+
+      <a role="tab" 
+         class="tab"
+         [class.tab-active]="activeSubTabLower === 'results'"
+         (click)="setSubActiveLower('results')">
+         نتائج البحث
+      </a>
+
+      <a role="tab" 
+         class="tab"
+         [class.tab-active]="activeSubTabLower === 'secretary'"
+         (click)="setSubActiveLower('secretary')">
+         السكرتارية
+      </a>
+
+      <a role="tab" 
+         class="tab"
+         [class.tab-active]="activeSubTabLower === 'autoNumbers'"
+         (click)="setSubActiveLower('autoNumbers')">
+         أرقام آلية
+      </a>
+    </div>
+         
+    <!-- ====================== CONTENT ======================= -->
+
+  <!-- الملاحظات -->
+    <div *ngIf="activeSubTabLower === 'notes'" class="mt-4">
+      <h3 class="font-bold mb-2">الملاحظات</h3>
+      <table class="table table-zebra w-full">
+        <thead>
+          <tr>
+            <th>الكود</th>
+            <th>التاريخ</th>
+            <th>الملاحظات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let note of notesData">
+            <td>{{ note.code }}</td>
+            <td>{{ note.date }}</td>
+            <td>{{ note.text }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- الإفادة -->
+    <div *ngIf="activeSubTabLower === 'efada'" class="mt-4">
+      <h3 class="font-bold mb-2">الإفادة</h3>
+      <table class="table table-zebra w-full table-sm">
+        <thead>
+          <tr>
+            <th>Serial</th>
+            <th>تاريخ الإفادة</th>
+            <th>الإفادة</th>
+            <th>تاريخ المراجعة</th>
+            <th>الإجراء القادم</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ef of efadaData">
+            <td>{{ ef.serial }}</td>
+            <td>{{ ef.efadaDate }}</td>
+            <td>{{ ef.efadaText }}</td>
+            <td>{{ ef.reviewDate }}</td>
+            <td>{{ ef.nextAction }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+   <!-- السجل -->
+    <div *ngIf="activeSubTabLower === 'record'" class="mt-4">
+      <h3 class="font-bold mb-2">السجل</h3>
+      <table class="table table-zebra w-full">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>التاريخ</th>
+            <th>الإفادة</th>
+            <th>المراجعة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of recordData; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ record.date }}</td>
+            <td>{{ record.efada }}</td>
+            <td>{{ record.review }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- executions -->
+    <div *ngIf="activeSubTabLower === 'executions'" class="mt-4">
+      <h3 class="font-bold mb-2">تنفيذات</h3>
+      <table class="table table-zebra w-full table-sm">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>التاريخ</th>
+            <th>آخر إجراء</th>
+            <th>تاريخ آخر إجراء</th>
+            <th>الإجراء القادم</th>
+            <th>تاريخ الإجراء القادم</th>
+            <th>مكان الملف</th>
+            <th>ملاحظات</th>
+            <th>المستخدم</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let exec of executionsData; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ exec.date }}</td>
+            <td>{{ exec.lastAction }}</td>
+            <td>{{ exec.lastActionDate }}</td>
+            <td>{{ exec.nextAction }}</td>
+            <td>{{ exec.nextActionDate }}</td>
+            <td>{{ exec.fileLocation }}</td>
+            <td>{{ exec.notes }}</td>
+            <td>{{ exec.user }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+   <!-- trader -->
+    <div *ngIf="activeSubTabLower === 'trader'" class="mt-4">
+      <h3 class="font-bold mb-2">جلسات المتداول</h3>
+      <table class="table table-zebra w-full table-sm">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>تاريخ الإفادة</th>
+            <th>نوع الجلسة</th>
+            <th>القرار</th>
+            <th>الجلسة القادمة</th>
+            <th>توقيت الخبراء</th>
+            <th>ملاحظات الجلسة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let session of traderData; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ session.efadaDate }}</td>
+            <td>{{ session.sessionType }}</td>
+            <td>{{ session.decision }}</td>
+            <td>{{ session.nextSession }}</td>
+            <td>{{ session.expertsTime }}</td>
+            <td>{{ session.notes }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- link-->
+    <div *ngIf="activeSubTabLower === 'link'" class="mt-4">
+      <h3 class="font-bold mb-2">link</h3>
+      <p>لينك</p>
+    </div>
+
+<!-- files -->
+<div *ngIf="activeSubTabLower === 'files'" class="mt-4">
+  <h3 class="font-bold mb-2">ملفات العميل</h3>
+  <table class="table table-zebra w-full table-sm">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>الكود</th>
+        <th>سبب المديونية</th>
+        <th>المدني</th>
+        <th>حالة الملف</th>
+        <th>الموكل</th>
+        <th>رقم العقد</th>
+        <th>قيمة المطالبة</th>
+        <th>المدفوع</th>
+        <th>المتبقي</th>
+        <th>الموكل الفرعي</th>
+        <th>الموظف</th>
+        <th>رقم الباتش</th>
+        <th>CASE_CLINT</th>
+        <th>CODE_CLINT</th>
+        <th>EMPLOYEE</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let file of filesData; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ file.code }}</td>
+        <td>{{ file.debtReason }}</td>
+        <td>{{ file.civil }}</td>
+        <td>{{ file.fileStatus }}</td>
+        <td>{{ file.client }}</td>
+        <td>{{ file.contractNumber }}</td>
+        <td>{{ file.claimAmount }}</td>
+        <td>{{ file.paid }}</td>
+        <td>{{ file.remaining }}</td>
+        <td>{{ file.subClient }}</td>
+        <td>{{ file.employee }}</td>
+        <td>{{ file.batchNumber }}</td>
+        <td>{{ file.caseClient }}</td>
+        <td>{{ file.codeClient }}</td>
+        <td>{{ file.employeeCode }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+    <!-- results-->
+    <div *ngIf="activeSubTabLower === 'results'" class="mt-4">
+      <h3 class="font-bold mb-2">results</h3>
+      <p>سيتم عرض نتائج البحث بعد اختيار الرقم…</p>
+    </div>
+
+    <!-- secretary -->
+    <div *ngIf="activeSubTabLower === 'secretary'" class="mt-4">
+      <h3 class="font-bold mb-2">سكرتارية</h3>
+      <table class="table table-zebra w-full table-sm">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>التاريخ</th>
+            <th>الملاحظة</th>
+            <th>الاسم</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let sec of secretaryData; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ sec.date }}</td>
+            <td>{{ sec.note }}</td>
+            <td>{{ sec.name }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- autoNumbers-->
+    <div *ngIf="activeSubTabLower === 'autoNumbers'" class="mt-4">
+      <h3 class="font-bold mb-2">autoNumbers</h3>
+      <p>سيتم عرض نتائج البحث بعد اختيار الرقم…</p>
+    </div>
+
+  </div>
+</div>
+   
+
+<!-- searchNumbers -->
+<div *ngIf="activeMainTab === 'searchNumbers'">
+ <div class="flex h-full gap-4 p-2">
+      
+  <!-- 1. لوحة التحكم والإدخال (يمين الشاشة) -->
+  <div class="w-100 flex flex-col gap-3 shrink-0 bg-gray-50 p-3 border border-gray-300 rounded-lg shadow-md overflow-y-auto">
+    
+    <!-- قسم الخصم والمدني وتاريخ الانتهاء -->
+    <div class="space-y-2 pb-3 ">
+        <div class="flex items-center gap-2 text-xs">
+            <label class="font-bold text-gray-700 w-12">الخصم :</label>
+            <input type="text" [(ngModel)]="searchNumbersForm.discount" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+        </div>
+        
+        <div class="flex items-center gap-2 text-xs">
+            <label class="font-bold text-gray-700 w-12">المدني :</label>
+            <input type="text" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+        </div>
+        
+        <div class="flex items-center gap-2 text-xs">
+            <label class="font-bold text-gray-700 w-24">تاريخ انتهاء المدنية :</label>
+            <input type="date" [(ngModel)]="searchNumbersForm.civilEndDate" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+        </div>
+    </div>
+    
+    <!-- A. بيانات الكفيل (القسم الثاني في الصورة) -->
+    <div class="space-y-2 border-b pb-3 border-gray-300">
+        <h4 class="font-bold text-gray-800 text-sm border-b border-gray-400 pb-1">بيانات الكفيل</h4>
+        <div class="flex items-center gap-2 text-xs">
+            <label class="font-bold text-gray-700 w-16">الكفيل</label>
+            <input type="text" [(ngModel)]="searchNumbersForm.guarantor" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+        </div>
+         <div class="flex items-center gap-2 text-xs">
+            <label class="font-bold text-gray-700 w-16">الغاكس</label>
+            <input type="text" [(ngModel)]="searchNumbersForm.fax" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+             <label class="font-bold text-gray-700 w-28">رقم السجل التجاري</label>
+             <input type="text" [(ngModel)]="searchNumbersForm.commercialReg" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+             <label class="font-bold text-gray-700 w-28">رقم مدني الشركة</label>
+             <input type="text" [(ngModel)]="searchNumbersForm.companyCivil" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+        </div>
+         <div class="flex items-center gap-2 text-xs">
+             <label class="font-bold text-gray-700 w-28">نوع العضوية</label>
+             <input type="text" [(ngModel)]="searchNumbersForm.membership" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+             <label class="font-bold text-gray-700 w-16">الهاتف</label>
+             <input type="text" [(ngModel)]="searchNumbersForm.phone" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+             <label class="font-bold text-gray-700 w-16">البريد</label>
+             <input type="text" [(ngModel)]="searchNumbersForm.email" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+        </div>
+        <!-- شركاء 1، 2، 3 -->
+        <div class="flex items-center gap-2 text-xs">
+             <label class="font-bold text-gray-700 w-16">شريك 1</label>
+             <input type="text" [(ngModel)]="searchNumbersForm.partner1" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+             <label class="font-bold text-gray-700 w-16">شريك 2</label>
+             <input type="text" [(ngModel)]="searchNumbersForm.partner2" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+             <label class="font-bold text-gray-700 w-16">شريك 3</label>
+             <input type="text" [(ngModel)]="searchNumbersForm.partner3" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+        </div>
+
+        <!-- أزرار الإكسل والحفظ (الأخضر) -->
+        <div class="flex justify-center gap-2 shrink-0 mt-3">
+            <button class="btn btn-sm bg-green-700 hover:bg-green-800 text-white shadow-sm rounded-none h-8 min-h-0 px-6">إكسل</button>
+            <button class="btn btn-sm bg-green-700 hover:bg-green-800 text-white shadow-sm rounded-none h-8 min-h-0 px-6" (click)="onSave()">حفظ</button>
+        </div>
+    </div>
+    
+    <!-- B. بيانات البحث عن الأرقام (القسم السفلي في الصورة) -->
+    <div class="space-y-2 border-t pt-3 border-gray-300">
+          <label class="font-bold text-gray-700 block">رقم الهواتف</label>
+          <input type="text" class="input input-xs input-bordered w-full rounded-none  h-6" />
+          
+          <label class="font-bold text-gray-700 block">المدني لمالك الهواتف</label>
+          <input type="text" class="input input-xs input-bordered w-full rounded-none  h-6" />
+
+          <label class="font-bold text-gray-700 block">المستخدم</label>
+          <select class="select select-xs select-bordered w-full rounded-none border-gray-400 h-6 min-h-0 bg-white"></select>
+
+           <label class="font-bold text-gray-700 block">المصدر</label>
+          <select class="select select-xs select-bordered w-full rounded-none border-gray-400 h-6 min-h-0 bg-white"></select>
+
+          <label class="font-bold text-gray-700 block">التصنيف</label>
+          <select class="select select-xs select-bordered w-full rounded-none border-gray-400 h-6 min-h-0 bg-white"></select>
+
+          <label class="font-bold text-gray-700 block">نوع الخط</label>
+          <select class="select select-xs select-bordered w-full rounded-none border-gray-400 h-6 min-h-0 bg-white"></select>
+          
+          <label class="font-bold text-gray-700 block">حالة الرقم</label>
+          <select class="select select-xs select-bordered w-full rounded-none border-gray-400 h-6 min-h-0 bg-white"></select>
+    </div>
+    
+    <!-- C. أزرار التحكم السفلية -->
+    <div class="flex justify-center gap-2 shrink-0 mt-3">
+        <button class="btn btn-xs bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400 shadow-sm rounded-none h-6 min-h-0 px-4">تراجع</button>
+        <button class="btn btn-xs bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400 shadow-sm rounded-none h-6 min-h-0 px-4">تعديل</button>
+        <button class="btn btn-xs bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400 shadow-sm rounded-none h-6 min-h-0 px-4">حفظ</button>
+    </div>
+  </div>
+
+  <!-- 2. منطقة الجدول والإحصائيات (وسط وشمال الشاشة) -->
+  <div class="flex-grow flex flex-col gap-2">
+    
+    <!-- A. الجدول الرئيسي -->
+    <div class="flex-grow overflow-hidden border border-gray-300 rounded-lg shadow-sm">
+
+        <!-- الجدول -->
+        <div class="overflow-auto h-full">
+            <table class="table table-xs table-pin-rows w-full border-collapse text-right whitespace-nowrap">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-700 border-b border-gray-300 text-[10px] h-7">
+                        <th class="border-r w-1/12 bg-gray-200">الرقم</th>
+                        <th class="border-r w-1/12 bg-gray-200">المدني</th>
+                        <th class="border-r w-1/12 bg-gray-200">المستخدم</th>
+                        <th class="border-r w-1/12 bg-gray-200">التصنيف</th>
+                        <th class="border-r w-1/12 bg-gray-200">المصدر</th>
+                        <th class="border-r w-1/12 bg-gray-200">نوع الخط</th>
+                        <th class="border-r w-1/12 bg-gray-200">تاريخ الإضافة</th>
+                        <th class="border-r w-1/12 bg-gray-200">حالة الرقم</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let row of numbersSearchResults">
+                        <td class="border-r font-mono font-bold">{{ row.number }}</td>
+                        <td class="border-r">{{ row.civilID }}</td>
+                        <td class="border-r">{{ row.user }}</td>
+                        <td class="border-r">{{ row.classification }}</td>
+                        <td class="border-r">{{ row.source }}</td>
+                        <td class="border-r">{{ row.type }}</td>
+                        <td class="border-r">{{ row.date }}</td>
+                        <td class="border-r">{{ row.status }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- B. الجداول السفلية (3 قوائم) -->
+    <div class="flex gap-4 shrink-0 h-40">
+        <!-- الجدول الأيمن -->
+        <div class="w-1/2 border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+            <table class="table table-xs w-full text-right">
+                <thead><tr class="bg-gray-100 text-gray-700"><th>العدد</th><th>نوع الخط</th></tr></thead>
+                <tbody>
+                     <tr *ngFor="let row of bottomTable1"><td>{{row.count}}</td><td>{{row.type}}</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- الجدول الأوسط -->
+        <div class="w-1/2 border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+            <table class="table table-xs w-full text-right">
+                <thead><tr class="bg-gray-100 text-gray-700"><th>العدد</th><th>المصدر</th></tr></thead>
+                <tbody>
+                      <tr *ngFor="let row of bottomTable2"><td>{{row.count}}</td><td>{{row.source}}</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+<!-- menuSearch -->
+<div *ngIf="activeMainTab === 'menuSearch'" dir="rtl"
+     class="p-6 bg-gray-50 border border-gray-300 rounded-lg shadow-md w-full">
+
+    <h3 class="text-xl font-bold mb-6 text-gray-800">قائمة البحث</h3>
+
+    <!-- النموذج الرئيسي -->
+    <div class="grid grid-cols-2 gap-4 w-full max-w-3xl text-sm">
+
+        <!-- الاسم بالكامل -->
+        <div class="col-span-2 flex items-center gap-4">
+            <label class="w-32 font-bold text-gray-700">الاسم بالكامل</label>
+            <input type="text"
+                   [(ngModel)]="menuSearchForm.fullName"
+                   name="fullName"
+                   class="input input-sm border-gray-400  w-full rounded-none" />
+        </div>
+
+        <!-- الاسم - الأب - الجد - العائلة -->
+        <div class="col-span-2 grid grid-cols-12 gap-4 items-center">
+            
+            <label class="w-32 font-bold text-gray-700 col-span-2 flex items-center">الاسم</label>
+
+            <input type="text" [(ngModel)]="menuSearchForm.firstName"
+                   placeholder="الاسم"
+                   name="firstName"
+                   class="col-span-2 input input-sm border-gray-400  rounded-none" />
+
+            <input type="text" [(ngModel)]="menuSearchForm.middleName"
+                   placeholder="الأب"
+                   name="middleName"
+                   class="col-span-2 input input-sm border-gray-400  rounded-none" />
+
+            <input type="text" [(ngModel)]="menuSearchForm.lastName"
+                   placeholder="الجد"
+                   name="lastName"
+                   class="col-span-2 input input-sm border-gray-400  rounded-none" />
+
+            <label class="font-bold text-gray-700 col-span-2 flex items-center">العائلة</label>
+
+            <select [(ngModel)]="menuSearchForm.familyName"
+                    name="familyName"
+                    class="col-span-2 select select-sm border-gray-400  rounded-none">
+                <option value="" disabled selected>--- اختر العائلة ---</option>
+                <option *ngFor="let family of familyList" [value]="family">
+                    {{ family }}
+                </option>
+            </select>
+        </div>
+
+        <!-- المدني + الموحد -->
+        <div class="col-span-2 grid grid-cols-8 gap-4 items-center">
+
+            <label class="w-32 font-bold text-gray-700 col-span-2">المدني</label>
+            <input type="text" [(ngModel)]="menuSearchForm.civilId"
+                   name="civilId"
+                   class="col-span-2 input input-sm border-gray-400  rounded-none" />
+
+            <label class="w-32 font-bold text-gray-700 col-span-2">الموحد</label>
+            <input type="text" [(ngModel)]="menuSearchForm.unifiedNumber"
+                   name="unifiedNumber"
+                   class="col-span-2 input input-sm border-gray-400  rounded-none" />
+        </div>
+
+        <!-- الرقم -->
+        <div class="col-span-2 flex items-center gap-4">
+            <label class="w-32 font-bold text-gray-700">الرقم</label>
+            <input type="text" [(ngModel)]="menuSearchForm.phone"
+                   name="phone"
+                   class="input input-sm border-gray-400  w-full rounded-none" />
+        </div>
+
+        <!-- العنوان -->
+        <div class="col-span-2 flex items-center gap-4">
+            <label class="w-32 font-bold text-gray-700">العنوان</label>
+            <input type="text" [(ngModel)]="menuSearchForm.address"
+                   name="address"
+                   class="input input-sm border-gray-400  w-full rounded-none" />
+        </div>
+
+    </div>
+
+    <!-- الأزرار -->
+    <div class="flex gap-3 mt-6 w-full max-w-3xl">
+        <button class="btn btn-sm bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400 rounded-none shadow-sm h-8 min-h-0 px-6"
+                (click)="searchMenu()">بحث</button>
+
+        <button class="btn btn-sm bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400 rounded-none shadow-sm h-8 min-h-0 px-6">
+            إضافة
+        </button>
+
+        <button class="btn btn-sm bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400 rounded-none shadow-sm h-8 min-h-0 px-6"
+                (click)="resetMenuSearch()">تراجع</button>
+    </div>
+
+</div>
+
+<!--  FeesAndCollection -->
+<div *ngIf="activeMainTab === 'FeesAndCollection'">
+   <h2 class="text-xl font-bold"> العمولات و التحصيل</h2>
+</div>
+
+<!-- notes -->
+<div *ngIf="activeMainTab === 'notes'">
+   <h2 class="text-xl font-bold">الملاحظات</h2>
+</div>
+
+<!-- preview -->
+<div *ngIf="activeMainTab === 'preview'">
+   <h2 class="text-xl font-bold">preview</h2>
+</div>
+
+<!-- newFiles -->
+<div *ngIf="activeMainTab === 'newFiles'">
+   <h2 class="text-xl font-bold">newFiles</h2>
+</div>
+
+<!-- statements -->
+<div *ngIf="activeMainTab === 'statements'">
+ <div class="flex flex-col h-full overflow-hidden">
+    
+    <!-- 1. شريط البحث والفلترة -->
+    <div class="flex flex-wrap justify-between items-center bg-gray-100 p-2 border border-gray-300 rounded-lg shadow-sm shrink-0 mb-3 gap-2">
+        
+        <!-- حقول التاريخ -->
+        <div class="flex items-center gap-4 text-xs shrink-0">
+            <div class="flex items-center gap-1">
+                <label class="font-bold text-gray-700">من تاريخ</label>
+                <input type="date" [(ngModel)]="fromDate" class="input input-xs input-bordered rounded-none h-6" />
+            </div>
+            <div class="flex items-center gap-1">
+                <label class="font-bold text-gray-700">الى تاريخ</label>
+                <input type="date" [(ngModel)]="toDate" class="input input-xs input-bordered rounded-none h-6" />
+            </div>
+            
+            <!-- زر البحث العام -->
+            <button class="btn btn-xs bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400 rounded-none h-6 min-h-0 px-4" (click)="searchStatements()">بحث عام</button>
+        </div>
+
+        <!-- أزرار الفلترة السريعة -->
+        <div class="flex items-center gap-2 text-xs">
+            
+             <button 
+                class="btn btn-xs rounded-none h-6 min-h-0 px-4"
+                [ngClass]="activeFilter === 'statements' ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400'"
+                (click)="setFilterAndSearch('statements')">
+                إفادات
+             </button>
+             
+             <button 
+                class="btn btn-xs rounded-none h-6 min-h-0 px-4"
+                [ngClass]="activeFilter === 'review' ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400'"
+                (click)="setFilterAndSearch('review')">
+                مراجعة
+             </button>
+
+             <button 
+                class="btn btn-xs rounded-none h-6 min-h-0 px-4"
+                [ngClass]="activeFilter === 'paid' ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400'"
+                (click)="setFilterAndSearch('paid')">
+                السداد
+             </button>
+
+             <button 
+                class="btn btn-xs rounded-none h-6 min-h-0 px-4"
+                [ngClass]="activeFilter === 'group_paid' ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400'"
+                (click)="setFilterAndSearch('group_paid')">
+                سداد المجموعة
+             </button>
+             
+             <button class="btn btn-xs bg-green-700 hover:bg-green-800 text-white rounded-none h-6 min-h-0 px-4" (click)="exportToExcel()">Excel</button>
+             <button class="btn btn-xs bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400 rounded-none h-6 min-h-0">طباعة</button>
+             <button class="btn btn-xs bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400 rounded-none h-6 min-h-0">حذف الإفادة</button>
+        </div>
+
+    </div>
+
+    <!-- 2. الجدول الرئيسي -->
+    <div class="flex-grow overflow-auto border border-gray-300 rounded-lg shadow-inner bg-white">
+        
+        <table class="table table-xs table-pin-rows w-full border-collapse text-right whitespace-nowrap">
+            <thead>
+                <tr class="bg-gray-100 text-gray-700 border-b border-gray-300 text-[10px] h-6">
+                    <th class="border-r w-8 bg-gray-200">#</th>
+                    <th class="border-r bg-gray-200">الاسم</th>
+                    <th class="border-r bg-gray-200">تاريخ الإفادة</th>
+                    <th class="border-r bg-gray-200">تاريخ المراجعة</th>
+                    <th class="border-r bg-gray-200">الإفادة</th>
+                    <th class="border-r bg-gray-200">الموظف</th>
+                    <th class="border-r bg-gray-200">طريقة التواصل</th>
+                    <th class="border-r bg-gray-200">حالة التواصل</th>
+                    <th class="border-r bg-gray-200">حالة التعاون</th>
+                    <th class="border-r bg-gray-200">الحالة المدنية</th>
+                    <th class="border-r bg-gray-200">الحالة الداخلية</th>
+                    <th class="border-r bg-gray-200">حالة الإيداع</th>
+                    <th class="border-r bg-gray-200">قيمة الإجمالي</th>
+                    <th class="border-r bg-gray-200">رقم الإفادة</th>
+                    <th class="border-r bg-gray-200">ملاحظات</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of statementRows; let i = index" class="hover:bg-blue-50 border-b border-gray-100">
+                     <td class="border-r text-center">{{ i + 1 }}</td>
+                     <td class="border-r font-bold text-blue-800">{{row.name}}</td>
+                     <td class="border-r">{{row.date}}</td>
+                     <td class="border-r">{{row.reviewDate}}</td>
+                     <td class="border-r truncate max-w-[150px]">{{row.efada}}</td>
+                     <td class="border-r">{{row.employee}}</td>
+                     <td class="border-r">{{row.contactMethod}}</td>
+                     <td class="border-r">{{row.contactStatus}}</td>
+                     <td class="border-r">{{row.cooperationStatus}}</td>
+                     <td class="border-r">{{row.civilStatus}}</td>
+                     <td class="border-r">{{row.internalStatus}}</td>
+                     <td class="border-r">{{row.depositStatus}}</td>
+                     <td class="border-r font-mono">{{row.totalAmount}}</td>
+                     <td class="border-r font-mono">{{row.statementNumber}}</td>
+                     <td class="border-r truncate max-w-[150px]">{{row.notes}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</div>
+
+<!-- searchStatements -->
+<div *ngIf="activeMainTab === 'searchStatements'">
+   <h2 class="text-xl font-bold">searchStatements</h2>
+</div>
+
+<!-- stats -->
+<div *ngIf="activeMainTab === 'stats'">
+   <h2 class="text-xl font-bold">stats</h2>
+</div>
+
+<div *ngIf="loading" class="flex justify-center my-10">
+  <span class="loading loading-spinner loading-lg"></span>
+</div>
+<app-lookup-modal
+  #lookupModal
+  (itemSelected)="onLookupSelected($event)"
+></app-lookup-modal>

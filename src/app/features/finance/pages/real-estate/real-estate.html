@@ -1,0 +1,106 @@
+<div class="min-h-screen bg-gray-100 p-6" style="direction: rtl;">
+  <div class="mx-auto bg-white shadow-xl rounded-2xl p-6 space-y-6">
+
+    <!-- الأعلى يمين: Box المطالبة بالمقدم والمؤخر -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Box المطالبة بالمقدم -->
+      <div class="bg-blue-50 p-4 rounded-lg shadow space-y-3">
+        <h3 class="font-bold text-lg mb-2">المطالبة بالمقدم</h3>
+        <div class="flex flex-col md:flex-row gap-3 items-end">
+          <input type="text"
+                 placeholder="اختر الشركة"
+                 [value]="selectedCompanyAdvance?.name || ''"
+                 readonly
+                 class="input input-bordered w-full md:w-64 cursor-pointer"
+                 (click)="openLookup('advance')" />
+
+          <input type="date" [(ngModel)]="advanceToDate" class="input input-bordered w-full md:w-40" />
+
+          <button class="btn btn-primary" (click)="searchAdvance()">بحث</button>
+        </div>
+      </div>
+
+      <!-- Box المطالبة بالمؤخر -->
+      <div class="bg-green-50 p-4 rounded-lg shadow space-y-3">
+        <h3 class="font-bold text-lg mb-2">المطالبة بالمؤخر</h3>
+        <div class="flex flex-col md:flex-row gap-3 items-end">
+          <input type="text"
+                 placeholder="اختر الشركة"
+                 [value]="selectedCompanyDelay?.name || ''"
+                 readonly
+                 class="input input-bordered w-full md:w-64 cursor-pointer"
+                 (click)="openLookup('delay')" />
+
+          <button class="btn btn-primary" (click)="searchDelay()">بحث</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- الأعلى الشمال: الأزرار والمقدم / المؤخر -->
+    <div class="flex flex-col md:flex-row gap-4 items-center mt-4">
+      <div class="flex gap-3">
+        <button class="btn btn-success" (click)="claimAdvance()">المطالبة بالمقدم</button>
+        <button class="btn btn-warning" (click)="claimDelay()">المطالبة بالمؤخر</button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <label class="font-semibold">المقدم / المؤخر:</label>
+        <input type="number" [(ngModel)]="amount" class="input input-bordered w-32" />
+      </div>
+    </div>
+
+    <!-- جدول عرض البيانات -->
+    <div class="overflow-x-auto mt-4">
+      <table class="table table-auto w-full border border-gray-200 shadow-md rounded-lg">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="text-center"><input type="checkbox" (change)="toggleAll($event)" /></th>
+            <th class="text-center">الكود</th>
+            <th class="text-center">الاسم</th>
+            <th class="text-center">المدني</th>
+            <th class="text-center">حالة الملف</th>
+            <th class="text-center">سبب المديونية</th>
+            <th class="text-center">رقم الباتش</th>
+            <th class="text-center">تاريخ الورود</th>
+            <th class="text-center">الموكل</th>
+            <th class="text-center">العقد</th>
+            <th class="text-center">الرقم الالي</th>
+            <th class="text-center">المبلغ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of data; let i = index" class="hover:bg-gray-50 transition">
+            <td class="text-center">
+              <input type="checkbox" [(ngModel)]="item.selected" />
+            </td>
+            <td class="text-center">{{ item.code }}</td>
+            <td class="text-center">{{ item.name }}</td>
+            <td class="text-center">{{ item.civil }}</td>
+            <td class="text-center">{{ item.fileStatus }}</td>
+            <td class="text-center">{{ item.reason }}</td>
+            <td class="text-center">{{ item.batchNumber }}</td>
+            <td class="text-center">{{ item.entryDate }}</td>
+            <td class="text-center">{{ item.client }}</td>
+            <td class="text-center">{{ item.contract }}</td>
+            <td class="text-center">{{ item.autoNumber }}</td>
+            <td class="text-center">{{ item.amount | number }}</td>
+          </tr>
+          <tr *ngIf="data.length === 0">
+            <td colspan="12" class="text-center py-6 text-gray-500">لا توجد بيانات</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Lookup Modal -->
+    <app-lookup-modal #lookup
+                      title="اختيار الشركة"
+                      [columns]="companyColumns"
+                      [data]="companies"
+                      (itemSelected)="onCompanySelected($event)">
+    </app-lookup-modal>
+
+  </div>
+</div>

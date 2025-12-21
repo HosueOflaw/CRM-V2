@@ -1,0 +1,86 @@
+<div class="p-6 bg-gray-50 min-h-screen">
+
+  <!-- Header -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 rounded-xl shadow">
+
+    <!-- من تاريخ -->
+    <div class="flex flex-col">
+      <label class="font-medium mb-1">من تاريخ</label>
+      <input type="date" [(ngModel)]="fromDate"
+        class="p-2 border rounded" />
+    </div>
+
+    <!-- الي تاريخ -->
+    <div class="flex flex-col">
+      <label class="font-medium mb-1">الى تاريخ</label>
+      <input type="date" [(ngModel)]="toDate"
+        class="p-2 border rounded" />
+    </div>
+
+    <!-- الشركة -->
+    <div class="flex flex-col">
+      <label class="font-medium mb-1">الشركة</label>
+      <select [(ngModel)]="company" class="p-2 border rounded">
+        <option value="all">All</option>
+        <option value="viva">Viva</option>
+        <option value="ooredoo">Ooredoo</option>
+        <option value="zain">Zain</option>
+        <option value="car">Car</option>
+        <option value="inst">Inst</option>
+      </select>
+    </div>
+
+    <!-- الأزرار -->
+    <div class="flex items-end gap-2 justify-start md:justify-end">
+
+      <!-- تقرير الإفادات -->
+      <button
+        (click)="loadReports()"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+        تقرير الإفادات
+      </button>
+
+      <!-- زر إضافي 1 -->
+      <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
+        زر 2
+      </button>
+
+      <!-- زر إضافي 2 -->
+      <button class="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-lg">
+        زر 3
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- جدول التقرير -->
+  <div *ngIf="reportData.length" class="mt-6 bg-white p-4 shadow rounded-xl">
+
+    <table class="w-full text-right border-collapse">
+      <thead>
+        <tr class="bg-gray-200 text-gray-700">
+          <th class="p-2 border">كود الموظف</th>
+          <th class="p-2 border">الاسم</th>
+          <th class="p-2 border">الشركة</th>
+          <th class="p-2 border">عدد الإفادات</th>
+          <th class="p-2 border">صافي الإفادات</th>
+          <th class="p-2 border">إجمالي الإفادات</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let row of reportData" class="hover:bg-gray-50">
+          <td class="p-2 border">{{ row.code }}</td>
+          <td class="p-2 border">{{ row.name }}</td>
+          <td class="p-2 border">{{ row.company }}</td>
+          <td class="p-2 border">{{ row.count }}</td>
+          <td class="p-2 border">{{ row.net }}</td>
+          <td class="p-2 border">{{ row.total }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+</div>

@@ -1,0 +1,37 @@
+<dialog #lookupModal class="modal">
+  <div class="modal-box w-11/12 max-w-4xl">
+    <h3 class="font-bold text-lg mb-3">{{ title }}</h3>
+
+    <input
+      [(ngModel)]="search"
+      (input)="filterData()"
+      placeholder="ابحث..."
+      class="input input-bordered w-full mb-4"
+    />
+
+    <div class="overflow-y-auto max-h-[400px]">
+      <table class="table table-sm w-full text-sm">
+        <thead>
+          <tr>
+            <th *ngFor="let col of columns">{{ col }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filteredData">
+            <td *ngFor="let col of columns">{{ row[col] }}</td>
+            <td>
+              <button class="btn btn-xs btn-primary" (click)="selectItem(row)">
+                اختيار
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal-action">
+      <button class="btn btn-outline" (click)="close()">إغلاق</button>
+    </div>
+  </div>
+</dialog>

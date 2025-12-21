@@ -1,0 +1,48 @@
+<div class="login-page" dir="rtl">
+  <div class="login-bg"></div>
+  
+  <div class="login-card">
+    <button class="back-btn" (click)="goBack()">← رجوع</button>
+    
+    <div class="login-header">
+      <div class="login-icon">⚖️</div>
+      <h2>{{ title }}</h2>
+      <p class="subtitle">يرجى إدخال بيانات الدخول</p>
+    </div>
+    
+    <form (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-field">
+        <label class="form-label">اسم المستخدم / البريد الإلكتروني</label>
+        <input
+          type="text"
+          class="form-input"
+          placeholder="admin"
+          [(ngModel)]="email"
+          name="email"
+          required
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">كلمة المرور</label>
+        <input
+          type="password"
+          class="form-input"
+          placeholder="••••••"
+          [(ngModel)]="password"
+          name="password"
+          required
+        />
+      </div>
+
+      <div class="hint-box">
+        <span>🔐</span>
+        <span>للدخول المؤقت: اسم المستخدم <strong>admin</strong> وكلمة المرور <strong>123456</strong></span>
+      </div>
+
+      <button type="submit" class="form-button form-button-primary submit-btn">
+        تسجيل الدخول
+      </button>
+    </form>
+  </div>
+</div>

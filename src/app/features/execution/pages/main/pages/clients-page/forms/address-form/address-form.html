@@ -1,0 +1,36 @@
+<div class="p-6 bg-white rounded-xl shadow-md">
+  <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+    🏠 العنوان
+  </h2>
+
+  <!-- 📊 جدول عرض العناوين -->
+  <div class="overflow-x-auto mt-8">
+    <table class="table table-zebra w-full text-center">
+      <thead class="bg-gray-100">
+        <tr class="text-gray-700">
+          <th>العنوان</th>
+          <th>جهة العمل</th>
+          <th>حالة الإعلان</th>
+          <th>المرفق</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of addresses; let i = index">
+          <td class="max-w-xs truncate">{{ item.address }}</td>
+          <td>{{ item.workPlace }}</td>
+          <td>{{ item.adStatus }}</td>
+          <td>
+            <a
+              *ngIf="item.attachment"
+              [href]="item.attachment"
+              target="_blank"
+              class="text-blue-600 hover:underline"
+              >📎 عرض</a
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

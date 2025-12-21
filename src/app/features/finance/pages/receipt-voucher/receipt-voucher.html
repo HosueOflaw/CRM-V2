@@ -1,0 +1,142 @@
+<div class="p-6 bg-gray-50 min-h-screen" style="direction: rtl;">
+  <h2 class="text-2xl font-bold text-center mb-8 text-gray-800">📄 سند قبض</h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+       <!-- 🔹 يمين: الفورم -->
+    <div class="bg-white p-4 rounded-2xl shadow space-y-3">
+      <h3 class="font-bold mb-4 text-lg border-b pb-2 text-gray-700">تفاصيل السند</h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+        <div>
+          <label class="block mb-1 font-medium">الكود</label>
+          <input type="text" class="input input-bordered w-full" />
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">الرقم المدني</label>
+          <input type="text" class="input input-bordered w-full" />
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">التاريخ:</label>
+          <input type="date" class="input input-bordered w-full" />
+        </div>
+
+        <div class="flex items-center justify-between">
+          <label class="font-medium">سداد جزئي:</label>
+          <input type="checkbox" class="checkbox" />
+        </div>
+        
+        <div>
+          <label class="block mb-1 font-medium">الشركة</label>
+          <input type="text" class="input input-bordered w-full" />
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">المدعي الفانوني</label>
+          <input type="text" class="input input-bordered w-full" />
+        </div>
+
+
+        <div>
+          <label class="block mb-1 font-medium">طريقة الدفع:</label>
+          <select class="select select-bordered w-full">
+            <option>نقدي</option>
+            <option>شيك</option>
+            <option>تحويل بنكي</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">البنك:</label>
+          <select class="select select-bordered w-full">
+            <option>بنك الكويت الوطني</option>
+            <option>بيت التمويل الكويتي</option>
+            <option>بنك الخليج</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">شيك رقم:</label>
+          <input class="input input-bordered w-full" />
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">من:</label>
+          <select class="select select-bordered w-full">
+            <option>العميل</option>
+            <option>شركة الاتصالات</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">المبلغ:</label>
+          <input type="number" class="input input-bordered w-full" />
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">الخصم:</label>
+          <input type="number" class="input input-bordered w-full" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block mb-1 font-medium">ملاحظات:</label>
+        <textarea class="textarea textarea-bordered w-full"></textarea>
+      </div>
+
+      <div>
+        <label class="block mb-1 font-medium">ملاحظات إضافية:</label>
+        <textarea class="textarea textarea-bordered w-full"></textarea>
+      </div>
+
+      <div class="flex flex-wrap gap-2 justify-center mt-4">
+        <button class="btn btn-primary">💾 حفظ</button>
+        <button class="btn btn-outline">↩️ تراجع</button>
+        <button class="btn btn-outline">📄 عرض سند القيد</button>
+        <button class="btn btn-outline">🔍 استعلام</button>
+        <button class="btn btn-error">🚪 خروج</button>
+        <button class="btn btn-error">🗑️ حذف</button>
+      </div>
+    </div>
+    <!-- 🔹 يسار: بيانات المعاملات -->
+    <div class="bg-white p-4 rounded-2xl shadow">
+      <h3 class="font-bold mb-4 text-lg border-b pb-2 text-gray-700">المعاملات بالمكتب</h3>
+
+      <table class="table-auto w-full border border-gray-200 text-center text-sm">
+        <thead class="bg-gray-100 text-gray-700">
+          <tr>
+            <th class="border p-2">الكود</th>
+            <th class="border p-2">رقم الباتش</th>
+            <th class="border p-2">رقم العقد</th>
+            <th class="border p-2">سبب المديونية</th>
+            <th class="border p-2">قيمة المطالبة</th>
+            <th class="border p-2">المدفوع</th>
+            <th class="border p-2">المتبقي</th>
+            <th class="border p-2">الخصم</th>
+            <th class="border p-2">الحالي</th>
+            <th class="border p-2">الحالة</th>
+            <th class="border p-2">الرقم الآلي</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hover:bg-gray-50">
+            <td class="border p-2">{{ receiptData?.code }}</td>
+            <td class="border p-2">{{ receiptData?.batch_no }}</td>
+            <td class="border p-2">{{ receiptData?.contract_no }}</td>
+            <td class="border p-2">{{ receiptData?.reason }}</td>
+            <td class="border p-2">{{ receiptData?.claim_value }}</td>
+            <td class="border p-2">{{ receiptData?.paid }}</td>
+            <td class="border p-2">{{ receiptData?.remaining }}</td>
+            <td class="border p-2">{{ receiptData?.discount }}</td>
+            <td class="border p-2">{{ receiptData?.current }}</td>
+            <td class="border p-2">{{ receiptData?.status }}</td>
+            <td class="border p-2">{{ receiptData?.civil }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+ 
+    
+  </div>
+</div>

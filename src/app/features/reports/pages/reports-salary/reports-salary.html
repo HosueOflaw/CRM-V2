@@ -1,0 +1,152 @@
+<div class="min-h-screen bg-gray-100 p-5 font-sans" dir="rtl">
+
+  <!-- ✅ الشريط العلوي -->
+  <div class="flex flex-wrap gap-3 mb-4">
+    <app-go-back></app-go-back>
+    <button (click)="reviewEntry(null)"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded transition-colors">
+      مراجعة الحسابات
+    </button>
+
+    <button (click)="showCheckVoucher(null)"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded transition-colors">
+      تم المراجعة
+    </button>
+
+    <button (click)="showBondStatement(null)"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded transition-colors">
+      سندات صرف
+    </button>
+
+    <button (click)="showReceipt(null)"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded transition-colors">
+      عرض السند
+    </button>
+
+    <!-- ✅ زر رفع ملف Excel -->
+    <div class="relative inline-block">
+      <input type="file" id="excelInput" accept=".xlsx, .xls" (change)="onFileSelected($event)" class="hidden" />
+      <button (click)="triggerFileInput()"
+        class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded transition-colors flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </button>
+    </div>
+
+    <div *ngIf="uploadedFileName" class="mt-2 text-sm text-gray-700">
+      📄 {{ uploadedFileName }}
+    </div>
+  </div>
+
+  <!-- ✅ الشريط الثاني -->
+  <div class="flex flex-wrap gap-3 mb-4">
+    <button (click)="showCurrentManagement()"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded transition-colors">
+      الإدارة الحالية
+    </button>
+
+    <button (click)="reviewEntry(null)"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded transition-colors">
+      تم المراجعة
+    </button>
+
+    <button (click)="showCheckVoucher(null)"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2.5 rounded transition-colors">
+      سندات قبض المكتب
+    </button>
+  </div>
+
+  <!-- ✅ الفورم -->
+  <div class="bg-white p-5 rounded-lg shadow-md mb-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
+      <div class="flex flex-col">
+        <label class="font-semibold mb-1.5 text-gray-700 text-sm text-right">الكود</label>
+        <input type="text" [(ngModel)]="code"
+          class="px-3 py-2 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <div class="flex flex-col">
+        <label class="font-semibold mb-1.5 text-gray-700 text-sm text-right">الاسم</label>
+        <input type="text" [(ngModel)]="name"
+          class="px-3 py-2 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
+      <div class="flex flex-col">
+        <label class="font-semibold mb-1.5 text-gray-700 text-sm text-right">المبلغ</label>
+        <input type="text" [(ngModel)]="amount"
+          class="px-3 py-2 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <div class="flex flex-col">
+        <label class="font-semibold mb-1.5 text-gray-700 text-sm text-right">البنك</label>
+        <input type="text" [(ngModel)]="bank"
+          class="px-3 py-2 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <div class="flex flex-col">
+        <label class="font-semibold mb-1.5 text-gray-700 text-sm text-right">التاريخ</label>
+        <input type="date" [(ngModel)]="date"
+          class="px-3 py-2 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+    </div>
+
+    <div class="flex flex-col">
+      <label class="font-semibold mb-1.5 text-gray-700 text-sm text-right">رقم السند</label>
+      <input type="number" [(ngModel)]="code"
+        class="px-3 py-2 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
+  </div>
+
+  <!-- ✅ البحث -->
+  <div class="flex gap-3 mb-5 items-center">
+    <input type="search" placeholder="ابحث هنا..."
+      class="flex-1 px-4 py-2.5 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    <button class="px-5 py-2.5 bg-white border border-gray-300 rounded hover:bg-gray-50 text-lg">
+      🔍
+    </button>
+  </div>
+
+  <!-- ✅ الجدول -->
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <table class="w-full border-collapse">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">الكود</th>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">الاسم</th>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">التاريخ</th>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">البنك</th>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">المبلغ</th>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">رقم السند</th>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let entry of entries" class="hover:bg-gray-50 transition-colors">
+          <td class="px-3 py-3 text-right border-b border-gray-200 text-sm">{{ entry.code }}</td>
+          <td class="px-3 py-3 text-right border-b border-gray-200 text-sm">{{ entry.name }}</td>
+          <td class="px-3 py-3 text-right border-b border-gray-200 text-sm">{{ entry.date }}</td>
+          <td class="px-3 py-3 text-right border-b border-gray-200 text-sm">{{ entry.bank }}</td>
+          <td class="px-3 py-3 text-right border-b border-gray-200 text-sm">{{ entry.amount }}</td>
+          <td class="px-3 py-3 text-right border-b border-gray-200 text-sm">{{ entry.id }}</td>
+          <td class="px-3 py-3 text-right border-b border-gray-200">
+            <button (click)="deleteEntry(entry)"
+              class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors">
+              حذف
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="entries.length === 0">
+          <td colspan="7" class="text-center text-gray-500 py-10 italic">
+            لا توجد بيانات
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+

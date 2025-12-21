@@ -1,0 +1,98 @@
+<div class="form-container" dir="rtl">
+  <div class="form-header">
+    <h2>{{ isReceipt ? '🧾 سند قبض' : '💸 سند صرف' }}</h2>
+  </div>
+
+  <div class="form-grid form-grid-2">
+    <!-- نوع السند -->
+    <div class="form-field">
+      <label class="form-label">نوع {{ isReceipt ? 'الإيراد' : 'المصرف' }}</label>
+      <select class="form-select" [(ngModel)]="formData.type">
+        <option value="">اختر النوع</option>
+        <option>نقدي</option>
+        <option>شيك</option>
+        <option>تحويل</option>
+      </select>
+    </div>
+
+    <!-- التكلفة -->
+    <div class="form-field">
+      <label class="form-label">التكلفة</label>
+      <div class="form-row">
+        <input class="form-input" [(ngModel)]="formData.cost" style="flex: 1;" />
+        <button class="form-button form-button-outline" type="button">...</button>
+      </div>
+    </div>
+
+    <!-- الحساب -->
+    <div class="form-field">
+      <label class="form-label">الحساب</label>
+      <div class="form-row">
+        <input class="form-input" [(ngModel)]="formData.account" style="flex: 1;" />
+        <button class="form-button form-button-outline" type="button">...</button>
+      </div>
+    </div>
+
+    <!-- تاريخ السند -->
+    <div class="form-field">
+      <label class="form-label">تاريخ السند</label>
+      <input type="date" class="form-input" [(ngModel)]="formData.date" />
+    </div>
+
+    <!-- اليدوي -->
+    <div class="form-field">
+      <label class="form-label">اليدوي</label>
+      <input class="form-input" [(ngModel)]="formData.manual" />
+    </div>
+
+    <!-- الدفع -->
+    <div class="form-field">
+      <label class="form-label">الدفع</label>
+      <input class="form-input" [(ngModel)]="formData.payment" />
+    </div>
+
+    <!-- شيك رقم -->
+    <div class="form-field">
+      <label class="form-label">شيك رقم</label>
+      <input class="form-input" [(ngModel)]="formData.chequeNo" />
+    </div>
+
+    <!-- طريقة الدفع -->
+    <div class="form-field">
+      <label class="form-label">طريقة الدفع</label>
+      <select class="form-select" [(ngModel)]="formData.paymentMethod">
+        <option value="">اختر طريقة الدفع</option>
+        <option>نقدي</option>
+        <option>شيك</option>
+        <option>تحويل بنكي</option>
+      </select>
+    </div>
+
+    <!-- على بنك -->
+    <div class="form-field">
+      <label class="form-label">على بنك</label>
+      <select class="form-select" [(ngModel)]="formData.bank">
+        <option value="">اختر البنك</option>
+        <option>بنك الكويت الوطني</option>
+        <option>بيت التمويل الكويتي</option>
+        <option>بنك الخليج</option>
+      </select>
+    </div>
+
+    <!-- ملاحظات -->
+    <div class="form-field form-field-full">
+      <label class="form-label">ملاحظات</label>
+      <textarea class="form-textarea" rows="3" [(ngModel)]="formData.note"></textarea>
+    </div>
+  </div>
+
+  <!-- أزرار -->
+  <div class="form-actions" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--surface-border);">
+    <button class="form-button form-button-secondary" (click)="closeForm()">← رجوع</button>
+    <button class="form-button form-button-primary">💾 حفظ</button>
+    <button class="form-button form-button-warning">تعديل</button>
+    <button class="form-button form-button-outline">تراجع</button>
+    <button class="form-button form-button-outline">طباعة</button>
+    <button class="form-button form-button-danger" (click)="closeForm()">إلغاء</button>
+  </div>
+</div>

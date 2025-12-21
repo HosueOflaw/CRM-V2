@@ -1,0 +1,138 @@
+<div class="min-h-screen bg-gray-100 p-6" style="direction: rtl;">
+
+  <!-- الكارت الرئيسي -->
+  <div class="bg-white shadow-xl rounded-2xl p-6 space-y-6">
+
+        <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">كشف تصفية السيارات</h2>
+
+
+    <!-- الأعلى يمين: اختيار الموكل + التاريخ + بحث -->
+    <div class="flex flex-col md:flex-row gap-4 items-end">
+      <input type="text"
+             placeholder="اختر الموكل"
+             [value]="selectedClient?.name || ''"
+             readonly
+             class="input input-bordered w-full md:w-64 cursor-pointer"
+             (click)="openLookup()" />
+
+      <input type="date" [(ngModel)]="toDate"
+             class="input input-bordered w-full md:w-40" />
+
+      <button class="btn btn-primary" (click)="search()">بحث</button>
+    </div>
+
+    <!-- الأعلى الوسط: إجماليات -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+      <div class="bg-blue-100 p-4 rounded-lg shadow">
+        <div class="font-semibold text-gray-700">إجمالي الشركة</div>
+        <div class="text-xl font-bold">{{ totals.company | number }} د.ك</div>
+      </div>
+      <div class="bg-green-100 p-4 rounded-lg shadow">
+        <div class="font-semibold text-gray-700">إجمالي المكتب</div>
+        <div class="text-xl font-bold">{{ totals.office | number }} د.ك</div>
+      </div>
+      <div class="bg-yellow-100 p-4 rounded-lg shadow">
+        <div class="font-semibold text-gray-700">إجمالي الشيكات</div>
+        <div class="text-xl font-bold">{{ totals.cheques | number }} د.ك</div>
+      </div>
+      <div class="bg-red-100 p-4 rounded-lg shadow">
+        <div class="font-semibold text-gray-700">إجمالي الرسوم</div>
+        <div class="text-xl font-bold">{{ totals.fees | number }} د.ك</div>
+      </div>
+    </div>
+
+    <!-- الأعلى يسار: أزرار + عمولة التحصيل -->
+    <div class="flex flex-col gap-4 items-center justify-center">
+
+        <div class="flex items-center gap-2">
+        <label class="font-semibold">عمولة التحصيل:</label>
+        <input type="number" [(ngModel)]="collectionCommission" class="input input-bordered w-32" />
+      </div>
+
+      <div class="flex gap-3">
+        <button class="btn btn-success" (click)="markReviewed()">تم مراجعة الفاتورة</button>
+        <button class="btn btn-warning" (click)="generateInvoice()">عمل الفاتورة</button>
+      </div>
+
+      
+    </div>
+
+    <!-- Tabs: السداد و الرسوم -->
+    <div class="tabs tabs-boxed">
+      <a class="tab" [class.tab-active]="activeTab === 'payments'" (click)="activeTab='payments'">السداد</a>
+      <a class="tab" [class.tab-active]="activeTab === 'fees'" (click)="activeTab='fees'">الرسوم</a>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="mt-4">
+      <!-- السداد -->
+      <div *ngIf="activeTab === 'payments'" class="overflow-x-auto">
+        <table class="table table-auto w-full border border-gray-200 shadow-md rounded-lg">
+          <thead class="bg-blue-100">
+            <tr>
+              <th class="text-center">Id</th>
+              <th class="text-center">الكود</th>
+              <th class="text-center">الاسم</th>
+              <th class="text-center">سبب المديونية</th>
+              <th class="text-center">المدفوع</th>
+              <th class="text-center">رقم السند</th>
+              <th class="text-center">رقم الشيك</th>
+              <th class="text-center">تاريخ الدفع</th>
+              <th class="text-center">عمولة التحصيل</th>
+              <th class="text-center">مبلغ التحصيل</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of payments" class="hover:bg-gray-50 transition">
+              <td class="text-center">{{item.id}}</td>
+              <td class="text-center">{{item.code}}</td>
+              <td class="text-center">{{item.name}}</td>
+              <td class="text-center">{{item.reason}}</td>
+              <td class="text-center">{{item.paid | number}}</td>
+              <td class="text-center">{{item.voucherNumber}}</td>
+              <td class="text-center">{{item.chequeNumber}}</td>
+              <td class="text-center">{{item.paymentDate}}</td>
+              <td class="text-center">{{item.collectionCommission}}</td>
+              <td class="text-center">{{item.collectedAmount | number}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- الرسوم -->
+      <div *ngIf="activeTab === 'fees'" class="overflow-x-auto">
+        <table class="table table-auto w-full border border-gray-200 shadow-md rounded-lg">
+          <thead class="bg-yellow-100">
+            <tr>
+              <th class="text-center">_ID</th>
+              <th class="text-center">الكود</th>
+              <th class="text-center">الاسم</th>
+              <th class="text-center">المبلغ</th>
+              <th class="text-center">الرسوم</th>
+              <th class="text-center">تاريخ المرفق</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of fees" class="hover:bg-gray-50 transition">
+              <td class="text-center">{{item._id}}</td>
+              <td class="text-center">{{item.code}}</td>
+              <td class="text-center">{{item.name}}</td>
+              <td class="text-center">{{item.amount | number}}</td>
+              <td class="text-center">{{item.fees | number}}</td>
+              <td class="text-center">{{item.attachDate}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Lookup Modal -->
+    <app-lookup-modal #lookup
+                      title="اختيار الموكل"
+                      [columns]="clientColumns"
+                      [data]="clients"
+                      (itemSelected)="onClientSelected($event)">
+    </app-lookup-modal>
+
+  </div>
+</div>

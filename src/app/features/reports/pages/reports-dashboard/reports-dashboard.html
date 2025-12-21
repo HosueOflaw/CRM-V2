@@ -1,0 +1,97 @@
+<app-dashboard-layout
+  [title]="'التقارير'"
+  [subtitle]="'اختر العملية التي ترغب في تنفيذها'"
+  [actions]="actions"
+></app-dashboard-layout>
+  <!-- : 'تحديد نسبة الباتشات لكل موظف' -->
+ <!-- ====== ديالوج تحديد النسبة ====== -->
+<div
+  *ngIf="showPatchratiodialogDialog"
+  class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+>
+  <div class="bg-white w-[500px] rounded-lg shadow-xl">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between p-3 border-b">
+      <div class="flex items-center gap-2">
+        <!-- <img src="assets/excel-icon.png" alt="Excel" class="w-5 h-5" /> -->
+        <span class="text-sm">النسبة المئوية المطلوبة من كل موظف من كل باتش</span>
+      </div>
+      <div class="flex items-center gap-1">
+
+        <button (click)="closepatchatratiodialog()" class="hover:bg-red-500 hover:text-white w-8 h-8 flex items-center justify-center">×</button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-4">
+      <form class="space-y-3">
+
+        <!-- القطاع والشركة في صف واحد -->
+        <div class="grid grid-cols-2 gap-3">
+          <!-- القطاع -->
+          <div>
+            <select class="w-full p-2 border rounded">
+              <option value="">القطاع</option>
+            </select>
+          </div>
+
+          <!-- الشركة -->
+          <div>
+            <select class="w-full p-2 border rounded">
+              <option value="">الشركة</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- أزرار بحث وحفظ -->
+        <div class="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            class="px-4 py-2 bg-white border border-gray-300 rounded hover:bg-gray-50"
+          >
+            بحث
+          </button>
+
+          <button
+            type="button"
+            class="px-4 py-2 bg-white border border-gray-300 rounded hover:bg-gray-50"
+          >
+            حفظ
+          </button>
+        </div>
+
+        <!-- الجدول -->
+        <div class="border rounded overflow-hidden">
+          <!-- منطقة السحب للتجميع -->
+          <!-- <div class="bg-gray-50 border-b p-2 text-center text-xs text-gray-500">
+            Drag a column header here to group by that column
+          </div> -->
+
+          <!-- رأس الجدول -->
+          <div class="bg-white border-b">
+            <div class="grid grid-cols-4 text-center text-sm font-medium">
+              <div class="border-l p-2">الباتش</div>
+              <div class="border-l p-2">التارجت</div>
+              <div class="border-l p-2">الفعالية</div>
+              <div class="border-l p-2">الأهمية</div>
+            </div>
+          </div>
+
+          <!-- محتوى الجدول (فارغ) -->
+          <div class="h-[400px] bg-white overflow-auto">
+            <!-- هنا سيتم عرض البيانات -->
+            <!-- <div *ngFor="let row of tableData" class="grid grid-cols-4 text-center text-sm border-b hover:bg-gray-50">
+              <div class="border-l p-2">{{ row.batch }}</div>
+              <div class="border-l p-2">{{ row.target }}</div>
+              <div class="border-l p-2">{{ row.active }}</div>
+              <div class="p-2">{{ row.importance }}</div>
+            </div> -->
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>

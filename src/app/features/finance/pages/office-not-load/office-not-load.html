@@ -1,0 +1,77 @@
+<div class="min-h-screen bg-gray-100 p-6" style="direction: rtl;">
+
+  <!-- الكارت الرئيسي -->
+  <div class=" bg-white shadow-xl rounded-2xl p-6 space-y-6">
+
+        <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">ما يتحمله المكتب</h2>
+
+
+    <!-- الأعلى: اختيار الموكل و CODE_ACC + أزرار -->
+    <div class="flex flex-col md:flex-row gap-4 justify-start items-end mb-6">
+
+      <!-- Lookup الموكل -->
+      <input type="text"
+             placeholder="اختر الموكل"
+             [value]="selectedClient?.name || ''"
+             readonly
+             class="input input-bordered w-full md:w-64 cursor-pointer"
+             (click)="openLookup()" />
+
+      <!-- الأزرار -->
+      <button class="btn btn-primary" (click)="search()">بحث</button>
+      <button class="btn btn-secondary" (click)="getAll()">استعلام على الكل</button>
+    </div>
+
+    <!-- جدول عرض البيانات -->
+    <div class="overflow-x-auto">
+      <table class="table table-auto w-full border border-gray-200 shadow-md rounded-lg">
+        <thead class="bg-blue-100">
+          <tr>
+            <th class="text-center">رقم ID</th>
+            <th class="text-center">الكود</th>
+            <th class="text-center">المصروف</th>
+            <th class="text-center">المبلغ</th>
+            <th class="text-center">الموكل</th>
+            <th class="text-center">الموظف</th>
+            <th class="text-center">تاريخ العهدة</th>
+            <th class="text-center">CODE_ACC</th>
+            <th class="text-center">رقم العهدة</th>
+            <th class="text-center">اسم الخصم</th>
+            <th class="text-center">الرقم الآلي</th>
+            <th class="text-center">الرقم المدني</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of data" class="hover:bg-gray-50 transition">
+            <td class="text-center">{{ item.id }}</td>
+            <td class="text-center">{{ item.code }}</td>
+            <td class="text-center">{{ item.expense }}</td>
+            <td class="text-center">{{ item.amount | number }}</td>
+            <td class="text-center">{{ item.client }}</td>
+            <td class="text-center">{{ item.employee }}</td>
+            <td class="text-center">{{ item.date }}</td>
+            <td class="text-center">{{ item.arhdaNumber }}</td>
+            <td class="text-center">{{ item.defendantName }}</td>
+            <td class="text-center">{{ item.autoNumber }}</td>
+            <td class="text-center">{{ item.civilNumber }}</td>
+          </tr>
+
+          <tr *ngIf="data.length === 0">
+            <td colspan="12" class="text-center py-6 text-gray-500">
+              لا توجد بيانات
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Lookup Modal -->
+    <app-lookup-modal #lookup
+                      title="اختيار الموكل"
+                      [columns]="clientColumns"
+                      [data]="clients"
+                      (itemSelected)="onClientSelected($event)">
+    </app-lookup-modal>
+
+  </div>
+</div>

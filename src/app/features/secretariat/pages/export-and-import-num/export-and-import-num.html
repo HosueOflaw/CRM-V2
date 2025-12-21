@@ -1,0 +1,114 @@
+ <div class="p-4 sm:p-8 bg-gray-100 min-h-screen flex justify-center items-start pt-10" dir="rtl">
+      <!-- البطاقة الرئيسية للنموذج -->
+      <div class="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 space-y-6">
+
+        <!-- العنوان -->
+        <h1 class="text-2xl font-bold text-gray-800 border-b pb-3 mb-4 text-center">
+          أرقام الصادر والوارد
+        </h1>
+
+        <!-- قسم حقول النموذج -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+          <!-- حقل الجهة الصادر اليها -->
+          <div class="md:col-span-2 space-y-1">
+            <label class="block text-sm font-medium text-gray-700">الجهة الصادر اليها</label>
+            <input
+              type="text"
+              [(ngModel)]="entity"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+              placeholder="أدخل اسم الجهة"
+            >
+          </div>
+
+          <!-- حقل رقم الفاكس -->
+          <div class="md:col-span-1 space-y-1">
+            <label class="block text-sm font-medium text-gray-700">رقم الفاكس</label>
+            <input
+              type="text"
+              [(ngModel)]="faxNumber"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+              placeholder="Re O/1642/2025"
+            >
+          </div>
+
+          <!-- حقل الموضوع (للتوافق مع الصورة، وضعته هنا بدلاً من صف الموضوع) -->
+          <div class="md:col-span-1 space-y-1">
+            <label class="block text-sm font-medium text-gray-700">موضوعه</label>
+            <input
+              type="text"
+              [(ngModel)]="subject"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+              placeholder="موضوع المراسلة"
+            >
+          </div>
+
+          <!-- حقل التاريخ -->
+          <div class="md:col-span-2 space-y-1">
+            <label class="block text-sm font-medium text-gray-700">التاريخ</label>
+            <input
+              type="date"
+              [(ngModel)]="date"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+            >
+          </div>
+        </div>
+
+        <!-- قسم الملاحظات والأزرار -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- حقل الملاحظات -->
+          <div class="md:col-span-3 space-y-1">
+            <label class="block text-sm font-medium text-gray-700">ملاحظات</label>
+            <textarea
+              rows="2"
+              [(ngModel)]="notes"
+              class="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150 resize-none"
+              placeholder="أضف أي ملاحظات هنا..."
+            ></textarea>
+          </div>
+
+          <!-- الأزرار -->
+          <div class="md:col-span-1 flex flex-row-reverse md:flex-col gap-3 justify-end items-end md:justify-start pt-6">
+            <button
+              (click)="onSave()"
+              class="w-full md:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-150 shadow-md"
+            >
+              حفظ
+            </button>
+            <button
+              (click)="onNew()"
+              class="w-full md:w-auto px-4 py-2 bg-white text-blue-600 border border-blue-600 font-semibold rounded-md hover:bg-gray-50 transition duration-150 shadow-md"
+            >
+              جديد
+            </button>
+          </div>
+        </div>
+
+        <!-- فاصل وعرض البيانات (الشبكة/الجدول) -->
+        <div class="mt-8 border-t pt-6">
+          <div class="bg-gray-50 border border-gray-200 rounded-md p-4 min-h-64 space-y-3">
+            <div class="flex items-center gap-2 text-gray-500">
+              <!-- أيقونة البحث -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span class="text-sm">الداتا الي هتيجي من الdatabase</span>
+            </div>
+            <!-- هذا هو محاكي منطقة عرض الجدول -->
+            <div class="h-48 border-t border-dashed border-gray-300 mt-4">
+              <!-- محتوى وهمي للجدول -->
+            </div>
+          </div>
+        </div>
+
+        <!-- عرض حالة النموذج الحالية (للتصحيح والاطلاع) -->
+        <div class="text-xs text-gray-500 pt-4 border-t">
+            <p><strong>حالة النموذج:</strong></p>
+            <p>الجهة: {{ entity() }}</p>
+            <p>الفاكس: {{ faxNumber() }}</p>
+            <p>الموضوع: {{ subject() }}</p>
+            <p>التاريخ: {{ date() }}</p>
+        </div>
+
+      </div>
+    </div>

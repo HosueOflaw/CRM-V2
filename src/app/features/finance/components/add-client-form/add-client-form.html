@@ -1,0 +1,341 @@
+<dialog class="modal" [open]="showModal()" dir="rtl">
+  <div class="modal-box modal-xl">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <h3>➕ إضافة موكل</h3>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <!-- Body Content -->
+    <div class="modal-body">
+      <form (ngSubmit)="addClient()">
+        
+        <!-- Tabs Navigation -->
+        <div class="tabs tabs-boxed mb-4">
+          <a class="tab" [class.tab-active]="activeTab() === 'basic'" 
+             (click)="activeTab.set('basic')">البيانات الأساسية</a>
+          <a class="tab" [class.tab-active]="activeTab() === 'contacts'" 
+             (click)="activeTab.set('contacts')">أرقام التواصل</a>
+          <a class="tab" [class.tab-active]="activeTab() === 'financial'" 
+             (click)="activeTab.set('financial')">البيانات المالية</a>
+          <a class="tab" [class.tab-active]="activeTab() === 'attachments'" 
+             (click)="activeTab.set('attachments')">المرفقات</a>
+        </div>
+
+        <!-- Tab 1: البيانات الأساسية -->
+        <div *ngIf="activeTab() === 'basic'" class="tab-content">
+          
+          <!-- Row 1: Code, Name -->
+          <div class="form-grid form-grid-3">
+            <!-- Client Code -->
+            <div class="form-field">
+              <label class="form-label form-label-required">كود الموكل</label>
+              <input type="text" [(ngModel)]="clientForm.code" name="code" 
+                     class="form-input" required />
+            </div>
+
+            <!-- Client Name -->
+            <div class="form-field" style="grid-column: span 2;">
+              <label class="form-label form-label-required">اسم الموكل</label>
+              <div class="form-row">
+                <input type="text" [(ngModel)]="clientForm.name" name="name" 
+                       class="form-input" style="flex: 1;" required />
+                <button class="form-button form-button-outline" type="button"
+                        (click)="clientLookup.open()">
+                  اختر...
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2: Contract Number, Sector, Legal Claimant -->
+          <div class="form-grid form-grid-3">
+            <div class="form-field">
+              <label class="form-label form-label-required">رقم العقد</label>
+              <div class="form-row">
+                <input type="text" [(ngModel)]="clientForm.contractNumber" name="contractNumber" 
+                       class="form-input" style="width: 80px;" required />
+                <span style="padding: 0 0.5rem;">/</span>
+                <select [(ngModel)]="clientForm.contractYear" name="contractYear"
+                        class="form-select" style="width: 100px;">
+                  <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Sector -->
+            <div class="form-field">
+              <label class="form-label">القطاع</label>
+              <select [(ngModel)]="clientForm.sector" name="sector" class="form-select">
+                <option value="">اختر القطاع</option>
+                <option *ngFor="let s of sectors" [ngValue]="s">{{ s }}</option>
+              </select>
+            </div>
+
+            <!-- Legal Claimant -->
+            <div class="form-field">
+              <label class="form-label">المدعي القانوني</label>
+              <input type="text" [(ngModel)]="clientForm.legalClaimant" name="legalClaimant" 
+                     class="form-input" />
+            </div>
+          </div>
+
+          <!-- Row 3: Cid, Address, Nationality -->
+          <div class="form-grid form-grid-3">
+            <div class="form-field">
+              <label class="form-label">الرقم المدني</label>
+              <input type="text" [(ngModel)]="clientForm.cid" name="cid" 
+                     class="form-input" />
+            </div>
+
+            <div class="form-field">
+              <label class="form-label">العنوان</label>
+              <input type="text" [(ngModel)]="clientForm.address" name="address" 
+                     class="form-input" />
+            </div>
+
+            <div class="form-field">
+              <label class="form-label">الجنسية</label>
+              <input type="text" [(ngModel)]="clientForm.nationality" name="nationality" 
+                     class="form-input" />
+            </div>
+          </div>
+
+          <!-- Permissions -->
+          <div class="form-field">
+            <label class="form-label">الصلاحيات</label>
+            <div class="checkbox-group">
+              <label>
+                <input type="checkbox" [(ngModel)]="clientForm.permissions.canViewInvoices" 
+                       name="viewInvoices" />
+                <span>الفواتير</span>
+              </label>
+              <label>
+                <input type="checkbox" [(ngModel)]="clientForm.permissions.canViewAttachments" 
+                       name="viewAttachments" />
+                <span>المرفقات</span>
+              </label>
+              <label>
+                <input type="checkbox" [(ngModel)]="clientForm.permissions.canViewFinancialMatrix" 
+                       name="viewFinancial" />
+                <span>الجدول المالي</span>
+              </label>
+              <label>
+                <input type="checkbox" [(ngModel)]="clientForm.permissions.canReceiveAutomatedMessages" 
+                       name="receiveMsgs" />
+                <span>إشعارات واتساب</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Contract Details -->
+          <div class="form-field">
+            <label class="form-label">بيان التعاقد</label>
+            <textarea [(ngModel)]="clientForm.contractDetails" name="contractDetails" 
+                      class="form-textarea" rows="3"></textarea>
+          </div>
+        </div>
+
+        <!-- Tab 2: أرقام التواصل -->
+        <div *ngIf="activeTab() === 'contacts'" class="tab-content">
+          <!-- Add Contact Form -->
+          <div class="form-section">
+            <div class="form-section-title">إضافة رقم جديد</div>
+            <div class="form-row" style="gap: 1rem;">
+              <div class="form-field" style="flex: 1;">
+                <label class="form-label">رقم الجوال</label>
+                <input type="text" [(ngModel)]="newContact.phone" name="phone"
+                       placeholder="ادخل رقم الجوال"
+                       class="form-input" />
+              </div>
+              <div class="form-field" style="flex: 1;">
+                <label class="form-label">منسوب إلى</label>
+                <input [(ngModel)]="newContact.relation" name="relation" 
+                       placeholder="منسوب إلى"
+                       class="form-input" />
+              </div>
+              <button type="button" class="form-button form-button-primary" 
+                      style="align-self: flex-end;" (click)="addContact()">
+                إضافة
+              </button>
+            </div>
+          </div>
+
+          <!-- Contacts Table -->
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>منسوب إلى</th>
+                  <th>رقم الجوال</th>
+                  <th>إجراء</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let c of contacts">
+                  <td>{{ c.relation }}</td>
+                  <td>{{ c.phone }}</td>
+                  <td>
+                    <button type="button" class="form-button form-button-danger" 
+                            style="padding: 0.25rem 0.5rem;"
+                            (click)="removeContact(c)">
+                      ✕
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="contacts.length === 0">
+                  <td colspan="3" class="text-center" style="color: var(--text-color-secondary); padding: 2rem;">
+                    لا توجد أرقام مضافة
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 3: البيانات المالية -->
+        <div *ngIf="activeTab() === 'financial'" class="tab-content">
+          <!-- Add Financial Entry -->
+          <div class="form-section">
+            <div class="form-section-title">إضافة صف مالي</div>
+            <div class="form-row" style="gap: 1rem;">
+              <select [(ngModel)]="newFinancialEntry.type" name="newType" 
+                      class="form-select" style="flex: 1;">
+                <option value="">اختر النوع</option>
+                <option *ngFor="let type of financialTypes" [ngValue]="type">
+                  {{ type }}
+                </option>
+              </select>
+              <button type="button" class="form-button form-button-primary" 
+                      (click)="addFinancialEntry()">
+                إضافة صف
+              </button>
+            </div>
+          </div>
+
+          <!-- Financial Table -->
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr style="background: var(--primary-color); color: white;">
+                  <th>#</th>
+                  <th>اتعاب</th>
+                  <th>ودي</th>
+                  <th>تنفيذ</th>
+                  <th>قضائي مدنى</th>
+                  <th>قضائي مدعى عليه</th>
+                  <th>خبراء</th>
+                  <th>اجراء</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let entry of financialEntries(); let i = index">
+                  <th style="font-weight: bold; color: var(--primary-color);">{{ entry.type }}</th>
+                  <td *ngFor="let col of financialCols" 
+                      class="editable-cell"
+                      contenteditable="true"
+                      (blur)="updateFinancialValue($event, entry, col.key)">
+                    {{ entry?.values?.[col.key] || '' }}
+                  </td>
+                  <td>
+                    <button type="button" class="form-button form-button-danger" 
+                            style="padding: 0.25rem 0.5rem;"
+                            (click)="deleteFinancialEntry(entry)">
+                      ✕
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="financialEntries().length === 0">
+                  <td colspan="9" class="text-center" style="color: var(--text-color-secondary); padding: 2rem;">
+                    لا توجد بيانات مالية
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 4: المرفقات -->
+        <div *ngIf="activeTab() === 'attachments'" class="tab-content">
+          <!-- Add Attachment Form -->
+          <div class="form-section">
+            <div class="form-section-title">إضافة مرفق</div>
+            <input type="file" #fileInput class="hidden" (change)="onFileSelected($event)"/>
+            <div class="form-row" style="gap: 1rem;">
+              <div class="form-field" style="flex: 1;">
+                <label class="form-label">ملاحظات المرفق</label>
+                <input type="text" [(ngModel)]="attachmentNote" name="attachmentNote" 
+                       class="form-input" 
+                       placeholder="ملاحظات المرفق"/>
+              </div>
+              <button type="button" class="form-button form-button-secondary" 
+                      style="align-self: flex-end;" (click)="fileInput.click()">
+                اختر ملف
+              </button>
+              <button type="button" class="form-button form-button-primary" 
+                      style="align-self: flex-end;"
+                      (click)="addAttachmentToQueue()">
+                إضافة
+              </button>
+            </div>
+            <div *ngIf="selectedFile" style="margin-top: 0.5rem; color: var(--primary-color);">
+              📎 {{ selectedFile.name }}
+            </div>
+          </div>
+
+          <!-- Attachments Table -->
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>البيان</th>
+                  <th>اسم الملف</th>
+                  <th>إجراء</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let att of attachments">
+                  <td>{{ att?.note }}</td>
+                  <td>{{ att?.file?.name }}</td>
+                  <td>
+                    <button type="button" class="form-button form-button-danger" 
+                            style="padding: 0.25rem 0.5rem;"
+                            (click)="removeAttachment(att)">
+                      ✕
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="attachments.length === 0">
+                  <td colspan="3" class="text-center" style="color: var(--text-color-secondary); padding: 2rem;">
+                    لا توجد مرفقات مضافة
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </form>
+    </div>
+    
+    <!-- Footer with action buttons -->
+    <div class="modal-footer">
+      <button type="button" class="form-button form-button-secondary" (click)="closeModal()">
+        ← رجوع
+      </button>
+      <button type="button" class="form-button form-button-success" (click)="addClient()" [disabled]="isSaving()">
+        {{ isSaving() ? 'جاري الحفظ...' : '💾 حفظ' }}
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<app-lookup-modal
+  #clientLookup
+  [title]="'اختر الموكل'"
+  [columns]="['code','name']"
+  [data]="clientsData"
+  (itemSelected)="onClientSelected($event)">
+</app-lookup-modal>

@@ -1,0 +1,359 @@
+
+<div class="sessions p-4 space-y-6">
+  <h2 class="text-lg font-bold text-center text-primary">📜 ترحيل الجلسات</h2>
+
+  <!-- 🔹 أزرار العمليات -->
+  <div class="flex justify-center gap-3 mt-4">
+    <button class="btn btn-outline btn-info btn-sm" (click)="openSearchModal()">🔍 بحث</button>
+    <button class="btn btn-outline btn-warning btn-sm" (click)="openJudgmentModal()">⚖️ الأحكام</button>
+    <button class="btn btn-outline btn-accent btn-sm" (click)="openAttachmentModal()">📎 المرفقات</button>
+    <button class="btn btn-outline btn-success btn-sm" (click)="printReport()">🖨️ طباعة</button>
+  </div>
+
+  <!-- 🔸 Tabs الرئيسية -->
+  <div role="tablist" class="tabs tabs-boxed w-full mt-6">
+    <a role="tab" class="tab" [class.tab-active]="activeTab==='sessions'" (click)="activeTab='sessions'">الجلسات</a>
+    <a role="tab" class="tab" [class.tab-active]="activeTab==='file'" (click)="activeTab='file'">مكان الملف</a>
+    <a role="tab" class="tab" [class.tab-active]="activeTab==='admin'" (click)="activeTab='admin'">العمل الإداري</a>
+  </div>
+
+  <div class="sessions p-4 space-y-6">
+
+  <!-- الجلسات -->
+  <div *ngIf="activeTab==='sessions'" class="space-y-4 p-3 border rounded-lg bg-gray-50">
+    <form [formGroup]="sessionForm" class="space-y-4">
+
+    <div class="grid grid-cols-3 gap-3">
+      <div>
+        <label class="label"><span class="label-text">الجلسة الحالية</span></label>
+        <input type="date" formControlName="currentSession" class="input input-bordered input-sm w-full" />
+      </div>
+
+      <div>
+        <label class="label"><span class="label-text">الجلسة القادمة</span></label>
+        <input type="date" formControlName="nextSession" class="input input-bordered input-sm w-full" />
+      </div>
+    </div>
+
+    <div>
+      <label class="label"><span class="label-text">ملاحظات</span></label>
+      <textarea formControlName="sessionNotes" class="textarea textarea-bordered w-full h-24"></textarea>
+    </div>
+
+    <div class="flex justify-end">
+      <button class="btn btn-success btn-sm">حفظ</button>
+    </div>
+    </form>
+    <!-- Tabs داخل الجلسات -->
+    <div role="tablist" class="tabs tabs-lifted mt-5">
+      <a role="tab" class="tab" [class.tab-active]="subTab==='court'" (click)="subTab='court'">جلسات المحكمة</a>
+      <a role="tab" class="tab" [class.tab-active]="subTab==='experts'" (click)="subTab='experts'">جلسات الخبراء</a>
+    </div>
+
+    <div *ngIf="subTab==='court'" class="overflow-x-auto border rounded-lg mt-2 bg-white">
+      <table class="table table-zebra w-full text-center">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>تاريخ الإفادة</th>
+            <th>نوع الجلسة</th>
+            <th>القرار</th>
+            <th>الجلسة القادمة</th>
+            <th>توقيت الخبراء</th>
+            <th>ملاحظات</th>
+            <th>المستخدم</th>
+            <th>تعديل</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of courtSessions">
+            <td>{{s.id}}</td>
+            <td>{{s.reportDate}}</td>
+            <td>{{s.type}}</td>
+            <td>{{s.decision}}</td>
+            <td>{{s.nextDate}}</td>
+            <td>{{s.expertTime}}</td>
+            <td>{{s.notes}}</td>
+            <td>{{s.user}}</td>
+            <td><button class="btn btn-xs btn-warning">تعديل</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="subTab==='experts'" class="overflow-x-auto border rounded-lg mt-2 bg-white">
+      <table class="table table-zebra w-full text-center">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>تاريخ الإفادة</th>
+            <th>نوع الجلسة</th>
+            <th>القرار</th>
+            <th>الجلسة القادمة</th>
+            <th>توقيت الخبراء</th>
+            <th>ملاحظات</th>
+            <th>المستخدم</th>
+            <th>تعديل</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of expertSessions">
+            <td>{{s.id}}</td>
+            <td>{{s.reportDate}}</td>
+            <td>{{s.type}}</td>
+            <td>{{s.decision}}</td>
+            <td>{{s.nextDate}}</td>
+            <td>{{s.expertTime}}</td>
+            <td>{{s.notes}}</td>
+            <td>{{s.user}}</td>
+            <td><button class="btn btn-xs btn-warning">تعديل</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- مكان الملف -->
+<div *ngIf="activeTab==='file'" class="space-y-4 p-3 border rounded-lg bg-gray-50">
+  <form class="space-y-4">
+    <!-- حقل اختيار مكان الملف -->
+    <div class="flex items-end gap-2">
+      <div class="flex-1">
+        <label class="label"><span class="label-text">📁 مكان الملف</span></label>
+        <input type="text" class="input input-bordered input-sm w-full" [(ngModel)]="fileLocation" name="fileLocation" readonly />
+      </div>
+      <button type="button" class="btn btn-outline btn-sm" (click)="openSectionModal()">...</button>
+    </div>
+
+    <!-- ملاحظات -->
+    <div>
+      <label class="label"><span class="label-text">ملاحظات</span></label>
+      <textarea class="textarea textarea-bordered w-full h-24" [(ngModel)]="fileNotes" name="fileNotes"></textarea>
+    </div>
+
+    <div class="flex justify-end">
+      <button type="button" class="btn btn-success btn-sm" (click)="saveFileLocation()">💾 حفظ</button>
+    </div>
+  </form>
+
+  <!-- جدول عرض -->
+  <div class="overflow-x-auto border rounded-lg mt-4 bg-white">
+    <table class="table table-zebra w-full text-center">
+      <thead>
+        <tr>
+          <th>📅 تاريخ الإفادة</th>
+          <th>📍 مكان الملف</th>
+          <th>📝 الملاحظات</th>
+          <th>👤 المستخدم</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of fileLocations">
+          <td>{{ item.date }}</td>
+          <td>{{ item.location }}</td>
+          <td>{{ item.notes }}</td>
+          <td>{{ item.user }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- مودال اختيار القسم -->
+  <dialog #sectionModal class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">اختيار القسم</h3>
+
+      <div class="space-y-2">
+        <button *ngFor="let section of sections"
+          class="btn btn-outline btn-block"
+          (click)="selectSection(section)">
+          {{ section }}
+        </button>
+      </div>
+
+      <div class="modal-action">
+        <button class="btn" (click)="sectionModal.close()">إغلاق</button>
+      </div>
+    </div>
+  </dialog>
+</div>
+
+
+  <!-- العمل الإداري -->
+<div *ngIf="activeTab==='admin'" class="space-y-4 p-3 border rounded-lg bg-gray-50">
+  <form class="space-y-4">
+    <!-- وقت المراجعة -->
+    <div>
+      <label class="label"><span class="label-text">🕒 وقت المراجعة</span></label>
+      <input type="datetime-local" class="input input-bordered input-sm w-full" [(ngModel)]="reviewTime" name="reviewTime" />
+    </div>
+
+    <!-- ملاحظات -->
+    <div>
+      <label class="label"><span class="label-text">ملاحظات</span></label>
+      <textarea class="textarea textarea-bordered w-full h-24" [(ngModel)]="adminNotes" name="adminNotes"></textarea>
+    </div>
+
+    <!-- زر حفظ -->
+    <div class="flex justify-end">
+      <button type="button" class="btn btn-success btn-sm" (click)="saveAdminTask()">💾 حفظ</button>
+    </div>
+  </form>
+
+  <!-- جدول عرض -->
+  <div class="overflow-x-auto border rounded-lg mt-4 bg-white">
+    <table class="table table-zebra w-full text-center">
+      <thead>
+        <tr>
+          <th>📅 التاريخ</th>
+          <th>⚙️ الإداري</th>
+          <th>🕒 تاريخ المراجعة</th>
+          <th>👤 الموظف</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of adminTasks">
+          <td>{{ a.date }}</td>
+          <td>{{ a.notes }}</td>
+          <td>{{ a.reviewTime }}</td>
+          <td>{{ a.user }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+<app-report-template
+  #report
+    class="print-only"
+  [caseData]="expertSessions"
+  [expertSessions]="expertSessions"
+  [courtSessions]="courtSessions">
+</app-report-template>
+</div>
+
+
+
+<!-- 🔹 مودال البحث -->
+<dialog #searchModal class="modal">
+  <div class="modal-box max-w-4xl">
+    <h3 class="font-bold text-lg mb-4 text-center">🔍 بحث عن القضايا</h3>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div *ngFor="let field of searchFields">
+        <label class="label"><span class="label-text">{{ field.label }}</span></label>
+        <div class="flex items-center gap-2">
+          <input [(ngModel)]="field.value" type="text" class="input input-bordered input-sm w-full" />
+          <button class="btn btn-outline btn-sm">بحث</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs نتائج البحث -->
+    <div class="mt-5">
+      <div role="tablist" class="tabs tabs-lifted">
+        <a role="tab" class="tab" [class.tab-active]="searchTab==='current'" (click)="searchTab='current'">البحث في المتداول</a>
+        <a role="tab" class="tab" [class.tab-active]="searchTab==='results'" (click)="searchTab='results'">نتائج البحث</a>
+      </div>
+
+      <div *ngIf="searchTab==='current'" class="p-3">
+        <p class="text-gray-500 text-center">🔎 ابحث في القضايا المتداولة</p>
+      </div>
+
+      <div *ngIf="searchTab==='results'" class="overflow-x-auto border rounded-lg bg-white mt-3">
+        <table class="table table-zebra w-full text-center">
+          <thead>
+            <tr>
+              <th>📄 الكود</th>
+              <th>📁 رقم القضية</th>
+              <th>👤 الموكل</th>
+              <th>⚖️ الخصم</th>
+              <th>📅 التاريخ</th>
+              <th>📍 المحكمة</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let result of searchResults">
+              <td>{{ result.code }}</td>
+              <td>{{ result.caseNumber }}</td>
+              <td>{{ result.client }}</td>
+              <td>{{ result.opponent }}</td>
+              <td>{{ result.date }}</td>
+              <td>{{ result.court }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="modal-action">
+      <button class="btn" (click)="searchModal.close()">إغلاق</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- 🔹 مودال الأحكام -->
+<dialog #judgmentModal class="modal">
+  <div class="modal-box max-w-3xl">
+    <h3 class="font-bold text-lg mb-4 text-center">⚖️ منطوق الحكم</h3>
+    <div class="overflow-x-auto border rounded-lg bg-white">
+      <table class="table table-zebra w-full text-center">
+        <thead>
+          <tr>
+            <th>منطوق الحكم</th>
+            <th>تاريخ الحكم</th>
+            <th>درجة التقاضي</th>
+            <th>نوع الحكم</th>
+            <th>المحكمة</th>
+            <th>📎 المرفق</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let j of judgments">
+            <td>{{ j.text }}</td>
+            <td>{{ j.date }}</td>
+            <td>{{ j.level }}</td>
+            <td>{{ j.type }}</td>
+            <td>{{ j.court }}</td>
+            <td><button class="btn btn-outline btn-xs">فتح</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-action">
+      <button class="btn" (click)="judgmentModal.close()">إغلاق</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- 🔹 مودال المرفقات -->
+<dialog #attachmentModal class="modal">
+  <div class="modal-box max-w-md">
+    <h3 class="font-bold text-lg mb-4 text-center">📎 إضافة مرفق</h3>
+
+    <form class="space-y-4">
+      <div>
+        <label class="label"><span class="label-text">البيان</span></label>
+        <input type="text" class="input input-bordered input-sm w-full" [(ngModel)]="attachment.statement" name="statement" />
+      </div>
+
+      <div>
+        <label class="label"><span class="label-text">المرفق</span></label>
+        <input type="file" class="file-input file-input-bordered file-input-sm w-full" (change)="onFileSelected($event)" />
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <button type="button" class="btn btn-success btn-sm" (click)="saveAttachment()">💾 حفظ</button>
+        <button type="button" class="btn btn-warning btn-sm" (click)="updateAttachment()">✏️ تعديل</button>
+      </div>
+    </form>
+
+    <div class="modal-action">
+      <button class="btn" (click)="attachmentModal.close()">إغلاق</button>
+    </div>
+  </div>
+</dialog>
+
+
+

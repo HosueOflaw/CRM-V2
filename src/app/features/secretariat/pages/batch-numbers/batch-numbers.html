@@ -1,0 +1,90 @@
+<div dir="rtl" class="flex flex-col h-screen bg-gray-50 font-sans text-sm">
+
+  <!-- ========================================== -->
+  <!-- 1. شريط الأدوات العلوي -->
+  <!-- ========================================== -->
+  <div class="bg-gray-100 border-b border-gray-300 p-2 flex justify-between items-center shadow-sm">
+    
+    <!-- الجانب الأيمن: بحث الموظف والأزرار -->
+    <div class="flex items-center gap-2">
+      
+      <!-- مجموعة حقل الموظف -->
+      <div class="flex items-center gap-1 bg-white border border-gray-300 p-1 rounded-sm">
+        <label class="font-bold text-gray-700 text-xs px-1">الموظف</label>
+        
+        <!-- حقل اسم الموظف -->
+        <input type="text" 
+               [(ngModel)]="selectedEmployeeName" 
+               class="input input-xs input-ghost h-6 w-64 focus:bg-transparent" 
+               readonly /> <!-- readonly لأن الاختيار يتم من المودال -->
+
+        <!-- زر الـ ... (يفتح المودال) -->
+        <button class="btn btn-xs btn-square btn-ghost border border-gray-300 bg-gray-50 hover:bg-gray-200" 
+                (click)="openEmployeeModal()">
+          ...
+        </button>
+      </div>
+
+      <!-- زر بحث -->
+      <button class="btn btn-sm bg-gray-200 hover:bg-gray-300 text-gray-800 border-gray-300 px-4 rounded-sm font-normal h-8 min-h-0" 
+              (click)="search()">
+        بحث
+      </button>
+
+      <!-- زر توجيه المصروف -->
+      <button class="btn btn-sm bg-gray-200 hover:bg-gray-300 text-gray-800 border-gray-300 px-4 rounded-sm font-normal h-8 min-h-0" 
+              (click)="directExpense()">
+        توجيه المصروف
+      </button>
+
+    </div>
+
+    <!-- الجانب الأيسر: زر تم الاستلام -->
+    <button class="btn btn-sm bg-gray-200 hover:bg-gray-300 text-gray-800 border-gray-300 px-4 rounded-sm font-normal h-8 min-h-0" 
+            (click)="markReceived()">
+      تم الاستلام
+    </button>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. الجدول -->
+  <!-- ========================================== -->
+  <div class="flex-grow bg-white overflow-auto border-b border-gray-300 relative">
+    <table class="table table-xs table-pin-rows w-full border-collapse text-right">
+      <thead>
+        <tr class="bg-gray-50 border-b border-gray-300 text-gray-700">
+           <th class="border-r border-gray-300 w-12 text-center">م</th>
+           <th class="border-r border-gray-300">اسم الشركة</th>
+           <th class="border-r border-gray-300">رقم الكشف</th>
+           <th class="border-r border-gray-300">المبلغ</th>
+           <th class="border-r border-gray-300">التاريخ</th>
+           <th class="border-r border-gray-300">الشركة</th>
+           <th class="border-r border-gray-300">المكتب</th>
+        </tr>
+      </thead>
+      <tbody>
+         <!-- محتوى فارغ كما في الصورة -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 3. التذييل (Footer) -->
+  <!-- ========================================== -->
+  <div class="bg-gray-50 border-t border-gray-300 p-1 px-4 text-xs font-bold text-gray-700 flex items-center justify-center gap-2">
+      <span>اجمالي العهدة</span>
+      <span class="text-blue-800 font-mono">{{ totalCustody }}</span>
+  </div>
+
+</div>
+
+<!-- ========================================== -->
+<!-- 4. استدعاء المودال (مخفي افتراضياً) -->
+<!-- ========================================== -->
+<app-lookup-modal
+  #employeeLookup
+  [title]="'بحث عن موظف'"
+  [data]="employeesData"
+  [columns]="['code', 'name', 'department']"
+  (itemSelected)="onEmployeeSelected($event)">
+</app-lookup-modal>
