@@ -1,4 +1,5 @@
-<div class="p-6 bg-base-200 min-h-screen">
+<div class="p-6 min-h-screen"
+     style="background-color: var(--surface-ground);">
   <!-- 🔹 العنوان + الفلاتر -->
   <div class="flex flex-col justify-center mb-4 gap-2">
 
@@ -6,11 +7,13 @@
       <input
         type="date"
         class="input input-bordered input-sm"
+        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
         [(ngModel)]="startDate"
       />
       <input
         type="date"
         class="input input-bordered input-sm"
+        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
         [(ngModel)]="endDate"
       />
 
@@ -19,6 +22,7 @@
         type="text"
         placeholder="اختر المحكمة..."
         class="input input-bordered input-sm w-48"
+        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
         [(ngModel)]="selectedCourt"
         readonly
         (click)="openCourtsModal()"
@@ -37,6 +41,7 @@
         type="text"
         placeholder="ابحث بالاسم أو الكود أو المحكمة..."
         class="input input-bordered w-full"
+        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
         [(ngModel)]="searchTerm"
         (input)="applyFilters()"
       />
@@ -44,9 +49,11 @@
   </div>
 
   <!-- الجدول -->
-  <div class="overflow-x-auto bg-base-100 rounded-xl shadow">
+  <div class="overflow-x-auto rounded-xl shadow"
+       style="background-color: var(--surface-card);">
     <table class="table table-sm w-full text-sm">
-      <thead class="bg-base-300 text-base font-semibold">
+      <thead style="background-color: var(--surface-section); color: var(--text-color);"
+             class="font-semibold">
         <tr>
           <th>الكود</th>
           <th>الاسم</th>
@@ -69,7 +76,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let record of paginatedRecords" class="hover:bg-base-200 transition-all">
+        <tr *ngFor="let record of paginatedRecords; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color); transition: background-color 0.2s;">
           <td>{{ record.code }}</td>
           <td>{{ record.name }}</td>
           <td>{{ record.status }}</td>
@@ -102,7 +111,8 @@
     >
       السابق
     </button>
-    <span class="font-semibold text-primary">
+    <span class="font-semibold"
+          style="color: var(--primary-color);">
       الصفحة {{ currentPage }} من
       {{ Math.ceil(filteredRecords.length / pageSize) }}
     </span>

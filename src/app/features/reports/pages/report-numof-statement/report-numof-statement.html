@@ -1,26 +1,31 @@
-<div class="p-6 bg-gray-50 min-h-screen">
+<div class="p-6 min-h-screen"
+     style="background-color: var(--surface-ground);">
 
   <!-- Header -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 rounded-xl shadow">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded-xl shadow"
+       style="background-color: var(--surface-card);">
 
     <!-- من تاريخ -->
     <div class="flex flex-col">
-      <label class="font-medium mb-1">من تاريخ</label>
+      <label class="font-medium mb-1" style="color: var(--text-color);">من تاريخ</label>
       <input type="date" [(ngModel)]="fromDate"
-        class="p-2 border rounded" />
+        class="p-2 border rounded"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
     </div>
 
     <!-- الي تاريخ -->
     <div class="flex flex-col">
-      <label class="font-medium mb-1">الى تاريخ</label>
+      <label class="font-medium mb-1" style="color: var(--text-color);">الى تاريخ</label>
       <input type="date" [(ngModel)]="toDate"
-        class="p-2 border rounded" />
+        class="p-2 border rounded"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
     </div>
 
     <!-- الشركة -->
     <div class="flex flex-col">
-      <label class="font-medium mb-1">الشركة</label>
-      <select [(ngModel)]="company" class="p-2 border rounded">
+      <label class="font-medium mb-1" style="color: var(--text-color);">الشركة</label>
+      <select [(ngModel)]="company" class="p-2 border rounded"
+              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
         <option value="all">All</option>
         <option value="viva">Viva</option>
         <option value="ooredoo">Ooredoo</option>
@@ -55,28 +60,32 @@
   </div>
 
   <!-- جدول التقرير -->
-  <div *ngIf="reportData.length" class="mt-6 bg-white p-4 shadow rounded-xl">
+  <div *ngIf="reportData.length" class="mt-6 p-4 shadow rounded-xl"
+       style="background-color: var(--surface-card);">
 
-    <table class="w-full text-right border-collapse">
+    <table class="w-full text-right border-collapse"
+           style="border-color: var(--surface-border);">
       <thead>
-        <tr class="bg-gray-200 text-gray-700">
-          <th class="p-2 border">كود الموظف</th>
-          <th class="p-2 border">الاسم</th>
-          <th class="p-2 border">الشركة</th>
-          <th class="p-2 border">عدد الإفادات</th>
-          <th class="p-2 border">صافي الإفادات</th>
-          <th class="p-2 border">إجمالي الإفادات</th>
+        <tr style="background-color: var(--surface-section);">
+          <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">كود الموظف</th>
+          <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">الاسم</th>
+          <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">الشركة</th>
+          <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">عدد الإفادات</th>
+          <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">صافي الإفادات</th>
+          <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">إجمالي الإفادات</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr *ngFor="let row of reportData" class="hover:bg-gray-50">
-          <td class="p-2 border">{{ row.code }}</td>
-          <td class="p-2 border">{{ row.name }}</td>
-          <td class="p-2 border">{{ row.company }}</td>
-          <td class="p-2 border">{{ row.count }}</td>
-          <td class="p-2 border">{{ row.net }}</td>
-          <td class="p-2 border">{{ row.total }}</td>
+        <tr *ngFor="let row of reportData; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color); transition: background-color 0.2s;">
+          <td class="p-2 border" style="border-color: var(--surface-border);">{{ row.code }}</td>
+          <td class="p-2 border" style="border-color: var(--surface-border);">{{ row.name }}</td>
+          <td class="p-2 border" style="border-color: var(--surface-border);">{{ row.company }}</td>
+          <td class="p-2 border" style="border-color: var(--surface-border);">{{ row.count }}</td>
+          <td class="p-2 border" style="border-color: var(--surface-border);">{{ row.net }}</td>
+          <td class="p-2 border" style="border-color: var(--surface-border);">{{ row.total }}</td>
         </tr>
       </tbody>
     </table>

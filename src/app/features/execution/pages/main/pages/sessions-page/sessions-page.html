@@ -1,28 +1,32 @@
-<div class="p-6 bg-base-200 min-h-screen">
+<div class="p-6 min-h-screen"
+     style="background-color: var(--surface-ground);">
   <!-- 🔹 الفلاتر -->
   <div class="flex flex-wrap items-end gap-3 mb-6">
     <div>
-      <label class="block mb-1 text-sm font-semibold">من تاريخ</label>
+      <label class="block mb-1 text-sm font-semibold" style="color: var(--text-color);">من تاريخ</label>
       <input
         type="date"
         class="input input-bordered input-sm"
+        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
         [(ngModel)]="startDate"
       />
     </div>
 
     <div>
-      <label class="block mb-1 text-sm font-semibold">إلى تاريخ</label>
+      <label class="block mb-1 text-sm font-semibold" style="color: var(--text-color);">إلى تاريخ</label>
       <input
         type="date"
         class="input input-bordered input-sm"
+        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
         [(ngModel)]="endDate"
       />
     </div>
 
     <div>
-      <label class="block mb-1 text-sm font-semibold">نوع الجلسة</label>
+      <label class="block mb-1 text-sm font-semibold" style="color: var(--text-color);">نوع الجلسة</label>
       <select
         class="select select-bordered select-sm w-64"
+        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
         [(ngModel)]="selectedSessionType"
       >
         <option value="">الكل</option>
@@ -41,9 +45,11 @@
   </div>
 
   <!-- 🔹 الجدول -->
-  <div class="overflow-x-auto bg-base-100 rounded-xl shadow">
+  <div class="overflow-x-auto rounded-xl shadow"
+       style="background-color: var(--surface-card);">
     <table class="table table-sm w-full text-sm">
-      <thead class="bg-base-300 text-base font-semibold">
+      <thead style="background-color: var(--surface-section); color: var(--text-color);"
+             class="font-semibold">
         <tr>
           <th>رقم الجلسة</th>
           <th>التاريخ</th>
@@ -55,8 +61,9 @@
       </thead>
       <tbody>
         <tr
-          *ngFor="let session of filteredSessions"
-          class="hover:bg-base-200 transition-all"
+          *ngFor="let session of filteredSessions; let i = index"
+          [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+          style="color: var(--text-color); transition: background-color 0.2s;"
         >
           <td>{{ session.sessionNumber }}</td>
           <td>{{ session.date | date: 'yyyy-MM-dd' }}</td>
@@ -70,7 +77,8 @@
   </div>
 
   <!-- 🔹 لا توجد بيانات -->
-  <div *ngIf="filteredSessions.length === 0" class="text-center mt-4 text-gray-500">
+  <div *ngIf="filteredSessions.length === 0" class="text-center mt-4"
+       style="color: var(--text-color-secondary);">
     لا توجد جلسات مطابقة للبحث.
   </div>
 </div>

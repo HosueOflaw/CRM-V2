@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
 
 @Component({
   selector: 'app-expense-form',
@@ -9,6 +10,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
   styleUrl: './expense-form.css'
 })
 export class ExpenseForm {
+  ref = inject(DynamicDialogRef, { optional: true });
 
   @Output() cancel = new EventEmitter<void>();
 
@@ -30,7 +32,11 @@ export class ExpenseForm {
 
   // إغلاق الصفحة
   closeForm() {
-    this.cancel.emit();
+    if (this.ref) {
+      this.ref.close();
+    } else {
+      this.cancel.emit();
+    }
   }
 
   selectExpenseType(type: string) {

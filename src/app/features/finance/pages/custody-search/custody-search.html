@@ -1,25 +1,30 @@
-<div dir="rtl" class="flex flex-col h-screen bg-gray-50 p-4 font-sans text-sm">
+<div dir="rtl" class="flex flex-col h-screen p-4 font-sans text-sm"
+     style="background-color: var(--surface-ground);">
 
     <!-- Header / Title -->
-    <h1 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+    <h1 class="text-lg font-bold mb-4 border-b pb-2"
+        style="color: var(--text-color); border-color: var(--surface-border);">
       كل العهد الموجودة على المستشار
     </h1>
 
     <!-- شريط البحث (Toolbar) -->
-    <div class="bg-white p-3 rounded-lg shadow-md mb-4 flex justify-between items-center border border-gray-300">
+    <div class="p-3 rounded-lg shadow-md mb-4 flex justify-between items-center border"
+         style="background-color: var(--surface-card); border-color: var(--surface-border);">
         
         <!-- حقل الموكل وزر الـ Lookup -->
         <div class="flex items-center gap-3">
-            <label class="font-bold text-gray-700">الموكل</label>
+            <label class="font-bold" style="color: var(--text-color);">الموكل</label>
             
             <input type="text" 
-                   class="input input-sm input-bordered rounded-none w-64 bg-yellow-50 border-yellow-400" 
+                   class="input input-sm input-bordered rounded-none w-64" 
+                   style="background-color: var(--surface-ground); border-color: var(--surface-border); color: var(--text-color);"
                    [(ngModel)]="selectedClientName" 
                    placeholder="اختر موكل"
                    readonly />
             
             <!-- زر الـ Lookup Modal -->
-            <button class="btn btn-sm bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400 rounded-none"
+            <button class="btn btn-sm rounded-none"
+                    style="background-color: var(--surface-section); color: var(--text-color); border-color: var(--surface-border); hover:background-color: var(--surface-hover);"
                     (click)="openClientLookup()">
                 ...
             </button>
@@ -33,39 +38,44 @@
 
         <!-- معلومات المستشار (يمين) -->
         <div class="flex items-center gap-2">
-            <label class="font-bold text-gray-700">المستشار:</label>
-            <span class="text-blue-700 font-mono">{{ selectedConsultant }}</span>
+            <label class="font-bold" style="color: var(--text-color);">المستشار:</label>
+            <span class="font-mono" style="color: var(--primary-color);">{{ selectedConsultant }}</span>
         </div>
     </div>
 
     <!-- منطقة الجدول (Grid) -->
-    <div class="flex-grow overflow-auto border border-gray-300 rounded-lg shadow-lg bg-white">
+    <div class="flex-grow overflow-auto border rounded-lg shadow-lg"
+         style="background-color: var(--surface-card); border-color: var(--surface-border);">
         
       
 
         <!-- الجدول نفسه -->
-        <table class="table table-sm table-pin-rows w-full border-collapse text-right whitespace-nowrap">
+        <table class="table table-sm table-pin-rows w-full border-collapse text-right whitespace-nowrap"
+               style="border-color: var(--surface-border);">
             <thead>
-                <tr class="bg-gray-100 text-gray-700 border-b border-gray-300">
-                    <th class="w-12">الرقم</th>
-                    <th>تاريخ العهدة</th>
-                    <th>نوع العهدة</th>
-                    <th>المبلغ</th>
-                    <th>الموكل</th>
-                    <th>المستخدم</th>
+                <tr style="background-color: var(--surface-section); border-color: var(--surface-border);">
+                    <th class="w-12" style="color: var(--text-color); border-color: var(--surface-border);">الرقم</th>
+                    <th style="color: var(--text-color); border-color: var(--surface-border);">تاريخ العهدة</th>
+                    <th style="color: var(--text-color); border-color: var(--surface-border);">نوع العهدة</th>
+                    <th style="color: var(--text-color); border-color: var(--surface-border);">المبلغ</th>
+                    <th style="color: var(--text-color); border-color: var(--surface-border);">الموكل</th>
+                    <th style="color: var(--text-color); border-color: var(--surface-border);">المستخدم</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let row of custodyRows">
+                <tr *ngFor="let row of custodyRows; let i = index"
+                    [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+                    style="color: var(--text-color);">
                     <td class="font-mono">{{ row.id }}</td>
                     <td>{{ row.date }}</td>
                     <td>{{ row.type }}</td>
-                    <td class="font-bold text-green-700">{{ row.amount | number }}</td>
+                    <td class="font-bold" style="color: var(--green-500);">{{ row.amount | number }}</td>
                     <td>{{ row.client }}</td>
                     <td>{{ row.user }}</td>
                 </tr>
                 <tr *ngIf="custodyRows.length === 0">
-                    <td colspan="6" class="text-center p-4 text-gray-500">لا توجد عهد لعرضها.</td>
+                    <td colspan="6" class="text-center p-4"
+                        style="color: var(--text-color-secondary);">لا توجد عهد لعرضها.</td>
                 </tr>
             </tbody>
         </table>

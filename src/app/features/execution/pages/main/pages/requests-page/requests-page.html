@@ -1,26 +1,33 @@
-<div class="p-6 bg-gray-50 min-h-screen space-y-6">
+<div class="p-6 min-h-screen space-y-6"
+     style="background-color: var(--surface-ground);">
   <!-- 🔸 Filters -->
-  <div class="bg-white p-6 rounded-xl shadow space-y-4">
-    <h2 class="text-lg font-semibold mb-2">بحث الطلبات</h2>
+  <div class="p-6 rounded-xl shadow space-y-4"
+       style="background-color: var(--surface-card);">
+    <h2 class="text-lg font-semibold mb-2" style="color: var(--text-color);">بحث الطلبات</h2>
 
     <div class="flex flex-wrap gap-4">
       <div class="flex flex-col w-1/5">
-        <label class="text-sm mb-1">من تاريخ</label>
-        <input type="date" [(ngModel)]="fromDate" class="input input-bordered" />
+        <label class="text-sm mb-1" style="color: var(--text-color);">من تاريخ</label>
+        <input type="date" [(ngModel)]="fromDate"
+               class="input input-bordered"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="flex flex-col w-1/5">
-        <label class="text-sm mb-1">إلى تاريخ</label>
-        <input type="date" [(ngModel)]="toDate" class="input input-bordered" />
+        <label class="text-sm mb-1" style="color: var(--text-color);">إلى تاريخ</label>
+        <input type="date" [(ngModel)]="toDate"
+               class="input input-bordered"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="flex flex-col w-1/5">
-        <label class="text-sm mb-1">المحكمة</label>
+        <label class="text-sm mb-1" style="color: var(--text-color);">المحكمة</label>
         <div class="flex gap-2">
           <input
             type="text"
             readonly
             class="input input-bordered w-full"
+            style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
             placeholder="اختر المحكمة"
             [(ngModel)]="selectedCourt"
           />
@@ -36,21 +43,25 @@
   </div>
 
   <!-- 🔹 Table Section -->
-  <div class="bg-white p-6 rounded-xl shadow">
-    <h3 class="text-lg font-semibold mb-4">الطلبات</h3>
+  <div class="p-6 rounded-xl shadow"
+       style="background-color: var(--surface-card);">
+    <h3 class="text-lg font-semibold mb-4" style="color: var(--text-color);">الطلبات</h3>
     <div class="overflow-x-auto">
-      <table class="table table-zebra w-full text-center">
+      <table class="table table-zebra w-full text-center"
+             style="border-color: var(--surface-border);">
         <thead>
-          <tr>
-            <th>#</th>
-            <th>رقم الطلب</th>
-            <th>اسم المحكمة</th>
-            <th>تاريخ الطلب</th>
-            <th>الحالة</th>
+          <tr style="background-color: var(--surface-section);">
+            <th style="color: var(--text-color);">#</th>
+            <th style="color: var(--text-color);">رقم الطلب</th>
+            <th style="color: var(--text-color);">اسم المحكمة</th>
+            <th style="color: var(--text-color);">تاريخ الطلب</th>
+            <th style="color: var(--text-color);">الحالة</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let req of filteredRequests">
+          <tr *ngFor="let req of filteredRequests; let i = index"
+              [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+              style="color: var(--text-color);">
             <td>{{ req.id }}</td>
             <td>{{ req.number }}</td>
             <td>{{ req.court }}</td>
@@ -74,26 +85,31 @@
 
   <!-- 🔸 Court Modal -->
   <dialog #lookupModal class="modal">
-    <div class="modal-box w-11/12 max-w-4xl">
-      <h3 class="font-bold text-lg mb-3">{{ title }}</h3>
+    <div class="modal-box w-11/12 max-w-4xl"
+         style="background-color: var(--surface-card);">
+      <h3 class="font-bold text-lg mb-3" style="color: var(--text-color);">{{ title }}</h3>
 
       <input
         [(ngModel)]="search"
         (input)="filterData()"
         placeholder="ابحث..."
         class="input input-bordered w-full mb-4"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
       />
 
       <div class="overflow-y-auto max-h-[400px]">
-        <table class="table table-sm w-full text-sm">
+        <table class="table table-sm w-full text-sm"
+               style="border-color: var(--surface-border);">
           <thead>
-            <tr>
-              <th *ngFor="let col of columns">{{ col }}</th>
-              <th></th>
+            <tr style="background-color: var(--surface-section);">
+              <th *ngFor="let col of columns" style="color: var(--text-color);">{{ col }}</th>
+              <th style="color: var(--text-color);"></th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let row of filteredData">
+            <tr *ngFor="let row of filteredData; let i = index"
+                [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+                style="color: var(--text-color);">
               <td *ngFor="let col of columns">{{ row[col] }}</td>
               <td>
                 <button class="btn btn-xs btn-primary" (click)="selectItem(row)">

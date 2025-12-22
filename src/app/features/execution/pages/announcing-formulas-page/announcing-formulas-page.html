@@ -1,33 +1,44 @@
 <app-go-back></app-go-back>
 
-<div class="p-6 bg-base-200 min-h-screen" dir="rtl">
-  <div class="max-w-7xl mx-auto bg-white p-6 rounded-2xl shadow-md space-y-6">
+<div class="p-6 min-h-screen" dir="rtl"
+     style="background-color: var(--surface-ground);">
+  <div class="max-w-7xl mx-auto p-6 rounded-2xl shadow-md space-y-6"
+       style="background-color: var(--surface-card);">
 
     <!-- العنوان -->
-    <h2 class="text-2xl font-bold text-center text-primary mb-4">
+    <h2 class="text-2xl font-bold text-center mb-4"
+        style="color: var(--primary-color);">
       📜 إعلان واستلام الصيغ
     </h2>
 
     <!-- 🧾 القسم الأول: الإدخال -->
     <form class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700">الكود</label>
-        <input type="text" class="input input-bordered w-full" [(ngModel)]="form.code" name="code" />
+        <label class="block text-sm font-medium" style="color: var(--text-color);">الكود</label>
+        <input type="text" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+               [(ngModel)]="form.code" name="code" />
       </div>
 
       <div class="md:col-span-2">
-        <label class="block text-sm font-medium text-gray-700">الاسم</label>
-        <input type="text" class="input input-bordered w-full" [(ngModel)]="form.name" name="name" />
+        <label class="block text-sm font-medium" style="color: var(--text-color);">الاسم</label>
+        <input type="text" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+               [(ngModel)]="form.name" name="name" />
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700">الرقم الآلي</label>
-        <input type="text" class="input input-bordered w-full" [(ngModel)]="form.autoNum" name="autoNum" />
+        <label class="block text-sm font-medium" style="color: var(--text-color);">الرقم الآلي</label>
+        <input type="text" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+               [(ngModel)]="form.autoNum" name="autoNum" />
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700">المدني</label>
-        <input type="text" class="input input-bordered w-full" [(ngModel)]="form.civilId" name="civilId" />
+        <label class="block text-sm font-medium" style="color: var(--text-color);">المدني</label>
+        <input type="text" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+               [(ngModel)]="form.civilId" name="civilId" />
       </div>
     </form>
 
@@ -38,10 +49,13 @@
     </div>
 
     <!-- 📅 القسم الثاني: التواريخ -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 border rounded-xl p-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 border rounded-xl p-4"
+         style="border-color: var(--surface-border);">
       <div *ngFor="let d of dateLabels; let i = index">
-        <label class="block text-sm font-medium mb-1">{{ d }}</label>
-        <input type="date" class="input input-bordered w-full" [(ngModel)]="form.dates[i]" name="date{{i}}" />
+        <label class="block text-sm font-medium mb-1" style="color: var(--text-color);">{{ d }}</label>
+        <input type="date" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+               [(ngModel)]="form.dates[i]" name="date{{i}}" />
       </div>
     </div>
 
@@ -54,23 +68,30 @@
     </div>
 
     <!-- 🔍 القسم الرابع: البحث -->
-    <div class="border rounded-xl p-4 space-y-4">
-      <h3 class="text-lg font-bold text-center">🔎 البحث في البيانات</h3>
+    <div class="border rounded-xl p-4 space-y-4"
+         style="border-color: var(--surface-border);">
+      <h3 class="text-lg font-bold text-center" style="color: var(--text-color);">🔎 البحث في البيانات</h3>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label class="block mb-1">من تاريخ</label>
-          <input type="date" class="input input-bordered w-full" [(ngModel)]="search.fromDate" name="fromDate" />
+          <label class="block mb-1" style="color: var(--text-color);">من تاريخ</label>
+          <input type="date" class="input input-bordered w-full"
+                 style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+                 [(ngModel)]="search.fromDate" name="fromDate" />
         </div>
 
         <div>
-          <label class="block mb-1">إلى تاريخ</label>
-          <input type="date" class="input input-bordered w-full" [(ngModel)]="search.toDate" name="toDate" />
+          <label class="block mb-1" style="color: var(--text-color);">إلى تاريخ</label>
+          <input type="date" class="input input-bordered w-full"
+                 style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+                 [(ngModel)]="search.toDate" name="toDate" />
         </div>
 
         <div>
-          <label class="block mb-1">نوع البحث</label>
-          <select class="select select-bordered w-full" [(ngModel)]="search.type" name="searchType">
+          <label class="block mb-1" style="color: var(--text-color);">نوع البحث</label>
+          <select class="select select-bordered w-full"
+                  style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+                  [(ngModel)]="search.type" name="searchType">
             <option value="">اختر...</option>
             <option *ngFor="let t of searchTypes" [value]="t">{{ t }}</option>
           </select>
@@ -84,18 +105,21 @@
 
     <!-- 📊 القسم الخامس: النتائج -->
     <div class="overflow-x-auto">
-      <table class="table table-zebra w-full text-center">
+      <table class="table table-zebra w-full text-center"
+             style="border-color: var(--surface-border);">
         <thead>
-          <tr>
-            <th>الكود</th>
-            <th>الاسم</th>
-            <th>المدني</th>
-            <th>الرقم الآلي</th>
-            <th *ngFor="let d of dateLabels">{{ d }}</th>
+          <tr style="background-color: var(--surface-section);">
+            <th style="color: var(--text-color);">الكود</th>
+            <th style="color: var(--text-color);">الاسم</th>
+            <th style="color: var(--text-color);">المدني</th>
+            <th style="color: var(--text-color);">الرقم الآلي</th>
+            <th *ngFor="let d of dateLabels" style="color: var(--text-color);">{{ d }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of data">
+          <tr *ngFor="let item of data; let i = index"
+              [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+              style="color: var(--text-color);">
             <td>{{ item.code }}</td>
             <td>{{ item.name }}</td>
             <td>{{ item.civilId }}</td>

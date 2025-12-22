@@ -1,15 +1,18 @@
-<div class="page-container p-5 bg-gray-100 min-h-screen font-sans">
+<div class="page-container p-5 min-h-screen font-sans"
+     style="background-color: var(--surface-ground);">
 <app-go-back></app-go-back>
   <!-- 🔹 Header Section -->
 <div class="flex justify-start items-center gap-3 mb-6">
 
     <!-- Search Box -->
-    <div class="flex items-center border border-gray-300 bg-white rounded-lg px-3 py-1">
-      <i class="fa fa-search text-gray-500 mr-2"></i>
+    <div class="flex items-center border rounded-lg px-3 py-1"
+         style="border-color: var(--surface-border); background-color: var(--surface-card);">
+      <i class="fa fa-search mr-2" style="color: var(--text-color-secondary);"></i>
       <input
         type="text"
         placeholder="ابحث..."
         class="outline-none border-none w-48 bg-transparent"
+        style="color: var(--text-color);"
       />
     </div>
 
@@ -30,26 +33,30 @@
   </div>
 
   <!-- 🔹 Table Placeholder -->
-  <div class="bg-white rounded-lg shadow p-5 text-center text-gray-500">
+  <div class="rounded-lg shadow p-5 text-center"
+       style="background-color: var(--surface-card); color: var(--text-color-secondary);">
     <ng-container *ngIf="!dataLoaded">
       اضغط على أحد الأزرار لعرض البيانات
     </ng-container>
 
     <ng-container *ngIf="dataLoaded">
-      <table class="w-full border-collapse border border-gray-300">
+      <table class="w-full border-collapse"
+             style="border-color: var(--surface-border);">
         <thead>
-          <tr class="bg-gray-200 text-gray-700">
-            <th class="border border-gray-300 px-4 py-2">#</th>
-            <th class="border border-gray-300 px-4 py-2">الاسم</th>
-            <th class="border border-gray-300 px-4 py-2">القيمة</th>
+          <tr style="background-color: var(--surface-section);">
+            <th class="border px-4 py-2" style="border-color: var(--surface-border); color: var(--text-color);">#</th>
+            <th class="border px-4 py-2" style="border-color: var(--surface-border); color: var(--text-color);">الاسم</th>
+            <th class="border px-4 py-2" style="border-color: var(--surface-border); color: var(--text-color);">القيمة</th>
 
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of tableData; let i = index">
-            <td class="border border-gray-300 px-4 py-2">{{ i + 1 }}</td>
-            <td class="border border-gray-300 px-4 py-2">{{ item.name }}</td>
-            <td class="border border-gray-300 px-4 py-2">{{ item.value }}</td>
+          <tr *ngFor="let item of tableData; let i = index"
+              [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+              style="color: var(--text-color);">
+            <td class="border px-4 py-2" style="border-color: var(--surface-border);">{{ i + 1 }}</td>
+            <td class="border px-4 py-2" style="border-color: var(--surface-border);">{{ item.name }}</td>
+            <td class="border px-4 py-2" style="border-color: var(--surface-border);">{{ item.value }}</td>
           </tr>
         </tbody>
       </table>

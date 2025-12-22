@@ -1,4 +1,5 @@
-<div class="min-h-screen bg-gray-100 p-5 font-sans" dir="rtl">
+<div class="min-h-screen p-5 font-sans" dir="rtl"
+     style="background-color: var(--surface-ground);">
 
   <!-- ✅ الشريط العلوي -->
   <div class="flex flex-wrap gap-3 mb-4">
@@ -35,7 +36,8 @@
       </button>
     </div>
 
-    <div *ngIf="uploadedFileName" class="mt-2 text-sm text-gray-700">
+    <div *ngIf="uploadedFileName" class="mt-2 text-sm"
+         style="color: var(--text-color-secondary);">
       📄 {{ uploadedFileName }}
     </div>
   </div>
@@ -59,80 +61,107 @@
   </div>
 
   <!-- ✅ الفورم -->
-  <div class="bg-white p-5 rounded-lg shadow-md mb-5">
+  <div class="p-5 rounded-lg shadow-md mb-5"
+       style="background-color: var(--surface-card);">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
       <div class="flex flex-col">
-        <label class="font-semibold mb-1.5 text-gray-700 text-sm text-right">الكود</label>
+        <label class="font-semibold mb-1.5 text-sm text-right" style="color: var(--text-color);">الكود</label>
         <input type="text" [(ngModel)]="code"
-          class="px-3 py-2 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          class="px-3 py-2 border rounded text-sm text-right focus:outline-none"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="flex flex-col">
-        <label class="font-semibold mb-1.5 text-gray-700 text-sm text-right">الاسم</label>
+        <label class="font-semibold mb-1.5 text-sm text-right" style="color: var(--text-color);">الاسم</label>
         <input type="text" [(ngModel)]="name"
-          class="px-3 py-2 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          class="px-3 py-2 border rounded text-sm text-right focus:outline-none"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
       <div class="flex flex-col">
-        <label class="font-semibold mb-1.5 text-gray-700 text-sm text-right">المبلغ</label>
+        <label class="font-semibold mb-1.5 text-sm text-right" style="color: var(--text-color);">المبلغ</label>
         <input type="text" [(ngModel)]="amount"
-          class="px-3 py-2 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          class="px-3 py-2 border rounded text-sm text-right focus:outline-none"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="flex flex-col">
-        <label class="font-semibold mb-1.5 text-gray-700 text-sm text-right">البنك</label>
+        <label class="font-semibold mb-1.5 text-sm text-right" style="color: var(--text-color);">البنك</label>
         <input type="text" [(ngModel)]="bank"
-          class="px-3 py-2 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          class="px-3 py-2 border rounded text-sm text-right focus:outline-none"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="flex flex-col">
-        <label class="font-semibold mb-1.5 text-gray-700 text-sm text-right">التاريخ</label>
+        <label class="font-semibold mb-1.5 text-sm text-right" style="color: var(--text-color);">التاريخ</label>
         <input type="date" [(ngModel)]="date"
-          class="px-3 py-2 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          class="px-3 py-2 border rounded text-sm text-right focus:outline-none"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
     </div>
 
     <div class="flex flex-col">
-      <label class="font-semibold mb-1.5 text-gray-700 text-sm text-right">رقم السند</label>
+      <label class="font-semibold mb-1.5 text-sm text-right" style="color: var(--text-color);">رقم السند</label>
       <input type="number" [(ngModel)]="code"
-        class="px-3 py-2 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        class="px-3 py-2 border rounded text-sm text-right focus:outline-none"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
     </div>
   </div>
 
   <!-- ✅ البحث -->
   <div class="flex gap-3 mb-5 items-center">
     <input type="search" placeholder="ابحث هنا..."
-      class="flex-1 px-4 py-2.5 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
-    <button class="px-5 py-2.5 bg-white border border-gray-300 rounded hover:bg-gray-50 text-lg">
+      class="flex-1 px-4 py-2.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);" />
+    <button class="px-5 py-2.5 border rounded text-lg transition-colors"
+            style="background-color: var(--surface-card); border-color: var(--surface-border); color: var(--text-color);">
       🔍
     </button>
   </div>
 
   <!-- ✅ الجدول -->
-  <div class="bg-white rounded-lg shadow-md overflow-hidden">
-    <table class="w-full border-collapse">
-      <thead class="bg-gray-50">
+  <div class="rounded-lg shadow-md overflow-hidden"
+       style="background-color: var(--surface-card);">
+    <table class="w-full border-collapse"
+           style="border-color: var(--surface-border);">
+      <thead style="background-color: var(--surface-section);">
         <tr>
-          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">الكود</th>
-          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">الاسم</th>
-          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">التاريخ</th>
-          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">البنك</th>
-          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">المبلغ</th>
-          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">رقم السند</th>
-          <th class="px-3 py-3 text-right font-semibold border-b-2 border-gray-200 text-gray-700 text-sm">إجراءات</th>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 text-sm"
+              style="border-color: var(--surface-border); color: var(--text-color);">الكود</th>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 text-sm"
+              style="border-color: var(--surface-border); color: var(--text-color);">الاسم</th>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 text-sm"
+              style="border-color: var(--surface-border); color: var(--text-color);">التاريخ</th>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 text-sm"
+              style="border-color: var(--surface-border); color: var(--text-color);">البنك</th>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 text-sm"
+              style="border-color: var(--surface-border); color: var(--text-color);">المبلغ</th>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 text-sm"
+              style="border-color: var(--surface-border); color: var(--text-color);">رقم السند</th>
+          <th class="px-3 py-3 text-right font-semibold border-b-2 text-sm"
+              style="border-color: var(--surface-border); color: var(--text-color);">إجراءات</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let entry of entries" class="hover:bg-gray-50 transition-colors">
-          <td class="px-3 py-3 text-right border-b border-gray-200 text-sm">{{ entry.code }}</td>
-          <td class="px-3 py-3 text-right border-b border-gray-200 text-sm">{{ entry.name }}</td>
-          <td class="px-3 py-3 text-right border-b border-gray-200 text-sm">{{ entry.date }}</td>
-          <td class="px-3 py-3 text-right border-b border-gray-200 text-sm">{{ entry.bank }}</td>
-          <td class="px-3 py-3 text-right border-b border-gray-200 text-sm">{{ entry.amount }}</td>
-          <td class="px-3 py-3 text-right border-b border-gray-200 text-sm">{{ entry.id }}</td>
-          <td class="px-3 py-3 text-right border-b border-gray-200">
+        <tr *ngFor="let entry of entries; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color); transition: background-color 0.2s;">
+          <td class="px-3 py-3 text-right border-b text-sm"
+              style="border-color: var(--surface-border);">{{ entry.code }}</td>
+          <td class="px-3 py-3 text-right border-b text-sm"
+              style="border-color: var(--surface-border);">{{ entry.name }}</td>
+          <td class="px-3 py-3 text-right border-b text-sm"
+              style="border-color: var(--surface-border);">{{ entry.date }}</td>
+          <td class="px-3 py-3 text-right border-b text-sm"
+              style="border-color: var(--surface-border);">{{ entry.bank }}</td>
+          <td class="px-3 py-3 text-right border-b text-sm"
+              style="border-color: var(--surface-border);">{{ entry.amount }}</td>
+          <td class="px-3 py-3 text-right border-b text-sm"
+              style="border-color: var(--surface-border);">{{ entry.id }}</td>
+          <td class="px-3 py-3 text-right border-b"
+              style="border-color: var(--surface-border);">
             <button (click)="deleteEntry(entry)"
               class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors">
               حذف
@@ -140,7 +169,8 @@
           </td>
         </tr>
         <tr *ngIf="entries.length === 0">
-          <td colspan="7" class="text-center text-gray-500 py-10 italic">
+          <td colspan="7" class="text-center py-10 italic"
+              style="color: var(--text-color-secondary);">
             لا توجد بيانات
           </td>
         </tr>

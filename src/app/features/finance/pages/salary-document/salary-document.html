@@ -1,35 +1,69 @@
-<div class="p-6 space-y-6 justify-between gap-6" style="direction: rtl; display: flex;">
+<div class="p-6 space-y-6 justify-between gap-6" style="direction: rtl; display: flex; background-color: var(--surface-ground);">
 
   <!-- يمين: نموذج البحث + بيانات السند + الافادة + أزرار -->
   <div class="w-1/2 space-y-4">
     <!-- 🔍 نموذج البحث -->
-    <form class="flex gap-2 bg-white p-4 rounded-2xl shadow">
-      <input type="text" placeholder="كود" [(ngModel)]="searchCode" name="searchCode" class="border p-2 rounded-lg flex-1">
+    <form class="flex gap-2 p-4 rounded-2xl shadow"
+          style="background-color: var(--surface-card);">
+      <input type="text" placeholder="كود" [(ngModel)]="searchCode" name="searchCode"
+             class="border p-2 rounded-lg flex-1"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
       <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" (click)="searchReceipt()">بحث</button>
     </form>
 
     <!-- بيانات السند بعد البحث -->
-    <div class="grid grid-cols-2 gap-4 bg-white p-4 rounded-2xl shadow">
-      <div><label>الاسم</label><input class="border p-2 w-full" [value]="receiptData?.name" readonly></div>
-      <div><label>سبب المديونية</label><input class="border p-2 w-full" [value]="receiptData?.reason_due" readonly></div>
-      <div><label>الرقم المدني</label><input class="border p-2 w-full" [value]="receiptData?.civil_id" readonly></div>
-      <div><label>رقم العقد</label><input class="border p-2 w-full" [value]="receiptData?.contract_num" readonly></div>
-      <div><label>قيمة المطالبة</label><input class="border p-2 w-full" [value]="receiptData?.claim_value" readonly></div>
-      <div><label>رقم الباتش</label><input class="border p-2 w-full" [value]="receiptData?.batch_no" readonly></div>
-      <div><label>موكل فرعي</label><input class="border p-2 w-full" [value]="receiptData?.sub_client" readonly></div>
-      <div><label>الرسوم</label><input class="border p-2 w-full" [value]="receiptData?.fees" readonly></div>
-      <div><label>الإجمالي</label><input class="border p-2 w-full" [value]="receiptData?.total" readonly></div>
-      <div><label>حالة الملف</label><input class="border p-2 w-full" [value]="receiptData?.case_status" readonly></div>
-      <div><label>المدفوع</label><input class="border p-2 w-full" [value]="receiptData?.paid" readonly></div>
-      <div><label>المدعي القانوني</label><input class="border p-2 w-full" [value]="receiptData?.legal_claimant" readonly></div>
-      <div><label>المتبقي</label><input class="border p-2 w-full" [value]="receiptData?.remaining" readonly></div>
-      <div><label>الرقم الآلي</label><input class="border p-2 w-full" [value]="receiptData?.auto_num" readonly></div>
+    <div class="grid grid-cols-2 gap-4 p-4 rounded-2xl shadow"
+         style="background-color: var(--surface-card);">
+      <div><label style="color: var(--text-color-secondary);">الاسم</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.name" readonly></div>
+      <div><label style="color: var(--text-color-secondary);">سبب المديونية</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.reason_due" readonly></div>
+      <div><label style="color: var(--text-color-secondary);">الرقم المدني</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.civil_id" readonly></div>
+      <div><label style="color: var(--text-color-secondary);">رقم العقد</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.contract_num" readonly></div>
+      <div><label style="color: var(--text-color-secondary);">قيمة المطالبة</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.claim_value" readonly></div>
+      <div><label style="color: var(--text-color-secondary);">رقم الباتش</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.batch_no" readonly></div>
+      <div><label style="color: var(--text-color-secondary);">موكل فرعي</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.sub_client" readonly></div>
+      <div><label style="color: var(--text-color-secondary);">الرسوم</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.fees" readonly></div>
+      <div><label style="color: var(--text-color-secondary);">الإجمالي</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.total" readonly></div>
+      <div><label style="color: var(--text-color-secondary);">حالة الملف</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.case_status" readonly></div>
+      <div><label style="color: var(--text-color-secondary);">المدفوع</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.paid" readonly></div>
+      <div><label style="color: var(--text-color-secondary);">المدعي القانوني</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.legal_claimant" readonly></div>
+      <div><label style="color: var(--text-color-secondary);">المتبقي</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.remaining" readonly></div>
+      <div><label style="color: var(--text-color-secondary);">الرقم الآلي</label><input class="border p-2 w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [value]="receiptData?.auto_num" readonly></div>
     </div>
 
     <!-- فورم الإفادة -->
-    <div class="bg-white p-4 rounded-2xl shadow">
-      <label>نموذج الإفادة</label>
-      <textarea class="w-full border rounded-lg p-2 h-24"></textarea>
+    <div class="p-4 rounded-2xl shadow"
+         style="background-color: var(--surface-card);">
+      <label style="color: var(--text-color);">نموذج الإفادة</label>
+      <textarea class="w-full border rounded-lg p-2 h-24"
+                style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"></textarea>
     </div>
 
     <!-- 7 أزرار -->
@@ -49,53 +83,58 @@
   <!-- شمال: إفادات الاستمارة + المعاملات بالمكتب -->
   <div class="w-1/2 space-y-4">
     <!-- إفادات الاستمارة -->
-    <div class="bg-white p-4 rounded-2xl shadow h-64 overflow-auto">
-      <label>إفادات الاستمارة</label>
-      <div class="mt-2">هنا يمكن عرض محتوى الإفادات</div>
+    <div class="p-4 rounded-2xl shadow h-64 overflow-auto"
+         style="background-color: var(--surface-card);">
+      <label style="color: var(--text-color);">إفادات الاستمارة</label>
+      <div class="mt-2" style="color: var(--text-color-secondary);">هنا يمكن عرض محتوى الإفادات</div>
     </div>
 
     <!-- المعاملات بالمكتب -->
-    <div class="bg-white p-4 rounded-2xl shadow overflow-auto">
-      <label>المعاملات بالمكتب</label>
-      <table class="w-full border text-sm mt-2">
-        <thead class="bg-gray-100">
+    <div class="p-4 rounded-2xl shadow overflow-auto"
+         style="background-color: var(--surface-card);">
+      <label style="color: var(--text-color);">المعاملات بالمكتب</label>
+      <table class="w-full border text-sm mt-2"
+             style="border-color: var(--surface-border);">
+        <thead style="background-color: var(--surface-section);">
           <tr>
-            <th class="p-2 border">code</th>
-            <th class="p-2 border">name</th>
-            <th class="p-2 border">reason_due</th>
-            <th class="p-2 border">batch_no</th>
-            <th class="p-2 border">clint</th>
-            <th class="p-2 border">contract_num</th>
-            <th class="p-2 border">_case</th>
-            <th class="p-2 border">_national</th>
-            <th class="p-2 border">civil_id</th>
-            <th class="p-2 border">sub_customer</th>
-            <th class="p-2 border">total</th>
-            <th class="p-2 border">total_pay</th>
-            <th class="p-2 border">code_clint</th>
-            <th class="p-2 border">employee</th>
-            <th class="p-2 border">expr1</th>
-            <th class="p-2 border">auto_num</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">code</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">name</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">reason_due</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">batch_no</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">clint</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">contract_num</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">_case</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">_national</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">civil_id</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">sub_customer</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">total</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">total_pay</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">code_clint</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">employee</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">expr1</th>
+            <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">auto_num</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let t of receiptTransactions">
-            <td class="p-2 border">{{ t.code }}</td>
-            <td class="p-2 border">{{ t.name }}</td>
-            <td class="p-2 border">{{ t.reason_due }}</td>
-            <td class="p-2 border">{{ t.batch_no }}</td>
-            <td class="p-2 border">{{ t.client }}</td>
-            <td class="p-2 border">{{ t.contract_num }}</td>
-            <td class="p-2 border">{{ t._case }}</td>
-            <td class="p-2 border">{{ t._national }}</td>
-            <td class="p-2 border">{{ t.civil_id }}</td>
-            <td class="p-2 border">{{ t.sub_customer }}</td>
-            <td class="p-2 border">{{ t.total }}</td>
-            <td class="p-2 border">{{ t.total_pay }}</td>
-            <td class="p-2 border">{{ t.code_client }}</td>
-            <td class="p-2 border">{{ t.employee }}</td>
-            <td class="p-2 border">{{ t.expr1 }}</td>
-            <td class="p-2 border">{{ t.auto_num }}</td>
+          <tr *ngFor="let t of receiptTransactions; let i = index"
+              [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+              style="color: var(--text-color);">
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.code }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.name }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.reason_due }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.batch_no }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.client }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.contract_num }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t._case }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t._national }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.civil_id }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.sub_customer }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.total }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.total_pay }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.code_client }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.employee }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.expr1 }}</td>
+            <td class="p-2 border" style="border-color: var(--surface-border);">{{ t.auto_num }}</td>
           </tr>
         </tbody>
       </table>

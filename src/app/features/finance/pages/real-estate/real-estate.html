@@ -1,35 +1,41 @@
-<div class="min-h-screen bg-gray-100 p-6" style="direction: rtl;">
-  <div class="mx-auto bg-white shadow-xl rounded-2xl p-6 space-y-6">
+<div class="min-h-screen p-6" style="direction: rtl; background-color: var(--surface-ground);">
+  <div class="mx-auto shadow-xl rounded-2xl p-6 space-y-6"
+       style="background-color: var(--surface-card);">
 
     <!-- الأعلى يمين: Box المطالبة بالمقدم والمؤخر -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
       <!-- Box المطالبة بالمقدم -->
-      <div class="bg-blue-50 p-4 rounded-lg shadow space-y-3">
-        <h3 class="font-bold text-lg mb-2">المطالبة بالمقدم</h3>
+      <div class="p-4 rounded-lg shadow space-y-3"
+           style="background-color: var(--surface-section);">
+        <h3 class="font-bold text-lg mb-2" style="color: var(--text-color);">المطالبة بالمقدم</h3>
         <div class="flex flex-col md:flex-row gap-3 items-end">
           <input type="text"
                  placeholder="اختر الشركة"
                  [value]="selectedCompanyAdvance?.name || ''"
                  readonly
                  class="input input-bordered w-full md:w-64 cursor-pointer"
+                 style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
                  (click)="openLookup('advance')" />
 
-          <input type="date" [(ngModel)]="advanceToDate" class="input input-bordered w-full md:w-40" />
+          <input type="date" [(ngModel)]="advanceToDate" class="input input-bordered w-full md:w-40"
+                 style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
 
           <button class="btn btn-primary" (click)="searchAdvance()">بحث</button>
         </div>
       </div>
 
       <!-- Box المطالبة بالمؤخر -->
-      <div class="bg-green-50 p-4 rounded-lg shadow space-y-3">
-        <h3 class="font-bold text-lg mb-2">المطالبة بالمؤخر</h3>
+      <div class="p-4 rounded-lg shadow space-y-3"
+           style="background-color: var(--surface-section);">
+        <h3 class="font-bold text-lg mb-2" style="color: var(--text-color);">المطالبة بالمؤخر</h3>
         <div class="flex flex-col md:flex-row gap-3 items-end">
           <input type="text"
                  placeholder="اختر الشركة"
                  [value]="selectedCompanyDelay?.name || ''"
                  readonly
                  class="input input-bordered w-full md:w-64 cursor-pointer"
+                 style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
                  (click)="openLookup('delay')" />
 
           <button class="btn btn-primary" (click)="searchDelay()">بحث</button>
@@ -46,32 +52,36 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <label class="font-semibold">المقدم / المؤخر:</label>
-        <input type="number" [(ngModel)]="amount" class="input input-bordered w-32" />
+        <label class="font-semibold" style="color: var(--text-color);">المقدم / المؤخر:</label>
+        <input type="number" [(ngModel)]="amount" class="input input-bordered w-32"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
     </div>
 
     <!-- جدول عرض البيانات -->
     <div class="overflow-x-auto mt-4">
-      <table class="table table-auto w-full border border-gray-200 shadow-md rounded-lg">
-        <thead class="bg-gray-100">
+      <table class="table table-auto w-full border shadow-md rounded-lg"
+             style="border-color: var(--surface-border);">
+        <thead style="background-color: var(--surface-section);">
           <tr>
-            <th class="text-center"><input type="checkbox" (change)="toggleAll($event)" /></th>
-            <th class="text-center">الكود</th>
-            <th class="text-center">الاسم</th>
-            <th class="text-center">المدني</th>
-            <th class="text-center">حالة الملف</th>
-            <th class="text-center">سبب المديونية</th>
-            <th class="text-center">رقم الباتش</th>
-            <th class="text-center">تاريخ الورود</th>
-            <th class="text-center">الموكل</th>
-            <th class="text-center">العقد</th>
-            <th class="text-center">الرقم الالي</th>
-            <th class="text-center">المبلغ</th>
+            <th class="text-center" style="color: var(--text-color);"><input type="checkbox" (change)="toggleAll($event)" /></th>
+            <th class="text-center" style="color: var(--text-color);">الكود</th>
+            <th class="text-center" style="color: var(--text-color);">الاسم</th>
+            <th class="text-center" style="color: var(--text-color);">المدني</th>
+            <th class="text-center" style="color: var(--text-color);">حالة الملف</th>
+            <th class="text-center" style="color: var(--text-color);">سبب المديونية</th>
+            <th class="text-center" style="color: var(--text-color);">رقم الباتش</th>
+            <th class="text-center" style="color: var(--text-color);">تاريخ الورود</th>
+            <th class="text-center" style="color: var(--text-color);">الموكل</th>
+            <th class="text-center" style="color: var(--text-color);">العقد</th>
+            <th class="text-center" style="color: var(--text-color);">الرقم الالي</th>
+            <th class="text-center" style="color: var(--text-color);">المبلغ</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of data; let i = index" class="hover:bg-gray-50 transition">
+          <tr *ngFor="let item of data; let i = index"
+              [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+              style="color: var(--text-color); transition: background-color 0.2s;">
             <td class="text-center">
               <input type="checkbox" [(ngModel)]="item.selected" />
             </td>
@@ -88,7 +98,8 @@
             <td class="text-center">{{ item.amount | number }}</td>
           </tr>
           <tr *ngIf="data.length === 0">
-            <td colspan="12" class="text-center py-6 text-gray-500">لا توجد بيانات</td>
+            <td colspan="12" class="text-center py-6"
+                style="color: var(--text-color-secondary);">لا توجد بيانات</td>
           </tr>
         </tbody>
       </table>

@@ -1,13 +1,15 @@
-<div class="p-6 bg-gray-100 min-h-screen" style="direction: rtl;">
+<div class="p-6 min-h-screen" style="direction: rtl; background-color: var(--surface-ground);">
 
   <!-- HEADER SEARCH -->
-  <div class="bg-white p-4 rounded-xl shadow mb-6">
+  <div class="p-4 rounded-xl shadow mb-6"
+       style="background-color: var(--surface-card);">
     <div class="grid grid-cols-6 gap-4 items-end">
 
       <!-- Input Options -->
       <div>
-        <label class="block mb-1">القطاع</label>
-        <select class="select select-bordered w-full">
+        <label class="block mb-1" style="color: var(--text-color-secondary);">القطاع</label>
+        <select class="select select-bordered w-full"
+                style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
           <option disabled selected>اختر القطاع</option>
           <option>قطاع 1</option>
           <option>قطاع 2</option>
@@ -15,8 +17,9 @@
       </div>
 
       <div>
-        <label class="block mb-1">الشركة</label>
-        <select class="select select-bordered w-full">
+        <label class="block mb-1" style="color: var(--text-color-secondary);">الشركة</label>
+        <select class="select select-bordered w-full"
+                style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
           <option disabled selected>اختر الشركة</option>
           <option>شركة 1</option>
           <option>شركة 2</option>
@@ -24,8 +27,9 @@
       </div>
 
       <div>
-        <label class="block mb-1">Group</label>
-        <select class="select select-bordered w-full">
+        <label class="block mb-1" style="color: var(--text-color-secondary);">Group</label>
+        <select class="select select-bordered w-full"
+                style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
           <option disabled selected>اختر المجموعة</option>
           <option>Group 1</option>
           <option>Group 2</option>
@@ -34,13 +38,15 @@
 
       <!-- التاريخ -->
       <div>
-        <label class="block mb-1">التاريخ من</label>
-        <input type="date" class="input input-bordered w-full">
+        <label class="block mb-1" style="color: var(--text-color-secondary);">التاريخ من</label>
+        <input type="date" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
       </div>
 
       <div>
-        <label class="block mb-1">التاريخ إلى</label>
-        <input type="date" class="input input-bordered w-full">
+        <label class="block mb-1" style="color: var(--text-color-secondary);">التاريخ إلى</label>
+        <input type="date" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
       </div>
 
       <!-- Buttons -->
@@ -61,46 +67,50 @@ class="btn btn-accent mb-4"
   </div>
 
   <!-- RESULTS TABLE -->
-  <div class="overflow-x-auto bg-white rounded-xl shadow p-4">
-    <table class="table table-zebra w-full">
+  <div class="overflow-x-auto rounded-xl shadow p-4"
+       style="background-color: var(--surface-card);">
+    <table class="table table-zebra w-full"
+           style="border-color: var(--surface-border);">
       <thead>
-        <tr>
-          <th>الكود</th>
-          <th>الاسم</th>
-          <th>سبب المديونية</th>
-          <th>رقم العقد</th>
-          <th>رقم الباتش</th>
-          <th>الموظف</th>
-          <th>رقم الموظف</th>
-          <th>قيمة المطالبة</th>
-          <th>اجمالي المدفوع</th>
-          <th>المتبقي</th>
-          <th>تاريخ الورود</th>
-          <th>الموكل</th>
-          <th>كود الموكل</th>
-          <th>تاريخ الاستلام</th>
-          <th>تاريخ السحب</th>
-          <th>الرقم الالي</th>
-          <th>ملاحظات</th>
-          <th>الجنسية</th>
-          <th>المدني</th>
-          <th>ملاحظات 2</th>
-          <th>ملاحظات 3</th>
-          <th>ملاحظات 4</th>
-          <th>المحكمة</th>
-          <th>ملاحظات الملفات</th>
-          <th>group</th>
-          <th>الخصم</th>
-          <th>نسبة الخصم</th>
-          <th>القطاع</th>
-          <th>نسبة العمولة</th>
-          <th>عمولة مستقطعة</th>
-          <th>عمولة التسكير</th>
-          <th>المحاسبة علي العمولة المستقطعة</th>
+        <tr style="background-color: var(--surface-section);">
+          <th style="color: var(--text-color);">الكود</th>
+          <th style="color: var(--text-color);">الاسم</th>
+          <th style="color: var(--text-color);">سبب المديونية</th>
+          <th style="color: var(--text-color);">رقم العقد</th>
+          <th style="color: var(--text-color);">رقم الباتش</th>
+          <th style="color: var(--text-color);">الموظف</th>
+          <th style="color: var(--text-color);">رقم الموظف</th>
+          <th style="color: var(--text-color);">قيمة المطالبة</th>
+          <th style="color: var(--text-color);">اجمالي المدفوع</th>
+          <th style="color: var(--text-color);">المتبقي</th>
+          <th style="color: var(--text-color);">تاريخ الورود</th>
+          <th style="color: var(--text-color);">الموكل</th>
+          <th style="color: var(--text-color);">كود الموكل</th>
+          <th style="color: var(--text-color);">تاريخ الاستلام</th>
+          <th style="color: var(--text-color);">تاريخ السحب</th>
+          <th style="color: var(--text-color);">الرقم الالي</th>
+          <th style="color: var(--text-color);">ملاحظات</th>
+          <th style="color: var(--text-color);">الجنسية</th>
+          <th style="color: var(--text-color);">المدني</th>
+          <th style="color: var(--text-color);">ملاحظات 2</th>
+          <th style="color: var(--text-color);">ملاحظات 3</th>
+          <th style="color: var(--text-color);">ملاحظات 4</th>
+          <th style="color: var(--text-color);">المحكمة</th>
+          <th style="color: var(--text-color);">ملاحظات الملفات</th>
+          <th style="color: var(--text-color);">group</th>
+          <th style="color: var(--text-color);">الخصم</th>
+          <th style="color: var(--text-color);">نسبة الخصم</th>
+          <th style="color: var(--text-color);">القطاع</th>
+          <th style="color: var(--text-color);">نسبة العمولة</th>
+          <th style="color: var(--text-color);">عمولة مستقطعة</th>
+          <th style="color: var(--text-color);">عمولة التسكير</th>
+          <th style="color: var(--text-color);">المحاسبة علي العمولة المستقطعة</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let row of results">
+        <tr *ngFor="let row of results; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color);">
           <td>{{row.code}}</td>
           <td>{{row.name}}</td>
           <td>{{row.reason}}</td>

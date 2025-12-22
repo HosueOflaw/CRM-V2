@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 
 @Component({
   selector: 'app-voucher-form',
@@ -9,13 +10,27 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './voucher-form.html',
   styleUrl: './voucher-form.css'
 })
-export class VoucherForm {
+export class VoucherForm implements OnInit {
+  ref = inject(DynamicDialogRef, { optional: true });
+  config = inject(DynamicDialogConfig, { optional: true });
+
   @Input() isReceipt = true;
   @Output() cancel = new EventEmitter<void>();
 
   formData: any = {};
 
+  ngOnInit() {
+    // Get data from dialog config if available
+    if (this.config?.data) {
+      this.isReceipt = this.config.data.isReceipt !== false;
+    }
+  }
+
   closeForm() {
-    this.cancel.emit();
+    if (this.ref) {
+      this.ref.close();
+    } else {
+      this.cancel.emit();
+    }
   }
 }

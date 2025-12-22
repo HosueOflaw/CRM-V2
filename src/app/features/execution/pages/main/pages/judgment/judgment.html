@@ -1,27 +1,32 @@
-<div class="p-6 bg-base-200 min-h-screen">
+<div class="p-6 min-h-screen"
+     style="background-color: var(--surface-ground);">
   <!-- 🔹 الفلاتر -->
   <div class="flex flex-wrap items-end gap-3 mb-6">
     <div>
-      <label class="block mb-1 text-sm font-semibold">من تاريخ</label>
+      <label class="block mb-1 text-sm font-semibold" style="color: var(--text-color);">من تاريخ</label>
       <input
         type="date"
         class="input input-bordered input-sm"
+        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
         [(ngModel)]="startDate"
       />
     </div>
 
     <div>
-      <label class="block mb-1 text-sm font-semibold">إلى تاريخ</label>
+      <label class="block mb-1 text-sm font-semibold" style="color: var(--text-color);">إلى تاريخ</label>
       <input
         type="date"
         class="input input-bordered input-sm"
+        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
         [(ngModel)]="endDate"
       />
     </div>
 
     <div>
-      <label class="block mb-1 text-sm font-semibold">الدرجة</label>
-      <select class="select select-bordered select-sm w-40" [(ngModel)]="selectedDegree">
+      <label class="block mb-1 text-sm font-semibold" style="color: var(--text-color);">الدرجة</label>
+      <select class="select select-bordered select-sm w-40"
+              style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
+              [(ngModel)]="selectedDegree">
         <option value="">الكل</option>
         <option value="أول درجة">أول درجة</option>
         <option value="استئناف">استئناف</option>
@@ -35,9 +40,11 @@
   </div>
 
   <!-- 🔹 الجدول -->
-  <div class="overflow-x-auto bg-base-100 rounded-xl shadow">
+  <div class="overflow-x-auto rounded-xl shadow"
+       style="background-color: var(--surface-card);">
     <table class="table table-sm w-full text-sm">
-      <thead class="bg-base-300 text-base font-semibold">
+      <thead style="background-color: var(--surface-section); color: var(--text-color);"
+             class="font-semibold">
         <tr>
           <th>رقم القضية</th>
           <th>اسم الخصم</th>
@@ -47,7 +54,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let caseItem of filteredCases" class="hover:bg-base-200 transition-all">
+        <tr *ngFor="let caseItem of filteredCases; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color); transition: background-color 0.2s;">
           <td>{{ caseItem.caseNumber }}</td>
           <td>{{ caseItem.opponent }}</td>
           <td>{{ caseItem.degree }}</td>
@@ -59,7 +68,8 @@
   </div>
 
   <!-- 🔹 لا توجد بيانات -->
-  <div *ngIf="filteredCases.length === 0" class="text-center mt-4 text-gray-500">
+  <div *ngIf="filteredCases.length === 0" class="text-center mt-4"
+       style="color: var(--text-color-secondary);">
     لا توجد نتائج مطابقة للبحث.
   </div>
 </div>

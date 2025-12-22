@@ -1,13 +1,13 @@
-<div class="p-4 space-y-6">
+<div class="p-4 space-y-6" style="background-color: var(--surface-ground);">
   <!-- البحث -->
-  <form class="grid grid-cols-6 gap-4 bg-white p-4 rounded-2xl shadow" style="
-    direction: rtl;
-">
+  <form class="grid grid-cols-6 gap-4 p-4 rounded-2xl shadow" style="direction: rtl; background-color: var(--surface-card);">
     <!-- المحكمة -->
     <div class="col-span-2">
-      <label class="block text-sm font-medium mb-1">المحكمة</label>
+      <label class="block text-sm font-medium mb-1"
+             style="color: var(--text-color-secondary);">المحكمة</label>
       <select
         class="w-full border rounded-lg p-2"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
         [(ngModel)]="formData.court"
         name="court"
       >
@@ -20,9 +20,11 @@
 
     <!-- الصفة -->
     <div >
-      <label class="block text-sm font-medium mb-1">الصفة</label>
+      <label class="block text-sm font-medium mb-1"
+             style="color: var(--text-color-secondary);">الصفة</label>
       <select
         class="w-full border rounded-lg p-2"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
         [(ngModel)]="formData.role"
         name="role"
         [disabled]="!formData.court"
@@ -36,9 +38,11 @@
 
     <!-- القرار -->
     <div>
-      <label class="block text-sm font-medium mb-1">القرار</label>
+      <label class="block text-sm font-medium mb-1"
+             style="color: var(--text-color-secondary);">القرار</label>
       <select
         class="w-full border rounded-lg p-2"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
         [(ngModel)]="formData.decision"
         name="decision"
       >
@@ -51,9 +55,11 @@
 
     <!-- نوع الجلسة -->
     <div>
-      <label class="block text-sm font-medium mb-1">نوع الجلسة</label>
+      <label class="block text-sm font-medium mb-1"
+             style="color: var(--text-color-secondary);">نوع الجلسة</label>
       <select
         class="w-full border rounded-lg p-2"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
         [(ngModel)]="formData.sessionType"
         name="sessionType"
       >
@@ -66,10 +72,12 @@
 
     <!-- من تاريخ -->
     <div>
-      <label class="block text-sm font-medium mb-1">من تاريخ</label>
+      <label class="block text-sm font-medium mb-1"
+             style="color: var(--text-color-secondary);">من تاريخ</label>
       <input
         type="date"
         class="w-full border rounded-lg p-2"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
         [(ngModel)]="formData.fromDate"
         name="fromDate"
       />
@@ -77,10 +85,12 @@
 
     <!-- إلى تاريخ -->
     <div>
-      <label class="block text-sm font-medium mb-1">إلى تاريخ</label>
+      <label class="block text-sm font-medium mb-1"
+             style="color: var(--text-color-secondary);">إلى تاريخ</label>
       <input
         type="date"
         class="w-full border rounded-lg p-2"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
         [(ngModel)]="formData.toDate"
         name="toDate"
       />
@@ -105,38 +115,47 @@
 
   <!-- Tabs -->
   <div style="direction: rtl;">
-    <ul class="flex border-b">
+    <ul class="flex border-b"
+        style="border-color: var(--surface-border);">
       <li
         *ngFor="let tab of tabs"
         (click)="activeTab = tab.key"
         class="cursor-pointer px-4 py-2"
         [class.border-b-2]="activeTab === tab.key"
-        [class.border-blue-600]="activeTab === tab.key"
+        [style.border-bottom-color]="activeTab === tab.key ? 'var(--primary-color)' : 'transparent'"
+        [style.color]="activeTab === tab.key ? 'var(--text-color)' : 'var(--text-color-secondary)'"
       >
         {{ tab.label }}
       </li>
     </ul>
 
     <!-- المحتوى -->
-    <div class="mt-4 bg-white p-4 rounded-xl shadow">
-      <table *ngIf="activeTabData.length" class="w-full text-sm border">
-        <thead class="bg-gray-100">
+    <div class="mt-4 p-4 rounded-xl shadow"
+         style="background-color: var(--surface-card);">
+      <table *ngIf="activeTabData.length" class="w-full text-sm border"
+             style="border-color: var(--surface-border);">
+        <thead style="background-color: var(--surface-section);">
           <tr>
-            <th *ngFor="let col of columns" class="p-2 border text-right">
+            <th *ngFor="let col of columns" class="p-2 border text-right"
+                style="border-color: var(--surface-border); color: var(--text-color);">
               {{ col }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of activeTabData" class="border-b hover:bg-gray-50">
-            <td *ngFor="let col of columns" class="p-2 border text-right">
+          <tr *ngFor="let row of activeTabData; let i = index"
+              [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+              style="color: var(--text-color); border-color: var(--surface-border);">
+            <td *ngFor="let col of columns" class="p-2 border text-right"
+                style="border-color: var(--surface-border);">
               {{ row[col] || '-' }}
             </td>
           </tr>
         </tbody>
       </table>
 
-      <div *ngIf="!activeTabData.length" class="text-center text-gray-500 py-8">
+      <div *ngIf="!activeTabData.length" class="text-center py-8"
+           style="color: var(--text-color-secondary);">
         لا توجد بيانات
       </div>
     </div>

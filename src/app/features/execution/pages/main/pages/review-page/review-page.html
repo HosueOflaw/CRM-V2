@@ -1,42 +1,48 @@
-<div class="p-6 bg-base-200 min-h-screen">
-  <h1 class="text-2xl font-bold mb-6 text-center text-primary">
+<div class="p-6 min-h-screen"
+     style="background-color: var(--surface-ground);">
+  <h1 class="text-2xl font-bold mb-6 text-center"
+      style="color: var(--primary-color);">
     مراجعة الملفات
   </h1>
 
   <!-- Filters Section -->
   <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
     <div>
-      <label class="block font-semibold mb-1">تاريخ الإدخال</label>
+      <label class="block font-semibold mb-1" style="color: var(--text-color);">تاريخ الإدخال</label>
       <input
         type="date"
         class="input input-bordered w-full"
+        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
         [(ngModel)]="startDate"
         (change)="applyFilters()"
       />
     </div>
     <div>
-      <label class="block font-semibold mb-1">تاريخ الإجراء</label>
+      <label class="block font-semibold mb-1" style="color: var(--text-color);">تاريخ الإجراء</label>
       <input
         type="date"
         class="input input-bordered w-full"
+        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
         [(ngModel)]="endDate"
         (change)="applyFilters()"
       />
     </div>
     <div>
-      <label class="block font-semibold mb-1">تاريخ المراجعة</label>
+      <label class="block font-semibold mb-1" style="color: var(--text-color);">تاريخ المراجعة</label>
       <input
         type="date"
         class="input input-bordered w-full"
+        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
         [(ngModel)]="reviewDate"
       />
     </div>
     <div>
-      <label class="block font-semibold mb-1">بحث</label>
+      <label class="block font-semibold mb-1" style="color: var(--text-color);">بحث</label>
       <input
         type="text"
         placeholder="ابحث بالاسم أو الكود أو الوكيل..."
         class="input input-bordered w-full"
+        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
         [(ngModel)]="searchTerm"
         (input)="applyFilters()"
       />
@@ -44,9 +50,11 @@
   </div>
 
   <!-- Table -->
-  <div class="overflow-x-auto bg-base-100 rounded-xl shadow">
+  <div class="overflow-x-auto rounded-xl shadow"
+       style="background-color: var(--surface-card);">
     <table class="table w-full text-sm">
-      <thead class="bg-base-300 text-base font-semibold">
+      <thead style="background-color: var(--surface-section); color: var(--text-color);"
+             class="font-semibold">
         <tr>
           <th>الكود</th>
           <th>الاسم</th>
@@ -70,8 +78,9 @@
       </thead>
       <tbody>
         <tr
-          *ngFor="let record of paginatedRecords"
-          class="hover:bg-base-200 transition-all"
+          *ngFor="let record of paginatedRecords; let i = index"
+          [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+          style="color: var(--text-color); transition: background-color 0.2s;"
         >
           <td>{{ record.code }}</td>
           <td>{{ record.name }}</td>
@@ -105,7 +114,8 @@
     >
       السابق
     </button>
-    <span class="font-semibold text-primary"
+    <span class="font-semibold"
+          style="color: var(--primary-color);"
       >الصفحة {{ currentPage }} من
       {{ 1 }}</span
     >

@@ -15,7 +15,7 @@ import { ReceiptVoucher } from "../../components/receipt-voucher/receipt-voucher
 @Component({
   selector: 'app-finance-dashboard',
   standalone: true,
-  imports: [DashboardLayout, CommonModule, FormsModule, AddClientForm, ExpenseForm, VoucherForm, ReceiptVoucher],
+  imports: [DashboardLayout, CommonModule, FormsModule, AddClientForm],
   templateUrl: './finance-dashboard.html',
   styleUrl: './finance-dashboard.css',
   providers: [DialogService]

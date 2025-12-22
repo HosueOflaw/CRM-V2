@@ -1,38 +1,46 @@
-<div dir="rtl" class="flex flex-col h-screen bg-base-100 p-2 font-sans text-sm">
+<div dir="rtl" class="flex flex-col h-screen p-2 font-sans text-sm"
+     style="background-color: var(--surface-ground);">
 
-  <div role="tablist" class="tabs tabs-lifted tabs-sm mb-0">
-    <a role="tab" class="tab" 
-       [class.tab-active]="activeTab === 1" 
+  <div role="tablist" class="tabs tabs-lifted tabs-sm mb-0"
+       style="border-color: var(--surface-border);">
+    <a role="tab" class="tab"
+       [class.tab-active]="activeTab === 1"
        [class.font-bold]="activeTab === 1"
+       style="color: var(--text-color); border-color: var(--surface-border);"
        (click)="setActiveTab(1)">
        رفع الإجراءات
     </a>
-    <a role="tab" class="tab" 
+    <a role="tab" class="tab"
        [class.tab-active]="activeTab === 2"
        [class.font-bold]="activeTab === 2"
+       style="color: var(--text-color); border-color: var(--surface-border);"
        (click)="setActiveTab(2)">
        التقارير
     </a>
-    <a role="tab" class="tab flex-grow cursor-default bg-base-100 border-b-base-300 border-b"></a>
+    <a role="tab" class="tab flex-grow cursor-default border-b"
+       style="background-color: var(--surface-card); border-color: var(--surface-border);"></a>
   </div>
 
-  <div class="bg-base-100 border border-base-300 border-t-0 p-3 rounded-b-box flex-grow flex flex-col overflow-hidden">
+  <div class="border border-t-0 p-3 rounded-b-box flex-grow flex flex-col overflow-hidden"
+       style="background-color: var(--surface-card); border-color: var(--surface-border);">
 
     <div *ngIf="activeTab === 1" class="flex flex-col h-full gap-3">
       
-      <div class="bg-base-200 p-3 rounded-lg border border-base-300">
+      <div class="p-3 rounded-lg border"
+           style="background-color: var(--surface-section); border-color: var(--surface-border);">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
           
           <div class="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
             
           <div class="form-control flex-row items-center gap-2">
-              <label class="label-text w-20 font-bold">الكود</label>
+              <label class="label-text w-20 font-bold" style="color: var(--text-color);">الكود</label>
               <div class="join w-full">
                 <button class="btn btn-xs btn-square join-item btn-primary" (click)="searchByCode()" title="بحث">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
                 </button>
                 <input type="text" 
-                       class="input input-bordered input-xs join-item w-full bg-white focus:outline-none" 
+                       class="input input-bordered input-xs join-item w-full focus:outline-none"
+                       style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
                        [(ngModel)]="formData.code" 
                        (keydown.enter)="searchByCode()" 
                        placeholder="اضغط Enter للبحث"/>
@@ -40,59 +48,80 @@
             </div>
 
               <div class="form-control flex-row items-center gap-2">
-              <label class="label-text w-20 font-bold">الموكل</label>
-              <input type="text" class="input input-bordered input-xs w-full bg-white"  [(ngModel)]="formData.client"/>
+              <label class="label-text w-20 font-bold" style="color: var(--text-color);">الموكل</label>
+              <input type="text" class="input input-bordered input-xs w-full"
+                     style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
+                     [(ngModel)]="formData.client"/>
             </div>
 
             
             <div class="form-control flex-row items-center gap-2">
-              <label class="label-text w-20 font-bold">الاسم</label>
-              <input type="text" class="input input-bordered input-xs w-full bg-white" [(ngModel)]="formData.name" />
+              <label class="label-text w-20 font-bold" style="color: var(--text-color);">الاسم</label>
+              <input type="text" class="input input-bordered input-xs w-full"
+                     style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
+                     [(ngModel)]="formData.name" />
             </div>
 
              <div class="form-control flex-row items-center gap-2">
-              <label class="label-text w-20 font-bold">المدعي القانوني</label>
-              <input type="text" class="input input-bordered input-xs w-full bg-white"  [(ngModel)]="formData.legal_prosecutor"/>
+              <label class="label-text w-20 font-bold" style="color: var(--text-color);">المدعي القانوني</label>
+              <input type="text" class="input input-bordered input-xs w-full"
+                     style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
+                     [(ngModel)]="formData.legal_prosecutor"/>
             </div>
 
                 <div class="form-control flex-row items-center gap-2">
-              <label class="label-text w-20 font-bold">الرقم المدني</label>
-              <input type="text" class="input input-bordered input-xs w-full bg-white" [(ngModel)]="formData.civilId" />
+              <label class="label-text w-20 font-bold" style="color: var(--text-color);">الرقم المدني</label>
+              <input type="text" class="input input-bordered input-xs w-full"
+                     style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
+                     [(ngModel)]="formData.civilId" />
             </div>
 
                    <div class="form-control flex-row items-center gap-2">
-              <label class="label-text w-20 font-bold">المحكمة</label>
-              <input type="text" class="input input-bordered input-xs w-full bg-white"  [(ngModel)]="formData.court"/>
+              <label class="label-text w-20 font-bold" style="color: var(--text-color);">المحكمة</label>
+              <input type="text" class="input input-bordered input-xs w-full"
+                     style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
+                     [(ngModel)]="formData.court"/>
             </div>
             
              <div class="form-control flex-row items-center gap-2">
-              <label class="label-text w-20 font-bold">العقد</label>
-              <input type="text" class="input input-bordered input-xs w-full bg-white" [(ngModel)]="formData.contract" />
+              <label class="label-text w-20 font-bold" style="color: var(--text-color);">العقد</label>
+              <input type="text" class="input input-bordered input-xs w-full"
+                     style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
+                     [(ngModel)]="formData.contract" />
             </div>
 
             <div class="form-control flex-row items-center gap-2">
-              <label class="label-text w-20 font-bold">الرقم الآلي</label>
-              <input type="text" class="input input-bordered input-xs w-full bg-white"  [(ngModel)]="formData.autoNumber" />
+              <label class="label-text w-20 font-bold" style="color: var(--text-color);">الرقم الآلي</label>
+              <input type="text" class="input input-bordered input-xs w-full"
+                     style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
+                     [(ngModel)]="formData.autoNumber" />
             </div>
 
                     <div class="form-control flex-row items-center gap-2">
-              <label class="label-text w-20 font-bold">المديونية</label>
-              <input type="text" class="input input-bordered input-xs w-full bg-white" [(ngModel)]="formData.amount" />
+              <label class="label-text w-20 font-bold" style="color: var(--text-color);">المديونية</label>
+              <input type="text" class="input input-bordered input-xs w-full"
+                     style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
+                     [(ngModel)]="formData.amount" />
             </div>
 
         
     
             <div class="form-control flex-row items-center gap-2">
-              <label class="label-text w-20 font-bold">الموكل الفرعي</label>
-              <input type="text" class="input input-bordered input-xs w-full bg-white" [(ngModel)]="formData.subClient" />
+              <label class="label-text w-20 font-bold" style="color: var(--text-color);">الموكل الفرعي</label>
+              <input type="text" class="input input-bordered input-xs w-full"
+                     style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
+                     [(ngModel)]="formData.subClient" />
             </div>
           </div>
 
-          <div class="md:col-span-4 flex flex-col gap-2 border-r border-gray-300 pr-4">
+          <div class="md:col-span-4 flex flex-col gap-2 border-r pr-4"
+               style="border-color: var(--surface-border);">
              
              <div class="flex items-center gap-2">
-                <label class="label-text w-16 font-bold">الإجراء</label>
-                <select class="select select-bordered select-xs w-full bg-white" [(ngModel)]="formData.procedure">
+                <label class="label-text w-16 font-bold" style="color: var(--text-color);">الإجراء</label>
+                <select class="select select-bordered select-xs w-full"
+                        style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
+                        [(ngModel)]="formData.procedure">
                   <option>حفظ</option>
                   <option>منع سفر</option>
                   <option>ضبط واحضار</option>

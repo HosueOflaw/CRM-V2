@@ -1,23 +1,26 @@
-<div class="p-6 space-y-6" style="
-    direction: rtl;
-">
+<div class="p-6 space-y-6" style="direction: rtl; background-color: var(--surface-ground);">
   <!-- 🔍 Search area -->
-  <form class="grid grid-cols-4 gap-4 bg-white p-4 rounded-2xl shadow">
+  <form class="grid grid-cols-4 gap-4 p-4 rounded-2xl shadow"
+        style="background-color: var(--surface-card);">
     <div>
-      <label class="block text-sm font-medium mb-1">من تاريخ</label>
+      <label class="block text-sm font-medium mb-1"
+             style="color: var(--text-color-secondary);">من تاريخ</label>
       <input
         type="date"
         class="w-full border rounded-lg p-2"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
         [(ngModel)]="filters.fromDate"
         name="fromDate"
       />
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-1">الي تاريخ</label>
+      <label class="block text-sm font-medium mb-1"
+             style="color: var(--text-color-secondary);">الي تاريخ</label>
       <input
         type="date"
         class="w-full border rounded-lg p-2"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
         [(ngModel)]="filters.toDate"
         name="toDate"
       />
@@ -51,15 +54,18 @@
   </form>
 
   <!-- 📋 Tables display -->
-  <div class="bg-white p-4 rounded-2xl shadow">
+  <div class="p-4 rounded-2xl shadow"
+       style="background-color: var(--surface-card);">
     <!-- Tabs -->
-    <div class="flex border-b mb-4">
+    <div class="flex border-b mb-4"
+         style="border-color: var(--surface-border);">
       <button
         *ngFor="let tab of tabs"
         (click)="activeTab = tab.key"
         class="px-4 py-2 cursor-pointer"
         [class.border-b-2]="activeTab === tab.key"
-        [class.border-blue-600]="activeTab === tab.key"
+        [style.border-bottom-color]="activeTab === tab.key ? 'var(--primary-color)' : 'transparent'"
+        [style.color]="activeTab === tab.key ? 'var(--text-color)' : 'var(--text-color-secondary)'"
       >
         {{ tab.label }}
       </button>
@@ -67,10 +73,12 @@
 
     <!-- Tables -->
     <div *ngIf="activeTabData.length; else emptyState">
-      <table class="w-full border text-sm">
-        <thead class="bg-gray-100">
+      <table class="w-full border text-sm"
+             style="border-color: var(--surface-border);">
+        <thead style="background-color: var(--surface-section);">
           <tr>
-            <th *ngFor="let col of columns[activeTab]" class="p-2 border text-right">
+            <th *ngFor="let col of columns[activeTab]" class="p-2 border text-right"
+                style="border-color: var(--surface-border); color: var(--text-color);">
               {{ col }}
             </th>
           </tr>
@@ -78,10 +86,12 @@
 
         <tbody>
           <tr
-            *ngFor="let row of activeTabData"
-            class="hover:bg-gray-50 border-b"
+            *ngFor="let row of activeTabData; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color); border-color: var(--surface-border);"
           >
-            <td *ngFor="let col of columns[activeTab]" class="p-2 border text-right">
+            <td *ngFor="let col of columns[activeTab]" class="p-2 border text-right"
+                style="border-color: var(--surface-border);">
               {{ row[col] || '-' }}
             </td>
           </tr>
@@ -90,7 +100,8 @@
     </div>
 
     <ng-template #emptyState>
-      <div class="text-center text-gray-500 py-8">
+      <div class="text-center py-8"
+           style="color: var(--text-color-secondary);">
         No data matching the selected period
       </div>
     </ng-template>

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Output, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
 
 @Component({
   selector: 'app-receipt-voucher',
@@ -10,6 +11,8 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './receipt-voucher.css'
 })
 export class ReceiptVoucher {
+  ref = inject(DynamicDialogRef, { optional: true });
+
   @Output() cancel = new EventEmitter<void>();
   voucherForm = {
     receiptNumber: 0,
@@ -40,6 +43,10 @@ export class ReceiptVoucher {
   }
 
   closeVoucherFormModal() {
-    this.cancel.emit();
+    if (this.ref) {
+      this.ref.close();
+    } else {
+      this.cancel.emit();
+    }
   }
 }

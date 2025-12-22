@@ -1,4 +1,4 @@
-<div class="p-6 space-y-6 bg-gray-50 min-h-screen" style="direction: rtl;">
+<div class="p-6 space-y-6 min-h-screen" style="direction: rtl; background-color: var(--surface-ground);">
 
   <!-- Header -->
   <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
@@ -38,16 +38,19 @@
   </div>
 
   <!-- Table -->
-  <div class="overflow-x-auto border rounded-lg shadow-sm bg-white">
+  <div class="overflow-x-auto border rounded-lg shadow-sm"
+       style="background-color: var(--surface-card); border-color: var(--surface-border);">
     <table class="table table-zebra w-full">
-      <thead class="bg-gray-100">
+      <thead style="background-color: var(--surface-section);">
         <tr>
           <th class="w-10"><input type="checkbox" [(ngModel)]="allSelected" (change)="toggleAll()"></th>
           <th *ngFor="let col of displayedColumns" class="text-center font-medium">{{ col }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let row of filteredData() | paginate: { itemsPerPage: pageSize, currentPage: currentPage }; let i = index" class="hover:bg-gray-50">
+        <tr *ngFor="let row of filteredData() | paginate: { itemsPerPage: pageSize, currentPage: currentPage }; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color);">
           <td class="text-center"><input type="checkbox" [(ngModel)]="row.selected"></td>
           <td *ngFor="let col of displayedColumns" class="text-center">{{ row[col] }}</td>
         </tr>
