@@ -26,7 +26,7 @@
   </div>
 
   <!-- Stats Counters -->
-  <div class="card bg-purple-700 text-white shadow-md">
+  <div class="card bg-purple-700 text-white shadow-md" style="color: var(--text-color);"> 
     <div class="card-body p-4 text-center space-y-2">
       <div class="flex items-center justify-around p-2">
         <div class="text-4xl font-bold">0</div>
@@ -49,6 +49,41 @@
       </div>
     </div>
   </div>
+  <!-- Financial Summary -->
+   <div class="col-span-2 card" style="background: var(--primary-color); color: var(--text-color);">
+     <div class="card-body">
+       <div class="space-y-2 text-sm">
+         <div class="flex justify-between"><span>قيمة المطالبة:</span><span>45.712</span></div>
+         <div class="flex justify-between"><span>الرسوم:</span><span>0</span></div>
+         <div class="flex justify-between"><span>أتعاب المحاماة:</span><span>0</span></div>
+       </div>
+       <div style="border-top: 1px solid rgba(255,255,255,0.3); margin: 0.5rem 0;"></div>
+       <div style="background: rgba(0,0,0,0.2); padding: 0.75rem; border-radius: var(--content-border-radius);">
+         <div class="flex justify-between font-bold"><span>المسدد:</span><span>45.712</span></div>
+         <div class="flex justify-between text-xs"><span>التاريخ:</span><span>9/26/2011</span></div>
+       </div>
+       <div class="mt-2 space-y-2 text-sm">
+         <div class="flex justify-between"><span>إجمالي المسدد:</span><span>45.712</span></div>
+         <div class="flex justify-between"><span>إجمالي التخفيض:</span><span>0.000</span></div>
+         <div class="flex justify-between font-bold"><span>المتبقي:</span><span>0.000</span></div>
+       </div>
+     </div>
+   </div>
+    <div class="col-span-2 lg:col-span-2 card">
+      <div class="card-body">
+        <h3 class="card-header">المراجعة</h3>
+        <div class="form-grid">
+          <div class="form-field" style="width: fit-content;">
+            <label class="form-label">تاريخ المراجعة</label>
+            <input type="date" class="form-input" />
+          </div>
+          <div class="form-actions" style="width: fit-content;">
+            <button class="form-button form-button-primary" style="flex: 1;">حفظ</button>
+            <button class="form-button form-button-outline" style="flex: 1;">تراجع</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
   <!-- Print Button -->
   <div class="card bg-base-100 shadow-md mt-auto">

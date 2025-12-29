@@ -31,10 +31,16 @@
             ],
             "styles": [
               "src/assets/styles.scss"
-            ]
+            ],
+            "allowedCommonJsDependencies": [
+            "sweetalert2"
+          ]
           },
           "configurations": {
             "production": {
+               "optimization": {
+                "fonts": false
+              },
               "budgets": [
                 {
                   "type": "initial",
