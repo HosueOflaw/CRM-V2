@@ -32,34 +32,82 @@
   box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 59, 130, 246), 0.1);
 }
 
-/* Daisy-like buttons (light weight) */
+/* Daisy-like buttons (light weight) - !important to override global styles */
+:host ::ng-deep .btn-primary,
 .btn-primary {
-  background: var(--primary-color);
-  color: var(--primary-contrast-color, #ffffff);
-  padding: 0.6rem 1rem;
-  border-radius: 10px;
-  font-weight: 600;
-  border: none;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s;
+  background: var(--primary-color) !important;
+  color: var(--primary-contrast-color, #ffffff) !important;
+  padding: 0.6rem 1rem !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  border: none !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 
+:host ::ng-deep .btn-primary::before,
+.btn-primary::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: translate(-50%, -50%) !important;
+  transition: width 0.6s, height 0.6s !important;
+  z-index: 0 !important;
+}
+
+:host ::ng-deep .btn-primary:hover,
 .btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+  background: var(--primary-color) !important;
+  filter: brightness(1.1) !important;
 }
 
+:host ::ng-deep .btn-primary:hover::before,
+.btn-primary:hover::before {
+  width: 300px !important;
+  height: 300px !important;
+}
+
+:host ::ng-deep .btn-primary:active,
+.btn-primary:active {
+  transform: translateY(0) scale(0.98) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+:host ::ng-deep .btn-outline,
 .btn-outline {
-  padding: 0.5rem 0.9rem;
-  border-radius: 10px;
-  background: transparent;
-  border: 1px solid var(--surface-border);
-  color: var(--text-color);
-  transition: all 0.2s;
+  padding: 0.5rem 0.9rem !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  border: 1px solid var(--surface-border) !important;
+  color: var(--text-color) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
+  font-weight: 500 !important;
 }
 
+:host ::ng-deep .btn-outline:hover,
 .btn-outline:hover {
-  background: var(--surface-hover);
+  background: var(--surface-hover, rgba(0, 0, 0, 0.05)) !important;
+  border-color: var(--primary-color) !important;
+  color: var(--primary-color) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+:host ::ng-deep .btn-outline:active,
+.btn-outline:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* switch */
@@ -99,8 +147,123 @@
   transform: translateX(20px);
 }
 
+/* PrimeNG Dialog with Blur Background */
+:host ::ng-deep .users-dialog {
+  background: var(--surface-card) !important;
+  color: var(--text-color) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+}
+
+:host ::ng-deep .users-dialog .p-dialog-header {
+  background: var(--surface-card) !important;
+  color: var(--text-color) !important;
+  border-bottom: 1px solid var(--surface-border) !important;
+  padding: 1.25rem 1.5rem !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+:host ::ng-deep .users-dialog .p-dialog-header .p-dialog-title {
+  color: var(--primary-color) !important;
+  font-weight: 600 !important;
+  font-size: 1.25rem !important;
+}
+
+:host ::ng-deep .users-dialog .p-dialog-content {
+  background: var(--surface-card) !important;
+  color: var(--text-color) !important;
+  padding: 1.5rem !important;
+  border-radius: 0 0 12px 12px !important;
+}
+
+:host ::ng-deep .users-dialog .p-dialog-header-icon {
+  color: var(--text-color-secondary) !important;
+  transition: all 0.2s ease !important;
+}
+
+:host ::ng-deep .users-dialog .p-dialog-header-icon:hover {
+  color: var(--red-500) !important;
+  background: var(--surface-hover) !important;
+}
+
+/* Blur Background for Dialog Mask */
+:host ::ng-deep .p-dialog-mask {
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Dark Mode Support for Dialog */
+:host ::ng-deep .p-dialog-mask.p-component-overlay {
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* Table Styling inside Dialog */
+:host ::ng-deep .users-dialog .p-datatable {
+  background: transparent !important;
+}
+
+:host ::ng-deep .users-dialog .p-datatable .p-datatable-thead > tr > th {
+  background: var(--surface-50) !important;
+  color: var(--text-color) !important;
+  border-color: var(--surface-border) !important;
+  font-weight: 600 !important;
+}
+
+:host ::ng-deep .users-dialog .p-datatable .p-datatable-tbody > tr {
+  background: var(--surface-card) !important;
+  color: var(--text-color) !important;
+  border-color: var(--surface-border) !important;
+}
+
+:host ::ng-deep .users-dialog .p-datatable .p-datatable-tbody > tr:hover {
+  background: var(--surface-hover) !important;
+}
+
+:host ::ng-deep .users-dialog .p-datatable .p-datatable-tbody > tr > td {
+  border-color: var(--surface-border) !important;
+  color: var(--text-color) !important;
+}
+
+/* Paginator Styling */
+:host ::ng-deep .users-dialog .p-paginator {
+  background: var(--surface-card) !important;
+  border-color: var(--surface-border) !important;
+  color: var(--text-color) !important;
+}
+
+:host ::ng-deep .users-dialog .p-paginator .p-paginator-page,
+:host ::ng-deep .users-dialog .p-paginator .p-paginator-prev,
+:host ::ng-deep .users-dialog .p-paginator .p-paginator-next {
+  color: var(--text-color) !important;
+}
+
+:host ::ng-deep .users-dialog .p-paginator .p-paginator-page.p-highlight {
+  background: var(--primary-color) !important;
+  color: white !important;
+}
+
+/* Input Styling in Dialog */
+:host ::ng-deep .users-dialog .p-inputtext {
+  background: var(--surface-ground) !important;
+  border-color: var(--surface-border) !important;
+  color: var(--text-color) !important;
+}
+
+:host ::ng-deep .users-dialog .p-inputtext:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb, 59, 130, 246), 0.2) !important;
+}
+
 /* responsive */
 @media (max-width: 768px) {
   .settings-page { padding: 1.5rem; }
   .header { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+  
+  :host ::ng-deep .users-dialog {
+    width: 95vw !important;
+    max-width: 95vw !important;
+  }
 }

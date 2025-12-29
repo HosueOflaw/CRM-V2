@@ -101,6 +101,10 @@ import { RouterModule } from '@angular/router';
       z-index: -1;
     }
 
+    .app-dark .login-bg {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0a0e1a 100%);
+    }
+
     .login-bg::before {
       content: '';
       position: absolute;
@@ -113,7 +117,7 @@ import { RouterModule } from '@angular/router';
       grid-template-columns: 1fr 1fr;
       max-width: 1000px;
       width: 100%;
-      background: white;
+      background: var(--surface-card);
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -186,17 +190,18 @@ import { RouterModule } from '@angular/router';
       display: flex;
       flex-direction: column;
       justify-content: center;
+      background: var(--surface-card);
     }
 
     .selector-section h2 {
       font-size: 1.75rem;
       font-weight: bold;
-      color: #1a202c;
+      color: var(--text-color);
       margin: 0 0 0.5rem 0;
     }
 
     .subtitle {
-      color: #718096;
+      color: var(--text-color-secondary);
       margin: 0 0 2rem 0;
     }
 
@@ -211,10 +216,11 @@ import { RouterModule } from '@angular/router';
       align-items: center;
       gap: 1rem;
       padding: 1.25rem;
-      border: 2px solid #e2e8f0;
+      border: 2px solid var(--surface-border);
       border-radius: 12px;
       text-decoration: none;
-      color: inherit;
+      color: var(--text-color);
+      background: var(--surface-card);
       transition: all 0.3s ease;
     }
 
@@ -251,18 +257,18 @@ import { RouterModule } from '@angular/router';
       font-size: 1.125rem;
       font-weight: 600;
       margin: 0 0 0.25rem 0;
-      color: #2d3748;
+      color: var(--text-color);
     }
 
     .option-content p {
       font-size: 0.875rem;
-      color: #718096;
+      color: var(--text-color-secondary);
       margin: 0;
     }
 
     .arrow {
       font-size: 1.5rem;
-      color: #a0aec0;
+      color: var(--text-color-secondary);
       transition: transform 0.3s ease;
     }
 
@@ -274,18 +280,18 @@ import { RouterModule } from '@angular/router';
     .help-text {
       margin-top: 2rem;
       padding-top: 1.5rem;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid var(--surface-border);
       text-align: center;
     }
 
     .help-text p {
       font-size: 0.875rem;
-      color: #718096;
+      color: var(--text-color-secondary);
       margin: 0 0 0.5rem 0;
     }
 
     .help-text a {
-      color: #3182ce;
+      color: var(--primary-color, #3b82f6);
       font-weight: 600;
       text-decoration: none;
     }

@@ -1,148 +1,92 @@
-// import { Injectable } from '@angular/core';
-// import { MatSnackBar } from '@angular/material/snack-bar';
-// import { BehaviorSubject } from 'rxjs';
-// import { lastValueFrom } from 'rxjs';
-// import { HttpService } from './http.service';
-// import { Order } from '../models/order.model';
-// import { User } from '../models/user.model';
-// import { OrderService } from './order.service';
-// import { StayService } from './stay.service';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-// @Ijectable({
-//   providedIn: 'root',
-// })
-// export class UserService {
-//   constructor(
-    // private httpService: HttpService,
-    // private stayService: StayService,
-    // public orderService: OrderService,
-    // public snackBar: MatSnackBar
-//   ) {
-    // const user = this.getUser();
-    // this._user$.next(user);
-//   }
+export interface CreateUserDto {
+  username: string;
+  fullName?: string;
+  email?: string;
+  role?: string;
+  password: string;
+  code?: number;
+}
 
-//   private USER_URL = 'user/';
-//   private STORAGE_KEY_LOGGEDIN_USER = 'user';
-//   private AUTH_URL = 'auth/';
+export interface UpdateUserDto {
+  username?: string;
+  fullName?: string;
+  email?: string;
+  role?: string;
+  code?: number;
+}
 
-//   private _user$ = new BehaviorSubject<User | null>(null);
-//   public user$ = this._user$.asObservable();
+export interface UserDto {
+  id: number;
+  code?: number;
+  username?: string;
+  fullName?: string;
+  email?: string;
+  role?: string;
+  createdAt?: string;
+}
 
-//   hostFunction = this.updateHostMsg.bind(this);
-//   userFunction = this.updateUserMsg.bind(this);
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  private apiUrl = `${environment.apiUrl}/Users`;
 
-//   public getUser(): User {
-//     return JSON.parse(
-//       sessionStorage.getItem(this.STORAGE_KEY_LOGGEDIN_USER) as string
-//     );
-//   }
+  constructor(private http: HttpClient) {}
 
-//   public async login(credentials: User) {
-//     try {
-//       const res = (await lastValueFrom(
-//         this.httpService.post(this.AUTH_URL + 'login', credentials)
-//       )) as any;
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: token ? `Bearer ${token}` : '',
+    });
+  }
 
-//       if (res?.token) {
-//         sessionStorage.setItem('token', res.token);
-//       }
+  // Get all users
+  getUsers(): Observable<UserDto[]> {
+    return this.http.get<UserDto[]>(this.apiUrl, { headers: this.getHeaders() });
+  }
 
-//       if (res?.user) {
-//         this.saveLocalUser(res.user);
-//         this._user$.next(res.user);
-//       }
-//     } catch (err) {
-//       throw err;
-//     }
-//   }
+  // Get user by ID
+  getUserById(id: number): Observable<UserDto> {
+    return this.http.get<UserDto>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+  }
 
-//   public async signup(user: User) {
-//     try {
-//       const res = (await lastValueFrom(
-//         this.httpService.post(this.AUTH_URL + 'signup', user)
-//       )) as any;
+  // Create new user
+  createUser(userData: CreateUserDto): Observable<UserDto> {
+    return this.http.post<UserDto>(this.apiUrl, userData, { headers: this.getHeaders() });
+  }
 
-//       if (res?.token) {
-//         sessionStorage.setItem('token', res.token);
-//       }
+  // Update user
+  updateUser(id: number, userData: UpdateUserDto): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, userData, { headers: this.getHeaders() });
+  }
 
-//       if (res?.user) {
-//         this.saveLocalUser(res.user);
-//         this._user$.next(res.user);
-//       }
-//     } catch (err) {
-//       throw err;
-//     }
-//   }
+  // Delete user
+  deleteUser(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+  }
 
-//   public getEmptyUser() {
-//     return {
-//       username: '',
-//       fullname: '',
-//       password: '',
-//       imgUrl: '',
-//       userMsg: 0,
-//       hostMsg: 0,
-//     };
-//   }
+  // Get user by username
+  getUserByUsername(username: string): Observable<UserDto> {
+    return this.http.get<UserDto>(`${this.apiUrl}/username/${username}`, { headers: this.getHeaders() });
+  }
 
-//   async update(user: User) {
-//     try {
-//       if (!user) return;
-//       const updatedUser = (await lastValueFrom(
-//         this.httpService.put(this.USER_URL, user)
-//       )) as User;
-//       this.saveLocalUser(updatedUser);
-//       this._user$.next(updatedUser);
-//       return updatedUser;
-//     } catch (err) {
-//       throw err;
-//     }
-//   }
+  // Get users by role
+  getUsersByRole(role: string): Observable<UserDto[]> {
+    return this.http.get<UserDto[]>(`${this.apiUrl}/role/${role}`, { headers: this.getHeaders() });
+  }
 
-//   async updateHostMsg(order: Order) {
-//     try {
-//       const user = this.getUser();
-//       user.hostMsg++;
-//       await this.update(user);
-//       const msg = `${order.buyer.fullname} invite your place`;
-//       this.snackBar.open(msg, 'Close', { duration: 3000 });
-//       this.orderService.loadOrders();
-//     } catch (err) {
-//       console.log('err:', err);
-//     }
-//   }
-
-//   async updateUserMsg(order: Order) {
-//     try {
-//       const user = this.getUser();
-//       user.userMsg++;
-//       await this.update(user);
-//       const msg = `${order.stay.name} update your vacation status`;
-//       this.snackBar.open(msg, 'Close', { duration: 3000 });
-//       this.orderService.loadOrders();
-//     } catch (err) {
-//       console.log('err:', err);
-//     }
-//   }
-
-//   public async logout() {
-//     try {
-//       await lastValueFrom(this.httpService.post(this.AUTH_URL + 'logout'));
-//       sessionStorage.clear();
-//       this._user$.next(null);
-//       window.location.assign('/');
-//     } catch (err) {
-//       console.log('err:', err);
-//     }
-//   }
-
-//   private saveLocalUser(user: User) {
-//     sessionStorage.setItem(
-//       this.STORAGE_KEY_LOGGEDIN_USER,
-//       JSON.stringify(user)
-//     );
-//     return user;
-//   }
-// }
+  // Change password
+  changePassword(userId: number, oldPassword: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/change-password`, {
+      userId,
+      oldPassword,
+      newPassword
+    }, { headers: this.getHeaders() });
+  }
+}

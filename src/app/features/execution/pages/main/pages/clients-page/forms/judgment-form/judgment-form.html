@@ -1,5 +1,5 @@
-<div class="p-6 bg-white rounded-xl shadow-md">
-  <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+<div class="p-6 rounded-xl shadow-md" style="background-color: var(--surface-card);">
+  <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color: var(--text-color);">
     ⚖️ منطوق الحكم
   </h2>
 
@@ -89,20 +89,20 @@
 
   <!-- 📊 جدول عرض الأحكام -->
   <div class="overflow-x-auto mt-8">
-    <table class="table table-zebra w-full text-center">
-      <thead class="bg-gray-100">
-        <tr class="text-gray-700">
-          <th>منطوق الحكم</th>
-          <th>تاريخ الحكم</th>
-          <th>درجة التقاضي</th>
-          <th>نوع الحكم</th>
-          <th>المحكمة</th>
-          <th>المرفق</th>
-          <th>إجراء</th>
+    <table class="table table-zebra w-full text-center" style="border-color: var(--surface-border);">
+      <thead style="background-color: var(--surface-section);">
+        <tr style="color: var(--text-color);">
+          <th style="color: var(--text-color);">منطوق الحكم</th>
+          <th style="color: var(--text-color);">تاريخ الحكم</th>
+          <th style="color: var(--text-color);">درجة التقاضي</th>
+          <th style="color: var(--text-color);">نوع الحكم</th>
+          <th style="color: var(--text-color);">المحكمة</th>
+          <th style="color: var(--text-color);">المرفق</th>
+          <th style="color: var(--text-color);">إجراء</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of judgments; let i = index">
+        <tr *ngFor="let item of judgments; let i = index" style="color: var(--text-color);">
           <td class="max-w-xs truncate">{{ item.statement }}</td>
           <td>{{ item.date | date: 'dd/MM/yyyy' }}</td>
           <td>{{ item.level }}</td>
@@ -113,7 +113,8 @@
               *ngIf="item.attachment"
               [href]="item.attachment"
               target="_blank"
-              class="text-blue-600 hover:underline"
+              style="color: var(--primary-color, #3b82f6);"
+              class="hover:underline"
               >📎 عرض</a
             >
           </td>

@@ -1,5 +1,5 @@
-<div class="p-6 bg-white rounded-xl shadow-md">
-  <h2 class="text-xl font-bold mb-6 flex items-center gap-2">🗓️ الجلسات</h2>
+<div class="p-6 rounded-xl shadow-md" style="background-color: var(--surface-card);">
+  <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color: var(--text-color);">🗓️ الجلسات</h2>
 
   <!-- 🧩 نموذج إضافة جلسة -->
   <form (ngSubmit)="addSession()" #sessionForm="ngForm">
@@ -7,7 +7,7 @@
 
       <!-- الجلسة -->
       <div class="form-control">
-        <label class="label font-semibold">الجلسة</label>
+        <label class="label font-semibold" style="color: var(--text-color-secondary);">الجلسة</label>
         <input
           type="text"
           class="input input-bordered"
@@ -15,29 +15,32 @@
           [(ngModel)]="newSession.name"
           name="name"
           required
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
         />
       </div>
 
       <!-- تاريخ الجلسة -->
       <div class="form-control">
-        <label class="label font-semibold">تاريخ الجلسة</label>
+        <label class="label font-semibold" style="color: var(--text-color-secondary);">تاريخ الجلسة</label>
         <input
           type="date"
           class="input input-bordered"
           [(ngModel)]="newSession.date"
           name="date"
           required
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
         />
       </div>
 
       <!-- حالة الجلسة -->
       <div class="form-control">
-        <label class="label font-semibold">حالة الجلسة</label>
+        <label class="label font-semibold" style="color: var(--text-color-secondary);">حالة الجلسة</label>
         <select
           class="select select-bordered"
           [(ngModel)]="newSession.status"
           name="status"
           required
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
         >
           <option value="" disabled selected>اختر الحالة</option>
           <option>منعقدة</option>
@@ -48,12 +51,13 @@
 
       <!-- نوع الجلسة -->
       <div class="form-control">
-        <label class="label font-semibold">نوع الجلسة</label>
+        <label class="label font-semibold" style="color: var(--text-color-secondary);">نوع الجلسة</label>
         <select
           class="select select-bordered"
           [(ngModel)]="newSession.type"
           name="type"
           required
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
         >
           <option value="" disabled selected>اختر النوع</option>
           <option>مدنية</option>
@@ -86,19 +90,19 @@
 
   <!-- 📊 جدول عرض الجلسات -->
   <div class="overflow-x-auto mt-8">
-    <table class="table table-zebra w-full text-center">
-      <thead class="bg-gray-100">
-        <tr class="text-gray-700">
-          <th>الجلسة</th>
-          <th>تاريخ الجلسة</th>
-          <th>حالة الجلسة</th>
-          <th>نوع الجلسة</th>
-          <th>المرفق</th>
-          <th>إجراء</th>
+    <table class="table table-zebra w-full text-center" style="border-color: var(--surface-border);">
+      <thead style="background-color: var(--surface-section);">
+        <tr style="color: var(--text-color);">
+          <th style="color: var(--text-color);">الجلسة</th>
+          <th style="color: var(--text-color);">تاريخ الجلسة</th>
+          <th style="color: var(--text-color);">حالة الجلسة</th>
+          <th style="color: var(--text-color);">نوع الجلسة</th>
+          <th style="color: var(--text-color);">المرفق</th>
+          <th style="color: var(--text-color);">إجراء</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let session of sessions; let i = index">
+        <tr *ngFor="let session of sessions; let i = index" style="color: var(--text-color);">
           <td>{{ session.name }}</td>
           <td>{{ session.date | date: 'dd/MM/yyyy' }}</td>
           <td>{{ session.status }}</td>
@@ -108,7 +112,8 @@
               *ngIf="session.attachment"
               [href]="session.attachment"
               target="_blank"
-              class="text-blue-600 hover:underline"
+              style="color: var(--primary-color, #3b82f6);"
+              class="hover:underline"
               >📎 عرض</a
             >
           </td>

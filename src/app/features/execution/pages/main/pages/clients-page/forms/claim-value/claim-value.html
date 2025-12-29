@@ -1,18 +1,18 @@
-<div class="p-6 bg-white rounded-xl shadow-md">
-  <h2 class="text-xl font-bold mb-6 flex items-center gap-2">💰 قيمة المطالبة</h2>
+<div class="p-6 rounded-xl shadow-md" style="background-color: var(--surface-card);">
+  <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color: var(--text-color);">💰 قيمة المطالبة</h2>
 
   <!-- 📊 جدول عرض القيم -->
   <div class="overflow-x-auto">
-    <table class="table table-zebra w-full text-center">
-      <thead class="bg-gray-100">
-        <tr class="text-gray-700">
-          <th>البيان</th>
-          <th>المبلغ (د.ك)</th>
-          <th>الإجراء</th>
+    <table class="table table-zebra w-full text-center" style="border-color: var(--surface-border);">
+      <thead style="background-color: var(--surface-section);">
+        <tr style="color: var(--text-color);">
+          <th style="color: var(--text-color);">البيان</th>
+          <th style="color: var(--text-color);">المبلغ (د.ك)</th>
+          <th style="color: var(--text-color);">الإجراء</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let claim of claims; let i = index">
+        <tr *ngFor="let claim of claims; let i = index" style="color: var(--text-color);">
           <td class="max-w-xs truncate">{{ claim.statement }}</td>
           <td>{{ claim.amount | number: '1.2-2' }}</td>
           <td>

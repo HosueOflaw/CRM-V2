@@ -5,6 +5,7 @@
   justify-content: center;
   padding: 2rem;
   position: relative;
+  background-color: var(--surface-ground);
 }
 
 .login-bg {
@@ -14,14 +15,20 @@
   z-index: -1;
 }
 
+/* Dark mode background */
+.app-dark .login-bg {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0a0e1a 100%);
+}
+
 .login-card {
-  background: var(--surface-card, white);
+  background: var(--surface-card);
   border-radius: 16px;
   padding: 2.5rem;
   width: 100%;
   max-width: 420px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   position: relative;
+  color: var(--text-color);
 }
 
 .back-btn {
@@ -82,8 +89,13 @@
   color: var(--text-color);
 }
 
+.app-dark .hint-box {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
 .hint-box strong {
-  color: var(--primary-color);
+  color: var(--primary-color, #3b82f6);
 }
 
 .submit-btn {
@@ -91,4 +103,15 @@
   padding: 0.875rem;
   font-size: 1rem;
   margin-top: 0.5rem;
+}
+
+/* Ensure form inputs work in dark mode */
+.login-form .form-input {
+  background-color: var(--surface-ground) !important;
+  color: var(--text-color) !important;
+  border-color: var(--surface-border) !important;
+}
+
+.login-form .form-label {
+  color: var(--text-color-secondary) !important;
 }

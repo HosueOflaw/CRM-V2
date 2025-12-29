@@ -1,0 +1,143 @@
+/* SweetAlert2 Dark Mode Support */
+
+/* Dark mode styles for SweetAlert2 */
+.app-dark .swal2-popup {
+  background-color: var(--surface-card, #1e1e1e) !important;
+  color: var(--text-color, #ffffff) !important;
+  border: 1px solid var(--surface-border, rgba(255, 255, 255, 0.1)) !important;
+}
+
+.app-dark .swal2-title {
+  color: var(--text-color, #ffffff) !important;
+}
+
+.app-dark .swal2-html-container {
+  color: var(--text-color-secondary, #b0b0b0) !important;
+}
+
+.app-dark .swal2-confirm {
+  background-color: var(--primary-color, #3b82f6) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.app-dark .swal2-confirm:hover {
+  background-color: var(--primary-color, #2563eb) !important;
+}
+
+.app-dark .swal2-cancel {
+  background-color: var(--surface-ground, #2d2d2d) !important;
+  color: var(--text-color, #ffffff) !important;
+  border: 1px solid var(--surface-border, rgba(255, 255, 255, 0.1)) !important;
+}
+
+.app-dark .swal2-cancel:hover {
+  background-color: var(--surface-hover, rgba(255, 255, 255, 0.05)) !important;
+}
+
+.app-dark .swal2-close {
+  color: var(--text-color-secondary, #b0b0b0) !important;
+}
+
+.app-dark .swal2-close:hover {
+  color: var(--text-color, #ffffff) !important;
+}
+
+.app-dark .swal2-icon.swal2-success {
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+}
+
+.app-dark .swal2-icon.swal2-error {
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+}
+
+.app-dark .swal2-icon.swal2-warning {
+  border-color: #f59e0b !important;
+  color: #f59e0b !important;
+}
+
+.app-dark .swal2-icon.swal2-info {
+  border-color: #3b82f6 !important;
+  color: #3b82f6 !important;
+}
+
+.app-dark .swal2-icon.swal2-question {
+  border-color: #8b5cf6 !important;
+  color: #8b5cf6 !important;
+}
+
+/* Loading spinner */
+.app-dark .swal2-loader {
+  border-color: var(--surface-border, rgba(255, 255, 255, 0.1)) !important;
+  border-right-color: var(--primary-color, #3b82f6) !important;
+}
+
+/* Input fields in SweetAlert2 */
+.app-dark .swal2-input,
+.app-dark .swal2-textarea,
+.app-dark .swal2-select {
+  background-color: var(--surface-ground, #2d2d2d) !important;
+  color: var(--text-color, #ffffff) !important;
+  border-color: var(--surface-border, rgba(255, 255, 255, 0.1)) !important;
+}
+
+.app-dark .swal2-input:focus,
+.app-dark .swal2-textarea:focus,
+.app-dark .swal2-select:focus {
+  border-color: var(--primary-color, #3b82f6) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Progress bar */
+.app-dark .swal2-progress-bar {
+  background-color: var(--primary-color, #3b82f6) !important;
+}
+
+/* Footer */
+.app-dark .swal2-footer {
+  border-top-color: var(--surface-border, rgba(255, 255, 255, 0.1)) !important;
+  color: var(--text-color-secondary, #b0b0b0) !important;
+}
+
+/* Timer progress bar */
+.app-dark .swal2-timer-progress-bar {
+  background-color: var(--primary-color, #3b82f6) !important;
+}
+
+/* Validation message */
+.app-dark .swal2-validation-message {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+}
+
+/* Actions wrapper */
+.app-dark .swal2-actions {
+  gap: 0.5rem;
+}
+
+/* Custom classes for better dark mode support */
+.swal2-dark {
+  background-color: var(--surface-card, #1e1e1e) !important;
+}
+
+.swal2-title-dark {
+  color: var(--text-color, #ffffff) !important;
+}
+
+.swal2-html-dark {
+  color: var(--text-color-secondary, #b0b0b0) !important;
+}
+
+.swal2-confirm-dark {
+  background-color: var(--primary-color, #3b82f6) !important;
+  color: #ffffff !important;
+}
+
+.swal2-cancel-dark {
+  background-color: var(--surface-ground, #2d2d2d) !important;
+  color: var(--text-color, #ffffff) !important;
+  border-color: var(--surface-border, rgba(255, 255, 255, 0.1)) !important;
+}
+

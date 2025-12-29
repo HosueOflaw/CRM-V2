@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { AuthService } from '../../../../../core/services/auth';
 import { LoginFormComponent } from '../login-form/login-form';
 import { Router } from '@angular/router';
-import Swal from 'sweetalert2';
+import { SweetAlertService } from '../../../../../shared/services/sweet-alert.service';
 
 @Component({
   selector: 'app-login-client',
@@ -19,7 +19,11 @@ import Swal from 'sweetalert2';
   `,
 })
 export class LoginClientComponent {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    private swal: SweetAlertService
+  ) {}
 
   login(data: { email: string; password: string }) {
     this.authService.loginClient(data.email, data.password).subscribe({
@@ -28,8 +32,7 @@ export class LoginClientComponent {
         this.authService.saveUser(res.user);
         this.recordLogin(data.email, 'client', 'success');
         
-        Swal.fire({
-          icon: 'success',
+        this.swal.success({
           title: 'مرحباً!',
           text: res.message || 'تم تسجيل الدخول بنجاح',
           timer: 1500,
@@ -40,8 +43,7 @@ export class LoginClientComponent {
       },
       error: (err) => {
         this.recordLogin(data.email, 'client', 'failed');
-        Swal.fire({
-          icon: 'error',
+        this.swal.error({
           title: 'خطأ',
           text: err.message || 'اسم المستخدم أو كلمة المرور غير صحيحة',
           confirmButtonText: 'حسناً'

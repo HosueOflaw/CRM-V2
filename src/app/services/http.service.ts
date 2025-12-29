@@ -1,5 +1,6 @@
-import { Injectable, isDevMode } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -7,16 +8,13 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class HttpService {
   constructor(private http: HttpClient) {}
 
-  BASE_URL = isDevMode() ? 'https://localhost:7154/api/' : '/api/';
-  headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    Authorization: 'Bearer <token>',
-  });
+  BASE_URL = environment.apiUrl;
+  
   private getHeaders() {
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: token ? `Bearer ${token}` : '',
     });
   }
 

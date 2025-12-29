@@ -1,22 +1,22 @@
-<div class="p-6 bg-white rounded-xl shadow-md">
-  <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+<div class="p-6 rounded-xl shadow-md" style="background-color: var(--surface-card);">
+  <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color: var(--text-color);">
     🏠 العنوان
   </h2>
 
   <!-- 📊 جدول عرض العناوين -->
   <div class="overflow-x-auto mt-8">
-    <table class="table table-zebra w-full text-center">
-      <thead class="bg-gray-100">
-        <tr class="text-gray-700">
-          <th>العنوان</th>
-          <th>جهة العمل</th>
-          <th>حالة الإعلان</th>
-          <th>المرفق</th>
-          <th>إجراء</th>
+    <table class="table table-zebra w-full text-center" style="border-color: var(--surface-border);">
+      <thead style="background-color: var(--surface-section);">
+        <tr style="color: var(--text-color);">
+          <th style="color: var(--text-color);">العنوان</th>
+          <th style="color: var(--text-color);">جهة العمل</th>
+          <th style="color: var(--text-color);">حالة الإعلان</th>
+          <th style="color: var(--text-color);">المرفق</th>
+          <th style="color: var(--text-color);">إجراء</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of addresses; let i = index">
+        <tr *ngFor="let item of addresses; let i = index" style="color: var(--text-color);">
           <td class="max-w-xs truncate">{{ item.address }}</td>
           <td>{{ item.workPlace }}</td>
           <td>{{ item.adStatus }}</td>
@@ -25,7 +25,8 @@
               *ngIf="item.attachment"
               [href]="item.attachment"
               target="_blank"
-              class="text-blue-600 hover:underline"
+              style="color: var(--primary-color, #3b82f6);"
+              class="hover:underline"
               >📎 عرض</a
             >
           </td>

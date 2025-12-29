@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, Renderer2, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { GoBack } from '../../../../shared/components/go-back/go-back';
 import { LayoutService, layoutConfig } from '../../../../layout/service/layout.service';
@@ -8,6 +8,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
+import { DialogModule } from 'primeng/dialog';
+import { UserService } from '../../../../services/user.service';
+import { SweetAlertService } from '../../../../shared/services/sweet-alert.service';
 
 @Component({
   selector: 'app-settings',
@@ -20,10 +23,14 @@ import { TableModule } from 'primeng/table';
     InputTextModule,
     ButtonModule,
     FormsModule,
+    TableModule,
+    DialogModule,
+    DatePipe,
   ],
   templateUrl: './settings.html',
+  styleUrls: ['./settings.css'],
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent implements OnInit, OnDestroy {
   // 🧩 النماذج
   form: FormGroup;
   newUserForm: FormGroup;
@@ -34,6 +41,14 @@ export class SettingsComponent implements OnInit {
   showNewUserForm = false;
   showEditUserForm = false;
   uploadedFileName: string | null = null;
+  
+  // 👥 متغيرات المستخدمين
+  users: any[] = [];
+  filteredUsers: any[] = [];
+  showUsersTable = false;
+  loadingUsers = false;
+  searchText = '';
+  editingUserId: number | null = null; // ID المستخدم الذي يتم تعديله
 
   // 📚 بيانات المجموعات
   groups = [
@@ -65,14 +80,20 @@ export class SettingsComponent implements OnInit {
   // Language options
   languageOptions = [
     { label: 'العربية', value: 'ar' },
-    { label: 'English', value: 'en' }
   ];
 
   togglePermissions() {
     this.showPermissions = !this.showPermissions;
+    this.updateSidebarBlur();
   }
 
-  constructor(private fb: FormBuilder, private layoutService: LayoutService) {
+  constructor(
+    private fb: FormBuilder, 
+    private layoutService: LayoutService,
+    private userService: UserService,
+    private swal: SweetAlertService,
+    private renderer: Renderer2
+  ) {
     // ⚙️ نموذج الإعدادات العامة
     this.form = this.fb.group({
       displayName: [''],
@@ -84,10 +105,15 @@ export class SettingsComponent implements OnInit {
 
     // 👤 نموذج المستخدم الجديد
     this.newUserForm = this.fb.group({
-      latinName: ['', Validators.required],
-      arabicName: ['', Validators.required],
-      password: ['', Validators.required],
-      group: ['', Validators.required],
+      code: [''],
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      latinName: [''],
+      arabicName: [''],
+      fullName: ['', Validators.required],
+      email: ['', [Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      role: ['User', Validators.required],
+      group: [''],
       active: ['active'],
       phone: [''],
       hireDate: [''],
@@ -95,13 +121,14 @@ export class SettingsComponent implements OnInit {
 
     // ✏️ نموذج تعديل المستخدم
     this.editUserForm = this.fb.group({
-      arabicName: ['', Validators.required],
-      oldPassword: ['', Validators.required],
-      newPassword: ['', Validators.required],
-      confirmPassword: ['', Validators.required],
-      phone: [''],
-      internal: [''],
-      active: ['active'],
+      code: [''],
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      fullName: ['', Validators.required],
+      email: ['', [Validators.email]],
+      role: ['User', Validators.required],
+      oldPassword: [''], // اختياري - فقط إذا أراد تغيير كلمة المرور
+      newPassword: [''],
+      confirmPassword: [''],
     });
 
     this.load();
@@ -124,12 +151,29 @@ export class SettingsComponent implements OnInit {
   // 🔄 عرض/إخفاء فورم المستخدم الجديد
   toggleNewUserForm() {
     this.showNewUserForm = !this.showNewUserForm;
+    this.updateSidebarBlur();
   }
 
   // 🔄 عرض/إخفاء فورم تعديل المستخدم
   toggleEditUserForm() {
     this.showEditUserForm = !this.showEditUserForm;
     this.showNewUserForm = false;
+    this.updateSidebarBlur();
+  }
+
+  // 🎨 تطبيق/إزالة blur على الـ sidebar
+  updateSidebarBlur() {
+    const isAnyModalOpen = this.showNewUserForm || this.showEditUserForm || this.showPermissions;
+    if (isAnyModalOpen) {
+      this.renderer.addClass(document.body, 'modal-open-sidebar-blur');
+    } else {
+      this.renderer.removeClass(document.body, 'modal-open-sidebar-blur');
+    }
+  }
+
+  ngOnDestroy() {
+    // إزالة blur class عند تدمير الـ component
+    this.renderer.removeClass(document.body, 'modal-open-sidebar-blur');
   }
 
   // 💾 حفظ الإعدادات العامة
@@ -187,46 +231,312 @@ export class SettingsComponent implements OnInit {
   // 👨‍💼 حفظ مستخدم جديد
   saveNewUser() {
     if (this.newUserForm.invalid) {
-      alert('⚠️ من فضلك أكمل جميع الحقول المطلوبة');
+      this.swal.warning({
+        title: 'تحذير',
+        text: 'من فضلك أكمل جميع الحقول المطلوبة',
+        confirmButtonText: 'حسناً'
+      });
       return;
     }
 
-    const userData = this.newUserForm.value;
-    console.log('✅ بيانات المستخدم الجديد:', userData);
+    const formValue = this.newUserForm.value;
+    
+    // تحضير البيانات للباك إند
+    const userData: any = {
+      username: formValue.username,
+      fullName: formValue.fullName || formValue.arabicName || formValue.latinName,
+      email: formValue.email || '',
+      role: formValue.role || 'User',
+      password: formValue.password
+    };
 
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    users.push(userData);
-    localStorage.setItem('users', JSON.stringify(users));
+    // إضافة CODE إذا كان موجود
+    if (formValue.code && formValue.code !== '' && formValue.code !== null) {
+      const codeValue = parseInt(formValue.code);
+      if (!isNaN(codeValue)) {
+        userData.code = codeValue;
+      }
+    }
 
-    alert('✅ تم حفظ المستخدم الجديد بنجاح');
+    // إرسال للباك إند
+    this.userService.createUser(userData).subscribe({
+      next: (response) => {
+        this.swal.success({
+          title: 'نجح!',
+          text: 'تم حفظ المستخدم الجديد بنجاح',
+          timer: 2000,
+          showConfirmButton: false
+        });
     this.newUserForm.reset();
     this.showNewUserForm = false;
+        this.updateSidebarBlur();
+      },
+      error: (error) => {
+        const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء حفظ المستخدم';
+        this.swal.error({
+          title: 'خطأ',
+          text: errorMsg,
+          confirmButtonText: 'حسناً'
+        });
+      }
+    });
   }
 
   // ✏️ حفظ تعديل المستخدم
   saveEditUser() {
-    if (this.editUserForm.invalid) {
-      alert('⚠️ من فضلك أكمل جميع الحقول');
+    if (!this.editingUserId) {
+      this.swal.error({
+        title: 'خطأ',
+        text: 'لم يتم تحديد المستخدم للتعديل',
+        confirmButtonText: 'حسناً'
+      });
       return;
     }
 
-    const { newPassword, confirmPassword } = this.editUserForm.value;
+    if (this.editUserForm.invalid) {
+      this.swal.warning({
+        title: 'تحذير',
+        text: 'من فضلك أكمل جميع الحقول المطلوبة',
+        confirmButtonText: 'حسناً'
+      });
+      return;
+    }
+
+    const formValue = this.editUserForm.value;
+    const { newPassword, confirmPassword, oldPassword } = formValue;
+
+    // التحقق من كلمة المرور إذا تم إدخالها
+    if (newPassword || confirmPassword || oldPassword) {
+      if (!oldPassword || !newPassword || !confirmPassword) {
+        this.swal.warning({
+          title: 'تحذير',
+          text: 'يجب إدخال كلمة المرور القديمة والجديدة وتأكيدها',
+          confirmButtonText: 'حسناً'
+        });
+        return;
+      }
 
     if (newPassword !== confirmPassword) {
-      alert('❌ كلمة المرور الجديدة غير متطابقة');
+        this.swal.error({
+          title: 'خطأ',
+          text: 'كلمة المرور الجديدة غير متطابقة',
+          confirmButtonText: 'حسناً'
+        });
       return;
     }
 
-    const editedData = {
-      ...this.editUserForm.value,
-      uploadedFileName: this.uploadedFileName,
+      if (newPassword.length < 6) {
+        this.swal.warning({
+          title: 'تحذير',
+          text: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+          confirmButtonText: 'حسناً'
+        });
+        return;
+      }
+    }
+
+    // تحضير بيانات التعديل
+    const updateData: any = {
+      username: formValue.username,
+      fullName: formValue.fullName,
+      email: formValue.email || '',
+      role: formValue.role || 'User',
     };
 
-    console.log('✏️ بيانات المستخدم المعدلة:', editedData);
+    // إضافة CODE إذا كان موجود
+    if (formValue.code && formValue.code !== '' && formValue.code !== null) {
+      const codeValue = parseInt(formValue.code);
+      if (!isNaN(codeValue)) {
+        updateData.code = codeValue;
+      }
+    }
 
-    alert('✅ تم تعديل بيانات المستخدم بنجاح');
+    // تحديث بيانات المستخدم
+    const userId = this.editingUserId; // حفظ القيمة في متغير محلي
+    if (!userId) {
+      this.swal.error({
+        title: 'خطأ',
+        text: 'لم يتم تحديد المستخدم للتعديل',
+        confirmButtonText: 'حسناً'
+      });
+      return;
+    }
+
+    this.userService.updateUser(userId, updateData).subscribe({
+      next: () => {
+        // إذا تم إدخال كلمة مرور جديدة، قم بتغييرها
+        if (newPassword && oldPassword && userId) {
+          this.userService.changePassword(userId, oldPassword, newPassword).subscribe({
+            next: () => {
+              this.swal.success({
+                title: 'نجح!',
+                text: 'تم تحديث بيانات المستخدم وكلمة المرور بنجاح',
+                timer: 2000,
+                showConfirmButton: false
+              });
+              this.editUserForm.reset();
+              this.editingUserId = null;
+              this.showEditUserForm = false;
+              this.updateSidebarBlur();
+              this.loadUsers(); // إعادة تحميل المستخدمين
+            },
+            error: (error) => {
+              const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء تغيير كلمة المرور';
+              this.swal.error({
+                title: 'خطأ',
+                text: errorMsg,
+                confirmButtonText: 'حسناً'
+              });
+            }
+          });
+        } else {
+          this.swal.success({
+            title: 'نجح!',
+            text: 'تم تحديث بيانات المستخدم بنجاح',
+            timer: 2000,
+            showConfirmButton: false
+          });
     this.editUserForm.reset();
-    this.uploadedFileName = null;
+          this.editingUserId = null;
     this.showEditUserForm = false;
+          this.updateSidebarBlur();
+          this.loadUsers(); // إعادة تحميل المستخدمين
+        }
+      },
+      error: (error) => {
+        const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء تحديث المستخدم';
+        this.swal.error({
+          title: 'خطأ',
+          text: errorMsg,
+          confirmButtonText: 'حسناً'
+        });
+      }
+    });
+  }
+
+  // 👥 جلب جميع المستخدمين
+  loadUsers() {
+    this.loadingUsers = true;
+    this.showUsersTable = true;
+
+    this.userService.getUsers().subscribe({
+      next: (users) => {
+        this.users = users;
+        this.filteredUsers = users;
+        this.loadingUsers = false;
+        this.swal.success({
+          title: 'نجح!',
+          text: `تم جلب ${users.length} مستخدم بنجاح`,
+          timer: 1500,
+          showConfirmButton: false
+        });
+      },
+      error: (error) => {
+        this.loadingUsers = false;
+        const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء جلب المستخدمين';
+        this.swal.error({
+          title: 'خطأ',
+          text: errorMsg,
+          confirmButtonText: 'حسناً'
+        });
+      }
+    });
+  }
+
+  // 🔍 فلترة المستخدمين
+  filterUsers() {
+    if (!this.searchText || this.searchText.trim() === '') {
+      this.filteredUsers = [...this.users];
+      return;
+    }
+
+    const searchLower = this.searchText.toLowerCase().trim();
+    this.filteredUsers = this.users.filter(user => 
+      (user.username?.toLowerCase().includes(searchLower)) ||
+      (user.fullName?.toLowerCase().includes(searchLower)) ||
+      (user.email?.toLowerCase().includes(searchLower)) ||
+      (user.role?.toLowerCase().includes(searchLower)) ||
+      (user.id?.toString().includes(searchLower))
+    );
+  }
+
+  // 🎨 الحصول على لون الدور
+  getRoleColor(role: string | undefined): string {
+    if (!role) return '#6b7280';
+    const roleColors: { [key: string]: string } = {
+      'admin': '#ef4444',
+      'Admin': '#ef4444',
+      'employee': '#3b82f6',
+      'Employee': '#3b82f6',
+      'user': '#10b981',
+      'User': '#10b981',
+    };
+    return roleColors[role] || '#6b7280';
+  }
+
+  // ✏️ تعديل مستخدم
+  editUser(user: any) {
+    this.editingUserId = user.id;
+    
+    // جلب بيانات المستخدم الكاملة من الباك إند
+    this.userService.getUserById(user.id).subscribe({
+      next: (userData) => {
+        this.editUserForm.patchValue({
+          code: userData.code || '',
+          username: userData.username || '',
+          fullName: userData.fullName || '',
+          email: userData.email || '',
+          role: userData.role || 'User',
+          oldPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        });
+        this.showEditUserForm = true;
+        this.showUsersTable = false;
+        this.updateSidebarBlur();
+      },
+      error: (error) => {
+        const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء جلب بيانات المستخدم';
+        this.swal.error({
+          title: 'خطأ',
+          text: errorMsg,
+          confirmButtonText: 'حسناً'
+        });
+      }
+    });
+  }
+
+  // 🗑️ حذف مستخدم
+  deleteUser(userId: number) {
+    this.swal.question({
+      title: 'تأكيد الحذف',
+      text: 'هل أنت متأكد من حذف هذا المستخدم؟',
+      confirmButtonText: 'نعم، احذف',
+      cancelButtonText: 'إلغاء',
+      showCancelButton: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.userService.deleteUser(userId).subscribe({
+          next: () => {
+            this.swal.success({
+              title: 'نجح!',
+              text: 'تم حذف المستخدم بنجاح',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            // إعادة تحميل المستخدمين
+            this.loadUsers();
+          },
+          error: (error) => {
+            const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء حذف المستخدم';
+            this.swal.error({
+              title: 'خطأ',
+              text: errorMsg,
+              confirmButtonText: 'حسناً'
+            });
+          }
+        });
+      }
+    });
   }
 }

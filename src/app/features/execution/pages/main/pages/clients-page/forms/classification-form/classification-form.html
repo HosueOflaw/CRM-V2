@@ -1,12 +1,12 @@
-<div class="bg-white rounded-2xl shadow-lg p-6 max-w-2xl mx-auto">
-  <h3 class="text-xl font-bold text-center text-gray-700 mb-6">
+<div class="rounded-2xl shadow-lg p-6 max-w-2xl mx-auto" style="background-color: var(--surface-card);">
+  <h3 class="text-xl font-bold text-center mb-6" style="color: var(--text-color);">
     📋 نموذج التصنيف
   </h3>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- الإجراء المطلوب -->
     <div class="form-control">
-      <label class="label font-semibold text-gray-600">الإجراء المطلوب</label>
+      <label class="label font-semibold" style="color: var(--text-color-secondary);">الإجراء المطلوب</label>
       <input
         type="text"
         readonly
@@ -14,23 +14,25 @@
         (click)="openActionModal()"
         placeholder="اضغط للاختيار"
         class="input input-bordered cursor-pointer focus:ring-2 focus:ring-primary/50"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
       />
     </div>
 
     <!-- حالة العميل -->
     <div class="form-control">
-      <label class="label font-semibold text-gray-600">حالة العميل</label>
+      <label class="label font-semibold" style="color: var(--text-color-secondary);">حالة العميل</label>
       <input
         type="text"
         [(ngModel)]="selectedClientStatus"
         placeholder="اكتب حالة العميل"
         class="input input-bordered focus:ring-2 focus:ring-primary/50"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
       />
     </div>
 
     <!-- القسم -->
     <div class="form-control md:col-span-2">
-      <label class="label font-semibold text-gray-600">القسم</label>
+      <label class="label font-semibold" style="color: var(--text-color-secondary);">القسم</label>
       <input
         type="text"
         readonly
@@ -38,6 +40,7 @@
         (click)="openSectionModal()"
         placeholder="اضغط للاختيار"
         class="input input-bordered cursor-pointer focus:ring-2 focus:ring-primary/50"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
       />
     </div>
   </div>
@@ -52,20 +55,19 @@
 
 <!-- مودال الإجراءات -->
 <dialog #actionModal class="modal">
-  <div class="modal-box max-w-md rounded-2xl">
-    <h3 class="text-lg font-bold mb-4 text-gray-700">
+  <div class="modal-box max-w-md rounded-2xl" style="background-color: var(--surface-card);">
+    <h3 class="text-lg font-bold mb-4" style="color: var(--text-color);">
       ⚙️ اختر الإجراء المطلوب
     </h3>
-    <ul class="menu bg-base-100 rounded-box border border-gray-200 max-h-60 overflow-y-auto" style="
-    width: 100% !important;
-    font-weight: bold;
-    line-height: 1.6;">
+    <ul class="menu rounded-box border max-h-60 overflow-y-auto" 
+        style="width: 100% !important; font-weight: bold; line-height: 1.6; background-color: var(--surface-card); border-color: var(--surface-border);">
       <li
         *ngFor="let action of actions"
         (click)="selectAction(action)"
-        class="hover:bg-primary/10 transition-all cursor-pointer  border-b border-gray-200"
+        class="transition-all cursor-pointer border-b"
+        style="border-color: var(--surface-border);"
       >
-        <a>{{ action }}</a>
+        <a style="color: var(--text-color);">{{ action }}</a>
       </li>
     </ul>
     <div class="modal-action mt-4">
@@ -76,20 +78,19 @@
 
 <!-- مودال الأقسام -->
 <dialog #sectionModal class="modal">
-  <div class="modal-box max-w-md rounded-2xl">
-    <h3 class="text-lg font-bold mb-4 text-gray-700">
+  <div class="modal-box max-w-md rounded-2xl" style="background-color: var(--surface-card);">
+    <h3 class="text-lg font-bold mb-4" style="color: var(--text-color);">
       🏷️ اختر القسم
     </h3>
-    <ul class="menu bg-base-100 rounded-box border border-gray-200 max-h-60 overflow-y-auto w-full text-lg" style="
-    width: 100% !important;
-    font-weight: bold;
-    line-height: 1.6;">
+    <ul class="menu rounded-box border max-h-60 overflow-y-auto w-full text-lg" 
+        style="width: 100% !important; font-weight: bold; line-height: 1.6; background-color: var(--surface-card); border-color: var(--surface-border);">
       <li
         *ngFor="let section of sections"
         (click)="selectSection(section)"
-        class="hover:bg-primary/10 transition-all cursor-pointer border-b border-gray-200"
+        class="transition-all cursor-pointer border-b"
+        style="border-color: var(--surface-border);"
       >
-        <a>{{ section }}</a>
+        <a style="color: var(--text-color);">{{ section }}</a>
       </li>
     </ul>
     <div class="modal-action mt-4">

@@ -3,7 +3,7 @@ import { AuthService } from '../../../../../core/services/auth';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import Swal from 'sweetalert2';
+import { SweetAlertService } from '../../../../../shared/services/sweet-alert.service';
 
 @Component({
   selector: 'app-login-public',
@@ -77,7 +77,8 @@ export class LoginPublicComponent {
   constructor(
     private auth: AuthService, 
     private router: Router,
-    private location: Location
+    private location: Location,
+    private swal: SweetAlertService
   ) {}
 
   goBack() {
@@ -86,8 +87,7 @@ export class LoginPublicComponent {
 
   onSubmit() {
     if (!this.civilId) {
-      Swal.fire({
-        icon: 'warning',
+      this.swal.warning({
         title: 'تنبيه',
         text: 'يرجى إدخال الرقم المدني',
         confirmButtonText: 'حسناً'
@@ -106,8 +106,7 @@ export class LoginPublicComponent {
         });
         this.recordLogin(this.civilId, 'public', 'success');
         
-        Swal.fire({
-          icon: 'success',
+        this.swal.success({
           title: 'مرحباً!',
           text: res.message || 'تم تسجيل الدخول بنجاح',
           timer: 1500,
@@ -118,8 +117,7 @@ export class LoginPublicComponent {
       },
       error: () => {
         this.recordLogin(this.civilId, 'public', 'failed');
-        Swal.fire({
-          icon: 'error',
+        this.swal.error({
           title: 'خطأ',
           text: 'حدث خطأ أثناء التحقق',
           confirmButtonText: 'حسناً'

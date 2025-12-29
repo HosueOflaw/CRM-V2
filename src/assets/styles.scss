@@ -5,6 +5,7 @@
 @use './modal-styles.scss';
 @use './tabs-styles.scss';
 @use './page-styles.scss';
+@use './sweetalert-dark-mode.scss';
 @import './tailwind.css';
 @import 'primeicons/primeicons.css';
 
@@ -40,6 +41,26 @@ html.app-dark body,
   --surface-hover: rgba(255, 255, 255, 0.05);
   color: #ffffff;
   background-color: #121212;
+}
+
+/* Blur Effect on Sidebar when Modal is Open */
+body.modal-open-sidebar-blur app-sidebar,
+body.modal-open-sidebar-blur .layout-sidebar,
+body.modal-open-sidebar-blur .fixed.right-0 {
+  filter: blur(5px) !important;
+  -webkit-filter: blur(5px) !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  opacity: 0.6 !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Prevent clicks on sidebar when modal is open */
+body.modal-open-sidebar-blur app-sidebar *,
+body.modal-open-sidebar-blur .layout-sidebar *,
+body.modal-open-sidebar-blur .fixed.right-0 * {
+  pointer-events: none !important;
+  cursor: not-allowed !important;
 }
 
 /* Ensure text visibility in light mode */
