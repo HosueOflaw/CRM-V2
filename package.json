@@ -64,6 +64,7 @@
     "lucide-angular": "^0.546.0",
     "ng2-charts": "^8.0.0",
     "ngx-pagination": "^6.0.3",
+    "ngx-toastr": "^19.1.0",
     "primeclt": "^0.1.5",
     "primeicons": "^7.0.0",
     "primeng": "^20",
@@ -75,8 +76,8 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "^20.1.4",
     "@angular-devkit/build-angular": "^20",
+    "@angular/build": "^20.1.4",
     "@angular/cli": "^20.1.4",
     "@angular/compiler-cli": "^20.1.0",
     "@types/file-saver": "^2.0.7",

@@ -9,8 +9,10 @@ import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 import { UserService } from '../../../../services/user.service';
-import { SweetAlertService } from '../../../../shared/services/sweet-alert.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-settings',
@@ -25,8 +27,10 @@ import { SweetAlertService } from '../../../../shared/services/sweet-alert.servi
     FormsModule,
     TableModule,
     DialogModule,
+    ConfirmDialogModule,
     DatePipe,
   ],
+  providers: [ConfirmationService],
   templateUrl: './settings.html',
   styleUrls: ['./settings.css'],
 })
@@ -91,7 +95,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder, 
     private layoutService: LayoutService,
     private userService: UserService,
-    private swal: SweetAlertService,
+    private toastr: ToastrService,
+    private confirmationService: ConfirmationService,
     private renderer: Renderer2
   ) {
     // ⚙️ نموذج الإعدادات العامة
@@ -230,12 +235,15 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   // 👨‍💼 حفظ مستخدم جديد
   saveNewUser() {
+    // تعليم جميع الحقول كـ touched لعرض أخطاء validation
     if (this.newUserForm.invalid) {
-      this.swal.warning({
-        title: 'تحذير',
-        text: 'من فضلك أكمل جميع الحقول المطلوبة',
-        confirmButtonText: 'حسناً'
+      Object.keys(this.newUserForm.controls).forEach(key => {
+        const control = this.newUserForm.get(key);
+        if (control) {
+          control.markAsTouched();
+        }
       });
+      this.toastr.warning('من فضلك أكمل جميع الحقول المطلوبة', 'تحذير');
       return;
     }
 
@@ -261,23 +269,17 @@ export class SettingsComponent implements OnInit, OnDestroy {
     // إرسال للباك إند
     this.userService.createUser(userData).subscribe({
       next: (response) => {
-        this.swal.success({
-          title: 'نجح!',
-          text: 'تم حفظ المستخدم الجديد بنجاح',
-          timer: 2000,
-          showConfirmButton: false
+        this.toastr.success('تم حفظ المستخدم الجديد بنجاح', 'نجح!', {
+          timeOut: 2000
         });
-    this.newUserForm.reset();
-    this.showNewUserForm = false;
+        this.newUserForm.reset();
+        this.showNewUserForm = false;
         this.updateSidebarBlur();
+        this.loadUsers(false); // إعادة تحميل المستخدمين بدون عرض toastr
       },
       error: (error) => {
         const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء حفظ المستخدم';
-        this.swal.error({
-          title: 'خطأ',
-          text: errorMsg,
-          confirmButtonText: 'حسناً'
-        });
+        this.toastr.error(errorMsg, 'خطأ');
       }
     });
   }
@@ -285,20 +287,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
   // ✏️ حفظ تعديل المستخدم
   saveEditUser() {
     if (!this.editingUserId) {
-      this.swal.error({
-        title: 'خطأ',
-        text: 'لم يتم تحديد المستخدم للتعديل',
-        confirmButtonText: 'حسناً'
-      });
+      this.toastr.error('لم يتم تحديد المستخدم للتعديل', 'خطأ');
       return;
     }
 
     if (this.editUserForm.invalid) {
-      this.swal.warning({
-        title: 'تحذير',
-        text: 'من فضلك أكمل جميع الحقول المطلوبة',
-        confirmButtonText: 'حسناً'
-      });
+      this.toastr.warning('من فضلك أكمل جميع الحقول المطلوبة', 'تحذير');
       return;
     }
 
@@ -308,29 +302,17 @@ export class SettingsComponent implements OnInit, OnDestroy {
     // التحقق من كلمة المرور إذا تم إدخالها
     if (newPassword || confirmPassword || oldPassword) {
       if (!oldPassword || !newPassword || !confirmPassword) {
-        this.swal.warning({
-          title: 'تحذير',
-          text: 'يجب إدخال كلمة المرور القديمة والجديدة وتأكيدها',
-          confirmButtonText: 'حسناً'
-        });
+        this.toastr.warning('يجب إدخال كلمة المرور القديمة والجديدة وتأكيدها', 'تحذير');
         return;
       }
 
     if (newPassword !== confirmPassword) {
-        this.swal.error({
-          title: 'خطأ',
-          text: 'كلمة المرور الجديدة غير متطابقة',
-          confirmButtonText: 'حسناً'
-        });
+        this.toastr.error('كلمة المرور الجديدة غير متطابقة', 'خطأ');
       return;
     }
 
       if (newPassword.length < 6) {
-        this.swal.warning({
-          title: 'تحذير',
-          text: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
-          confirmButtonText: 'حسناً'
-        });
+        this.toastr.warning('كلمة المرور يجب أن تكون 6 أحرف على الأقل', 'تحذير');
         return;
       }
     }
@@ -354,11 +336,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     // تحديث بيانات المستخدم
     const userId = this.editingUserId; // حفظ القيمة في متغير محلي
     if (!userId) {
-      this.swal.error({
-        title: 'خطأ',
-        text: 'لم يتم تحديد المستخدم للتعديل',
-        confirmButtonText: 'حسناً'
-      });
+      this.toastr.error('لم يتم تحديد المستخدم للتعديل', 'خطأ');
       return;
     }
 
@@ -368,54 +346,40 @@ export class SettingsComponent implements OnInit, OnDestroy {
         if (newPassword && oldPassword && userId) {
           this.userService.changePassword(userId, oldPassword, newPassword).subscribe({
             next: () => {
-              this.swal.success({
-                title: 'نجح!',
-                text: 'تم تحديث بيانات المستخدم وكلمة المرور بنجاح',
-                timer: 2000,
-                showConfirmButton: false
+              this.toastr.success('تم تحديث بيانات المستخدم وكلمة المرور بنجاح', 'نجح!', {
+                timeOut: 2000
               });
               this.editUserForm.reset();
               this.editingUserId = null;
               this.showEditUserForm = false;
               this.updateSidebarBlur();
-              this.loadUsers(); // إعادة تحميل المستخدمين
+              this.loadUsers(false); // إعادة تحميل المستخدمين بدون عرض toastr
             },
             error: (error) => {
               const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء تغيير كلمة المرور';
-              this.swal.error({
-                title: 'خطأ',
-                text: errorMsg,
-                confirmButtonText: 'حسناً'
-              });
+              this.toastr.error(errorMsg, 'خطأ');
             }
           });
         } else {
-          this.swal.success({
-            title: 'نجح!',
-            text: 'تم تحديث بيانات المستخدم بنجاح',
-            timer: 2000,
-            showConfirmButton: false
+          this.toastr.success('تم تحديث بيانات المستخدم بنجاح', 'نجح!', {
+            timeOut: 2000
           });
     this.editUserForm.reset();
           this.editingUserId = null;
     this.showEditUserForm = false;
           this.updateSidebarBlur();
-          this.loadUsers(); // إعادة تحميل المستخدمين
+          this.loadUsers(false); // إعادة تحميل المستخدمين بدون عرض toastr
         }
       },
       error: (error) => {
         const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء تحديث المستخدم';
-        this.swal.error({
-          title: 'خطأ',
-          text: errorMsg,
-          confirmButtonText: 'حسناً'
-        });
+        this.toastr.error(errorMsg, 'خطأ');
       }
     });
   }
 
   // 👥 جلب جميع المستخدمين
-  loadUsers() {
+  loadUsers(showToast: boolean = true) {
     this.loadingUsers = true;
     this.showUsersTable = true;
 
@@ -424,21 +388,16 @@ export class SettingsComponent implements OnInit, OnDestroy {
         this.users = users;
         this.filteredUsers = users;
         this.loadingUsers = false;
-        this.swal.success({
-          title: 'نجح!',
-          text: `تم جلب ${users.length} مستخدم بنجاح`,
-          timer: 1500,
-          showConfirmButton: false
-        });
+        if (showToast) {
+          this.toastr.success(`تم جلب ${users.length} مستخدم بنجاح`, 'نجح!', {
+            timeOut: 1500
+          });
+        }
       },
       error: (error) => {
         this.loadingUsers = false;
         const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء جلب المستخدمين';
-        this.swal.error({
-          title: 'خطأ',
-          text: errorMsg,
-          confirmButtonText: 'حسناً'
-        });
+        this.toastr.error(errorMsg, 'خطأ');
       }
     });
   }
@@ -497,43 +456,32 @@ export class SettingsComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء جلب بيانات المستخدم';
-        this.swal.error({
-          title: 'خطأ',
-          text: errorMsg,
-          confirmButtonText: 'حسناً'
-        });
+        this.toastr.error(errorMsg, 'خطأ');
       }
     });
   }
 
   // 🗑️ حذف مستخدم
   deleteUser(userId: number) {
-    this.swal.question({
-      title: 'تأكيد الحذف',
-      text: 'هل أنت متأكد من حذف هذا المستخدم؟',
-      confirmButtonText: 'نعم، احذف',
-      cancelButtonText: 'إلغاء',
-      showCancelButton: true
-    }).then((result) => {
-      if (result.isConfirmed) {
+    this.confirmationService.confirm({
+      message: 'هل أنت متأكد من حذف هذا المستخدم؟',
+      header: 'تأكيد الحذف',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      acceptLabel: 'نعم، احذف',
+      rejectLabel: 'إلغاء',
+      accept: () => {
         this.userService.deleteUser(userId).subscribe({
           next: () => {
-            this.swal.success({
-              title: 'نجح!',
-              text: 'تم حذف المستخدم بنجاح',
-              timer: 2000,
-              showConfirmButton: false
+            this.toastr.success('تم حذف المستخدم بنجاح', 'نجح!', {
+              timeOut: 2000
             });
             // إعادة تحميل المستخدمين
-            this.loadUsers();
+            this.loadUsers(false);
           },
           error: (error) => {
             const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء حذف المستخدم';
-            this.swal.error({
-              title: 'خطأ',
-              text: errorMsg,
-              confirmButtonText: 'حسناً'
-            });
+            this.toastr.error(errorMsg, 'خطأ');
           }
         });
       }

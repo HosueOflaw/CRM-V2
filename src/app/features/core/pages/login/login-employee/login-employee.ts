@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { AuthService } from '../../../../../core/services/auth';
 import { LoginFormComponent } from '../login-form/login-form';
 import { Router } from '@angular/router';
-import { SweetAlertService } from '../../../../../shared/services/sweet-alert.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login-employee',
@@ -22,7 +22,7 @@ export class LoginEmployeeComponent {
   constructor(
     private authService: AuthService, 
     private router: Router,
-    private swal: SweetAlertService
+    private toastr: ToastrService
   ) {}
 
   login(data: { email: string; password: string }) {
@@ -33,22 +33,17 @@ export class LoginEmployeeComponent {
         this.authService.saveUser(res.user);
         this.recordLogin(data.email, 'employee', 'success');
         
-        this.swal.success({
-          title: 'مرحباً!',
-          text: res.message || 'تم تسجيل الدخول بنجاح',
-          timer: 1500,
-          showConfirmButton: false
-        }).then(() => {
-          this.router.navigate(['/']);
+        this.toastr.success(res.message || 'تم تسجيل الدخول بنجاح', 'مرحباً!', {
+          timeOut: 1500
         });
+        
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 1500);
       },
       error: (err) => {
         this.recordLogin(data.email, 'employee', 'failed');
-        this.swal.error({
-          title: 'خطأ',
-          text: err.message || 'اسم المستخدم أو كلمة المرور غير صحيحة',
-          confirmButtonText: 'حسناً'
-        });
+        this.toastr.error(err.message || 'اسم المستخدم أو كلمة المرور غير صحيحة', 'خطأ');
       },
     });
   }

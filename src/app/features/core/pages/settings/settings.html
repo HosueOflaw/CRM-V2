@@ -356,16 +356,33 @@
 
         <label class="flex flex-col">
           <span class="text-sm mb-1">اسم المستخدم *</span>
-          <input formControlName="username" type="text" class="input" placeholder="username" />
-          <small class="text-red-500" *ngIf="newUserForm.get('username')?.hasError('required') && newUserForm.get('username')?.touched">
+          <input 
+            formControlName="username" 
+            type="text" 
+            class="input" 
+            [class.border-red-500]="newUserForm.get('username')?.invalid && newUserForm.get('username')?.touched"
+            [class.border-2]="newUserForm.get('username')?.invalid && newUserForm.get('username')?.touched"
+            placeholder="username" 
+          />
+          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('username')?.hasError('required') && newUserForm.get('username')?.touched">
             اسم المستخدم مطلوب
+          </small>
+          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('username')?.hasError('minlength') && newUserForm.get('username')?.touched">
+            يجب أن يكون اسم المستخدم 3 أحرف على الأقل
           </small>
         </label>
 
         <label class="flex flex-col">
           <span class="text-sm mb-1">الاسم الكامل *</span>
-          <input formControlName="fullName" type="text" class="input" placeholder="الاسم الكامل" />
-          <small class="text-red-500" *ngIf="newUserForm.get('fullName')?.hasError('required') && newUserForm.get('fullName')?.touched">
+          <input 
+            formControlName="fullName" 
+            type="text" 
+            class="input" 
+            [class.border-red-500]="newUserForm.get('fullName')?.invalid && newUserForm.get('fullName')?.touched"
+            [class.border-2]="newUserForm.get('fullName')?.invalid && newUserForm.get('fullName')?.touched"
+            placeholder="الاسم الكامل" 
+          />
+          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('fullName')?.hasError('required') && newUserForm.get('fullName')?.touched">
             الاسم الكامل مطلوب
           </small>
         </label>
@@ -382,27 +399,51 @@
 
         <label class="flex flex-col">
           <span class="text-sm mb-1">الرقم السري *</span>
-          <input formControlName="password" type="password" class="input" />
-          <small class="text-red-500" *ngIf="newUserForm.get('password')?.hasError('required') && newUserForm.get('password')?.touched">
+          <input 
+            formControlName="password" 
+            type="password" 
+            class="input"
+            [class.border-red-500]="newUserForm.get('password')?.invalid && newUserForm.get('password')?.touched"
+            [class.border-2]="newUserForm.get('password')?.invalid && newUserForm.get('password')?.touched"
+          />
+          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('password')?.hasError('required') && newUserForm.get('password')?.touched">
             الرقم السري مطلوب
           </small>
-          <small class="text-red-500" *ngIf="newUserForm.get('password')?.hasError('minlength') && newUserForm.get('password')?.touched">
+          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('password')?.hasError('minlength') && newUserForm.get('password')?.touched">
             يجب أن يكون الرقم السري 6 أحرف على الأقل
           </small>
         </label>
 
         <label class="flex flex-col">
           <span class="text-sm mb-1">الدور *</span>
-          <select formControlName="role" class="input">
+          <select 
+            formControlName="role" 
+            class="input"
+            [class.border-red-500]="newUserForm.get('role')?.invalid && newUserForm.get('role')?.touched"
+            [class.border-2]="newUserForm.get('role')?.invalid && newUserForm.get('role')?.touched"
+          >
             <option value="User">User</option>
             <option value="admin">Admin</option>
             <option value="employee">Employee</option>
           </select>
+          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('role')?.hasError('required') && newUserForm.get('role')?.touched">
+            الدور مطلوب
+          </small>
         </label>
 
         <label class="flex flex-col">
           <span class="text-sm mb-1" style="color: var(--text-color-secondary);">البريد الإلكتروني</span>
-          <input formControlName="email" type="email" placeholder="email@example.com" class="input" />
+          <input 
+            formControlName="email" 
+            type="email" 
+            placeholder="email@example.com" 
+            class="input"
+            [class.border-red-500]="newUserForm.get('email')?.invalid && newUserForm.get('email')?.touched"
+            [class.border-2]="newUserForm.get('email')?.invalid && newUserForm.get('email')?.touched"
+          />
+          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('email')?.hasError('email') && newUserForm.get('email')?.touched">
+            البريد الإلكتروني غير صحيح
+          </small>
         </label>
 
         <label class="flex flex-col">
@@ -544,4 +585,7 @@
       </form>
     </div>
   </div>
+  
+  <!-- PrimeNG Confirm Dialog -->
+  <p-confirmDialog></p-confirmDialog>
 </div>
