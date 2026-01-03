@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.dashboard-btns {
+  direction: rtl;
+}
+
+h1 {
+  font-family: "Cairo", sans-serif;
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+  border-radius: var(--content-border-radius);
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  transform: translateY(0);
+}
+ 

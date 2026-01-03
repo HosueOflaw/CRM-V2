@@ -1,0 +1,12 @@
+.sessions,dialog{
+    direction: rtl !important;
+}
+.print-only {
+  display: none;
+}
+
+@media print {
+  .print-only {
+    display: block;
+  }
+}

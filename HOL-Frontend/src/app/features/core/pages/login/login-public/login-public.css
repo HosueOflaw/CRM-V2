@@ -1,0 +1,159 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  background-color: var(--surface-ground);
+}
+
+.login-bg {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #1a365d 0%, #2d3748 50%, #1a202c 100%);
+  z-index: -1;
+}
+
+/* Dark mode background */
+.app-dark .login-bg {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0a0e1a 100%);
+}
+
+.login-card {
+  background: var(--surface-card);
+  border-radius: 16px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  position: relative;
+  color: var(--text-color);
+}
+
+.back-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-color);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.login-header h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-color);
+  margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+  color: var(--text-color-secondary);
+  margin: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.checkbox-field label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+.checkbox-field input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--primary-color);
+}
+
+.hint-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(214, 158, 46, 0.1);
+  border: 1px solid rgba(214, 158, 46, 0.3);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--text-color);
+}
+
+.app-dark .hint-box {
+  background: rgba(214, 158, 46, 0.15);
+  border-color: rgba(214, 158, 46, 0.4);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 0.875rem;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.qr-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--surface-border);
+  text-align: center;
+}
+
+.qr-code {
+  width: 150px;
+  height: 150px;
+  margin: 1rem auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.status {
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.status.success {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.status.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+/* Ensure form inputs work in dark mode */
+.login-form .form-input {
+  background-color: var(--surface-ground) !important;
+  color: var(--text-color) !important;
+  border-color: var(--surface-border) !important;
+}
+
+.login-form .form-label {
+  color: var(--text-color-secondary) !important;
+}

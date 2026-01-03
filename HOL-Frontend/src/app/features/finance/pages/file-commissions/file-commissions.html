@@ -1,0 +1,151 @@
+<div class="p-6 min-h-screen" style="direction: rtl; background-color: var(--surface-ground);">
+
+  <!-- HEADER SEARCH -->
+  <div class="p-4 rounded-xl shadow mb-6"
+       style="background-color: var(--surface-card);">
+    <div class="grid grid-cols-6 gap-4 items-end">
+
+      <!-- Input Options -->
+      <div>
+        <label class="block mb-1" style="color: var(--text-color-secondary);">القطاع</label>
+        <select class="select select-bordered w-full"
+                style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+          <option disabled selected>اختر القطاع</option>
+          <option>قطاع 1</option>
+          <option>قطاع 2</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block mb-1" style="color: var(--text-color-secondary);">الشركة</label>
+        <select class="select select-bordered w-full"
+                style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+          <option disabled selected>اختر الشركة</option>
+          <option>شركة 1</option>
+          <option>شركة 2</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block mb-1" style="color: var(--text-color-secondary);">Group</label>
+        <select class="select select-bordered w-full"
+                style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+          <option disabled selected>اختر المجموعة</option>
+          <option>Group 1</option>
+          <option>Group 2</option>
+        </select>
+      </div>
+
+      <!-- التاريخ -->
+      <div>
+        <label class="block mb-1" style="color: var(--text-color-secondary);">التاريخ من</label>
+        <input type="date" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+      </div>
+
+      <div>
+        <label class="block mb-1" style="color: var(--text-color-secondary);">التاريخ إلى</label>
+        <input type="date" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+      </div>
+
+      <!-- Buttons -->
+      
+      <div class="flex space-x-2">
+      <button class="btn btn-primary" (click)="search('saddad')">السداد</button>
+      <button class="btn btn-secondary" (click)="search('files')">الملفات</button>
+      <button 
+class="btn btn-accent mb-4"
+(click)="exportToExcel()"
+[disabled]="results.length === 0"
+>
+تحميل Excel
+</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RESULTS TABLE -->
+  <div class="overflow-x-auto rounded-xl shadow p-4"
+       style="background-color: var(--surface-card);">
+    <table class="table table-zebra w-full"
+           style="border-color: var(--surface-border);">
+      <thead>
+        <tr style="background-color: var(--surface-section);">
+          <th style="color: var(--text-color);">الكود</th>
+          <th style="color: var(--text-color);">الاسم</th>
+          <th style="color: var(--text-color);">سبب المديونية</th>
+          <th style="color: var(--text-color);">رقم العقد</th>
+          <th style="color: var(--text-color);">رقم الباتش</th>
+          <th style="color: var(--text-color);">الموظف</th>
+          <th style="color: var(--text-color);">رقم الموظف</th>
+          <th style="color: var(--text-color);">قيمة المطالبة</th>
+          <th style="color: var(--text-color);">اجمالي المدفوع</th>
+          <th style="color: var(--text-color);">المتبقي</th>
+          <th style="color: var(--text-color);">تاريخ الورود</th>
+          <th style="color: var(--text-color);">الموكل</th>
+          <th style="color: var(--text-color);">كود الموكل</th>
+          <th style="color: var(--text-color);">تاريخ الاستلام</th>
+          <th style="color: var(--text-color);">تاريخ السحب</th>
+          <th style="color: var(--text-color);">الرقم الالي</th>
+          <th style="color: var(--text-color);">ملاحظات</th>
+          <th style="color: var(--text-color);">الجنسية</th>
+          <th style="color: var(--text-color);">المدني</th>
+          <th style="color: var(--text-color);">ملاحظات 2</th>
+          <th style="color: var(--text-color);">ملاحظات 3</th>
+          <th style="color: var(--text-color);">ملاحظات 4</th>
+          <th style="color: var(--text-color);">المحكمة</th>
+          <th style="color: var(--text-color);">ملاحظات الملفات</th>
+          <th style="color: var(--text-color);">group</th>
+          <th style="color: var(--text-color);">الخصم</th>
+          <th style="color: var(--text-color);">نسبة الخصم</th>
+          <th style="color: var(--text-color);">القطاع</th>
+          <th style="color: var(--text-color);">نسبة العمولة</th>
+          <th style="color: var(--text-color);">عمولة مستقطعة</th>
+          <th style="color: var(--text-color);">عمولة التسكير</th>
+          <th style="color: var(--text-color);">المحاسبة علي العمولة المستقطعة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of results; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color);">
+          <td>{{row.code}}</td>
+          <td>{{row.name}}</td>
+          <td>{{row.reason}}</td>
+          <td>{{row.contractNumber}}</td>
+          <td>{{row.batchNumber}}</td>
+          <td>{{row.employee}}</td>
+          <td>{{row.employeeNumber}}</td>
+          <td>{{row.claimValue}}</td>
+          <td>{{row.totalPaid}}</td>
+          <td>{{row.remaining}}</td>
+          <td>{{row.receiptDate}}</td>
+          <td>{{row.client}}</td>
+          <td>{{row.clientCode}}</td>
+          <td>{{row.receiveDate}}</td>
+          <td>{{row.withdrawDate}}</td>
+          <td>{{row.autoNumber}}</td>
+          <td>{{row.notes}}</td>
+          <td>{{row.nationality}}</td>
+          <td>{{row.civilNumber}}</td>
+          <td>{{row.notes2}}</td>
+          <td>{{row.notes3}}</td>
+          <td>{{row.notes4}}</td>
+          <td>{{row.court}}</td>
+          <td>{{row.fileNotes}}</td>
+          <td>{{row.group}}</td>
+          <td>{{row.discount}}</td>
+          <td>{{row.discountPercent}}</td>
+          <td>{{row.sector}}</td>
+          <td>{{row.commissionPercent}}</td>
+          <td>{{row.deductedCommission}}</td>
+          <td>{{row.closingCommission}}</td>
+          <td>{{row.accountingDeduction}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

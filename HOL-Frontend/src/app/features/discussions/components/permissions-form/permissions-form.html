@@ -1,0 +1,92 @@
+<div class="p-6">
+  <h2 class="text-xl font-bold mb-6 text-center">إضافة محكمة ودائرة إلى الموظف</h2>
+
+  <div class="">
+    <!-- الموظف -->
+    <div class="flex items-center gap-2">
+      <button class="btn btn-outline btn-sm" (click)="openLookup('employee')">...</button>
+      <input
+        type="text"
+        class="input input-bordered w-full"
+        placeholder="اختر الموظف"
+        [value]="selectedEmployee?.name || ''"
+        readonly
+      />
+      <span class="w-20 text-right">الموظف</span>
+    </div>
+
+    <!-- المحكمة -->
+    <div class="flex items-center gap-2">
+      <button class="btn btn-outline btn-sm" (click)="openLookup('court')">...</button>
+      <input
+        type="text"
+        class="input input-bordered w-full"
+        placeholder="اختر المحكمة"
+        [value]="selectedCourt?.name || ''"
+        readonly
+      />
+      <span class="w-20 text-right">المحكمة</span>
+    </div>
+
+    <!-- الدائرة -->
+    <div class="flex items-center gap-2">
+      <button class="btn btn-outline btn-sm" (click)="openLookup('department')">...</button>
+      <input
+        type="text"
+        class="input input-bordered w-full"
+        placeholder="اختر الدائرة"
+        [value]="selectedDepartment?.name || ''"
+        readonly
+      />
+      <span class="w-20 text-right">الدائرة</span>
+    </div>
+  </div>
+</div>
+<div class="mt-6 border-t pt-4" style="
+    direction: rtl;
+">
+  <div class="grid grid-cols-2 p-3 gap-3 mb-4 text-center">
+    <button class="btn btn-success btn-sm" (click)="addCourt()">➕ إضافة محكمة</button>
+    <button class="btn btn-outline btn-success btn-sm" (click)="addAllCourts()">➕ إضافة كل المحاكم</button>
+    <button class="btn btn-primary btn-sm" (click)="addDepartment()">➕ إضافة دائرة</button>
+    <button class="btn btn-outline btn-primary btn-sm" (click)="addAllDepartments()">➕ إضافة كل الدوائر</button>
+  </div>
+
+  <!-- جدول عرض النتائج -->
+  <div  class="mt-4">
+    <h3 class="font-bold mb-2 text-center">العناصر المضافة</h3>
+    <table class="table table-sm w-full border">
+      <thead class="bg-base-200 text-center">
+        <tr>
+          <th>#</th>
+          <th>الموظف</th>
+          <th>المحكمة</th>
+          <th>الدائرة</th>
+          <th>الإجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of assignedItems; let i = index" class="text-center">
+          <td>{{ i + 1 }}</td>
+          <td>{{ item.employee?.name }}</td>
+          <td>{{ item.court?.name || '-' }}</td>
+          <td>{{ item.department?.name || '-' }}</td>
+          <td>
+            <button class="btn btn-error btn-xs" (click)="removeItem(i)">حذف</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<!-- ✅ استخدم الـ shared LookupModal مرة واحدة -->
+<app-lookup-modal
+  #lookup
+  [title]="lookupTitle"
+  [columns]="lookupColumns"
+  [data]="lookupData"
+  (itemSelected)="handleLookupSelection($event)"
+></app-lookup-modal>

@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+/* النشطة */
+.menu li a.active,
+.settings a.active {
+  background-color: hsl(var(--p));
+  color: red !important;
+}
+
+/* Hover */
+.menu li a {
+  transition: all 0.3s ease;
+}
+
+.menu li a:hover {
+  transform: translateX(-4px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .translate-x-full {
+    transform: translateX(100%);
+  }
+}
+
+/* Light mode */
+:root[data-theme='light'] {
+  --p: 220 80% 50%;
+  --base-200: #f8f9fa;
+  --base-300: #e9ecef;
+  color-scheme: light;
+  color: var(--text-color);
+}
+
+/* Dark mode */
+:root[data-theme='dark'] {
+  --p: 210 80% 60%;
+  --base-200: #1e293b;
+  --base-300: #334155;
+  color-scheme: dark;
+  color: var(--text-color);
+}
+
+.menu li ,
+.settings a {
+  color: var(--text-color) !important;
+}
+

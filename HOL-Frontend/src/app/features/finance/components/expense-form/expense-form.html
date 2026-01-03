@@ -1,0 +1,139 @@
+<div class="form-container" dir="rtl">
+  <!-- Header -->
+  <div class="form-header">
+    <h2>💰 إضافة نوع مصروف / إيراد</h2>
+  </div>
+
+  <!-- قسم 1: إضافة المصروفات -->
+  <div class="form-section">
+    <div class="form-section-title" style="color: var(--primary-color);">إضافة المصروفات</div>
+
+    <!-- نوع المصروف -->
+    <div class="form-field">
+      <label class="form-label">نوع المصروف</label>
+      <div class="form-row">
+        <input class="form-input" readonly [value]="selectedExpenseType" style="flex: 1;">
+        <button class="form-button form-button-outline" type="button" (click)="showExpenseTypePicker = true">...</button>
+      </div>
+    </div>
+
+    <!-- الحساب -->
+    <div class="form-field">
+      <label class="form-label">الحساب</label>
+      <div class="form-row">
+        <input class="form-input" readonly [value]="selectedExpenseAccount" style="flex: 1;">
+        <button class="form-button form-button-outline" type="button" (click)="showExpenseAccountPicker = true">...</button>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="form-button form-button-primary">إضافة</button>
+      <button class="form-button form-button-warning">تعديل</button>
+    </div>
+  </div>
+
+  <!-- قسم 2: إضافة الإيرادات -->
+  <div class="form-section">
+    <div class="form-section-title" style="color: var(--green-500, #22c55e);">إضافة الإيرادات</div>
+
+    <!-- نوع الإيراد -->
+    <div class="form-field">
+      <label class="form-label">نوع الإيراد</label>
+      <div class="form-row">
+        <input class="form-input" readonly [value]="selectedIncomeType" style="flex: 1;">
+        <button class="form-button form-button-outline" type="button" (click)="showIncomeTypePicker = true">...</button>
+      </div>
+    </div>
+
+    <!-- الحساب -->
+    <div class="form-field">
+      <label class="form-label">الحساب</label>
+      <div class="form-row">
+        <input class="form-input" readonly [value]="selectedIncomeAccount" style="flex: 1;">
+        <button class="form-button form-button-outline" type="button" (click)="showIncomeAccountPicker = true">...</button>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="form-button form-button-primary">إضافة</button>
+      <button class="form-button form-button-warning">تعديل</button>
+    </div>
+  </div>
+
+  <!-- أزرار أسفل -->
+  <div class="form-actions" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--surface-border);">
+    <button class="form-button form-button-secondary" (click)="closeForm()">← رجوع</button>
+    <button class="form-button form-button-primary">إضافة</button>
+    <button class="form-button form-button-warning">تعديل</button>
+    <button class="form-button form-button-danger" (click)="closeForm()">إلغاء</button>
+  </div>
+
+  <!-- Popup اختيار عنصر -->
+  <!-- نوع المصروف -->
+  <dialog class="modal" [open]="showExpenseTypePicker">
+    <div class="modal-box modal-sm">
+      <div class="modal-header">
+        <h3>اختيار نوع المصروف</h3>
+        <button class="modal-close" (click)="showExpenseTypePicker = false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let t of expenseTypes" 
+             class="picker-item" 
+             (click)="selectExpenseType(t)">
+          {{ t }}
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- حساب المصروف -->
+  <dialog class="modal" [open]="showExpenseAccountPicker">
+    <div class="modal-box modal-sm">
+      <div class="modal-header">
+        <h3>اختيار الحساب</h3>
+        <button class="modal-close" (click)="showExpenseAccountPicker = false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let acc of accounts" 
+             class="picker-item" 
+             (click)="selectExpenseAccount(acc)">
+          {{ acc }}
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- نوع الإيراد -->
+  <dialog class="modal" [open]="showIncomeTypePicker">
+    <div class="modal-box modal-sm">
+      <div class="modal-header">
+        <h3>اختيار نوع الإيراد</h3>
+        <button class="modal-close" (click)="showIncomeTypePicker = false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let t of incomeTypes" 
+             class="picker-item" 
+             (click)="selectIncomeType(t)">
+          {{ t }}
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- حساب الإيراد -->
+  <dialog class="modal" [open]="showIncomeAccountPicker">
+    <div class="modal-box modal-sm">
+      <div class="modal-header">
+        <h3>اختيار الحساب</h3>
+        <button class="modal-close" (click)="showIncomeAccountPicker = false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let acc of accounts" 
+             class="picker-item" 
+             (click)="selectIncomeAccount(acc)">
+          {{ acc }}
+        </div>
+      </div>
+    </div>
+  </dialog>
+</div>

@@ -1,0 +1,73 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>سجل تسجيلات الدخول</h1>
+  </div>
+
+  <div class="page-content">
+    <!-- Search Section -->
+    <div class="search-section">
+      <div class="search-filters">
+        <div class="form-field">
+          <label class="form-label">بحث</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="searchTerm"
+            (input)="onSearch()"
+            placeholder="ابحث بالاسم، البريد الإلكتروني، أو عنوان IP"
+            class="form-input"
+          />
+        </div>
+      </div>
+      <div class="search-actions">
+        <p-button label="تصدير Excel" icon="pi pi-file-excel" (onClick)="exportToExcel()" />
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <p-table
+        [value]="filteredLogins"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[10, 20, 50]"
+        [globalFilterFields]="['username', 'email', 'ipAddress']"
+        styleClass="p-datatable-striped"
+        [tableStyle]="{ 'min-width': '50rem' }"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>ID</th>
+            <th>الاسم</th>
+            <th>البريد الإلكتروني</th>
+            <th>نوع الدخول</th>
+            <th>وقت الدخول</th>
+            <th>عنوان IP</th>
+            <th>الحالة</th>
+            <th>المتصفح</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-login>
+          <tr>
+            <td>{{ login.id }}</td>
+            <td>{{ login.username }}</td>
+            <td>{{ login.email }}</td>
+            <td>{{ getLoginTypeLabel(login.loginType) }}</td>
+            <td>{{ login.loginTime | date: 'short' }}</td>
+            <td>{{ login.ipAddress }}</td>
+            <td>
+              <p-tag [value]="login.status === 'success' ? 'نجح' : 'فشل'" [severity]="getSeverity(login.status)" />
+            </td>
+            <td>{{ login.userAgent }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8" class="text-center">لا توجد بيانات</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+

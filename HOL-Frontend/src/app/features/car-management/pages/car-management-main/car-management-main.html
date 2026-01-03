@@ -1,0 +1,368 @@
+<div dir="rtl" class="flex flex-col h-screen font-sans text-xs overflow-hidden" style="background: var(--surface-ground); color: var(--text-color);">
+
+  <!-- ========================================== -->
+  <!-- 1. الهيدر العلوي (Tabs: الرئيسية / العملاء) -->
+  <!-- ========================================== -->
+  <div class="border-b p-1 px-2 flex justify-between items-center shadow-sm h-10 shrink-0 z-20" dir="ltr" style="background: var(--surface-card); border-color: var(--surface-border);">
+    <div class="font-bold flex items-center gap-2" style="color: var(--text-color);">
+      <span class="text-orange-500 text-lg">📷</span>
+      <span class="text-sm">ضبط السيارات</span>
+    </div>
+
+    <div class="flex gap-1 self-end">
+        <button class="btn btn-xs btn-ghost gap-1 font-bold text-gray-600 rounded-t-md border-b-2 rounded-b-none pb-1 h-8"
+                [class.border-blue-600]="activeMainTab === 'main'"
+                [class.text-blue-600]="activeMainTab === 'main'"
+                [class.bg-blue-50]="activeMainTab === 'main'"
+                (click)="setMainTab('main')">
+            <span class="text-blue-500">■</span> الرئيسية
+        </button>
+        <button class="btn btn-xs btn-ghost gap-1 font-bold text-gray-600 rounded-t-md border-b-2 rounded-b-none pb-1 h-8"
+                [class.border-orange-500]="activeMainTab === 'clients'"
+                [class.text-orange-600]="activeMainTab === 'clients'"
+                [class.bg-orange-50]="activeMainTab === 'clients'"
+                (click)="setMainTab('clients')">
+            <span class="text-orange-500">■</span> العملاء
+        </button>
+    </div>
+  </div>
+
+  <!-- حاوية الجسم (Flex Row) -->
+  <div class="flex flex-grow overflow-hidden relative">
+
+    <!-- ========================================== -->
+    <!-- 2. القائمة الجانبية (ثابتة دائماً) -->
+    <!-- ========================================== -->
+     <div class="w-72 border-l flex flex-col p-2 gap-2 shrink-0 overflow-y-auto z-10" style="background: var(--surface-section); border-color: var(--surface-border);">
+        
+        <!-- زر الملفات (مشترك) -->
+        <div class="bg-[#1b4d1b] text-white h-12 flex items-center justify-center shadow-sm cursor-pointer hover:bg-[#143a14] border border-[#0f2e0f] mb-2 rounded-sm gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            <span class="font-bold text-sm">الملفات</span>
+        </div>
+
+        <!-- الفورم (يظهر فقط في الرئيسية) -->
+        <ng-container *ngIf="activeMainTab === 'main'">
+            <div class="flex items-center gap-1">
+                <label class="w-14 font-bold" style="color: var(--text-color);">الموكل :</label>
+                <div class="flex-grow flex gap-1">
+                    <button class="btn btn-xs btn-square min-h-0 h-5" style="background: var(--surface-300); border-color: var(--surface-border);">...</button>
+                    <input type="text" [(ngModel)]="sidebarData.client" class="input input-xs input-bordered flex-grow rounded-none h-5 focus:outline-none" style="background: var(--surface-card); border-color: var(--surface-border); color: var(--text-color);" />
+                </div>
+            </div>
+            <div class="flex items-center gap-1">
+                <label class="w-14 font-bold text-gray-700">العميل :</label>
+                <input type="text" [(ngModel)]="sidebarData.customer" class="input input-xs input-bordered flex-grow rounded-none h-5 focus:outline-none" style="background: var(--surface-card); border-color: var(--surface-border); color: var(--text-color);" />
+            </div>
+            <div class="flex items-center gap-1">
+                <label class="w-14 font-bold text-gray-700">المدني :</label>
+                <input type="text" [(ngModel)]="sidebarData.civilId" class="input input-xs input-bordered flex-grow bg-white rounded-none border-gray-400 h-5 focus:outline-none" />
+            </div>
+            <div class="flex gap-1">
+                <div class="flex items-center gap-1 w-1/2">
+                    <label class="w-10 font-bold text-gray-700">الحالة :</label>
+                    <input type="text" [(ngModel)]="sidebarData.status" class="input input-xs input-bordered w-full bg-white rounded-none border-gray-400 h-5 focus:outline-none" />
+                </div>
+                <div class="flex items-center gap-1 w-1/2">
+                    <label class="w-14 font-bold text-gray-700 text-[9px] whitespace-nowrap">الارقام الالية</label>
+                    <div class="border w-full h-5 flex items-center justify-center font-bold text-xs" style="background: var(--surface-card); border-color: var(--surface-border); color: var(--text-color);">{{sidebarData.autoNumCount}}</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-1">
+                <label class="w-14 font-bold text-gray-700 text-[10px]">المديونية :</label>
+                <input type="text" [(ngModel)]="sidebarData.debt" class="input input-xs input-bordered flex-grow bg-white rounded-none border-gray-400 h-5 focus:outline-none" />
+            </div>
+            <div class="flex items-center gap-1">
+                <label class="w-14 font-bold text-gray-700">الباحث :</label>
+                <input type="text" [(ngModel)]="sidebarData.researcher" class="input input-xs input-bordered flex-grow bg-white rounded-none border-gray-400 h-5 focus:outline-none" />
+            </div>
+            <div class="flex flex-col gap-1 flex-grow">
+                <label class="font-bold text-gray-700">العنوان :</label>
+                <textarea [(ngModel)]="sidebarData.address" class="textarea textarea-bordered textarea-xs w-full h-full resize-none rounded-none focus:outline-none" style="background: var(--surface-card); border-color: var(--surface-border); color: var(--text-color);"></textarea>
+            </div>
+        </ng-container>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 3. منطقة المحتوى (متغيرة) -->
+    <!-- ========================================== -->
+    <div class="flex-grow flex flex-col overflow-hidden relative" style="background: var(--surface-card);">
+
+        <!-- ((((((((((((( الحالة A: تابة الرئيسية ))))))))))))) -->
+        <ng-container *ngIf="activeMainTab === 'main'">
+            
+            <!-- A.1 شريط البحث + التابات الداخلية -->
+            <div dir="ltr" class="border-b p-1 px-2 flex items-center justify-between text-[10px] h-8 shrink-0" style="background: var(--surface-section); border-color: var(--surface-border); color: var(--text-color-secondary);">
+                 <div class="flex items-center gap-2 w-1/3">
+                    <input class="input input-xs input-ghost w-full h-6 focus:bg-white focus:outline-none" placeholder="" />
+                 </div>
+                 
+                 <div class="flex items-center gap-4">
+                    <!-- التابات الداخلية (Main View / Fees) -->
+                    <div class="flex border rounded-sm overflow-hidden" style="background: var(--surface-card); border-color: var(--surface-border);">
+                        <button class="px-3 h-5 text-[10px] border-l transition-colors"
+                                [style.background]="activeInnerTab === 'fees' ? 'var(--surface-hover)' : 'transparent'"
+                                [style.color]="activeInnerTab === 'fees' ? 'var(--text-color)' : 'var(--text-color-secondary)'"
+                                [style.border-color]="'var(--surface-border)'"
+                                [class.font-bold]="activeInnerTab === 'fees'"
+                                (click)="setInnerTab('fees')">الرسوم</button>
+                        <button class="px-3 h-5 text-[10px] transition-colors"
+                                [style.background]="activeInnerTab === 'main_view' ? 'var(--surface-hover)' : 'transparent'"
+                                [style.color]="activeInnerTab === 'main_view' ? 'var(--text-color)' : 'var(--text-color-secondary)'"
+                                [class.font-bold]="activeInnerTab === 'main_view'"
+                                (click)="setInnerTab('main_view')">الرئيسية</button>
+                    </div>
+                 </div>
+            </div>
+
+            <!-- A.2 المنطقة الوسطى (جدول + قسم السداد) -->
+            <div class="flex-grow flex overflow-hidden border-b" style="background: var(--surface-ground); border-color: var(--surface-border);">
+                
+                <!-- المحتوى المتغير للتابات الداخلية -->
+                
+                <!-- 1. تابة "الرئيسية" الداخلية -->
+                <ng-container *ngIf="activeInnerTab === 'fees'">
+                    <!-- الجدول (يمين) -->
+                    <div class="flex-grow overflow-auto border-l" style="background: var(--surface-card); border-color: var(--surface-border);">
+                        <table class="table table-xs table-pin-rows w-full border-collapse text-right whitespace-nowrap">
+                            <thead>
+                                <tr class="border-b text-[10px] h-6" style="background: var(--surface-section); color: var(--text-color); border-color: var(--surface-border);">
+                                    <th class="border-r w-8"></th>
+                                    <th class="border-r">ID</th>
+                                    <th class="border-r">المصروف</th>
+                                    <th class="border-r">المبلغ</th>
+                                    <th class="border-r">رقم الكشف</th>
+                                    <th class="border-r">رقم العهدة</th>
+                                    <th class="border-r">الموظف</th>
+                                    <th class="border-r">المرفقات</th>
+                                </tr>
+                            </thead>
+                            <tbody><!-- فارغ --></tbody>
+                        </table>
+                    </div>
+                </ng-container>
+                
+                               
+
+                <!-- 2. تابة "الرسوم" الداخلية -->
+                <ng-container *ngIf="activeInnerTab === 'main_view'">
+                    <div class="flex items-center justify-center w-full h-full text-gray-400 font-bold text-lg">
+                        محتوى صفحة الرئيسية
+                    </div>
+                </ng-container>
+                     <!-- قسم السداد (يسار - يظهر على اليسار بسبب RTL + Flex order if needed, but standard flow puts it left) -->
+                                    <div class="w-48 p-2 border-r flex flex-col gap-2 shadow-inner shrink-0" style="background: var(--surface-section); border-color: var(--surface-border);">
+                                        <div class="text-center font-bold py-1 text-xs border" style="background: var(--surface-300); color: var(--text-color); border-color: var(--surface-border);">السداد</div>
+                                        
+                                        <!-- مجموعة الحقول -->
+                                        <div class="flex flex-col gap-1 border p-1" style="background: var(--surface-card); border-color: var(--surface-border);">
+                                            <div class="flex justify-between items-center text-[10px]">
+                                                <span>قيمة المطالبة :</span> 
+                                                <span class="font-bold">{{paymentData.claimValue}}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-[10px] border-t border-gray-200 pt-1">
+                                                <span>الرسوم :</span> 
+                                                <span class="font-bold">{{paymentData.fees}}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-[10px] border-t border-gray-200 pt-1">
+                                                <span>اتعاب المحاماة :</span> 
+                                                <span class="font-bold">{{paymentData.lawyerFees}}</span>
+                                            </div>
+                                        </div>
+                
+                                        <!-- المساحة البيضاء الفارغة (كما في الصورة) -->
+                                        <div class="flex-grow border" style="background: var(--surface-card); border-color: var(--surface-border);"></div>
+                
+                                        <!-- مجموعة الإجماليات -->
+                                        <div class="flex flex-col gap-1 border p-1" style="background: var(--surface-card); border-color: var(--surface-border);">
+                                            <div class="flex justify-between items-center text-[10px]">
+                                                <span>اجمالي المسدد :</span> 
+                                                <span class="font-bold">{{paymentData.totalPaid}}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-[10px] border-t border-gray-200 pt-1">
+                                                <span>اجمالي التخفيض :</span> 
+                                                <span class="font-bold">{{paymentData.totalDiscount}}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center text-[10px] border-t pt-1 font-bold" style="background: var(--surface-section); border-color: var(--surface-border);">
+                                                <span>المتبقي :</span> 
+                                                <span>{{paymentData.remaining}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+            </div>
+                   <!-- إحصائيات -->
+            <div class="h-60 flex shrink-0 border-t" style="background: var(--surface-ground); border-color: var(--surface-border);">
+                  <div class="flex flex-col gap-1 text-[10px] font-bold w-40 shrink-0 pt-4" style="color: var(--text-color);">
+                                    <div class="flex justify-between"><span>اخر اجراء :</span> <span class="text-red-700">{{statementData.lastAction}}</span></div>
+                                    <div class="flex justify-between"><span>تاريخ اخر اجراء :</span> <span class="text-red-700">{{statementData.lastActionDate}}</span></div>
+                                    <div class="flex justify-between"><span>الاجراء القادم :</span> <span class="text-red-700">{{statementData.nextAction}}</span></div>
+                                    <div class="flex justify-between"><span>تاريخ الاجراء القادم :</span> <span class="text-red-700">{{statementData.nextActionDate}}</span></div>
+                                    <div class="flex flex-col items-end gap-1 mt-4 text-gray-500">
+                                         <div class="text-lg font-bold leading-3">...</div>
+                                         <div class="text-lg font-bold leading-3">...</div>
+                                    </div>
+                  </div>
+                  <!-- إدخال الإفادة -->
+                  <div class="flex-grow flex flex-col gap-2">
+                                    <div class="flex items-start gap-1 h-full">
+                                        <label class="font-bold text-gray-700 mt-2 w-10 text-[10px]">الافادة :</label>
+                                        <div class="flex-grow h-full border" style="background: var(--surface-card); border-color: var(--surface-border);">
+                                            <textarea [(ngModel)]="statementData.text" class="w-full h-full resize-none p-1 text-xs outline-none" style="background: var(--surface-card); color: var(--text-color);"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-2">
+                                         <div class="flex items-center border h-7 px-1" style="background: var(--surface-card); border-color: var(--surface-border);">
+                                            <input type="text" [value]="statementData.reviewDate" class="w-20 text-xs text-center outline-none" readonly />
+                                            <span class="text-[10px] font-bold border-r pr-1" style="border-color: var(--surface-border); color: var(--text-color-secondary);">تاريخ المراجعة</span>
+                                         </div>
+                                         <button class="btn btn-sm bg-[#1b4d1b] hover:bg-[#143a14] text-white rounded-none h-7 min-h-0 px-4">حفظ</button>
+                                         <button class="btn btn-sm bg-[#b30000] hover:bg-[#800000] text-white rounded-none h-7 min-h-0 px-4">تراجع</button>
+                                    </div>
+                  </div>
+             </div>
+            <!-- A.3 المنطقة السفلية (Footer Tabs & Content) -->
+            <div class="h-60 flex flex-col shrink-0" style="background: var(--surface-ground);">
+                
+                <!-- شريط التبويبات السفلي -->
+                <div class="flex justify-end gap-[1px] border-t pr-2" dir="ltr" style="background: var(--surface-section); border-color: var(--surface-border);">
+                    <div dir="rtl">
+                        <button class="px-3 py-1 text-[11px] font-normal border-l transition-colors"
+                                [style.background]="activeBottomTab === 'statements' ? 'var(--surface-card)' : 'transparent'"
+                                [style.color]="activeBottomTab === 'statements' ? 'var(--text-color)' : 'var(--text-color-secondary)'"
+                                [style.border-color]="'var(--surface-border)'"
+                                (click)="setBottomTab('statements')">الافادات</button>
+                        
+                        <button class="px-3 py-1 text-[11px] font-normal border-l transition-colors"
+                                [style.background]="activeBottomTab === 'search_results' ? 'var(--surface-card)' : 'transparent'"
+                                [style.color]="activeBottomTab === 'search_results' ? 'var(--text-color)' : 'var(--text-color-secondary)'"
+                                [style.border-color]="'var(--surface-border)'"
+                                (click)="setBottomTab('search_results')">نتائج البحث</button>
+    
+                        <button class="px-3 py-1 text-[11px] font-normal border-l transition-colors"
+                                [style.background]="activeBottomTab === 'auto_num' ? 'var(--surface-card)' : 'transparent'"
+                                [style.color]="activeBottomTab === 'auto_num' ? 'var(--text-color)' : 'var(--text-color-secondary)'"
+                                [style.border-color]="'var(--surface-border)'"
+                                (click)="setBottomTab('auto_num')">الارقام الالية</button>
+    
+                        <button class="px-3 py-1 text-[11px] font-normal border-l transition-colors"
+                                [style.background]="activeBottomTab === 'Comm_statements' ? 'var(--surface-card)' : 'transparent'"
+                                [style.color]="activeBottomTab === 'Comm_statements' ? 'var(--text-color)' : 'var(--text-color-secondary)'"
+                                [style.border-color]="'var(--surface-border)'"
+                                (click)="setBottomTab('Comm_statements')">افادات الاتصالات</button>
+                        <button class="px-3 py-1 text-[11px] font-normal border-l transition-colors"
+                                [style.background]="activeBottomTab === 'Exec_statements' ? 'var(--surface-card)' : 'transparent'"
+                                [style.color]="activeBottomTab === 'Exec_statements' ? 'var(--text-color)' : 'var(--text-color-secondary)'"
+                                [style.border-color]="'var(--surface-border)'"
+                                (click)="setBottomTab('Exec_statements')">افادات التنفيذ</button>
+                    </div>
+                </div>
+                  <!-- المحتوى المتغير للتابات السفلية -->
+                <div class="flex-grow flex p-2 gap-4 overflow-hidden">
+                    
+                    <!-- 1. محتوى "الافادات" -->
+                    <ng-container *ngIf="activeBottomTab === 'statements'">
+                          <div class="w-full h-full border p-2 text-center" style="background: var(--surface-card); border-color: var(--surface-border); color: var(--text-color-secondary);">
+                            جدول نتائج الافادات
+                        </div>
+                    </ng-container>
+
+                    <!-- 2. محتوى "نتائج البحث" -->
+                    <ng-container *ngIf="activeBottomTab === 'search_results'">
+                        <div class="w-full h-full border border-gray-300 bg-white p-2 text-center text-gray-500">
+                            جدول نتائج البحث
+                        </div>
+                    </ng-container>
+
+                    <!-- 3. محتوى "الارقام الالية" -->
+                    <ng-container *ngIf="activeBottomTab === 'auto_num'">
+                        <div class="w-full h-full border border-gray-300 bg-white p-2 text-center text-gray-500">
+                            جدول الأرقام الآلية
+                        </div>
+                    </ng-container>
+
+                       <ng-container *ngIf="activeBottomTab === 'Comm_statements'">
+                        <div class="w-full h-full border border-gray-300 bg-white p-2 text-center text-gray-500">
+                            افادات الاتصالات
+                        </div>
+                    </ng-container>
+
+                       <ng-container *ngIf="activeBottomTab === 'Exec_statements'">
+                        <div class="w-full h-full border border-gray-300 bg-white p-2 text-center text-gray-500">
+                            افادات التنفيذ
+                        </div>
+                    </ng-container>
+
+                    <!-- باقي التابات (يمكنك إضافة المزيد هنا) -->
+
+                </div>
+            </div>
+        </ng-container>
+
+
+        <!-- ((((((((((((( الحالة B: تابة العملاء ))))))))))))) -->
+        <ng-container *ngIf="activeMainTab === 'clients'">
+            <div class="border-b p-1 px-2 h-8 shrink-0 flex items-center" style="background: var(--surface-section); border-color: var(--surface-border);">
+                 <input class="input input-xs input-ghost w-1/3 focus:outline-none" placeholder="بحث في العملاء..." style="background: var(--surface-card); color: var(--text-color);" />
+            </div>
+            <div class="flex-grow overflow-auto relative" style="background: var(--surface-card);">
+                <table class="table table-xs table-pin-rows w-full border-collapse text-right whitespace-nowrap">
+                    <thead>
+                        <tr class="border-b text-[10px]" style="background: var(--surface-section); color: var(--text-color); border-color: var(--surface-border);">
+                            <th class="border-r w-8"></th>
+                            <th class="border-r">الكود</th>
+                            <th class="border-r">الاسم</th>
+                            <th class="border-r">المدني</th>
+                            <th class="border-r">المصروف</th>
+                            <th class="border-r">الموكل</th>
+                            <th class="border-r">المدعي القانوني</th>
+                            <th class="border-r">الحالة</th>
+                            <th class="border-r">القطاع</th>
+                            <th class="border-r">المديونية</th>
+                            <th class="border-r">تاريخ الحجز</th>
+                            <th class="border-r">رقم الباتش</th>
+                            <th class="border-r">موظف الاتصالات</th>
+                            <th class="border-r">تاريخ الورود</th>
+                            <th class="border-r">المحكمة</th>
+                            <th class="border-r">رقم العقد</th>
+                            <th class="border-r">الرقم الالي</th>
+                            <th class="border-r">المطالبة</th>
+                            <th class="border-r">الجنسية</th>
+                            <th class="border-r">العنوان</th>
+                            <th class="border-r">ملاحظات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let row of clientRows" class="border-b text-[10px]" style="border-color: var(--surface-border);" onmouseover="this.style.background='var(--surface-hover)'" onmouseout="this.style.background='transparent'">
+                             <td class="border-r text-center"><input type="checkbox" class="checkbox checkbox-xs rounded-none h-3 w-3" /></td>
+                             <td class="border-r">{{row.id}}</td>
+                             <td class="border-r font-bold" style="color: var(--primary-color);">{{row.name}}</td>
+                             <td class="border-r">{{row.autoNum}}</td>
+                             <td class="border-r">{{row.expense}}</td>
+                             <td class="border-r">{{row.client}}</td>
+                             <td class="border-r">سحب اداري</td>
+                             <td class="border-r">{{row.status}}</td>
+                             <td class="border-r">Telecom</td>
+                             <td class="border-r">{{row.debt}}</td>
+                             <td class="border-r">{{row.date}}</td>
+                             <td class="border-r">{{row.batch}}</td>
+                             <td class="border-r">{{row.emp}}</td>
+                             <td class="border-r">{{row.receivedDate}}</td>
+                             <td class="border-r">{{row.court}}</td>
+                             <td class="border-r">{{row.contractNum}}</td>
+                             <td class="border-r">180405080</td>
+                             <td class="border-r">{{row.claim}}</td>
+                             <td class="border-r">{{row.nationality}}</td>
+                             <td class="border-r truncate max-w-[150px]">{{row.address}}</td>
+                             <td class="border-r">{{row.notes}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </ng-container>
+
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,96 @@
+<!-- report-template.html -->
+<div   #report   *ngIf="caseData" id="case-report" dir="rtl" style="font-family: 'Cairo', sans-serif; padding: 20px; width: 800px; margin: auto;">
+<div style="width: 100%; display: flex; justify-content: center; align-items: center; background-color: #fff;">
+  <img 
+    [src]="logoPath" 
+    alt="Logo" 
+    style="width: 100%; max-width: 100%; height: 200px; object-fit: contain;"
+  />
+</div>
+  <hr style="margin: 20px 0;">
+<div
+  class="case-info"
+  style="
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 20px;
+    width: 100%;
+    direction: rtl;
+    font-family: 'Cairo', sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+  "
+>
+  <div><strong>مسلسل:</strong> {{ caseData.serial }}</div>
+  <div><strong>الدرجة:</strong> {{ caseData.level }}</div>
+  <div><strong>الدائرة:</strong> {{ caseData.department }}</div>
+
+  <div><strong>الجهة:</strong> {{ caseData.court }}</div>
+  <div><strong>الرقم الآلي:</strong> {{ caseData.caseNumber }}</div>
+  <div><strong>رقم الدعوى:</strong> {{ caseData.caseRef }}</div>
+
+  <div><strong>الموكل:</strong> {{ caseData.client }}</div>
+  <div><strong>الخصم:</strong> {{ caseData.opponent }}</div>
+  <div><strong>صفة الخصم:</strong> {{ caseData.appellant }}</div>
+
+  <div><strong>المستشار:</strong> {{ caseData.judge }}</div>
+  <div><strong>القاعة:</strong> {{ caseData.hall }}</div>
+  <div><strong>حالة الملف:</strong> {{ caseData.status }}</div>
+
+  <div><strong>الخبراء:</strong> {{ caseData.expertOffice }}</div>
+  <div><strong>الشبلونة:</strong> {{ caseData.sheetNo }}</div>
+  <div><strong>الطابق:</strong> {{ caseData.floor }}</div>
+</div>
+
+  <h3 style="text-align: center; margin-top: 30px;">جلسات المحكمة</h3>
+  <table style="width: 100%; border-collapse: collapse; border: 1px solid #000;">
+    <thead>
+      <tr style="background-color: #f3f3f3;">
+        <th style="border: 1px solid #000; padding: 6px;">م</th>
+        <th style="border: 1px solid #000; padding: 6px;">تاريخ الإفادة</th>
+        <th style="border: 1px solid #000; padding: 6px;">نوع الجلسة</th>
+        <th style="border: 1px solid #000; padding: 6px;">القرار</th>
+        <th style="border: 1px solid #000; padding: 6px;">الجلسة القادمة</th>
+        <th style="border: 1px solid #000; padding: 6px;">توقيت الخبراء</th>
+        <th style="border: 1px solid #000; padding: 6px;">ملاحظات الجلسة</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let s of courtSessions; let i = index">
+        <td style="border: 1px solid #000; padding: 4px;">{{ i + 1 }}</td>
+        <td style="border: 1px solid #000; padding: 4px;">{{ s.reportDate }}</td>
+        <td style="border: 1px solid #000; padding: 4px;">{{ s.type }}</td>
+        <td style="border: 1px solid #000; padding: 4px;">{{ s.decision }}</td>
+        <td style="border: 1px solid #000; padding: 4px;">{{ s.nextDate }}</td>
+        <td style="border: 1px solid #000; padding: 4px;">{{ s.expertTime }}</td>
+        <td style="border: 1px solid #000; padding: 4px;">{{ s.notes }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 style="text-align: center; margin-top: 30px;">جلسات الخبراء</h3>
+
+    <table style="width: 100%; border-collapse: collapse; border: 1px solid #000;">
+    <thead>
+      <tr style="background-color: #f3f3f3;">
+        <th style="border: 1px solid #000; padding: 6px;">م</th>
+        <th style="border: 1px solid #000; padding: 6px;">تاريخ الإفادة</th>
+        <th style="border: 1px solid #000; padding: 6px;">نوع الجلسة</th>
+        <th style="border: 1px solid #000; padding: 6px;">القرار</th>
+        <th style="border: 1px solid #000; padding: 6px;">الجلسة القادمة</th>
+        <th style="border: 1px solid #000; padding: 6px;">توقيت الخبراء</th>
+        <th style="border: 1px solid #000; padding: 6px;">ملاحظات الجلسة</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let s of expertSessions; let i = index">
+        <td style="border: 1px solid #000; padding: 4px;">{{ i + 1 }}</td>
+        <td style="border: 1px solid #000; padding: 4px;">{{ s.reportDate }}</td>
+        <td style="border: 1px solid #000; padding: 4px;">{{ s.type }}</td>
+        <td style="border: 1px solid #000; padding: 4px;">{{ s.decision }}</td>
+        <td style="border: 1px solid #000; padding: 4px;">{{ s.nextDate }}</td>
+        <td style="border: 1px solid #000; padding: 4px;">{{ s.expertTime }}</td>
+        <td style="border: 1px solid #000; padding: 4px;">{{ s.notes }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

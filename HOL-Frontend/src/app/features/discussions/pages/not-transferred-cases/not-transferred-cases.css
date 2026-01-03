@@ -1,0 +1,9 @@
+table {
+  font-size: 13px;
+}
+th, td {
+  text-align: center;
+}
+.not-transferred {
+    direction: rtl !important;
+}

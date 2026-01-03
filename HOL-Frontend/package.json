@@ -1,0 +1,103 @@
+{
+  "name": "houseoflaw",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "ng": "ng",
+    "dev:web": "ng serve",
+    "dev:emain": "tsc -p electron/tsconfig.json -w",
+    "dev:electron": "wait-on http://localhost:4200 && cross-env IS_DEV=1 NG_APP_URL=http://localhost:4200 electron .",
+    "start": "concurrently -k \"npm:dev:web\" \"npm:dev:emain\" \"npm:dev:electron\"",
+    "build:web": "ng build",
+    "build:electron": "tsc -p electron/tsconfig.json",
+    "build": "npm run build:web && npm run build:electron",
+    "dist": "npm run build && electron-builder",
+    "pack": "npm run build && electron-builder --dir",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "prettier": {
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "build": {
+    "appId": "com.houseoflaw.houseoflaw",
+    "productName": "بيت القانون",
+    "files": [
+      "dist/**",
+      "dist-electron/**"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "electron/icon.ico"
+    },
+    "directories": {
+      "output": "release"
+    }
+  },
+  "dependencies": {
+    "@angular/animations": "^20.3.3",
+    "@angular/cdk": "^20.2.9",
+    "@angular/common": "^20.1.0",
+    "@angular/compiler": "^20.1.0",
+    "@angular/core": "^20.1.0",
+    "@angular/forms": "^20.1.0",
+    "@angular/material": "^20.2.9",
+    "@angular/platform-browser": "^20.1.0",
+    "@angular/platform-browser-dynamic": "^20.1.0",
+    "@angular/router": "^20.1.0",
+    "@microsoft/signalr": "^10.0.0",
+    "@primeuix/themes": "^1.2.1",
+    "@tailwindcss/cli": "^4.1.14",
+    "@tailwindcss/postcss": "^4.1.14",
+    "chart.js": "^4.5.1",
+    "file-saver": "^2.0.5",
+    "gsap": "^3.13.0",
+    "html2pdf.js": "^0.12.1",
+    "lucide-angular": "^0.546.0",
+    "ng2-charts": "^8.0.0",
+    "ngx-pagination": "^6.0.3",
+    "ngx-toastr": "^19.1.0",
+    "primeclt": "^0.1.5",
+    "primeicons": "^7.0.0",
+    "primeng": "^20",
+    "rxjs": "~7.8.0",
+    "sweetalert2": "^11.26.4",
+    "tailwindcss-primeui": "^0.6.1",
+    "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^20",
+    "@angular/build": "^20.1.4",
+    "@angular/cli": "^20.1.4",
+    "@angular/compiler-cli": "^20.1.0",
+    "@types/file-saver": "^2.0.7",
+    "@types/jasmine": "~5.1.0",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.0.0",
+    "cross-env": "^7.0.3",
+    "daisyui": "^5.2.1",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "jasmine-core": "~5.8.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "tailwindcss": "^4.1.14",
+    "typescript": "~5.8.2",
+    "wait-on": "^8.0.0"
+  }
+}

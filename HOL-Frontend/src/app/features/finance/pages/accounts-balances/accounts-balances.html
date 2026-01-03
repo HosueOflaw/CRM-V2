@@ -1,0 +1,77 @@
+<div class="min-h-screen p-8" style="direction: rtl; background-color: var(--surface-ground);">
+
+  <!-- الكارت الرئيسي -->
+  <div class="shadow-xl rounded-2xl p-6"
+       style="background-color: var(--surface-card);">
+
+    <!-- العنوان -->
+    <h2 class="text-3xl font-bold text-center mb-8"
+        style="color: var(--text-color);">
+      حسابات الأرصدة
+    </h2>
+
+    <!-- Filters Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+      <div>
+        <label class="label font-semibold" style="color: var(--text-color);">من تاريخ</label>
+        <input type="date"
+               class="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+               [(ngModel)]="fromDate" />
+      </div>
+
+      <div>
+        <label class="label font-semibold" style="color: var(--text-color);">إلى تاريخ</label>
+        <input type="date"
+               class="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+               [(ngModel)]="toDate" />
+      </div>
+
+      <div class="flex items-end">
+        <button class="btn btn-primary w-full" (click)="search()">
+          بحث
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Table Section -->
+    <div class="overflow-x-auto">
+      <table class="table table-auto w-full border shadow-md rounded-lg"
+             style="border-color: var(--surface-border);">
+        <thead style="background-color: var(--surface-section);">
+          <tr>
+            <th class="text-center" style="color: var(--text-color);">Code</th>
+            <th class="text-center" style="color: var(--text-color);">Name</th>
+            <th class="text-center" style="color: var(--text-color);">END_ACCOUNT</th>
+            <th class="text-center" style="color: var(--text-color);">EXPR1</th>
+            <th class="text-center" style="color: var(--text-color);">EXPR2</th>
+            <th class="text-center" style="color: var(--text-color);">EXPR3</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of data; let i = index"
+              [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+              style="color: var(--text-color); transition: background-color 0.2s;">
+            <td class="text-center font-medium">{{ item.Code }}</td>
+            <td class="text-center">{{ item.Name }}</td>
+            <td class="text-center">{{ item.END_ACCOUNT }}</td>
+            <td class="text-center">{{ item.EXPR1 }}</td>
+            <td class="text-center">{{ item.EXPR2 }}</td>
+            <td class="text-center">{{ item.EXPR3 }}</td>
+          </tr>
+
+          <tr *ngIf="data.length === 0">
+            <td colspan="6" class="text-center py-6"
+                style="color: var(--text-color-secondary);">
+              لا توجد بيانات
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>

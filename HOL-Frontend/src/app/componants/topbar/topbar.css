@@ -1,0 +1,45 @@
+
+.topbar{
+  -webkit-app-region: drag;
+  height:32px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 8px; user-select:none;
+}
+.actions, .actions * { -webkit-app-region: no-drag; }
+button { cursor:pointer; }
+
+
+.drag {
+  -webkit-app-region: drag;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+}
+
+.no-drag, button {
+  -webkit-app-region: no-drag;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  width: 36px;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #2a3942;
+}
+
+button.close:hover {
+  background: #f44336;
+  color: #fff;
+}

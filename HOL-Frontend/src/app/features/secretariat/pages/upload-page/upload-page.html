@@ -1,0 +1,70 @@
+<div dir="rtl" class="flex flex-col h-screen font-sans text-sm"
+     style="background-color: var(--surface-ground);">
+
+  <div class="border-b p-2 flex justify-between items-center shadow-sm"
+       style="background-color: var(--surface-card); border-color: var(--surface-border);">
+    
+    <div class="flex items-center gap-3">
+        <h1 class="text-lg font-bold px-2 border-l"
+            style="color: var(--text-color); border-color: var(--surface-border);">
+            رفع افادات
+        </h1>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+             style="color: var(--text-color-secondary);">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+    </div>
+
+    <div class="flex gap-2">
+        <input type="file" #fileInput (change)="onFileChange($event)" hidden accept=".xlsx, .xls" />
+
+        <button class="btn btn-sm btn-outline btn-info px-6 rounded-none"
+                style="color: var(--text-color); border-color: var(--surface-border);"
+                (click)="downloadTemplate()">
+            EXCEL
+        </button>
+
+        <button class="btn btn-sm px-6 rounded-none"
+                style="background-color: var(--surface-hover); color: var(--text-color); border-color: var(--surface-border);"
+                (click)="triggerFileUpload()">
+            UPLOAD
+        </button>
+    </div>
+  </div>
+
+  <div class="border-b p-1 text-xs text-left px-4"
+       style="background-color: var(--surface-section); border-color: var(--surface-border); color: var(--text-color-secondary);">
+    Drag a column header here to group by that column
+  </div>
+
+  <div class="flex-grow overflow-auto p-4"
+       style="background-color: var(--surface-card);">
+      
+      <div *ngIf="excelData.length === 0" class="h-full flex flex-col items-center justify-center"
+           style="color: var(--text-color-secondary);">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <p>الرجاء رفع ملف Excel لعرض البيانات</p>
+      </div>
+
+      <table *ngIf="excelData.length > 0" class="table table-xs table-pin-rows table-zebra w-full border"
+             style="border-color: var(--surface-border);">
+        <thead>
+          <tr style="background-color: var(--surface-section);">
+             <th *ngFor="let header of tableHeaders" style="color: var(--text-color);">{{ header }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of excelData; let i = index"
+              [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+              style="color: var(--text-color);">
+            <td *ngFor="let header of tableHeaders">
+                {{ row[header] }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+  </div>
+</div>

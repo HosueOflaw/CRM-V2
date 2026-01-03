@@ -1,0 +1,13 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.table th,
+.table td {
+  text-align: center;
+}
+
+.max-h-\[400px\] {
+  max-height: 400px;
+}

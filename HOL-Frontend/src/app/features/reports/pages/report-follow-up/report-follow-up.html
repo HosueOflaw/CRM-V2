@@ -1,0 +1,48 @@
+<app-go-back></app-go-back>
+
+<div class="flex justify-end mb-6"
+     style="background-color: var(--surface-ground);">
+  <button
+    (click)="toggleReport()"
+    class="bg-blue-600 hover:bg-blue-700 transition text-white font-semibold px-6 py-2.5 rounded-lg shadow-md">
+    تقرير
+  </button>
+</div>
+
+<div *ngIf="showReport" class="p-6 rounded-xl shadow-lg border"
+     style="background-color: var(--surface-card); border-color: var(--surface-border);">
+
+  <h2 class="text-xl font-bold mb-4 border-b pb-2"
+      style="color: var(--text-color); border-color: var(--surface-border);">
+    تقرير المتابعة
+  </h2>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-right border-collapse"
+           style="border-color: var(--surface-border);">
+      <thead>
+        <tr style="background-color: var(--surface-section);"
+            class="text-sm font-semibold">
+          <th class="p-3 border-b" style="border-color: var(--surface-border); color: var(--text-color);">الموظف</th>
+          <th class="p-3 border-b" style="border-color: var(--surface-border); color: var(--text-color);">الحالة</th>
+          <th class="p-3 border-b" style="border-color: var(--surface-border); color: var(--text-color);">العدد</th>
+          <th class="p-3 border-b" style="border-color: var(--surface-border); color: var(--text-color);">المتابعة</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr
+          *ngFor="let row of reportData; let i = index"
+          [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+          style="color: var(--text-color); transition: background-color 0.2s;">
+
+          <td class="p-3 border-b font-medium" style="border-color: var(--surface-border);">{{ row.employee }}</td>
+          <td class="p-3 border-b" style="border-color: var(--surface-border);">{{ row.status }}</td>
+          <td class="p-3 border-b" style="border-color: var(--surface-border);">{{ row.count }}</td>
+          <td class="p-3 border-b" style="border-color: var(--surface-border);">{{ row.follow }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

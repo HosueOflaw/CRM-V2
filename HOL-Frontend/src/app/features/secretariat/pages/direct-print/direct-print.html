@@ -1,0 +1,67 @@
+<div dir="rtl" class="flex flex-col h-screen font-sans text-sm"
+     style="background-color: var(--surface-ground);">
+
+  <div class="border-b p-2 flex flex-wrap items-center gap-2 shadow-sm"
+       style="background-color: var(--surface-card); border-color: var(--surface-border);">
+    
+    <div class="flex items-center gap-2 pl-2 border-l"
+         style="border-color: var(--surface-border);">
+      <label class="font-bold whitespace-nowrap" style="color: var(--text-color);">الطابعة</label>
+      <select [(ngModel)]="selectedPrinter"
+              class="select select-bordered select-sm w-56 max-w-xs"
+              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+        <option *ngFor="let printer of printers" [value]="printer">{{ printer }}</option>
+      </select>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button class="btn btn-sm btn-outline px-6 font-normal"
+              style="background-color: var(--surface-section); color: var(--text-color); border-color: var(--surface-border);"
+              (click)="exportExcel()">
+        اكسيل
+      </button>
+      
+      <button class="btn btn-sm btn-outline px-6 font-normal"
+              style="background-color: var(--surface-section); color: var(--text-color); border-color: var(--surface-border);"
+              (click)="print()">
+        طباعة
+      </button>
+    </div>
+
+    <div class="flex-grow">
+      <input type="text" 
+             [(ngModel)]="searchQuery" 
+             class="input input-bordered input-sm w-full focus:outline-none"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             placeholder="" />
+    </div>
+
+  </div>
+
+  <div class="border-b p-1 px-4 text-xs select-none"
+       style="background-color: var(--surface-section); border-color: var(--surface-border); color: var(--text-color-secondary);">
+    Drag a column header here to group by that column
+  </div>
+
+  <div class="flex-grow overflow-auto relative"
+       style="background-color: var(--surface-card);">
+    
+    <table class="table table-xs table-pin-rows w-full"
+           style="border-color: var(--surface-border);">
+      <thead>
+        <tr style="background-color: var(--surface-section); border-color: var(--surface-border);">
+           <th class="w-10" style="background-color: var(--surface-section);"></th>
+           <th style="background-color: var(--surface-section); color: var(--text-color);">...</th>
+           <th style="background-color: var(--surface-section); color: var(--text-color);">...</th>
+           <th style="background-color: var(--surface-section); color: var(--text-color);">...</th>
+           <th class="text-left" style="background-color: var(--surface-section);">
+              <span style="color: var(--text-color-secondary);">🔍</span> </th>
+        </tr>
+      </thead>
+      <tbody>
+        </tbody>
+    </table>
+
+    </div>
+
+</div>

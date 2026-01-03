@@ -1,0 +1,132 @@
+<!-- ================================
+   صفحة تقرير عرض بيانات زين (20 شهر)
+================================ -->
+
+<div class="p-4 md:p-6 min-h-screen" dir="rtl"
+     style="background-color: var(--surface-ground);">
+
+  <h1 class="text-2xl font-bold mb-6 border-b pb-2"
+      style="color: var(--text-color); border-color: var(--surface-border);">
+    تقرير عرض البيانات زين (تقارير الدفعات)
+  </h1>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 p-4 rounded-xl shadow-lg"
+       style="background-color: var(--surface-card);">
+
+    <!-- التاريخ -->
+    <div class="flex flex-col">
+      <label class="font-bold text-sm mb-1" style="color: var(--text-color);">حتى تاريخ</label>
+      <input
+        type="date"
+        [ngModel]="endDate()"
+        (ngModelChange)="endDate.set($event)"
+        class="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+      />
+    </div>
+
+    <!-- الشركة (DropDown من الداتا بيز) -->
+    <div class="flex flex-col">
+      <label class="font-bold text-sm mb-1" style="color: var(--text-color);">الشركة</label>
+      <select
+        [ngModel]="company()"
+        (ngModelChange)="company.set($event)"
+        class="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+      >
+        <option value="" disabled selected>اختر الشركة</option>
+
+        @for (c of companies; track c.value) {
+          <option [value]="c.value">{{ c.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- زر تحميل التقرير -->
+    <div class="col-span-2 md:col-span-2 flex items-end justify-start md:justify-end mt-4 md:mt-0">
+      <button
+        (click)="loadReports()"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg shadow-md text-sm font-semibold">
+        تحميل تقرير الدفعات (20 شهرًا)
+      </button>
+    </div>
+
+  </div>
+
+  <!-- جدول التقرير -->
+  @if (reportData().length) {
+    <div class="mt-6 overflow-x-auto shadow-lg rounded-xl border"
+         style="background-color: var(--surface-card); border-color: var(--surface-border);">
+      <table class="w-full text-right border-collapse text-sm"
+             style="border-color: var(--surface-border);">
+
+        <thead>
+          <tr style="background-color: var(--surface-section); border-color: var(--surface-border);"
+              class="font-semibold">
+            <th class="p-3 border-l" style="border-color: var(--surface-border); color: var(--text-color);">الاسم</th>
+            <th class="p-3 border-l" style="border-color: var(--surface-border); color: var(--text-color);">الإطار</th>
+            <th class="p-3 border-l" style="border-color: var(--surface-border); color: var(--text-color);">رقم الهوية</th>
+            <th class="p-3 border-l" style="border-color: var(--surface-border); color: var(--text-color);">إجمالي المدفوع</th>
+            <th class="p-3 border-l" style="border-color: var(--surface-border); color: var(--text-color);">إجمالي المستحق</th>
+            <th class="p-3 border-l" style="border-color: var(--surface-border); color: var(--text-color);">تاريخ الإصدار</th>
+            <th class="p-3 border-l" style="border-color: var(--surface-border); color: var(--text-color);">عدد الدفعات</th>
+
+            @for (header of monthlyHeaders(); track header) {
+              <th class="p-3 border-l min-w-[120px]" style="border-color: var(--surface-border); color: var(--text-color);">{{ header }}</th>
+            }
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (row of reportData(); track row.numberID; let i = $index) {
+            <tr class="border-b transition"
+                [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+                style="border-color: var(--surface-border); color: var(--text-color);">
+
+              <td class="p-3 border-l font-medium" style="border-color: var(--surface-border);">{{ row.name }}</td>
+              <td class="p-3 border-l text-center" style="border-color: var(--surface-border);">{{ row.theFrame }}</td>
+              <td class="p-3 border-l text-center" style="border-color: var(--surface-border);">{{ row.numberID }}</td>
+
+              <td class="p-3 border-l text-center font-bold" style="border-color: var(--surface-border); color: var(--green-500);">{{ row.totalPaid | number }}</td>
+              <td class="p-3 border-l text-center font-bold" style="border-color: var(--surface-border); color: var(--red-500);">{{ row.dueAmount | number }}</td>
+
+              <td class="p-3 border-l text-center" style="border-color: var(--surface-border);">{{ row.dateOfIssue }}</td>
+              <td class="p-3 border-l text-center" style="border-color: var(--surface-border);">{{ row.batches }}</td>
+
+              @for (header of monthlyHeaders(); track header) {
+                <td class="p-3 border-l text-center" style="border-color: var(--surface-border);">
+                  @if (row.monthlyPayments[header]) {
+                    <div class="text-xs font-semibold">
+                      {{ row.monthlyPayments[header].value | number }}
+                      <span style="color: var(--text-color-secondary);">
+                        ({{ row.monthlyPayments[header].percentage }}%)
+                      </span>
+                    </div>
+                  } @else {
+                    <span style="color: var(--text-color-secondary);">-</span>
+                  }
+                </td>
+              }
+
+            </tr>
+          }
+        </tbody>
+
+      </table>
+    </div>
+  } @else {
+    <div class="mt-6 p-10 text-center rounded-xl shadow"
+         style="background-color: var(--surface-card); color: var(--text-color-secondary);">
+      اضغط على زر "تحميل تقرير الدفعات" لعرض البيانات.
+    </div>
+  }
+
+
+
+
+
+
+</div>
+
+
+

@@ -1,0 +1,372 @@
+<div class="space-y-3">
+  <h2 class="text-lg font-bold text-center text-primary mb-2">إضافة قضية جديدة</h2>
+
+  <form [formGroup]="caseForm" (ngSubmit)="submit()" class="space-y-3">
+    <div class="grid grid-cols-3 gap-2">
+      <div class="form-control">
+        <label class="label"><span class="label-text">المسلسل</span></label>
+        <input type="text" formControlName="serial" class="input input-bordered input-sm" />
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text">الطابق</span></label>
+        <input type="number" formControlName="floor" class="input input-bordered input-sm" />
+      </div>
+
+        <div class="form-control">
+        <label class="label"><span class="label-text">الشبلونة</span></label>
+        <input type="number" formControlName="shblona" class="input input-bordered input-sm" />
+      </div>
+
+        <div class="form-control">
+        <label class="label"><span class="label-text">القاعة</span></label>
+        <input type="number" formControlName="hall" class="input input-bordered input-sm" />
+      </div>
+
+      <!-- المحكمة: خانة قابلة للضغط تفتح مودال -->
+      <div class="form-control">
+        <label class="label"><span class="label-text">المحكمة</span></label>
+        <div class="flex gap-2">
+          <input readonly [value]="caseForm.value.court?.name || ''" placeholder="اختر المحكمة" class="input input-bordered input-sm flex-1" />
+          <button type="button" class="btn btn-square btn-sm" (click)="openModal('court')">...</button>
+        </div>
+      </div>
+
+      <!-- الخبراء -->
+      <div class="form-control">
+        <label class="label"><span class="label-text">الخبراء</span></label>
+        <div class="flex gap-2">
+          <input readonly [value]="caseForm.value.expert?.name || ''" placeholder="اختر خبير" class="input input-bordered input-sm flex-1" />
+          <button type="button" class="btn btn-square btn-sm" (click)="openModal('expert')">...</button>
+        </div>
+      </div>
+
+      <!-- الموكل -->
+      <div class="form-control">
+        <label class="label"><span class="label-text">الموكل</span></label>
+        <div class="flex gap-2">
+          <input readonly [value]="caseForm.value.client?.name || ''" placeholder="اختر الموكل" class="input input-bordered input-sm flex-1" />
+          <button type="button" class="btn btn-square btn-sm" (click)="openModal('client')">...</button>
+        </div>
+      </div>
+
+      <!-- صفة الموكل -->
+      <div class="form-control">
+        <label class="label"><span class="label-text">صفة الموكل</span></label>
+        <div class="flex gap-2">
+          <input readonly [value]="caseForm.value.clientRole?.name || ''" placeholder="اختر الصفة" class="input input-bordered input-sm flex-1" />
+          <button type="button" class="btn btn-square btn-sm" (click)="openModal('role')">...</button>
+        </div>
+      </div>
+
+      
+        <div class="form-control">
+        <label class="label"><span class="label-text">الرقم الالي</span></label>
+        <input type="number" formControlName="automaticNo" class="input input-bordered input-sm" />
+      </div>
+
+
+      <!-- حالة الملف -->
+      <div class="form-control">
+        <label class="label"><span class="label-text">حالة الملف</span></label>
+        <div class="flex gap-2">
+          <input readonly [value]="caseForm.value.fileStatus?.name || ''" placeholder="اختر الحالة" class="input input-bordered input-sm flex-1" />
+          <button type="button" class="btn btn-square btn-sm" (click)="openModal('fileStatus')">...</button>
+        </div>
+      </div>
+
+      <!-- المحامي -->
+      <div class="form-control">
+        <label class="label"><span class="label-text">المحامي</span></label>
+        <div class="flex gap-2">
+          <input readonly [value]="caseForm.value.lawyer?.name || ''" placeholder="اختر المحامي" class="input input-bordered input-sm flex-1" />
+          <button type="button" class="btn btn-square btn-sm" (click)="openModal('lawyer')">...</button>
+        </div>
+      </div>
+
+      <!-- المستشار -->
+      <div class="form-control">
+        <label class="label"><span class="label-text">المستشار</span></label>
+        <div class="flex gap-2">
+          <input readonly [value]="caseForm.value.consultant?.name || ''" placeholder="اختر المستشار" class="input input-bordered input-sm flex-1" />
+          <button type="button" class="btn btn-square btn-sm" (click)="openModal('consultant')">...</button>
+        </div>
+      </div>
+
+      <!-- المندوب -->
+      <div class="form-control">
+        <label class="label"><span class="label-text">المندوب</span></label>
+        <div class="flex gap-2">
+          <input readonly [value]="caseForm.value.delegate?.name || ''" placeholder="اختر المندوب" class="input input-bordered input-sm flex-1" />
+          <button type="button" class="btn btn-square btn-sm" (click)="openModal('delegate')">...</button>
+        </div>
+      </div>
+
+      <!-- أول درجة -->
+      <div class="form-control">
+        <label class="label"><span class="label-text">أول درجة</span></label>
+        <div class="flex gap-2">
+          <input readonly [value]="caseForm.value.firstDegree?.name || ''" placeholder="اختر نوع أول درجة" class="input input-bordered input-sm flex-1" />
+          <button type="button" class="btn btn-square btn-sm" (click)="openModal('firstDegree')">...</button>
+        </div>
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text">رقم أول درجة</span></label>
+        <input type="text" formControlName="firstDegreeNumber" class="input input-bordered input-sm" />
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text">تاريخ رفع أول درجة</span></label>
+        <input type="date" formControlName="firstDegreeRaised" class="input input-bordered input-sm" />
+      </div>
+
+      <!-- الاستئناف -->
+      <div class="form-control">
+        <label class="label"><span class="label-text">الاستئناف</span></label>
+        <div class="flex gap-2">
+          <input readonly [value]="caseForm.value.appeals?.name || ''" placeholder="اختر نوع الاستئناف" class="input input-bordered input-sm flex-1" />
+          <button type="button" class="btn btn-square btn-sm" (click)="openModal('appeal')">...</button>
+        </div>
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text">رقم الاستئناف</span></label>
+        <input type="text" formControlName="appealNumber" class="input input-bordered input-sm" />
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text">تاريخ رفع الاستئناف</span></label>
+        <input type="date" formControlName="appealRaised" class="input input-bordered input-sm" />
+      </div>
+
+      <!-- التمييز -->
+      <div class="form-control">
+        <label class="label"><span class="label-text">التمييز</span></label>
+        <div class="flex gap-2">
+          <input readonly [value]="caseForm.value.cassation?.name || ''" placeholder="اختر نوع التمييز" class="input input-bordered input-sm flex-1" />
+          <button type="button" class="btn btn-square btn-sm" (click)="openModal('cassation')">...</button>
+        </div>
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text">رقم التمييز</span></label>
+        <input type="text" formControlName="cassationNumber" class="input input-bordered input-sm" />
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text">تاريخ رفع التمييز</span></label>
+        <input type="date" formControlName="cassationRaised" class="input input-bordered input-sm" />
+      </div>
+
+      <!-- الدائرة -->
+      <div class="form-control ">
+        <label class="label"><span class="label-text">الدائرة</span></label>
+        <div class="flex gap-2">
+          <input readonly [value]="caseForm.value.chamber?.name || ''" placeholder="اختر الدائرة" class="input input-bordered input-sm flex-1" />
+          <button type="button" class="btn btn-square btn-sm" (click)="openModal('chamber')">...</button>
+        </div>
+      </div>
+
+      <!-- باقى الحقول -->
+      <div class="form-control">
+        <label class="label"><span class="label-text">موضوع القضية</span></label>
+        <input type="text" formControlName="topic" class="input input-bordered input-sm" />
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text">ملاحظات الملف</span></label>
+        <textarea formControlName="notes" class="textarea textarea-bordered h-20"></textarea>
+      </div>
+    </div>
+
+    <!-- أزرار -->
+    <div class="flex gap-2 justify-center m-3">
+      <button type="button" class="btn btn-error" (click)="resetForm()">تراجع</button>
+      <button type="submit" class="btn btn-success">حفظ</button>
+      <button type="button" class="btn btn-warning">تعديل</button>
+      <button type="button" class="btn btn-ghost">إلغاء</button>
+      <button type="button" class="btn btn-primary" (click)="navigateToTransfer()" (click)="onTransferClick()">ترحيل الجلسات</button>
+    </div>
+  </form>
+</div>
+
+<!-- ========== Generic Modal template ==========
+     نستخدم نفس القالب لعدة أنواع، نظهر المصفوفة المناسبة بناءً على المودال المفتوح
+=========================================== -->
+
+<!-- Court modal -->
+<div *ngIf="modalVisible.court" class="modal modal-open">
+  <div class="modal-box max-w-md">
+    <h3 class="font-bold text-lg">اختر المحكمة</h3>
+    <div class="py-2">
+      <ul class="menu w-full">
+        <li *ngFor="let c of courts" class="hover:bg-base-200 cursor-pointer p-2 rounded" (click)="selectItem('court', c)">{{c.name}}</li>
+      </ul>
+    </div>
+    <div class="modal-action">
+      <button class="btn" (click)="closeModal('court')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- Expert modal -->
+<div *ngIf="modalVisible.expert" class="modal modal-open">
+  <div class="modal-box max-w-md">
+    <h3 class="font-bold text-lg">اختر الخبير</h3>
+    <div class="py-2">
+      <ul>
+        <li *ngFor="let e of experts" class="p-2 hover:bg-base-200 cursor-pointer rounded" (click)="selectItem('expert', e)">{{e.name}}</li>
+      </ul>
+    </div>
+    <div class="modal-action">
+      <button class="btn" (click)="closeModal('expert')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- Client modal -->
+<div *ngIf="modalVisible.client" class="modal modal-open">
+  <div class="modal-box max-w-md">
+    <h3 class="font-bold text-lg">اختر الموكل</h3>
+    <div class="py-2">
+      <ul>
+        <li *ngFor="let p of parties" class="p-2 hover:bg-base-200 cursor-pointer rounded" (click)="selectItem('client', p)">{{p.name}}</li>
+      </ul>
+    </div>
+    <div class="modal-action">
+      <button class="btn" (click)="closeModal('client')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- Role/modal for client role -->
+<div *ngIf="modalVisible.role" class="modal modal-open">
+  <div class="modal-box max-w-md">
+    <h3 class="font-bold text-lg">اختر الصفة</h3>
+    <div class="py-2">
+      <ul>
+        <li *ngFor="let r of roles" class="p-2 hover:bg-base-200 cursor-pointer rounded" (click)="selectItem('clientRole', r)">{{r.name}}</li>
+      </ul>
+    </div>
+    <div class="modal-action">
+      <button class="btn" (click)="closeModal('role')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- File status modal -->
+<div *ngIf="modalVisible.fileStatus" class="modal modal-open">
+  <div class="modal-box max-w-md">
+    <h3 class="font-bold text-lg">حالة الملف</h3>
+    <div class="py-2">
+      <ul>
+        <li *ngFor="let s of fileStatuses" class="p-2 hover:bg-base-200 cursor-pointer rounded" (click)="selectItem('fileStatus', s)">{{s.name}}</li>
+      </ul>
+    </div>
+    <div class="modal-action">
+      <button class="btn" (click)="closeModal('fileStatus')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lawyer -->
+<div *ngIf="modalVisible.lawyer" class="modal modal-open">
+  <div class="modal-box max-w-md">
+    <h3 class="font-bold text-lg">اختر المحامي</h3>
+    <div class="py-2">
+      <ul>
+        <li *ngFor="let l of lawyers" class="p-2 hover:bg-base-200 cursor-pointer rounded" (click)="selectItem('lawyer', l)">{{l.name}}</li>
+      </ul>
+    </div>
+    <div class="modal-action">
+      <button class="btn" (click)="closeModal('lawyer')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- Consultant, Delegate, FirstDegree, Appeal, Cassation, Chamber modals (similar) -->
+<div *ngIf="modalVisible.consultant" class="modal modal-open">
+  <div class="modal-box max-w-md">
+    <h3 class="font-bold text-lg">المستشار</h3>
+    <div class="py-2">
+      <ul>
+        <li *ngFor="let c of consultants" class="p-2 hover:bg-base-200 cursor-pointer rounded" (click)="selectItem('consultant', c)">{{c.name}}</li>
+      </ul>
+    </div>
+    <div class="modal-action">
+      <button class="btn" (click)="closeModal('consultant')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="modalVisible.delegate" class="modal modal-open">
+  <div class="modal-box max-w-md">
+    <h3 class="font-bold text-lg">المندوب</h3>
+    <div class="py-2">
+      <ul>
+        <li *ngFor="let d of delegates" class="p-2 hover:bg-base-200 cursor-pointer rounded" (click)="selectItem('delegate', d)">{{d.name}}</li>
+      </ul>
+    </div>
+    <div class="modal-action">
+      <button class="btn" (click)="closeModal('delegate')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="modalVisible.firstDegree" class="modal modal-open">
+  <div class="modal-box max-w-md">
+    <h3 class="font-bold text-lg">أول درجة</h3>
+    <div class="py-2">
+      <ul>
+        <li *ngFor="let f of firstDegrees" class="p-2 hover:bg-base-200 cursor-pointer rounded" (click)="selectItem('firstDegree', f)">{{f.name}}</li>
+      </ul>
+    </div>
+    <div class="modal-action">
+      <button class="btn" (click)="closeModal('firstDegree')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="modalVisible.appeal" class="modal modal-open">
+  <div class="modal-box max-w-md">
+    <h3 class="font-bold text-lg">الاستئناف</h3>
+    <div class="py-2">
+      <ul>
+        <li *ngFor="let a of appeals" class="p-2 hover:bg-base-200 cursor-pointer rounded" (click)="selectItem('appeal', a)">{{a.name}}</li>
+      </ul>
+    </div>
+    <div class="modal-action">
+      <button class="btn" (click)="closeModal('appeal')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="modalVisible.cassation" class="modal modal-open">
+  <div class="modal-box max-w-md">
+    <h3 class="font-bold text-lg">التمييز</h3>
+    <div class="py-2">
+      <ul>
+        <li *ngFor="let cs of cassations" class="p-2 hover:bg-base-200 cursor-pointer rounded" (click)="selectItem('cassation', cs)">{{cs.name}}</li>
+      </ul>
+    </div>
+    <div class="modal-action">
+      <button class="btn" (click)="closeModal('cassation')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="modalVisible.chamber" class="modal modal-open">
+  <div class="modal-box max-w-md">
+    <h3 class="font-bold text-lg">الدائرة</h3>
+    <div class="py-2">
+      <ul>
+        <li *ngFor="let ch of chambers" class="p-2 hover:bg-base-200 cursor-pointer rounded" (click)="selectItem('chamber', ch)">{{ch.name}}</li>
+      </ul>
+    </div>
+    <div class="modal-action">
+      <button class="btn" (click)="closeModal('chamber')">إغلاق</button>
+    </div>
+  </div>
+</div>
+ 

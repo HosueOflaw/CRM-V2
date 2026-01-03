@@ -1,0 +1,75 @@
+.selector-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top, #1a1a1a, #0d0d0d);
+  font-family: 'Cairo', sans-serif;
+  color: #fff;
+}
+
+.selector-box {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+  text-align: center;
+  width: 350px;
+  backdrop-filter: blur(8px);
+  animation: fadeInUp 0.7s ease-out;
+}
+
+.main-logo {
+  width: 80px;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  margin-bottom: 2rem;
+  font-weight: 600;
+  color: #ddd;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.btn {
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.employee {
+  background: linear-gradient(135deg, #1976d2, #0d47a1);
+}
+
+.client {
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+}
+
+.public {
+  background: linear-gradient(135deg, #fbc02d, #f57f17);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

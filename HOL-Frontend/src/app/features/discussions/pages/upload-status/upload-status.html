@@ -1,0 +1,50 @@
+<div class="p-6 space-y-6" style="background-color: var(--surface-ground);">
+  <!-- 🔘 Buttons for status filter -->
+  <div class="flex gap-4 mb-4 justify-center">
+    <button
+      class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+      [class.bg-blue-800]="activeStatus === 'pending'"
+      (click)="filterStatus('pending')"
+    >
+      قيد الرفع
+    </button>
+
+    <button
+      class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700"
+      [class.bg-green-800]="activeStatus === 'uploaded'"
+      (click)="filterStatus('uploaded')"
+    >
+      تم الرفع
+    </button>
+  </div>
+
+  <!-- 📋 Table -->
+  <div class="p-4 rounded-2xl shadow" style="direction: rtl; background-color: var(--surface-card);">
+    <table class="w-full border text-sm"
+           style="border-color: var(--surface-border);">
+      <thead style="background-color: var(--surface-section);">
+        <tr>
+          <th class="p-2 border text-right" style="border-color: var(--surface-border); color: var(--text-color);">ID</th>
+          <th class="p-2 border text-right" style="border-color: var(--surface-border); color: var(--text-color);">الاسم</th>
+          <th class="p-2 border text-right" style="border-color: var(--surface-border); color: var(--text-color);">التاريخ</th>
+          <th class="p-2 border text-right" style="border-color: var(--surface-border); color: var(--text-color);">ملاحظات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of activeTableData; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color); border-color: var(--surface-border);">
+          <td class="p-2 border text-right" style="border-color: var(--surface-border);">{{ row.id }}</td>
+          <td class="p-2 border text-right" style="border-color: var(--surface-border);">{{ row.name }}</td>
+          <td class="p-2 border text-right" style="border-color: var(--surface-border);">{{ row.date }}</td>
+          <td class="p-2 border text-right" style="border-color: var(--surface-border);">{{ row.notes }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="activeTableData.length === 0" class="text-center py-8"
+         style="color: var(--text-color-secondary);">
+      لا توجد بيانات
+    </div>
+  </div>
+</div>

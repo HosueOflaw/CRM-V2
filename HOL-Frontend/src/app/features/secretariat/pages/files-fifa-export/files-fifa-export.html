@@ -1,0 +1,124 @@
+<div class="flex flex-col h-screen font-sans text-sm"
+     style="background-color: var(--surface-ground);">
+
+  <!-- ========================================== -->
+  <!-- 1. شريط العنوان والتبويبات (Header & Tabs) -->
+  <!-- ========================================== -->
+  <div class="border-b flex justify-between items-end px-2 pt-2 shadow-sm"
+       style="background-color: var(--surface-card); border-color: var(--surface-border);">
+    
+    <!-- العنوان -->
+    <div class="font-bold pb-2 px-2" style="color: var(--text-color);">
+      {{title}}
+    </div>
+
+    <!-- التبويبات (Tabs) -->
+    <div class="tabs tabs-lifted tabs-sm -mb-px" style="direction: rtl;">
+      <!-- تبويب الرئيسية -->
+      <a class="tab tab-bordered" 
+         [class.tab-active]="activeTab === 1"
+         [class.font-bold]="activeTab === 1"
+         [class.bg-white]="activeTab === 1"
+         (click)="setActiveTab(1)">
+         الرئيسية
+      </a>
+      
+      <!-- تبويب الاخطاء -->
+      <a class="tab tab-bordered" 
+         [class.tab-active]="activeTab === 2"
+         [class.font-bold]="activeTab === 2"
+         [class.bg-white]="activeTab === 2"
+         (click)="setActiveTab(2)">
+         الاخطاء
+      </a>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. محتوى التبويب النشط (Toolbar Area)    -->
+  <!-- ========================================== -->
+  
+  <!-- A. شريط أدوات "الرئيسية" -->
+  <div *ngIf="activeTab === 1" class="border-b p-2 flex justify-between items-center"
+       style="background-color: var(--surface-section); border-color: var(--surface-border);">
+    
+    <!-- الجهة اليسرى (كما في الصورة): زر Find وحقل البحث -->
+    <!-- استخدمنا ltr هنا لعكس الترتيب ليطابق الصورة تماماً (Find ثم الحقل) -->
+    <div class="flex items-center gap-1" dir="ltr">
+        <button class="btn btn-xs btn-outline px-4 rounded-none font-normal"
+                style="background-color: var(--surface-card); color: var(--text-color); border-color: var(--surface-border);"
+                (click)="searchMain()">
+            Find
+        </button>
+        
+        <div class="relative w-64">
+            <input type="text" 
+                   [(ngModel)]="mainSearchText"
+                   class="input input-xs input-bordered w-full rounded-none focus:outline-none pr-6"
+                   style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"
+                   placeholder="...Enter text to search" />
+            <!-- زر المسح X -->
+            <button *ngIf="mainSearchText" 
+                    class="absolute right-1 top-1/2 -translate-y-1/2"
+                    style="color: var(--text-color-secondary);"
+                    (click)="mainSearchText = ''">
+                ✕
+            </button>
+        </div>
+    </div>
+
+    <!-- الجهة اليمنى: التاريخ -->
+    <div class="flex items-center gap-2">
+        <input type="date" [(ngModel)]="selectedDate"
+               class="input input-xs input-bordered rounded-none"
+               style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);" />
+    </div>
+  </div>
+
+
+  <!-- B. شريط أدوات "الاخطاء" -->
+  <div *ngIf="activeTab === 2" class="border-b p-2 flex items-center gap-2"
+       style="background-color: var(--surface-section); border-color: var(--surface-border);">
+    
+    <!-- الأزرار (على اليسار كما في الصورة) - نستخدم ltr لترتيبهم من اليسار -->
+    <div class="flex items-center gap-2 w-full" dir="ltr">
+        
+        <button class="btn btn-xs btn-outline px-4 rounded-none font-normal"
+                style="background-color: var(--surface-hover); color: var(--text-color); border-color: var(--surface-border);"
+                (click)="exportExcel()">
+            تصدير اكسيل
+        </button>
+
+        <button class="btn btn-xs btn-outline px-4 rounded-none font-normal"
+                style="background-color: var(--surface-hover); color: var(--text-color); border-color: var(--surface-border);"
+                (click)="deleteErrors()">
+            حذف الاخطاء
+        </button>
+
+        <button class="btn btn-xs btn-outline px-4 rounded-none font-normal"
+                style="background-color: var(--surface-hover); color: var(--text-color); border-color: var(--surface-border);"
+                (click)="showErrors()">
+            الاخطاء
+        </button>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- 3. شريط التجميع (Grouping Bar) -->
+  <!-- ========================================== -->
+  <div class="border-b p-1 px-2 text-xs flex items-center gap-2"
+       style="background-color: var(--surface-section); border-color: var(--surface-border); color: var(--text-color-secondary);">
+    <!-- أيقونة البحث الصغيرة التي ظهرت في تبويب الأخطاء -->
+    <svg  xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          style="color: var(--text-color-secondary);">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+    
+    <span>Drag a column header here to group by that column</span>
+  </div>
+
+
+
+</div>

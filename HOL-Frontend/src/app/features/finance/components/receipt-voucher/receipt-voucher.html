@@ -1,0 +1,94 @@
+<div class="form-container" dir="rtl">
+  <div class="form-header">
+    <h2>🧾 سند قبض</h2>
+  </div>
+
+  <div class="form-grid form-grid-3">
+    <!-- رقم الإيصال -->
+    <div class="form-field">
+      <label class="form-label">رقم الإيصال</label>
+      <input type="number" [(ngModel)]="voucherForm.receiptNumber" name="receiptNumber" 
+             class="form-input" />
+    </div>
+    
+    <!-- تاريخ السند -->
+    <div class="form-field">
+      <label class="form-label">تاريخ السند</label>
+      <input type="date" [(ngModel)]="voucherForm.voucherDate" name="voucherDate" 
+             class="form-input" />
+    </div>
+    
+    <!-- رقم السند -->
+    <div class="form-field">
+      <label class="form-label">رقم السند</label>
+      <input type="number" [(ngModel)]="voucherForm.voucherNumber" name="voucherNumber" 
+             class="form-input" />
+    </div>
+  </div>
+
+  <div class="form-grid form-grid-2">
+    <!-- نوع السند -->
+    <div class="form-field">
+      <label class="form-label">نوع السند</label>
+      <div class="form-row">
+        <select [(ngModel)]="voucherForm.voucherType" name="voucherType" 
+                class="form-select" style="flex: 1;">
+          <option value="">اختر النوع</option>
+          <option *ngFor="let type of voucherTypes" [value]="type">{{ type }}</option>
+        </select>
+        <button class="form-button form-button-outline" type="button">+</button>
+      </div>
+    </div>
+    
+    <!-- طريقة الدفع -->
+    <div class="form-field">
+      <label class="form-label">طريقة الدفع</label>
+      <div class="form-row">
+        <select [(ngModel)]="voucherForm.paymentMethod" name="paymentMethod" 
+                class="form-select" style="flex: 1;">
+          <option value="">اختر طريقة الدفع</option>
+          <option *ngFor="let method of paymentMethods" [value]="method">{{ method }}</option>
+        </select>
+        <button class="form-button form-button-outline" type="button">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-grid form-grid-3">
+    <!-- الحساب -->
+    <div class="form-field">
+      <label class="form-label">الحساب</label>
+      <input type="text" [(ngModel)]="voucherForm.account" name="account" 
+             class="form-input" />
+    </div>
+    
+    <!-- المبلغ -->
+    <div class="form-field">
+      <label class="form-label">المبلغ</label>
+      <input type="number" [(ngModel)]="voucherForm.amount" name="amount" 
+             class="form-input" />
+    </div>
+    
+    <!-- التخفيض -->
+    <div class="form-field">
+      <label class="form-label">التخفيض</label>
+      <input type="number" [(ngModel)]="voucherForm.discount" name="discount" 
+             class="form-input" />
+    </div>
+  </div>
+  
+  <!-- الملاحظات -->
+  <div class="form-field">
+    <label class="form-label">ملاحظات</label>
+    <textarea [(ngModel)]="voucherForm.notes" name="notes" rows="3"
+              class="form-textarea"></textarea>
+  </div>
+
+  <!-- أزرار -->
+  <div class="form-actions" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--surface-border);">
+    <button class="form-button form-button-secondary" (click)="closeVoucherFormModal()">← رجوع</button>
+    <button class="form-button form-button-success" (click)="saveVoucher()">💾 حفظ</button>
+    <button class="form-button form-button-primary" (click)="editVoucher()">تعديل</button>
+    <button class="form-button form-button-danger" (click)="closeVoucherFormModal()">إلغاء</button>
+  </div>
+</div>

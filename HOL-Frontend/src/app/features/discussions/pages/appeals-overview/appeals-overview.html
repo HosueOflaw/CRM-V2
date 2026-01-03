@@ -1,0 +1,78 @@
+<div class="p-6 space-y-6" style="direction: rtl; background-color: var(--surface-ground);">
+  <!-- 🔍 Date Filters -->
+  <form class="grid grid-cols-4 gap-4 p-4 rounded-2xl shadow mb-4"
+        style="background-color: var(--surface-card);">
+    <div>
+      <label class="block text-sm font-medium mb-1"
+             style="color: var(--text-color-secondary);">من تاريخ</label>
+      <input type="date" class="w-full border rounded-lg p-2"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [(ngModel)]="filters.fromDate" name="fromDate"/>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1"
+             style="color: var(--text-color-secondary);">إلى تاريخ</label>
+      <input type="date" class="w-full border rounded-lg p-2"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             [(ngModel)]="filters.toDate" name="toDate"/>
+    </div>
+
+    <div class="col-span-2 flex gap-3 items-end">
+      <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" (click)="searchBy('judgmentDate')">
+        بحث بتاريخ صدور الحكم
+      </button>
+      <button type="button" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700" (click)="searchBy('alertDate')">
+        بحث بتاريخ التنبيه
+      </button>
+      <button type="button" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700" (click)="searchBy('appealDate')">
+        بحث بتاريخ موعد الطعن
+      </button>
+    </div>
+  </form>
+
+  <!-- 🔖 Tabs -->
+  <div class="flex border-b mb-4"
+       style="border-color: var(--surface-border);">
+<button *ngFor="let tab of tabs"
+        (click)="activeTab = tab.key"
+        class="px-4 py-2 cursor-pointer"
+        [class.border-b-2]="activeTab === tab.key"
+        [style.border-bottom-color]="activeTab === tab.key ? 'var(--primary-color)' : 'transparent'"
+        [style.color]="activeTab === tab.key ? 'var(--text-color)' : 'var(--text-color-secondary)'">
+  {{ tab.label }}
+</button>
+
+  </div>
+
+  <!-- 📋 Table -->
+  <div class="p-4 rounded-2xl shadow"
+       style="background-color: var(--surface-card);">
+    <table class="w-full border text-sm"
+           style="border-color: var(--surface-border);">
+      <thead style="background-color: var(--surface-section);">
+        <tr>
+          <th *ngFor="let col of columns[activeTab]" class="p-2 border text-right"
+              style="border-color: var(--surface-border); color: var(--text-color);">
+            {{ col }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of activeTableData; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color); border-color: var(--surface-border);">
+          <td *ngFor="let col of columns[activeTab]" class="p-2 border text-right"
+              style="border-color: var(--surface-border);">
+            {{ row[col] || '-' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="activeTableData.length === 0" class="text-center py-8"
+         style="color: var(--text-color-secondary);">
+      لا توجد بيانات
+    </div>
+  </div>
+</div>

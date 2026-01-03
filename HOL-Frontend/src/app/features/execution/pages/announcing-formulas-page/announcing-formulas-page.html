@@ -1,0 +1,160 @@
+<app-go-back></app-go-back>
+
+<div class="p-6 min-h-screen" dir="rtl"
+     style="background-color: var(--surface-ground);">
+  <div class="max-w-7xl mx-auto p-6 rounded-2xl shadow-md space-y-6"
+       style="background-color: var(--surface-card);">
+
+    <!-- العنوان -->
+    <h2 class="text-2xl font-bold text-center mb-4"
+        style="color: var(--primary-color);">
+      📜 إعلان واستلام الصيغ
+    </h2>
+
+    <!-- 🧾 القسم الأول: الإدخال -->
+    <form class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div>
+        <label class="block text-sm font-medium" style="color: var(--text-color);">الكود</label>
+        <input type="text" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+               [(ngModel)]="form.code" name="code" />
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium" style="color: var(--text-color);">الاسم</label>
+        <input type="text" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+               [(ngModel)]="form.name" name="name" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium" style="color: var(--text-color);">الرقم الآلي</label>
+        <input type="text" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+               [(ngModel)]="form.autoNum" name="autoNum" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium" style="color: var(--text-color);">المدني</label>
+        <input type="text" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+               [(ngModel)]="form.civilId" name="civilId" />
+      </div>
+    </form>
+
+    <!-- 🟢 أزرار الحفظ والتعديل -->
+    <div class="flex justify-end gap-4">
+      <button class="btn btn-success" (click)="save()">💾 حفظ</button>
+      <button class="btn btn-warning" (click)="edit()">✏️ تعديل</button>
+    </div>
+
+    <!-- 📅 القسم الثاني: التواريخ -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 border rounded-xl p-4"
+         style="border-color: var(--surface-border);">
+      <div *ngFor="let d of dateLabels; let i = index">
+        <label class="block text-sm font-medium mb-1" style="color: var(--text-color);">{{ d }}</label>
+        <input type="date" class="input input-bordered w-full"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+               [(ngModel)]="form.dates[i]" name="date{{i}}" />
+      </div>
+    </div>
+
+    <!-- 🗂️ القسم الثالث: العمليات -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <button class="btn btn-primary w-full" (click)="openModal('imageReceived')">📥 تم استلام صورة طبق الأصل</button>
+      <button class="btn btn-primary w-full" (click)="openModal('imageAnnounced')">📢 تم إعلان صورة طبق الأصل</button>
+      <button class="btn btn-primary w-full" (click)="openModal('copyReceived')">📥 تم استلام صيغة طبق الأصل</button>
+      <button class="btn btn-primary w-full" (click)="openModal('copyAnnounced')">📢 تم إعلان صيغة طبق الأصل</button>
+    </div>
+
+    <!-- 🔍 القسم الرابع: البحث -->
+    <div class="border rounded-xl p-4 space-y-4"
+         style="border-color: var(--surface-border);">
+      <h3 class="text-lg font-bold text-center" style="color: var(--text-color);">🔎 البحث في البيانات</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block mb-1" style="color: var(--text-color);">من تاريخ</label>
+          <input type="date" class="input input-bordered w-full"
+                 style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+                 [(ngModel)]="search.fromDate" name="fromDate" />
+        </div>
+
+        <div>
+          <label class="block mb-1" style="color: var(--text-color);">إلى تاريخ</label>
+          <input type="date" class="input input-bordered w-full"
+                 style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+                 [(ngModel)]="search.toDate" name="toDate" />
+        </div>
+
+        <div>
+          <label class="block mb-1" style="color: var(--text-color);">نوع البحث</label>
+          <select class="select select-bordered w-full"
+                  style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+                  [(ngModel)]="search.type" name="searchType">
+            <option value="">اختر...</option>
+            <option *ngFor="let t of searchTypes" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button class="btn btn-accent" (click)="doSearch()">بحث</button>
+      </div>
+    </div>
+
+    <!-- 📊 القسم الخامس: النتائج -->
+    <div class="overflow-x-auto">
+      <table class="table table-zebra w-full text-center"
+             style="border-color: var(--surface-border);">
+        <thead>
+          <tr style="background-color: var(--surface-section);">
+            <th style="color: var(--text-color);">الكود</th>
+            <th style="color: var(--text-color);">الاسم</th>
+            <th style="color: var(--text-color);">المدني</th>
+            <th style="color: var(--text-color);">الرقم الآلي</th>
+            <th *ngFor="let d of dateLabels" style="color: var(--text-color);">{{ d }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of data; let i = index"
+              [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+              style="color: var(--text-color);">
+            <td>{{ item.code }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.civilId }}</td>
+            <td>{{ item.autoNum }}</td>
+            <td *ngFor="let date of item.dates">{{ date | date: 'yyyy-MM-dd' }}</td>
+          </tr>
+          <tr *ngIf="!data.length">
+            <td colspan="9" class="text-gray-400 py-6">لا توجد بيانات مطابقة 🔍</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 📁 المودال -->
+    <dialog *ngIf="showModal" class="modal modal-open">
+      <div class="modal-box w-11/12 max-w-md">
+        <h3 class="text-lg font-bold mb-4">{{ modalTitle }}</h3>
+
+        <form (ngSubmit)="submitModal()" #modalForm="ngForm">
+          <div class="mb-4">
+            <label class="block mb-1 font-medium">اسم الملف</label>
+            <input type="text" class="input input-bordered w-full" [(ngModel)]="modalData.fileName" name="fileName" required />
+          </div>
+
+          <div class="mb-4">
+            <label class="block mb-1 font-medium">رفع الملف</label>
+            <input type="file" class="file-input file-input-bordered w-full" (change)="onFileSelected($event)" required />
+          </div>
+
+          <div class="flex justify-end gap-2">
+            <button type="button" class="btn" (click)="closeModal()">إغلاق</button>
+            <button type="submit" class="btn btn-primary">حفظ</button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+  </div>
+</div>

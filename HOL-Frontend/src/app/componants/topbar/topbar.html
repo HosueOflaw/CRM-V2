@@ -1,0 +1,10 @@
+<div class="topbar">
+  <div class="title drag">بيت القانون</div>
+  <div class="actions no-drag">
+    <button title="Minimize" (click)="es.minimize()">&#x2212;</button>
+    <button title="Maximize/Restore" (click)="es.toggleMaximize()">
+      {{ isMax ? '▢' : '⬜' }}
+    </button>
+    <button title="Close" class="close" (click)="es.close()">✕</button>
+  </div>
+</div>

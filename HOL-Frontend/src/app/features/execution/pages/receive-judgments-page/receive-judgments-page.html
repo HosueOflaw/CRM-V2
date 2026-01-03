@@ -1,0 +1,98 @@
+<app-go-back></app-go-back>
+<div class="p-6 min-h-screen flex flex-col gap-6"
+     style="background-color: var(--surface-ground);">
+  <!-- 🔹 العنوان -->
+  <h2 class="text-2xl font-bold text-center"
+      style="color: var(--primary-color);">📜 استلام الأحكام</h2>
+  
+  <!-- 🔹 نموذج البحث -->
+  <form [formGroup]="filterForm" class="p-6 rounded-xl shadow flex flex-wrap gap-4 justify-center items-end"
+        style="background-color: var(--surface-card);">
+    <div>
+      <label class="label font-semibold" style="color: var(--text-color);">من تاريخ</label>
+      <input type="date" formControlName="fromDate"
+             class="input input-bordered w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+    </div>
+
+    <div>
+      <label class="label font-semibold" style="color: var(--text-color);">إلى تاريخ</label>
+      <input type="date" formControlName="toDate"
+             class="input input-bordered w-full"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+    </div>
+
+    <div class="flex gap-2 mt-4">
+      <button type="button" class="btn btn-primary" (click)="search()">🔍 بحث</button>
+      <button type="button" class="btn btn-outline" (click)="reset()">↩️ تراجع</button>
+      
+    </div>
+  </form>
+
+  <!-- 🔹 حقل البحث داخل الجدول -->
+  <div class="flex justify-between items-center p-4 rounded-xl shadow"
+       style="background-color: var(--surface-card);">
+    <input [(ngModel)]="searchText" placeholder="ابحث بالكود أو الاسم أو المحكمة" (input)="autoSearch()"
+           class="input input-bordered w-1/2"
+           style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+    <button class="btn btn-success" (click)="exportToExcel()">📥 تحميل Excel</button>
+  </div>
+
+  <!-- 🔹 جدول النتائج -->
+  <div class="overflow-x-auto rounded-xl shadow"
+       style="background-color: var(--surface-card);">
+    <table class="table table-zebra w-full text-sm"
+           style="border-color: var(--surface-border);">
+      <thead>
+        <tr style="background-color: var(--surface-section);">
+          <th style="color: var(--text-color);">الكود</th>
+          <th style="color: var(--text-color);">الموكل</th>
+          <th style="color: var(--text-color);">الاسم</th>
+          <th style="color: var(--text-color);">المحكمة</th>
+          <th style="color: var(--text-color);">الرقم الآلي</th>
+          <th style="color: var(--text-color);">أول درجة</th>
+          <th style="color: var(--text-color);">الاستئناف</th>
+          <th style="color: var(--text-color);">التمييز</th>
+          <th style="color: var(--text-color);">الدائرة</th>
+          <th style="color: var(--text-color);">تاريخ الحكم</th>
+          <th style="color: var(--text-color);">منطوق الحكم</th>
+          <th style="color: var(--text-color);">قيمة المطالبة</th>
+          <th style="color: var(--text-color);">الدرجة</th>
+          <th style="color: var(--text-color);">الحضور</th>
+          <th style="color: var(--text-color);">الموظف</th>
+          <th style="color: var(--text-color);">رقم الباتش</th>
+          <th style="color: var(--text-color);">الحالة</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let r of filteredResults; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color);">
+          <td>{{ r.code }}</td>
+          <td>{{ r.client }}</td>
+          <td>{{ r.name }}</td>
+          <td>{{ r.court }}</td>
+          <td>{{ r.autoNumber }}</td>
+          <td>{{ r.firstDegree }}</td>
+          <td>{{ r.appeal }}</td>
+          <td>{{ r.cassation }}</td>
+          <td>{{ r.circle }}</td>
+          <td>{{ r.judgmentDate | date:'yyyy-MM-dd' }}</td>
+          <td>{{ r.judgmentText }}</td>
+          <td>{{ r.claimValue | number }}</td>
+          <td>{{ r.degree }}</td>
+          <td>{{ r.attendance }}</td>
+          <td>{{ r.employee }}</td>
+          <td>{{ r.batchNumber }}</td>
+          <td>{{ r.status }}</td>
+        </tr>
+
+        <tr *ngIf="filteredResults.length === 0">
+          <td colspan="17" class="text-center py-6"
+              style="color: var(--text-color-secondary);">لا توجد بيانات مطابقة 🔍</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

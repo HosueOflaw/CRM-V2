@@ -1,0 +1,28 @@
+<div class="p-4">
+  <h3 class="text-lg font-bold mb-3 text-center">اختيار الاسم من قاعدة البيانات</h3>
+
+  <table class="table table-bordered w-full text-center">
+    <thead>
+      <tr>
+        <th>الاسم</th>
+        <th>الكود</th>
+        <th>آخر إجراء</th>
+        <th>اختيار</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of names">
+        <td>{{ item.name }}</td>
+        <td>{{ item.code }}</td>
+        <td>{{ item.lastAction }}</td>
+        <td>
+          <button class="btn btn-primary btn-sm" (click)="selectName(item)">اختيار</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="text-center mt-3">
+    <button class="btn btn-secondary" (click)="close()">إغلاق</button>
+  </div>
+</div>

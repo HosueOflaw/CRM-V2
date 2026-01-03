@@ -1,0 +1,16 @@
+.tab {
+  transition: all 0.3s ease;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+.tab-active {
+  background-color: #2563eb !important; /* أزرق داكن */
+  color: white !important;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.4); /* ظل خفيف */
+  transform: scale(1.05);
+}
+
+.tab:hover {
+  background-color: rgba(37, 99, 235, 0.1);
+}

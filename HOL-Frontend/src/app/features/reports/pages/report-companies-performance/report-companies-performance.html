@@ -1,0 +1,200 @@
+<div class="p-4 md:p-6 min-h-screen" dir="rtl"
+     style="background-color: var(--surface-ground);">
+
+  <!-- العنوان الرئيسي -->
+  <h1 class="text-2xl font-bold mb-6 border-b pb-2"
+      style="color: var(--text-color); border-color: var(--surface-border);">
+    تقرير أداء الشركات
+  </h1>
+
+  <!-- Header: فلاتر التقرير -->
+  <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 p-4 rounded-xl shadow-lg"
+       style="background-color: var(--surface-card);">
+
+    <!-- من تاريخ -->
+    <div class="flex flex-col">
+      <label class="font-bold text-sm mb-1" style="color: var(--text-color);">من تاريخ</label>
+      <input
+        type="date"
+        [ngModel]="fromDate()"
+        (ngModelChange)="fromDate.set($event)"
+        class="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition cursor-pointer"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+      />
+    </div>
+
+    <!-- الي تاريخ -->
+    <div class="flex flex-col">
+      <label class="font-bold text-sm mb-1" style="color: var(--text-color);">الى تاريخ</label>
+      <input
+        type="date"
+        [ngModel]="toDate()"
+        (ngModelChange)="toDate.set($event)"
+        class="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition cursor-pointer"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+      />
+    </div>
+
+    <!-- اختيار القطاع -->
+    <div class="flex flex-col">
+      <label class="font-bold text-sm mb-1" style="color: var(--text-color);">القطاع</label>
+      <select
+        [ngModel]="selectedSector()"
+        (ngModelChange)="selectedSector.set($event)"
+        class="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition appearance-none cursor-pointer"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+      >
+        <!-- قائمة القطاعات الطويلة -->
+        @for (sector of sectors; track sector.value) {
+          <option [value]="sector.value">{{ sector.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- زر تحميل التقرير -->
+    <div class="col-span-2 md:col-span-1 flex items-end justify-start md:justify-end mt-4 md:mt-0">
+      <button
+        (click)="loadReports()"
+        class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition shadow-md hover:shadow-lg text-sm font-semibold whitespace-nowrap">
+        عرض التقرير
+      </button>
+    </div>
+
+  </div>
+
+  <!-- جدول التقرير -->
+  @if (reportData().length) {
+    <div class="mt-6 overflow-x-auto shadow-lg rounded-xl border"
+         style="background-color: var(--surface-card); border-color: var(--surface-border);">
+      <!-- جعل الجدول عريضاً جداً ليحتوي الأعمدة الكثيرة -->
+      <table class="w-[3000px] xl:w-full text-right border-collapse text-sm"
+             style="border-color: var(--surface-border);">
+
+        <!-- رأس الجدول - 25 عموداً -->
+        <thead>
+          <tr style="background-color: var(--surface-section); border-color: var(--surface-border);"
+              class="font-semibold sticky top-0">
+            <th class="p-3 whitespace-nowrap border-l min-w-[120px]" style="border-color: var(--surface-border); color: var(--text-color);">الموكل</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[100px]" style="border-color: var(--surface-border); color: var(--text-color);">عدد الملفات</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[150px]" style="border-color: var(--surface-border); color: var(--text-color);">قيمة المطالبة</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[120px]" style="border-color: var(--surface-border); color: var(--text-color);">المدفوع</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[120px]" style="border-color: var(--surface-border); color: var(--text-color);">المتبقي</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[150px]" style="border-color: var(--surface-border); color: var(--text-color);">غير قابل للتحصيل</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[150px]" style="border-color: var(--surface-border); color: var(--text-color);">غير قابل للتحصيل (موزع)</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[150px]" style="border-color: var(--surface-border); color: var(--text-color);">غير قابل للتحصيل (غير موزع)</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[120px]" style="border-color: var(--surface-border); color: var(--text-color);">قابل للتحصيل</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[150px]" style="border-color: var(--surface-border); color: var(--text-color);">قابل للتحصيل (موزع)</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[170px]" style="border-color: var(--surface-border); color: var(--text-color);">قابل للتحصيل (متواصل)</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[170px]" style="border-color: var(--surface-border); color: var(--text-color);">قابل للتحصيل (غير متواصل)</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[200px]" style="border-color: var(--surface-border); color: var(--text-color);">قابل للتحصيل (لا يمكن التواصل)</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[200px]" style="border-color: var(--surface-border); color: var(--text-color);">قابل للتحصيل (متواصل مع اخر)</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[170px]" style="border-color: var(--surface-border); color: var(--text-color);">قابل للتحصيل (غير مصنف)</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[150px]" style="border-color: var(--surface-border); color: var(--text-color);">قابل للتحصيل (متابع)</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[170px]" style="border-color: var(--surface-border); color: var(--text-color);">قابل للتحصيل (غير متابع)</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[200px]" style="border-color: var(--surface-border); color: var(--text-color);">قابل للتحصيل (لم يتم الإتصال)</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[180px]" style="border-color: var(--surface-border); color: var(--text-color);">قابل للتحصيل (غير موزع)</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[100px]" style="border-color: var(--surface-border); color: var(--text-color);">تنفيذ</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[130px]" style="border-color: var(--surface-border); color: var(--text-color);">متابع تنفيذ</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[150px]" style="border-color: var(--surface-border); color: var(--text-color);">غير متابع تنفيذ</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[100px]" style="border-color: var(--surface-border); color: var(--text-color);">الرسوم</th>
+            <th class="p-3 whitespace-nowrap border-l min-w-[100px]" style="border-color: var(--surface-border); color: var(--text-color);">اونلاين</th>
+            <th class="p-3 whitespace-nowrap min-w-[100px]" style="color: var(--text-color);">ودي</th>
+          </tr>
+        </thead>
+
+        <!-- جسم الجدول - بيانات وهمية لحين تحديث الـ TS -->
+        <tbody>
+          @for (row of reportData(); track row.company; let i = $index) {
+            <tr class="border-b transition-colors"
+                [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+                style="border-color: var(--surface-border); color: var(--text-color);">
+
+              <!-- 1. الموكل (اسم الشركة) -->
+              <td class="p-3 font-medium border-l" style="border-color: var(--surface-border);">{{ row.company }}</td>
+
+              <!-- 2. عدد الملفات (Mock) -->
+              <td class="p-3 text-center border-l font-bold" style="border-color: var(--surface-border); color: var(--indigo-500);">150</td>
+
+              <!-- 3. قيمة المطالبة (Mock) -->
+              <td class="p-3 text-center border-l font-bold" style="border-color: var(--surface-border); color: var(--blue-500);">75,000 د.ك</td>
+
+              <!-- 4. المدفوع (Mock) -->
+              <td class="p-3 text-center border-l font-bold" style="border-color: var(--surface-border); color: var(--green-500);">12,500</td>
+
+              <!-- 5. المتبقي (Mock) -->
+              <td class="p-3 text-center border-l font-bold" style="border-color: var(--surface-border); color: var(--orange-500);">62,500</td>
+
+              <!-- 6. غير قابل للتحصيل (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">1,000</td>
+
+              <!-- 7. غير قابل للتحصيل (موزع) (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">500</td>
+
+              <!-- 8. غير قابل للتحصيل (غير موزع) (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">500</td>
+
+              <!-- 9. قابل للتحصيل (Mock) -->
+              <td class="p-3 text-center border-l font-bold" style="border-color: var(--surface-border); color: var(--green-500);">60,000</td>
+
+              <!-- 10. قابل للتحصيل (موزع) (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">20,000</td>
+
+              <!-- 11. قابل للتحصيل (متواصل) (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">15,000</td>
+
+              <!-- 12. قابل للتحصيل (غير متواصل) (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">5,000</td>
+
+              <!-- 13. قابل للتحصيل (لا يمكن التواصل) (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">1,000</td>
+
+              <!-- 14. قابل للتحصيل (متواصل مع اخر) (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">3,000</td>
+
+              <!-- 15. قابل للتحصيل (غير مصنف) (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">1,000</td>
+
+              <!-- 16. قابل للتحصيل (متابع) (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">2,500</td>
+
+              <!-- 17. قابل للتحصيل (غير متابع) (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">500</td>
+
+              <!-- 18. قابل للتحصيل (لم يتم الإتصال) (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">1,500</td>
+
+              <!-- 19. قابل للتحصيل (غير موزع) (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">500</td>
+
+              <!-- 20. تنفيذ (Mock) -->
+              <td class="p-3 text-center border-l font-bold" style="border-color: var(--surface-border); color: var(--red-500);">10</td>
+
+              <!-- 21. متابع تنفيذ (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">5</td>
+
+              <!-- 22. غير متابع تنفيذ (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">5</td>
+
+              <!-- 23. الرسوم (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">2,000</td>
+
+              <!-- 24. اونلاين (Mock) -->
+              <td class="p-3 text-center border-l" style="border-color: var(--surface-border);">1,000</td>
+
+              <!-- 25. ودي (Mock) -->
+              <td class="p-3 text-center">1,000</td>
+
+              <!-- تم إزالة خلايا نسبة النجاح والمبيعات القديمة -->
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="mt-6 p-10 text-center rounded-xl shadow"
+         style="background-color: var(--surface-card); color: var(--text-color-secondary);">
+      يرجى تحديد الفلاتر والضغط على "عرض التقرير" للحصول على نتائج الأداء.
+    </div>
+  }
+
+</div>

@@ -1,0 +1,129 @@
+<div class="p-6 rounded-xl shadow-md" style="background-color: var(--surface-card);">
+  <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color: var(--text-color);">🗓️ الجلسات</h2>
+
+  <!-- 🧩 نموذج إضافة جلسة -->
+  <form (ngSubmit)="addSession()" #sessionForm="ngForm">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <!-- الجلسة -->
+      <div class="form-control">
+        <label class="label font-semibold" style="color: var(--text-color-secondary);">الجلسة</label>
+        <input
+          type="text"
+          class="input input-bordered"
+          placeholder="اكتب اسم الجلسة"
+          [(ngModel)]="newSession.name"
+          name="name"
+          required
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+        />
+      </div>
+
+      <!-- تاريخ الجلسة -->
+      <div class="form-control">
+        <label class="label font-semibold" style="color: var(--text-color-secondary);">تاريخ الجلسة</label>
+        <input
+          type="date"
+          class="input input-bordered"
+          [(ngModel)]="newSession.date"
+          name="date"
+          required
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+        />
+      </div>
+
+      <!-- حالة الجلسة -->
+      <div class="form-control">
+        <label class="label font-semibold" style="color: var(--text-color-secondary);">حالة الجلسة</label>
+        <select
+          class="select select-bordered"
+          [(ngModel)]="newSession.status"
+          name="status"
+          required
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+        >
+          <option value="" disabled selected>اختر الحالة</option>
+          <option>منعقدة</option>
+          <option>مؤجلة</option>
+          <option>محجوزة للحكم</option>
+        </select>
+      </div>
+
+      <!-- نوع الجلسة -->
+      <div class="form-control">
+        <label class="label font-semibold" style="color: var(--text-color-secondary);">نوع الجلسة</label>
+        <select
+          class="select select-bordered"
+          [(ngModel)]="newSession.type"
+          name="type"
+          required
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+        >
+          <option value="" disabled selected>اختر النوع</option>
+          <option>مدنية</option>
+          <option>جنائية</option>
+          <option>أحوال شخصية</option>
+        </select>
+      </div>
+
+      <!-- المرفق -->
+      <div class="form-control">
+        <label class="label font-semibold">المرفق</label>
+        <input
+          type="file"
+          (change)="onFileSelected($event)"
+          class="file-input file-input-bordered w-full"
+        />
+      </div>
+    </div>
+
+    <!-- أزرار -->
+    <div class="text-center mt-6 flex justify-center gap-3">
+      <button class="btn btn-primary" type="submit" [disabled]="!sessionForm.valid">
+        💾 حفظ الجلسة
+      </button>
+      <button class="btn btn-outline btn-error" type="button" (click)="resetForm()">
+        🧹 إخلاء
+      </button>
+    </div>
+  </form>
+
+  <!-- 📊 جدول عرض الجلسات -->
+  <div class="overflow-x-auto mt-8">
+    <table class="table table-zebra w-full text-center" style="border-color: var(--surface-border);">
+      <thead style="background-color: var(--surface-section);">
+        <tr style="color: var(--text-color);">
+          <th style="color: var(--text-color);">الجلسة</th>
+          <th style="color: var(--text-color);">تاريخ الجلسة</th>
+          <th style="color: var(--text-color);">حالة الجلسة</th>
+          <th style="color: var(--text-color);">نوع الجلسة</th>
+          <th style="color: var(--text-color);">المرفق</th>
+          <th style="color: var(--text-color);">إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let session of sessions; let i = index" style="color: var(--text-color);">
+          <td>{{ session.name }}</td>
+          <td>{{ session.date | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ session.status }}</td>
+          <td>{{ session.type }}</td>
+          <td>
+            <a
+              *ngIf="session.attachment"
+              [href]="session.attachment"
+              target="_blank"
+              style="color: var(--primary-color, #3b82f6);"
+              class="hover:underline"
+              >📎 عرض</a
+            >
+          </td>
+          <td>
+            <button class="btn btn-sm btn-error" (click)="deleteSession(i)">
+              🗑️ حذف
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

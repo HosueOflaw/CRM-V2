@@ -1,0 +1,68 @@
+<div class="min-h-screen p-8" style="direction: rtl; background-color: var(--surface-ground);">
+
+  <!-- الكارت الرئيسي -->
+  <div class="shadow-xl rounded-2xl p-6"
+       style="background-color: var(--surface-card);">
+
+    <!-- العنوان -->
+    <h2 class="text-3xl font-bold text-center mb-8"
+        style="color: var(--text-color);">
+      استعلام عن كشف الموظفين
+    </h2>
+
+    <!-- قسم اختيار الموظف والبحث -->
+    <div class="flex flex-col md:flex-row gap-4 md:gap-3 items-center mb-6">
+      <input type="text"
+             placeholder="اختر الموظف"
+             [value]="selectedEmployee?.name || ''"
+             readonly
+             class="input input-bordered w-full md:flex-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             (click)="openLookup()" />
+
+      <button class="btn btn-primary w-full md:w-auto" (click)="search()">
+        بحث
+      </button>
+    </div>
+
+    <!-- جدول عرض النتائج -->
+    <div class="overflow-x-auto">
+      <table class="table w-full table-auto border shadow-md rounded-lg"
+             style="border-color: var(--surface-border);"
+             *ngIf="filteredData.length > 0">
+        <thead style="background-color: var(--surface-section);">
+          <tr>
+            <th class="text-center" style="color: var(--text-color);">الكود</th>
+            <th class="text-center" style="color: var(--text-color);">اسم الموظف</th>
+            <th class="text-center" style="color: var(--text-color);">التاريخ</th>
+            <th class="text-center" style="color: var(--text-color);">المبلغ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredData; let i = index"
+              [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+              style="color: var(--text-color); transition: background-color 0.2s;">
+            <td class="text-center font-medium">{{ item.code }}</td>
+            <td class="text-center">{{ item.employeeName }}</td>
+            <td class="text-center">{{ item.date }}</td>
+            <td class="text-center font-semibold">{{ item.amount }} ر.س</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p *ngIf="filteredData.length === 0" class="text-center mt-6"
+         style="color: var(--text-color-secondary);">
+        لا توجد نتائج
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Lookup Modal -->
+  <app-lookup-modal #lookup
+                    title="اختيار الموظف"
+                    [columns]="employeeColumns"
+                    [data]="employees"
+                    (itemSelected)="onEmployeeSelected($event)">
+  </app-lookup-modal>
+</div>

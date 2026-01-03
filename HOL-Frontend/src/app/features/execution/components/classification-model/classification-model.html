@@ -1,0 +1,70 @@
+<div class="form-container">
+  <h3 class="text-2xl font-bold text-center mb-6" style="color: var(--primary-color);">
+    🗂️ إضافة تصنيف جديد
+  </h3>
+
+  <form [formGroup]="form" class="form-grid form-grid-2">
+    <!-- التصنيف -->
+    <div class="form-field">
+      <label class="form-label form-label-required">التصنيف</label>
+      <select formControlName="category" class="form-select">
+        <option value="">-- اختر التصنيف --</option>
+        <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+      </select>
+    </div>
+
+    <!-- القطاع -->
+    <div class="form-field">
+      <label class="form-label form-label-required">القطاع</label>
+      <select formControlName="sector" class="form-select">
+        <option value="">-- اختر القطاع --</option>
+        <option *ngFor="let s of sectors" [value]="s.id">{{ s.name }}</option>
+      </select>
+    </div>
+
+    <!-- الاسم -->
+    <div class="form-field form-row">
+      <div class="form-field" style="flex: 1;">
+        <label class="form-label form-label-required">الاسم</label>
+        <input
+          type="text"
+          class="form-input"
+          formControlName="name"
+          readonly
+        />
+      </div>
+      <button
+        type="button"
+        class="form-button form-button-outline"
+        style="margin-bottom: 0;"
+        (click)="openNameDialog()"
+      >
+        ...
+      </button>
+    </div>
+
+    <!-- الكود -->
+    <div class="form-field">
+      <label class="form-label">الكود</label>
+      <input type="text" formControlName="code" class="form-input" readonly />
+    </div>
+  </form>
+
+  <!-- الأزرار -->
+  <div class="form-actions form-actions-center">
+    <button type="button" class="form-button form-button-secondary" (click)="newForm()">
+      🆕 جديد
+    </button>
+    <button type="button" class="form-button form-button-success" (click)="saveForm()">
+      💾 حفظ
+    </button>
+    <button type="button" class="form-button form-button-warning" (click)="updateForm()">
+      ✏️ تعديل
+    </button>
+    <button type="button" class="form-button form-button-danger" (click)="cancelForm()">
+      🚫 إلغاء
+    </button>
+  </div>
+</div>
+
+

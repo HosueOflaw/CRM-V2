@@ -1,0 +1,66 @@
+<div class="p-6 space-y-6 min-h-screen" style="direction: rtl; background-color: var(--surface-ground);">
+
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+    
+    <!-- Left actions -->
+    <div class="flex flex-wrap gap-3 items-center">
+      <button class="btn btn-primary btn-sm" (click)="confirmSelected()">
+        <i class="lucide-check mr-1"></i> Confirm
+      </button>
+      <button class="btn btn-secondary btn-sm" (click)="unconfirmSelected()">
+        <i class="lucide-x mr-1"></i> UnConfirm
+      </button>
+      <select [(ngModel)]="selectedOption" class="select select-bordered select-sm">
+        <option value="">اختر خيار</option>
+        <option *ngFor="let opt of options" [value]="opt">{{ opt }}</option>
+      </select>
+      <input type="text" [(ngModel)]="searchText" placeholder="بحث..." class="input input-bordered input-sm w-40">
+    </div>
+
+    <!-- Right actions -->
+    <div class="flex flex-wrap gap-3 items-center">
+      <button class="btn btn-error btn-sm" (click)="deleteSelected()">
+     حذف
+      </button>
+      <button class="btn btn-warning btn-sm" (click)="editSelected()">
+         تعديل
+      </button>
+      <button class="btn btn-success btn-sm" (click)="saveSelected()">
+        حفظ
+      </button>
+      <label class="btn btn-info btn-sm cursor-pointer">
+        رفع Excel
+        <input type="file" class="hidden" (change)="onFileChange($event)">
+      </label>
+    </div>
+
+  </div>
+
+  <!-- Table -->
+  <div class="overflow-x-auto border rounded-lg shadow-sm"
+       style="background-color: var(--surface-card); border-color: var(--surface-border);">
+    <table class="table table-zebra w-full">
+      <thead style="background-color: var(--surface-section);">
+        <tr>
+          <th class="w-10"><input type="checkbox" [(ngModel)]="allSelected" (change)="toggleAll()"></th>
+          <th *ngFor="let col of displayedColumns" class="text-center font-medium">{{ col }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of filteredData() | paginate: { itemsPerPage: pageSize, currentPage: currentPage }; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color);">
+          <td class="text-center"><input type="checkbox" [(ngModel)]="row.selected"></td>
+          <td *ngFor="let col of displayedColumns" class="text-center">{{ row[col] }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex justify-end mt-4">
+    <pagination-controls (pageChange)="currentPage = $event"></pagination-controls>
+  </div>
+
+</div>

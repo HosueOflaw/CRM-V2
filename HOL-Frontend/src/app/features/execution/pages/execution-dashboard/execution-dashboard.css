@@ -1,0 +1,51 @@
+.execution-dashboard {
+  padding: 2rem;
+  background-color: #f4f6f9;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+  text-align: right;
+}
+
+.dashboard-header h2 {
+  font-size: 1.8rem;
+  color: #1a3c6e;
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-header p {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.dashboard-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.action-btn {
+  background-color: #1a2b4a;
+  color: #e7eaf0;
+  border: none;
+  border-radius: 10px;
+  padding: 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-align: center;
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  background-color: #d4af37;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}

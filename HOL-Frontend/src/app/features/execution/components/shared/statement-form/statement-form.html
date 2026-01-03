@@ -1,0 +1,86 @@
+<div class="statementForm flex flex-col gap-6 bg-base-100 p-6 rounded-xl shadow-sm">
+
+  <!-- ✅ نموذج البيانات -->
+  <form [formGroup]="statementForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+    <!-- الكود + زر البحث -->
+    <div class="flex items-end gap-2">
+      <div class="flex-1">
+        <label class="label text-gray-700 font-semibold">الكود</label>
+        <input type="text" formControlName="code" class="input input-bordered w-full" />
+      </div>
+      <button type="button" class="btn btn-primary mt-6" (click)="searchByCode()">🔍</button>
+    </div>
+
+    <!-- باقي الحقول -->
+    <div *ngFor="let field of fieldList">
+      <label class="label text-gray-700 font-semibold">{{ labels[field] }}</label>
+      <input
+        [type]="field === 'date' ? 'date' : field === 'amount' ? 'number' : 'text'"
+        formControlName="{{field}}"
+        class="input input-bordered w-full"
+      />
+    </div>
+
+    <!-- المحكمة -->
+    <div>
+      <label class="label text-gray-700 font-semibold">المحكمة</label>
+      <select formControlName="court" class="select select-bordered w-full">
+        <option value="">اختر المحكمة</option>
+        <option *ngFor="let court of courts" [value]="court">{{ court }}</option>
+      </select>
+    </div>
+
+    <!-- ملاحظات -->
+    <div class="col-span-3">
+      <label class="label text-gray-700 font-semibold">ملاحظات</label>
+      <textarea formControlName="notes" rows="4" class="textarea textarea-bordered w-full"></textarea>
+    </div>
+  </form>
+  <!-- ✅ جدول النتائج -->
+  <div class="bg-base-100 p-6 rounded-xl shadow-sm">
+    <div class="flex gap-2 mb-4">
+      <input [(ngModel)]="query" placeholder="ابحث بالاسم أو الكود" class="input input-bordered w-full" />
+      <button class="btn btn-primary" (click)="search()">بحث</button>
+    </div>
+
+    <table class="table table-zebra w-full">
+      <thead>
+        <tr>
+          <th>الكود</th>
+          <th>الاسم</th>
+          <th>الرقم الآلي</th>
+          <th>الحالة</th>
+          <th>المبلغ</th>
+          <th>المحكمة</th>
+          <th>التاريخ</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of statements; let i = index">
+          <td>{{s.code}}</td>
+          <td>{{s.name}}</td>
+          <td>{{s.autoNumber}}</td>
+          <td>{{s.status}}</td>
+          <td>{{s.amount}}</td>
+          <td>{{s.court}}</td>
+          <td>{{s.date}}</td>
+          <td>
+            <button class="btn btn-error btn-xs" (click)="deleteStatement(i)">حذف</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- ✅ أزرار التحكم -->
+  <div class="flex justify-end gap-3 mt-4">
+    <button class="btn btn-success" *ngIf="mode === 'add'" class="btn btn-outline" (click)="save()">💾 حفظ</button>
+    <button class="btn btn-warning" *ngIf="mode === 'add'" class="btn btn-outline" (click)="edit()">✏️ تعديل</button>
+    <button class="btn btn-error" *ngIf="mode === 'add' || mode === 'inquiry'" (click)="delete()">🗑️ حذف</button>
+    <button class="btn btn-outline" *ngIf="mode === 'add'" class="btn btn-outline" (click)="print()">🖨️ طباعة</button>
+    <button class="btn btn-neutral" *ngIf="mode === 'add'" class="btn btn-outline" (click)="reset()">↩️ تراجع</button>
+  </div>
+</div>

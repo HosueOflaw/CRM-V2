@@ -1,0 +1,116 @@
+    <app-go-back></app-go-back>
+
+<div class="p-6 min-h-screen font-[Cairo]" dir="rtl"
+     style="background-color: var(--surface-ground);">
+  <h2 class="text-center text-3xl font-extrabold mb-10"
+      style="color: var(--red-500);">
+    التقارير
+  </h2>
+
+  <div class="flex flex-wrap justify-center gap-6">
+    <div
+      *ngFor="let form of formsList"
+      class="rounded-2xl shadow-lg border w-80 p-5 hover:shadow-xl transition"
+      style="background-color: var(--surface-card); border-color: var(--surface-border);"
+    >
+      <h3 class="text-center text-base font-bold mb-4"
+          style="color: var(--text-color);">
+        {{ form.title }}
+      </h3>
+
+      <form [formGroup]="form.group" (ngSubmit)="onSubmit(form.name)" class="space-y-3">
+
+        <div *ngIf="form.showSector">
+          <select formControlName="sector" class="border rounded-md px-2 py-1 w-full text-sm"
+                  style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+            <option value="">القطاع</option>
+          </select>
+        </div>
+
+        <div *ngIf="form.showCompany">
+          <select formControlName="company" class="border rounded-md px-2 py-1 w-full text-sm"
+                  style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+            <option value="">الشركة</option>
+          </select>
+        </div>
+
+        <div *ngIf="form.showGroup">
+          <select formControlName="group" class="border rounded-md px-2 py-1 w-full text-sm"
+                  style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+            <option value="">المجموعة</option>
+          </select>
+        </div>
+
+        <div *ngIf="form.showEmployee">
+          <select formControlName="employee" class="border rounded-md px-2 py-1 w-full text-sm"
+                  style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+            <option value="">الموظف</option>
+          </select>
+        </div>
+
+        <div *ngIf="form.showStatus">
+          <select formControlName="status" class="border rounded-md px-2 py-1 w-full text-sm"
+                  style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+            <option value="">الحالة</option>
+          </select>
+        </div>
+
+        <div *ngIf="form.showCourt">
+          <select formControlName="court" class="border rounded-md px-2 py-1 w-full text-sm"
+                  style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+            <option value="">المحكمة</option>
+          </select>
+        </div>
+
+        <!-- التاريخ -->
+        <div class="flex flex-col gap-2 mt-2">
+          <div class="flex items-center justify-between gap-2">
+            <label class="text-sm whitespace-nowrap" style="color: var(--text-color-secondary);">من</label>
+            <input type="date" formControlName="fromDate"
+                   class="flex-1 border rounded-md px-2 py-1 text-sm text-right"
+                   style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+          </div>
+
+          <div class="flex items-center justify-between gap-2">
+            <label class="text-sm whitespace-nowrap" style="color: var(--text-color-secondary);">إلى</label>
+            <input type="date" formControlName="toDate"
+                   class="flex-1 border rounded-md px-2 py-1 text-sm text-right"
+                   style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+          </div>
+        </div>
+
+        <!-- الأزرار -->
+        <div class="space-y-2 mt-3">
+          <button *ngIf="form.showDateActionBtn" type="button"
+            class="bg-teal-700 text-white w-full py-2 rounded-md font-bold hover:bg-teal-800 transition">
+            تاريخ الإجراء
+          </button>
+
+          <button *ngIf="form.showDateReviewBtn" type="button"
+            class="bg-teal-700 text-white w-full py-2 rounded-md font-bold hover:bg-teal-800 transition">
+            تاريخ المراجعة
+          </button>
+
+          <button *ngIf="form.showReportBtn" type="button"
+            class="bg-blue-700 text-white w-full py-2 rounded-md font-bold hover:bg-blue-800 transition">
+            استعلام
+          </button>
+
+          <button *ngIf="form.showPayBtn" type="button"
+            class="bg-indigo-700 text-white w-full py-2 rounded-md font-bold hover:bg-indigo-800 transition">
+            السداد
+          </button>
+
+          <button *ngIf="form.showSaleBtn" type="button"
+            class="bg-purple-700 text-white w-full py-2 rounded-md font-bold hover:bg-purple-800 transition">
+            الخصم
+          </button>
+            <button *ngIf="form.showMowkelBtn" type="button"
+            class="bg-green-700 text-white w-full py-2 rounded-md font-bold hover:bg-green-800 transition">
+            تقرير الموكلين
+            </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,80 @@
+<!-- الصندوق الرئيسي -->
+<div class="form-container" dir="rtl" *ngIf="showMainForm">
+  
+  <!-- Header -->
+  <div class="form-header">
+    <h1>💰 لوحة التحكم المالية</h1>
+  </div>
+
+  <!-- الصف 1 -->
+  <div class="button-row">
+    <button class="form-button form-button-primary" (click)="onButtonClick('سند قبض')">🧾 سند قبض</button>
+    <button class="form-button form-button-primary" (click)="onButtonClick('سند صرف')">💸 سند صرف</button>
+    <button class="form-button form-button-primary" (click)="onButtonClick('قيود اليومية')">📋 قيود اليومية</button>
+    <button class="form-button form-button-primary" (click)="onButtonClick('شجرة الترميز')">🌳 شجرة الترميز</button>
+  </div>
+
+  <!-- الصف 2 -->
+  <div class="button-row">
+    <button class="form-button form-button-secondary" (click)="onButtonClick('عمولات الملفات')">📁 عمولات الملفات</button>
+    <button class="form-button form-button-secondary" (click)="onButtonClick('إضافة نوع مصروف')">➕ إضافة نوع مصروف</button>
+  </div>
+
+  <!-- الصف 3 -->
+  <div class="button-row">
+    <button class="form-button form-button-accent" (click)="onButtonClick('أرصدة الحسابات')">💳 أرصدة الحسابات</button>
+    <button class="form-button form-button-accent" (click)="onButtonClick('الميزانية العمومية')">📊 الميزانية العمومية</button>
+  </div>
+
+  <!-- الصف 4 -->
+  <div class="button-row">
+    <button class="form-button form-button-info" (click)="onButtonClick('استعلام عن كشف التصفية')">🔍 كشف التصفية</button>
+    <button class="form-button form-button-info" (click)="onButtonClick('استعلام عن كشف عهد الموظفين')">👥 كشف عهد الموظفين</button>
+  </div>
+
+  <!-- الصف 5 -->
+  <div class="button-row">
+    <button class="form-button form-button-warning" (click)="onButtonClick('استعلام عن كشف العهد المستلمة')">📥 العهد المستلمة</button>
+    <button class="form-button form-button-warning" (click)="onButtonClick('استعلام عن الكشوف برقم القيد')">🔢 الكشوف برقم القيد</button>
+  </div>
+
+  <!-- الصف 6 -->
+  <div class="button-row">
+    <button class="form-button form-button-success" (click)="onButtonClick('مصروفات يتحملها المكتب')">🏢 مصروفات المكتب</button>
+    <button class="form-button form-button-success" (click)="onButtonClick('تصفية السيارات')">🚗 تصفية السيارات</button>
+  </div>
+
+  <!-- الصف 7 -->
+  <div class="button-row">
+    <button class="form-button form-button-danger" (click)="onButtonClick('مقدم ومؤخر إيجار العقارات')">🏠 إيجار العقارات</button>
+    <button class="form-button form-button-danger" (click)="onButtonClick('كل العهد على السيستم')">📋 كل العهد</button>
+  </div>
+
+  <!-- الصف 8 -->
+  <div class="button-row">
+    <button class="form-button form-button-outline" (click)="onButtonClick('رابط المكتب باكسل')">📊 رابط اكسل</button>
+    <button class="form-button form-button-outline" (click)="onButtonClick('سند قبض - جديد')">🧾 سند قبض جديد</button>
+    <button class="form-button form-button-outline" (click)="onButtonClick('سند صرف - جديد')">💸 سند صرف جديد</button>
+  </div>
+
+  <!-- زر الإغلاق -->
+  <div class="form-actions" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--surface-border);">
+    <button class="form-button form-button-secondary" (click)="closeMainForm()">← رجوع</button>
+  </div>
+</div>
+
+<app-voucher-form
+  *ngIf="showVoucherForm"
+  [isReceipt]="formType === 'receipt'"
+  (cancel)="backToMainForm()">
+</app-voucher-form>
+
+<app-expense-form 
+  *ngIf="showExpenseTypeForm"
+  (cancel)="closeExpenseTypeForm()">
+</app-expense-form>
+
+<app-receipt-voucher 
+  *ngIf="showReceiptVoucherModal"
+  (cancel)="closeReceiptVoucherForm()">
+</app-receipt-voucher>

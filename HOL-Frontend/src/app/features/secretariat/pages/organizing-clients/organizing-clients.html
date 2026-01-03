@@ -1,0 +1,81 @@
+<div class="p-6 max-w-5xl mx-auto space-y-6" style="direction: rtl; background-color: var(--surface-ground);">
+
+  <h1 class="text-2xl font-bold text-center mb-4" style="color: var(--text-color);">إدارة الزيارات</h1>
+
+  <!-- اختيار سبب الزيارة -->
+  <div class="flex gap-4 items-center">
+    <label class="font-semibold" style="color: var(--text-color);">سبب الزيارة:</label>
+    <select [(ngModel)]="visitType" class="border rounded px-2 py-1"
+            style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);">
+      <option value="">اختر السبب</option>
+      <option value="موكل">موكل</option>
+      <option value="عميل">عميل</option>
+      <option value="مقابلات وظائف">مقابلات وظائف</option>
+      <option value="زيارة">زيارة</option>
+    </select>
+  </div>
+
+  <!-- فورم العميل يظهر فقط عند اختيار عميل -->
+  <div *ngIf="visitType === 'عميل'" class="border p-4 rounded space-y-4"
+       style="background-color: var(--surface-section); border-color: var(--surface-border);">
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="flex flex-col">
+        <label class="font-semibold mb-1" style="color: var(--text-color);">الكود</label>
+        <input type="text" [(ngModel)]="client.code"
+               class="border rounded px-2 py-1"
+               style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"/>
+      </div>
+      <div class="flex flex-col">
+        <label class="font-semibold mb-1" style="color: var(--text-color);">الاسم</label>
+        <input type="text" [(ngModel)]="client.name"
+               class="border rounded px-2 py-1"
+               style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"/>
+      </div>
+      <div class="flex flex-col">
+        <label class="font-semibold mb-1" style="color: var(--text-color);">الرقم المدني</label>
+        <input type="text" [(ngModel)]="client.civilNumber"
+               class="border rounded px-2 py-1"
+               style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"/>
+      </div>
+      <div class="flex flex-col">
+        <label class="font-semibold mb-1" style="color: var(--text-color);">المعاملات</label>
+        <input type="text" [(ngModel)]="client.transactions"
+               class="border rounded px-2 py-1"
+               style="border-color: var(--surface-border); background-color: var(--surface-card); color: var(--text-color);"/>
+      </div>
+    </div>
+
+    <button class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700" (click)="searchClient()">بحث</button>
+
+    <hr class="my-4"/>
+
+    <div class="space-y-2">
+      <div class="flex justify-between">
+        <span>قيمة المطالبة:</span>
+        <span>{{ claimValue }}</span>
+        <button (click)="incrementClaim()" class="bg-green-500 text-white px-2 rounded">+</button>
+      </div>
+
+      <div class="flex justify-between">
+        <span>اجمالي قيمة الرسوم:</span>
+        <span>{{ totalFees }}</span>
+        <button (click)="decrementFees()" class="bg-red-500 text-white px-2 rounded">-</button>
+      </div>
+
+      <div class="flex justify-between">
+        <span>المدفوع:</span>
+        <span>{{ paid }}</span>
+      </div>
+
+      <hr/>
+
+      <div class="flex justify-between font-bold">
+        <span>المتبقي:</span>
+        <span>{{ remaining }}</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>

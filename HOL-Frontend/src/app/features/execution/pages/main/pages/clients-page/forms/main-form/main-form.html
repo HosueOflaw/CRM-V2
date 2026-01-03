@@ -1,0 +1,90 @@
+<div class="card" style="background-color: var(--surface-card);">
+  <h2 class="text-lg font-semibold mb-3" style="color: var(--text-color);">البيانات الرئيسية</h2>
+
+  <div class="grid grid-cols-2 gap-6">
+    <!-- الفورم الأول -->
+    <form class="space-y-4">
+      <div class="mb-1">
+        <label class="text-sm" style="color: var(--text-color-secondary);">القطاع</label>
+        <input type="text" class="input input-bordered w-full" 
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      </div>
+
+      <div  class="mb-1">
+        <label class="text-sm" style="color: var(--text-color-secondary);">المدعي القانوني</label>
+        <input type="text" class="input input-bordered w-full" 
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      </div>
+
+      <div  class="mb-1">
+        <label class="text-sm" style="color: var(--text-color-secondary);">تاريخ الإخلاء</label>
+        <input type="date" class="input input-bordered w-full" 
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      </div>
+
+      <div  class="mb-1">
+        <label class="text-sm" style="color: var(--text-color-secondary);">تاريخ التوزيع</label>
+        <input type="date" class="input input-bordered w-full" 
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      </div>
+
+      <div  class="mb-1">
+        <label class="text-sm" style="color: var(--text-color-secondary);">إدارة التنفيذ</label>
+        <input type="text" class="input input-bordered w-full" 
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      </div>
+
+      <div  class="mb-1">
+        <label class="text-sm" style="color: var(--text-color-secondary);">جهة العمل</label>
+        <input type="text" class="input input-bordered w-full" 
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      </div>
+
+      <div  class="mb-1">
+        <label class="text-sm" style="color: var(--text-color-secondary);">المهنة</label>
+        <input type="text" class="input input-bordered w-full" 
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      </div>
+    </form>
+
+    <!-- الفورم الثاني -->
+    <form class="space-y-4">
+      <h3 class="text-lg font-semibold mb-1" style="color: var(--text-color);">بيانات الحكم</h3>
+
+      <div  class="mb-1">
+        <label class="text-sm" style="color: var(--text-color-secondary);">التكرار</label>
+        <input type="text" class="input input-bordered w-full" 
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      </div>
+
+      <div  class="mb-1">
+        <label class="text-sm" style="color: var(--text-color-secondary);">تاريخ صدور الحكم</label>
+        <input type="date" class="input input-bordered w-full" 
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      </div>
+
+      <div  class="mb-1">
+        <label class="text-sm" style="color: var(--text-color-secondary);">يُعلن قبل</label>
+        <input type="date" class="input input-bordered w-full" 
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      </div>
+
+      <div  class="mb-1">
+        <label class="text-sm" style="color: var(--text-color-secondary);">نوع الحكم</label>
+        <select class="select select-bordered w-full"
+                style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+          <option selected disabled>اختر نوع الحكم</option>
+          <option>مدني</option>
+          <option>جنائي</option>
+          <option>استئناف</option>
+        </select>
+      </div>
+       <!-- زر الحفظ -->
+      <div class="mt-2 text-center">
+        <button class="btn btn-primary px-8">حفظ</button>
+      </div>
+    </form>
+  </div>
+
+ 
+</div>

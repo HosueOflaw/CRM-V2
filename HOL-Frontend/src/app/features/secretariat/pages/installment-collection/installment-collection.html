@@ -1,0 +1,42 @@
+<div class="p-6 mx-auto space-y-6" style="direction: rtl;">
+
+  <h1 class="text-2xl font-bold text-center mb-6">تجميع الأقساط</h1>
+
+  <!-- أزرار -->
+  <div class="flex flex-wrap gap-4 justify-center mb-6">
+    <label class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 cursor-pointer flex items-center gap-2">
+      <span> الاكسيل</span>
+      <input type="file" accept=".xlsx, .xls" class="hidden" (change)="onExcelUpload($event)" />
+    </label>
+
+    <button (click)="collectOnlineFiles()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center gap-2">
+       تجميع ملفات الاونلاين
+    </button>
+
+    <button (click)="collectPrintFiles()" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 flex items-center gap-2">
+       تجميع ملفات الطباعة
+    </button>
+  </div>
+
+  <!-- جدول عرض الأقساط -->
+  <div class="overflow-x-auto">
+    <table class="table-auto w-full border border-gray-200 text-sm">
+      <thead class="bg-gray-100">
+        <tr>
+          <th *ngFor="let col of columns" class="border px-2 py-1">{{ col }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of installments | paginate: { itemsPerPage: 10, currentPage: currentPage }">
+          <td *ngFor="let col of columns" class="border px-2 py-1">{{ row[col] }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex justify-end mt-4">
+    <pagination-controls (pageChange)="currentPage = $event"></pagination-controls>
+  </div>
+
+</div>

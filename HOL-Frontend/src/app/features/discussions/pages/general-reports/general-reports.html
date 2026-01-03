@@ -1,0 +1,87 @@
+<div class="p-6" style="direction: rtl;">
+  <h2 class="text-xl font-bold mb-6 text-center">التقارير العامة</h2>
+
+  <!-- 🔹 فلاتر التاريخ -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 items-end">
+    <div>
+      <label class="block mb-1 font-semibold">من تاريخ</label>
+      <input type="date" class="input input-bordered w-full" [(ngModel)]="fromDate" />
+    </div>
+
+    <div>
+      <label class="block mb-1 font-semibold">إلى تاريخ</label>
+      <input type="date" class="input input-bordered w-full" [(ngModel)]="toDate" />
+    </div>
+
+    <!-- 🔹 زر تحميل Excel -->
+    <div class="md:col-span-2 text-center md:text-right">
+      <button class="btn btn-outline btn-success w-full md:w-auto" (click)="downloadExcel()">⬇️ تحميل Excel</button>
+    </div>
+  </div>
+
+  <!-- 🔹 أزرار التقارير -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center mb-6">
+    <button class="btn btn-primary" (click)="getReport('courtSessions')">جلسات المحكمة</button>
+    <button class="btn btn-accent" (click)="getReport('expertSessions')">جلسات الخبراء</button>
+    <button class="btn btn-info" (click)="getReport('adminWork')">الأعمال الإدارية</button>
+    <button class="btn btn-warning" (click)="getReport('judgmentReport')">تقرير عن الأحكام</button>
+  </div>
+
+  <!-- 🔹 عرض النتائج -->
+  <div class="overflow-x-auto mt-6">
+    <table class="table table-sm w-full border text-center">
+      <thead class="bg-base-200">
+        <tr>
+          <th>الكود</th>
+          <th>المسلسل</th>
+          <th>الشبلونة</th>
+          <th>الموكل</th>
+          <th>الخصم</th>
+          <th>المحكمة</th>
+          <th>الرقم الآلي</th>
+          <th>موضوع الدعوى</th>
+          <th>نوع الحكم</th>
+          <th>الدائرة</th>
+          <th>تاريخ الحكم</th>
+          <th>آخر موعد للاستئناف</th>
+          <th>موعد التنبيه</th>
+          <th>منطوق الحكم</th>
+          <th>الدرجة</th>
+          <th>الحضور</th>
+          <th>رقم أول درجة</th>
+          <th>رقم الاستئناف</th>
+          <th>رقم التمييز</th>
+          <th>النتيجة</th>
+          <th>✔️</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of reportData; let i = index">
+          <td>{{ row.code }}</td>
+          <td>{{ row.serial }}</td>
+          <td>{{ row.template }}</td>
+          <td>{{ row.client }}</td>
+          <td>{{ row.opponent }}</td>
+          <td>{{ row.court }}</td>
+          <td>{{ row.autoNumber }}</td>
+          <td>{{ row.caseSubject }}</td>
+          <td>{{ row.judgmentType }}</td>
+          <td>{{ row.department }}</td>
+          <td>{{ row.judgmentDate }}</td>
+          <td>{{ row.appealDeadline }}</td>
+          <td>{{ row.reminderDate }}</td>
+          <td>{{ row.judgmentText }}</td>
+          <td>{{ row.level }}</td>
+          <td>{{ row.attendance }}</td>
+          <td>{{ row.firstInstanceNumber }}</td>
+          <td>{{ row.appealNumber }}</td>
+          <td>{{ row.cassationNumber }}</td>
+          <td>{{ row.result }}</td>
+          <td>
+            <input type="checkbox" [(ngModel)]="row.check" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,99 @@
+<div class="p-8 bg-gray-50 min-h-screen">
+  <!-- 🏛️ Header -->
+  <div class="flex items-center justify-between mb-8">
+    <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-2">
+      <i class="fa-solid fa-scale-balanced text-primary"></i>
+      استلام الأحكام
+    </h2>
+
+    <div class="flex gap-2">
+      <button
+        class="btn"
+        [ngClass]="{
+          'btn-primary': selectedTab === 'new',
+          'btn-outline': selectedTab !== 'new'
+        }"
+        (click)="switchTab('new')"
+      >
+        ⚖️ أحكام جديدة
+      </button>
+
+      <button
+        class="btn"
+        [ngClass]="{
+          'btn-error': selectedTab === 'ended',
+          'btn-outline': selectedTab !== 'ended'
+        }"
+        (click)="switchTab('ended')"
+      >
+        🕯️ أحكام منتهية
+      </button>
+    </div>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="page-content">
+    <div *ngIf="selectedTab === 'new'" class="space-y-5">
+      <div *ngFor="let ruling of newRulings" class="card">
+        <div class="card-body">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-semibold text-xl mb-1">
+                {{ ruling.title }}
+              </h3>
+              <p class="text-sm" style="color: var(--text-color-secondary);">
+                رقم الدعوى: <span class="font-medium">{{ ruling.caseNumber }}</span>
+                <span class="mx-2">|</span>
+                المحكمة: <span class="font-medium">{{ ruling.court }}</span>
+              </p>
+              <p class="text-xs mt-1" style="color: var(--text-color-secondary);">
+                تاريخ الاستلام: {{ ruling.date }}
+              </p>
+            </div>
+            <button class="form-button form-button-success">📥 استلام</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Ended Rulings -->
+    <div *ngIf="selectedTab === 'ended'" class="space-y-6">
+      <div *ngIf="filteredRulings.length; else noResults" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div *ngFor="let ruling of filteredRulings" class="card" 
+             [style.border-top]="ruling.result === 'مقبول' ? '4px solid var(--green-500)' : '4px solid var(--red-500)'">
+          <div class="card-body">
+            <div class="flex justify-between items-center mb-4">
+              <span class="form-button" 
+                    [class.form-button-success]="ruling.result === 'مقبول'"
+                    [class.form-button-danger]="ruling.result === 'مرفوض'"
+                    style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
+                {{ ruling.result }}
+              </span>
+              <span class="text-sm" style="color: var(--text-color-secondary);">{{ ruling.date }}</span>
+            </div>
+
+            <h3 class="font-semibold text-lg mb-2">
+              {{ ruling.title }}
+            </h3>
+
+            <p class="text-sm mb-4" style="color: var(--text-color-secondary);">
+              {{ ruling.summary }}
+            </p>
+
+            <div class="text-sm border-t pt-2 flex justify-between" style="color: var(--text-color-secondary);">
+              <span>رقم الدعوى: {{ ruling.caseNumber }}</span>
+              <span>المحكمة: {{ ruling.court }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noResults>
+        <div class="text-center mt-20" style="color: var(--text-color-secondary);">
+          <p class="text-5xl mb-3">📁</p>
+          <p>لا توجد أحكام مطابقة لبحثك.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

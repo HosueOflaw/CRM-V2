@@ -1,0 +1,43 @@
+using House_of_law_api.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace House_of_law_api.Data;
+
+public class ApplicationDbContext : DbContext
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+    }
+
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Department> Departments => Set<Department>();
+    public DbSet<Mainfile> Mainfiles => Set<Mainfile>();
+    public DbSet<FileDetail> FileDetails => Set<FileDetail>();
+    public DbSet<AutoNumber> AutoNumbers => Set<AutoNumber>();
+    public DbSet<Note> Notes => Set<Note>();
+    public DbSet<Mail> Mails => Set<Mail>();
+    public DbSet<Attachment> Attachments => Set<Attachment>();
+    public DbSet<AuditsFile> AuditsFiles => Set<AuditsFile>();
+    public DbSet<FileStatus> FileStatuses => Set<FileStatus>();
+    public DbSet<FileClassification> FileClassifications => Set<FileClassification>();
+    public DbSet<CallcenterStatement> CallcenterStatements => Set<CallcenterStatement>();
+    public DbSet<AdditionalAmount> AdditionalAmounts => Set<AdditionalAmount>();
+    public DbSet<Payment> Payments => Set<Payment>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<FileDetail>().Property(x => x.DeptAmount)
+            .HasColumnType("decimal(18,3)");
+
+        modelBuilder.Entity<CallcenterStatement>().Property(x => x.PromiseAmount)
+            .HasColumnType("decimal(18,3)");
+
+        modelBuilder.Entity<AdditionalAmount>().Property(x => x.Value)
+            .HasColumnType("decimal(18,3)");
+
+        modelBuilder.Entity<Payment>().Property(x => x.Value)
+            .HasColumnType("decimal(18,3)");
+    }
+}

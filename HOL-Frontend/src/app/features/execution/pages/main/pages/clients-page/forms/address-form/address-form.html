@@ -1,0 +1,37 @@
+<div class="p-6 rounded-xl shadow-md" style="background-color: var(--surface-card);">
+  <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color: var(--text-color);">
+    🏠 العنوان
+  </h2>
+
+  <!-- 📊 جدول عرض العناوين -->
+  <div class="overflow-x-auto mt-8">
+    <table class="table table-zebra w-full text-center" style="border-color: var(--surface-border);">
+      <thead style="background-color: var(--surface-section);">
+        <tr style="color: var(--text-color);">
+          <th style="color: var(--text-color);">العنوان</th>
+          <th style="color: var(--text-color);">جهة العمل</th>
+          <th style="color: var(--text-color);">حالة الإعلان</th>
+          <th style="color: var(--text-color);">المرفق</th>
+          <th style="color: var(--text-color);">إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of addresses; let i = index" style="color: var(--text-color);">
+          <td class="max-w-xs truncate">{{ item.address }}</td>
+          <td>{{ item.workPlace }}</td>
+          <td>{{ item.adStatus }}</td>
+          <td>
+            <a
+              *ngIf="item.attachment"
+              [href]="item.attachment"
+              target="_blank"
+              style="color: var(--primary-color, #3b82f6);"
+              class="hover:underline"
+              >📎 عرض</a
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

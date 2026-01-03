@@ -1,0 +1,6 @@
+  .modal {
+      background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    }
+    .input:required {
+      border-color: #fca5a5; /* Light red border for required fields */
+    }

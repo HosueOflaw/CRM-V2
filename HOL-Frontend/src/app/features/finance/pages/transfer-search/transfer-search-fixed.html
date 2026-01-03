@@ -1,0 +1,88 @@
+<div class="page-container">
+  <!-- Tabs -->
+  <div class="tabs tabs-boxed">
+    <a class="tab" 
+       [class.tab-active]="activeStatusTab() === 'pending'"
+       (click)="activeStatusTab.set('pending'); runQuery()">لم يحول</a>
+    <a class="tab" 
+       [class.tab-active]="activeStatusTab() === 'transferred'"
+       (click)="activeStatusTab.set('transferred'); runQuery()">تم التحويل</a>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="search-filters">
+      <!-- Complex Filters -->
+      <ng-container *ngFor="let filter of complexFilters">
+        <div class="form-field">
+          <label class="checkbox-group">
+            <input type="checkbox" class="checkbox" [checked]="filter.active" (change)="toggleFilter(filter)" />
+            <span>{{ filter.label }}</span>
+          </label>
+        </div>
+      </ng-container>
+
+      <!-- Specific Date -->
+      <div class="form-field">
+        <label class="form-label">تاريخ محدد</label>
+        <input type="date" class="form-input" [(ngModel)]="searchForm.specificDate" name="specificDate" />
+      </div>
+
+      <!-- Search Query -->
+      <div class="form-field">
+        <label class="form-label">بحث عام</label>
+        <input type="text" class="form-input" [(ngModel)]="searchForm.searchQuery" name="searchQuery" placeholder="بحث عام أو اسم موكل..." />
+      </div>
+      
+      <!-- Selected Client -->
+      <div class="form-field">
+        <label class="form-label">الموكل</label>
+        <div class="form-row">
+          <input type="text" class="form-input" style="flex: 1;" [(ngModel)]="searchForm.selectedClient" name="selectedClient" placeholder="الموكل" readonly />
+          <button class="form-button form-button-outline" (click)="openClientLookup()">...</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="search-actions">
+      <label class="form-button form-button-secondary" style="cursor: pointer;">
+        رفع من إكسل
+        <input type="file" hidden (change)="uploadExcel($event)">
+      </label>
+      <button class="form-button form-button-success" (click)="exportExcel()">إكسل</button>
+      <button class="form-button form-button-primary" (click)="runQuery()">استعلام</button>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="page-content">
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>الاسم</th>
+            <th>المبلغ</th>
+            <th>التاريخ</th>
+            <th>المستخدم</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of transferRows(); let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ row.name }}</td>
+            <td style="font-family: monospace;">{{ row.amount }}</td>
+            <td>{{ row.date }}</td>
+            <td>{{ row.user }}</td>
+          </tr>
+          <tr *ngIf="transferRows().length === 0">
+            <td colspan="5" class="text-center" style="color: var(--text-color-secondary); padding: 2rem;">
+              لا توجد نتائج مطابقة لفلتر البحث.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,40 @@
+<div class="p-6 rounded-xl shadow-md" style="background-color: var(--surface-card);">
+  <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color: var(--text-color);">
+    📎 المرفقات
+  </h2>
+
+  <!-- 📊 جدول عرض المرفقات -->
+  <div class="overflow-x-auto mt-8">
+    <table class="table table-zebra w-full text-center" style="border-color: var(--surface-border);">
+      <thead style="background-color: var(--surface-section);">
+        <tr style="color: var(--text-color);">
+          <th style="color: var(--text-color);">الإجراء</th>
+          <th style="color: var(--text-color);">تاريخ الإجراء</th>
+          <th style="color: var(--text-color);">المرفق</th>
+          <th style="color: var(--text-color);">التحكم</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let attachment of attachments; let i = index" style="color: var(--text-color);">
+          <td>{{ attachment.action }}</td>
+          <td>{{ attachment.date | date: 'dd/MM/yyyy' }}</td>
+          <td>
+            <a
+              *ngIf="attachment.file"
+              [href]="attachment.file"
+              target="_blank"
+              style="color: var(--primary-color, #3b82f6);"
+              class="hover:underline"
+              >📂 عرض</a
+            >
+          </td>
+          <td>
+            <button class="btn btn-sm btn-error" (click)="deleteAttachment(i)">
+              🗑️ حذف
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

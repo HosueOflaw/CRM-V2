@@ -1,0 +1,43 @@
+<div class="min-h-screen flex items-center justify-center" style="background-color: var(--surface-ground);">
+  <div class="card w-full max-w-sm shadow-2xl rounded-2xl p-6 relative" 
+       style="background-color: var(--surface-card); color: var(--text-color);">
+   <app-go-back></app-go-back>
+
+    <h2 class="text-center text-lg font-semibold mb-2" style="color: var(--text-color);">
+      مصادقة هويتى
+    </h2>
+    <p class="text-center text-sm mb-4" style="color: var(--text-color-secondary);">
+      بيت القانون
+    </p>
+
+    <form (ngSubmit)="onSubmit()" class="space-y-3">
+      <label class="block text-sm mb-1" style="color: var(--text-color-secondary);">الرقم المدني</label>
+      <input
+        type="text"
+        maxlength="12"
+        class="input input-bordered w-full text-center tracking-widest text-lg rounded-lg"
+        [(ngModel)]="civilId"
+        name="civilId"
+        required
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+      />
+
+
+      <label class="flex items-center space-x-2 mt-2" style="color: var(--text-color);">
+        <input type="checkbox" class="checkbox checkbox-sm" [(ngModel)]="personalLogin" name="personalLogin" />
+        <span class="text-sm">دخول شخصي؟</span>
+      </label>
+
+      <button type="submit" class="btn btn-info w-full text-base font-semibold mt-3 rounded-full">
+        إرسال طلب المصادقة
+      </button>
+
+      <div class="text-sm p-2 rounded-lg mt-2 text-center"
+           style="background-color: rgba(214, 158, 46, 0.1); color: var(--text-color); border: 1px solid rgba(214, 158, 46, 0.3);">
+        سيتم إرسال طلب مصادقة إلى تطبيق هويتي، للتمكن من الدخول لبوابة الخدمة يجب المصادقة.
+      </div>
+    </form>
+
+
+  </div>
+</div>

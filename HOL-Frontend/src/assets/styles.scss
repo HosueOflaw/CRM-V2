@@ -1,0 +1,240 @@
+/* You can add global styles to this file, and also import other style files */
+@use 'ngx-toastr/toastr' as *;
+@use './layout/layout.scss';
+@use './prime-ng-overrides.scss';
+@use './form-styles.scss';
+@use './modal-styles.scss';
+@use './tabs-styles.scss';
+@use './page-styles.scss';
+@use './sweetalert-dark-mode.scss';
+@import './tailwind.css';
+@import 'primeicons/primeicons.css';
+
+/* Global Styles */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+}
+
+body {
+  background-color: var(--surface-ground, #f5f5f5);
+  color: var(--text-color, #1a1a1a);
+}
+
+/* Ensure text visibility in dark mode */
+:root.app-dark,
+html.app-dark,
+html.app-dark body,
+.app-dark {
+  --text-color: #ffffff;
+  --text-color-secondary: #b0b0b0;
+  --surface-card: #1e1e1e;
+  --surface-ground: #121212;
+  --surface-section: #252525;
+  --surface-border: rgba(255, 255, 255, 0.1);
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  background-color: #121212;
+}
+
+/* Blur Effect on Sidebar when Modal is Open */
+body.modal-open-sidebar-blur app-sidebar,
+body.modal-open-sidebar-blur .layout-sidebar,
+body.modal-open-sidebar-blur .fixed.right-0 {
+  filter: blur(5px) !important;
+  -webkit-filter: blur(5px) !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  opacity: 0.6 !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Prevent clicks on sidebar when modal is open */
+body.modal-open-sidebar-blur app-sidebar *,
+body.modal-open-sidebar-blur .layout-sidebar *,
+body.modal-open-sidebar-blur .fixed.right-0 * {
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+
+/* Ensure text visibility in light mode */
+:root:not(.app-dark),
+html:not(.app-dark),
+html:not(.app-dark) body {
+  --text-color: #1a1a1a;
+  --text-color-secondary: #666666;
+  --surface-card: #ffffff;
+  --surface-ground: #f5f5f5;
+  --surface-section: #f9fafb;
+  --surface-border: rgba(0, 0, 0, 0.12);
+  --surface-hover: rgba(0, 0, 0, 0.02);
+  color: #1a1a1a;
+  background-color: #f5f5f5;
+}
+
+/* Dark mode specific styles for components */
+.app-dark .card,
+.app-dark .page-content,
+.app-dark .page-container,
+.app-dark .search-section,
+.app-dark .table-container,
+.app-dark .modal-box,
+.app-dark .form-input,
+.app-dark .form-select,
+.app-dark .form-textarea,
+.app-dark input,
+.app-dark textarea,
+.app-dark select {
+  background: var(--surface-card) !important;
+  color: var(--text-color) !important;
+  border-color: var(--surface-border) !important;
+}
+
+.app-dark .table thead,
+.app-dark thead {
+  background: var(--surface-section) !important;
+  color: var(--text-color) !important;
+}
+
+.app-dark .table tbody tr,
+.app-dark tbody tr {
+  color: var(--text-color) !important;
+}
+
+.app-dark .table tbody tr:hover,
+.app-dark tbody tr:hover {
+  background: var(--surface-hover) !important;
+}
+
+.app-dark h1,
+.app-dark h2,
+.app-dark h3,
+.app-dark h4,
+.app-dark h5,
+.app-dark h6,
+.app-dark p,
+.app-dark span,
+.app-dark div,
+.app-dark label,
+.app-dark td,
+.app-dark th {
+  color: var(--text-color) !important;
+}
+
+/* Ensure buttons work in dark mode */
+.app-dark button:not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-warning) {
+  color: var(--text-color) !important;
+  background: var(--surface-card) !important;
+  border-color: var(--surface-border) !important;
+}
+
+/* Ensure modals work in dark mode */
+.app-dark .modal {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.app-dark .modal-box {
+  background: var(--surface-card) !important;
+  color: var(--text-color) !important;
+}
+
+/* Ensure all text elements are visible */
+.app-dark * {
+  color: inherit;
+}
+
+.app-dark input::placeholder,
+.app-dark textarea::placeholder {
+  color: var(--text-color-secondary) !important;
+  opacity: 0.7;
+}
+
+/* Switch Toggle Styles */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--primary-color, #2196F3);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* PrimeNG Card Override */
+.card {
+  background: var(--surface-card);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-radius: var(--content-border-radius);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+

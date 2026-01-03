@@ -1,0 +1,71 @@
+<div class="page-container">
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="search-filters">
+      <div class="form-field">
+        <label class="form-label">الموظف</label>
+        <input type="text" class="form-input" placeholder="الموظف" [(ngModel)]="employeeSearch" name="employeeSearch" />
+      </div>
+    </div>
+    
+    <div class="search-actions">
+      <button class="form-button form-button-outline" (click)="openModal()">...</button>
+      <button class="form-button form-button-primary">بحث</button>
+      <button class="form-button form-button-success">تم الاستلام</button>
+      <button class="form-button form-button-outline">نتيجة المصروف</button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="page-content">
+    <div class="table-container">
+
+    <table class="table table-sm table-zebra text-right">
+      <thead class="bg-gray-100">
+        <tr>
+          <th>م</th>
+          <th>اسم الشركة</th>
+          <th>رقم الكشف</th>
+          <th>المبلغ</th>
+          <th>التاريخ</th>
+          <th>الشركة</th>
+          <th>المكتب</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let row of rows; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ row.company }}</td>
+          <td>{{ row.sheetNumber }}</td>
+          <td>{{ row.amount }}</td>
+          <td>{{ row.date }}</td>
+          <td>{{ row.companyPay }}</td>
+          <td>{{ row.officePay }}</td>
+        </tr>
+
+        <tr *ngIf="rows.length === 0">
+          <td colspan="7" class="text-center text-gray-400 py-10">
+            لا توجد بيانات
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="mt-2 text-center text-sm font-bold">
+    إجمالي العهدة : {{ totalAmount }}
+  </div>
+
+</div>
+
+  <!-- 🔹 Lookup Modal -->
+  <app-lookup-modal
+    #lookup
+    [title]="lookupConfig.title"
+    [columns]="lookupConfig.columns"
+    [data]="lookupConfig.data"
+    (itemSelected)="handleSelect($event)"
+  ></app-lookup-modal>

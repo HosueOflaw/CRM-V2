@@ -1,0 +1,109 @@
+<div class="p-6 space-y-6" style="direction: rtl; background-color: var(--surface-ground);">
+  <!-- 🔍 Search area -->
+  <form class="grid grid-cols-4 gap-4 p-4 rounded-2xl shadow"
+        style="background-color: var(--surface-card);">
+    <div>
+      <label class="block text-sm font-medium mb-1"
+             style="color: var(--text-color-secondary);">من تاريخ</label>
+      <input
+        type="date"
+        class="w-full border rounded-lg p-2"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+        [(ngModel)]="filters.fromDate"
+        name="fromDate"
+      />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1"
+             style="color: var(--text-color-secondary);">الي تاريخ</label>
+      <input
+        type="date"
+        class="w-full border rounded-lg p-2"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+        [(ngModel)]="filters.toDate"
+        name="toDate"
+      />
+    </div>
+
+    <div class="col-span-2 flex gap-3 items-end">
+      <button
+        type="button"
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        (click)="search('migration')"
+      >
+        تقرير الترحيل
+      </button>
+
+      <button
+        type="button"
+        class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+        (click)="search('files')"
+      >
+        الملفات
+      </button>
+
+      <button
+        type="button"
+        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+        (click)="search('judgments')"
+      >
+        الأحكام
+      </button>
+    </div>
+  </form>
+
+  <!-- 📋 Tables display -->
+  <div class="p-4 rounded-2xl shadow"
+       style="background-color: var(--surface-card);">
+    <!-- Tabs -->
+    <div class="flex border-b mb-4"
+         style="border-color: var(--surface-border);">
+      <button
+        *ngFor="let tab of tabs"
+        (click)="activeTab = tab.key"
+        class="px-4 py-2 cursor-pointer"
+        [class.border-b-2]="activeTab === tab.key"
+        [style.border-bottom-color]="activeTab === tab.key ? 'var(--primary-color)' : 'transparent'"
+        [style.color]="activeTab === tab.key ? 'var(--text-color)' : 'var(--text-color-secondary)'"
+      >
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <!-- Tables -->
+    <div *ngIf="activeTabData.length; else emptyState">
+      <table class="w-full border text-sm"
+             style="border-color: var(--surface-border);">
+        <thead style="background-color: var(--surface-section);">
+          <tr>
+            <th *ngFor="let col of columns[activeTab]" class="p-2 border text-right"
+                style="border-color: var(--surface-border); color: var(--text-color);">
+              {{ col }}
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr
+            *ngFor="let row of activeTabData; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color); border-color: var(--surface-border);"
+          >
+            <td *ngFor="let col of columns[activeTab]" class="p-2 border text-right"
+                style="border-color: var(--surface-border);">
+              {{ row[col] || '-' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #emptyState>
+      <div class="text-center py-8"
+           style="color: var(--text-color-secondary);">
+        No data matching the selected period
+      </div>
+    </ng-template>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+<dialog #modal id="dateModal" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg mb-4">📅 اختر تاريخ الإجراء</h3>
+    <input
+      type="date"
+      class="input input-bordered w-full mb-4"
+      [(ngModel)]="selectedDate"
+    />
+    <div class="modal-action">
+      <button class="btn btn-primary" (click)="save()">حفظ</button>
+      <button class="btn" (click)="close()">إغلاق</button>
+    </div>
+  </div>
+</dialog>

@@ -1,0 +1,102 @@
+<div class="p-8 min-h-screen"
+     style="background-color: var(--surface-ground);">
+  <!-- 🏷️ العنوان -->
+  <div class="flex items-center justify-between mb-8">
+    <h2 class="text-3xl font-bold flex items-center gap-2"
+        style="color: var(--text-color);">
+      <i class="fa-solid fa-folder-plus" style="color: var(--primary-color);"></i>
+      الملفات الجديدة
+    </h2>
+
+    <button class="btn btn-primary flex items-center gap-2" (click)="openUploadModal()">
+      <i class="fa-solid fa-upload"></i>
+      رفع ملف جديد
+    </button>
+  </div>
+
+  <!-- 📂 عرض الملفات -->
+  <div *ngIf="files.length; else emptyState" class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div
+      *ngFor="let file of files"
+      class="rounded-2xl p-5 shadow-sm hover:shadow-lg transition-all border-t-4"
+      style="background-color: var(--surface-card); border-top-color: var(--primary-color);"
+    >
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <h3 class="font-semibold text-lg" style="color: var(--text-color);">{{ file.name }}</h3>
+          <p class="text-sm" style="color: var(--text-color-secondary);">النوع: {{ file.type }}</p>
+        </div>
+        <span class="badge badge-outline" style="border-color: var(--surface-border); color: var(--text-color);">{{ file.date }}</span>
+      </div>
+
+      <p class="text-sm leading-relaxed mb-3"
+         style="color: var(--text-color-secondary);">
+        {{ file.note || 'لا توجد ملاحظات' }}
+      </p>
+
+      <div class="flex justify-between items-center text-sm border-t pt-2"
+           style="border-color: var(--surface-border); color: var(--text-color-secondary);">
+        <span>الحالة: <span class="font-medium" style="color: var(--green-500);">جديد</span></span>
+        <button class="btn btn-sm btn-outline btn-error" (click)="removeFile(file)">🗑️ حذف</button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="text-center mt-20 flex flex-col items-center"
+         style="color: var(--text-color-secondary);">
+      <i class="fa-solid fa-folder-open text-6xl mb-3"></i>
+      <p>لا توجد ملفات بعد.</p>
+      <button class="btn btn-primary mt-4" (click)="openUploadModal()">📤 رفع أول ملف</button>
+    </div>
+  </ng-template>
+
+  <!-- 📤 Modal رفع ملف -->
+  <dialog #uploadModal class="modal modal-open" *ngIf="showUploadModal">
+    <div class="modal-box w-11/12 max-w-lg rounded-2xl"
+         style="background-color: var(--surface-card);">
+      <h3 class="font-bold text-lg mb-4" style="color: var(--text-color);">رفع ملف جديد</h3>
+
+      <form (ngSubmit)="uploadFile()" class="space-y-4">
+        <div>
+          <label class="text-sm" style="color: var(--text-color);">اسم الملف</label>
+          <input type="text" [(ngModel)]="newFile.name" name="name" required
+                 class="input input-bordered w-full"
+                 style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+        </div>
+
+        <div>
+          <label class="text-sm" style="color: var(--text-color);">نوع الملف</label>
+          <select [(ngModel)]="newFile.type" name="type" required
+                  class="select select-bordered w-full"
+                  style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+            <option value="" disabled selected>اختر نوع الملف</option>
+            <option>PDF</option>
+            <option>Word</option>
+            <option>Excel</option>
+            <option>صورة</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-sm" style="color: var(--text-color);">ملاحظات</label>
+          <textarea [(ngModel)]="newFile.note" name="note"
+                    class="textarea textarea-bordered w-full"
+                    style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"></textarea>
+        </div>
+
+        <div>
+          <label class="text-sm" style="color: var(--text-color);">اختيار الملف</label>
+          <input type="file" (change)="onFileSelect($event)"
+                 class="file-input file-input-bordered w-full"
+                 style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3">
+          <button type="button" class="btn btn-outline" (click)="closeUploadModal()">إلغاء</button>
+          <button type="submit" class="btn btn-primary">رفع</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+</div>

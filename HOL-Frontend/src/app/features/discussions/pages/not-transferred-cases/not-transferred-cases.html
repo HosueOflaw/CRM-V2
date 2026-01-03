@@ -1,0 +1,118 @@
+<div class="not-transferred p-6 bg-base-200 min-h-screen">
+  <!-- Error message -->
+  <div *ngIf="errorMessage" class="mb-3 text-sm text-red-600">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Court selection + Tabs + Actions -->
+  <div class="flex flex-wrap gap-2 items-center mb-4 justify-center">
+    <div class="flex items-center gap-2">
+      <input
+        type="text"
+        class="input input-bordered input-sm w-48"
+        placeholder="اختر المحكمة"
+        [(ngModel)]="selectedCourt"
+        readonly
+      />
+      <button class="btn btn-sm" (click)="openCourtsModal()">...</button>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <button
+        *ngFor="let t of tabs"
+        class="btn btn-sm"
+        [ngClass]="{ 'btn-primary': activeTab === t.key }"
+        (click)="filterSessions(t.key)"
+      >
+        {{ t.label }}
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button class="btn btn-sm btn-outline" (click)="printTable()">🖨️ طباعة</button>
+
+      <label class="btn btn-sm btn-success cursor-pointer">
+        📂 Excel
+        <input type="file" accept=".xlsx, .xls" (change)="onFileSelected($event)" hidden />
+      </label>
+    </div>
+  </div>
+
+  <!-- Spinner أثناء التحميل -->
+  <div class="flex justify-center my-8" *ngIf="isLoading">
+    <span class="loading loading-spinner loading-lg text-primary"></span>
+  </div>
+
+  <!-- الجدول -->
+  <div class="overflow-x-auto bg-base-100 rounded-xl shadow" *ngIf="!isLoading">
+    <table class="table table-sm w-full text-sm">
+      <thead class="bg-base-300 text-base font-semibold">
+        <tr>
+          <th *ngFor="let header of tableHeaders" (click)="sortBy(header.key)" class="cursor-pointer">
+            {{ header.label }}
+            <span *ngIf="sortColumn === header.key">
+              {{ sortDirection === 'asc' ? '▲' : '▼' }}
+            </span>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let row of paginatedRecords" class="hover:bg-base-200">
+          <td>{{ row.id }}</td>
+          <td>{{ row.template }}</td>
+          <td>{{ row.court }}</td>
+          <td>{{ row.sessionDate }}</td>
+          <td>{{ row.client }}</td>
+          <td>{{ row.session }}</td>
+          <td>{{ row.decision }}</td>
+          <td>{{ row.fileStatus }}</td>
+          <td>{{ row.autoNum }}</td>
+          <td>{{ row.subject }}</td>
+          <td>{{ row.decisionNotes }}</td>
+          <td>{{ row.level }}</td>
+          <td>{{ row.legalPlaintiff }}</td>
+          <td>{{ row.opponent }}</td>
+          <td>{{ row.attendance }}</td>
+          <td>{{ row.expert }}</td>
+          <td>{{ row.department }}</td>
+        </tr>
+
+        <tr *ngIf="paginatedRecords.length === 0">
+          <td class="text-center p-4" colspan="17">لا توجد بيانات للعرض</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="join flex justify-center mt-6" *ngIf="displayedRecords.length > pageSize">
+    <button
+      class="join-item btn btn-sm"
+      [disabled]="currentPage === 1"
+      (click)="changePage(currentPage - 1)"
+    >
+      «
+    </button>
+
+    <button
+      *ngFor="let p of totalPagesArray"
+      class="join-item btn btn-sm"
+      [ngClass]="{ 'btn-primary': currentPage === p }"
+      (click)="changePage(p)"
+    >
+      {{ p }}
+    </button>
+
+    <button
+      class="join-item btn btn-sm"
+      [disabled]="currentPage === totalPages"
+      (click)="changePage(currentPage + 1)"
+    >
+      »
+    </button>
+  </div>
+
+  <!-- Lookup Modal -->
+  <app-lookup-modal (itemSelected)="onCourtSelected($event)"></app-lookup-modal>
+</div>

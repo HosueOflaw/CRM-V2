@@ -1,0 +1,158 @@
+<div class="min-h-screen p-6" style="direction: rtl; background-color: var(--surface-ground);">
+
+  <!-- الكارت الرئيسي -->
+  <div class="shadow-xl rounded-2xl p-6 space-y-6"
+       style="background-color: var(--surface-card);">
+
+        <h2 class="text-3xl font-bold text-center mb-8"
+            style="color: var(--text-color);">كشف تصفية السيارات</h2>
+
+
+    <!-- الأعلى يمين: اختيار الموكل + التاريخ + بحث -->
+    <div class="flex flex-col md:flex-row gap-4 items-end">
+      <input type="text"
+             placeholder="اختر الموكل"
+             [value]="selectedClient?.name || ''"
+             readonly
+             class="input input-bordered w-full md:w-64 cursor-pointer"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             (click)="openLookup()" />
+
+      <input type="date" [(ngModel)]="toDate"
+             class="input input-bordered w-full md:w-40"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+
+      <button class="btn btn-primary" (click)="search()">بحث</button>
+    </div>
+
+    <!-- الأعلى الوسط: إجماليات -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+      <div class="p-4 rounded-lg shadow"
+           style="background-color: var(--surface-section);">
+        <div class="font-semibold" style="color: var(--text-color-secondary);">إجمالي الشركة</div>
+        <div class="text-xl font-bold" style="color: var(--text-color);">{{ totals.company | number }} د.ك</div>
+      </div>
+      <div class="p-4 rounded-lg shadow"
+           style="background-color: var(--surface-section);">
+        <div class="font-semibold" style="color: var(--text-color-secondary);">إجمالي المكتب</div>
+        <div class="text-xl font-bold" style="color: var(--text-color);">{{ totals.office | number }} د.ك</div>
+      </div>
+      <div class="p-4 rounded-lg shadow"
+           style="background-color: var(--surface-section);">
+        <div class="font-semibold" style="color: var(--text-color-secondary);">إجمالي الشيكات</div>
+        <div class="text-xl font-bold" style="color: var(--text-color);">{{ totals.cheques | number }} د.ك</div>
+      </div>
+      <div class="p-4 rounded-lg shadow"
+           style="background-color: var(--surface-section);">
+        <div class="font-semibold" style="color: var(--text-color-secondary);">إجمالي الرسوم</div>
+        <div class="text-xl font-bold" style="color: var(--text-color);">{{ totals.fees | number }} د.ك</div>
+      </div>
+    </div>
+
+    <!-- الأعلى يسار: أزرار + عمولة التحصيل -->
+    <div class="flex flex-col gap-4 items-center justify-center">
+
+        <div class="flex items-center gap-2">
+        <label class="font-semibold" style="color: var(--text-color);">عمولة التحصيل:</label>
+        <input type="number" [(ngModel)]="collectionCommission" class="input input-bordered w-32"
+               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      </div>
+
+      <div class="flex gap-3">
+        <button class="btn btn-success" (click)="markReviewed()">تم مراجعة الفاتورة</button>
+        <button class="btn btn-warning" (click)="generateInvoice()">عمل الفاتورة</button>
+      </div>
+
+      
+    </div>
+
+    <!-- Tabs: السداد و الرسوم -->
+    <div class="tabs tabs-boxed"
+         style="background-color: var(--surface-section);">
+      <a class="tab" [class.tab-active]="activeTab === 'payments'" (click)="activeTab='payments'"
+         [style.background-color]="activeTab === 'payments' ? 'var(--surface-card)' : 'transparent'"
+         [style.color]="activeTab === 'payments' ? 'var(--text-color)' : 'var(--text-color-secondary)'">السداد</a>
+      <a class="tab" [class.tab-active]="activeTab === 'fees'" (click)="activeTab='fees'"
+         [style.background-color]="activeTab === 'fees' ? 'var(--surface-card)' : 'transparent'"
+         [style.color]="activeTab === 'fees' ? 'var(--text-color)' : 'var(--text-color-secondary)'">الرسوم</a>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="mt-4">
+      <!-- السداد -->
+      <div *ngIf="activeTab === 'payments'" class="overflow-x-auto">
+        <table class="table table-auto w-full border shadow-md rounded-lg"
+               style="border-color: var(--surface-border);">
+          <thead style="background-color: var(--surface-section);">
+            <tr>
+              <th class="text-center" style="color: var(--text-color);">Id</th>
+              <th class="text-center" style="color: var(--text-color);">الكود</th>
+              <th class="text-center" style="color: var(--text-color);">الاسم</th>
+              <th class="text-center" style="color: var(--text-color);">سبب المديونية</th>
+              <th class="text-center" style="color: var(--text-color);">المدفوع</th>
+              <th class="text-center" style="color: var(--text-color);">رقم السند</th>
+              <th class="text-center" style="color: var(--text-color);">رقم الشيك</th>
+              <th class="text-center" style="color: var(--text-color);">تاريخ الدفع</th>
+              <th class="text-center" style="color: var(--text-color);">عمولة التحصيل</th>
+              <th class="text-center" style="color: var(--text-color);">مبلغ التحصيل</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of payments; let i = index"
+                [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+                style="color: var(--text-color); transition: background-color 0.2s;">
+              <td class="text-center">{{item.id}}</td>
+              <td class="text-center">{{item.code}}</td>
+              <td class="text-center">{{item.name}}</td>
+              <td class="text-center">{{item.reason}}</td>
+              <td class="text-center">{{item.paid | number}}</td>
+              <td class="text-center">{{item.voucherNumber}}</td>
+              <td class="text-center">{{item.chequeNumber}}</td>
+              <td class="text-center">{{item.paymentDate}}</td>
+              <td class="text-center">{{item.collectionCommission}}</td>
+              <td class="text-center">{{item.collectedAmount | number}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- الرسوم -->
+      <div *ngIf="activeTab === 'fees'" class="overflow-x-auto">
+        <table class="table table-auto w-full border shadow-md rounded-lg"
+               style="border-color: var(--surface-border);">
+          <thead style="background-color: var(--surface-section);">
+            <tr>
+              <th class="text-center" style="color: var(--text-color);">_ID</th>
+              <th class="text-center" style="color: var(--text-color);">الكود</th>
+              <th class="text-center" style="color: var(--text-color);">الاسم</th>
+              <th class="text-center" style="color: var(--text-color);">المبلغ</th>
+              <th class="text-center" style="color: var(--text-color);">الرسوم</th>
+              <th class="text-center" style="color: var(--text-color);">تاريخ المرفق</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of fees; let i = index"
+                [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+                style="color: var(--text-color); transition: background-color 0.2s;">
+              <td class="text-center">{{item._id}}</td>
+              <td class="text-center">{{item.code}}</td>
+              <td class="text-center">{{item.name}}</td>
+              <td class="text-center">{{item.amount | number}}</td>
+              <td class="text-center">{{item.fees | number}}</td>
+              <td class="text-center">{{item.attachDate}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Lookup Modal -->
+    <app-lookup-modal #lookup
+                      title="اختيار الموكل"
+                      [columns]="clientColumns"
+                      [data]="clients"
+                      (itemSelected)="onClientSelected($event)">
+    </app-lookup-modal>
+
+  </div>
+</div>

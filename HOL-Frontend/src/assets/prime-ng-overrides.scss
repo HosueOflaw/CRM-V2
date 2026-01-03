@@ -1,0 +1,578 @@
+/* PrimeNG Overrides and Utility Classes */
+
+/* Replace DaisyUI button classes with PrimeNG */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: var(--content-border-radius);
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  background: var(--primary-color);
+  color: var(--primary-contrast-color);
+  
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  
+  &.btn-primary {
+    background: var(--primary-color);
+    color: var(--primary-contrast-color);
+  }
+  
+  &.btn-success {
+    background: var(--green-500);
+    color: white;
+  }
+  
+  &.btn-error,
+  &.btn-danger {
+    background: var(--red-500);
+    color: white;
+  }
+  
+  &.btn-warning {
+    background: var(--orange-500);
+    color: white;
+  }
+  
+  &.btn-secondary {
+    background: var(--surface-300);
+    color: var(--text-color);
+  }
+  
+  &.btn-outline {
+    background: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+  }
+  
+  &.btn-ghost {
+    background: transparent;
+    color: var(--text-color);
+    
+    &:hover {
+      background: var(--surface-hover);
+    }
+  }
+  
+  &.btn-sm {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  &.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.125rem;
+  }
+  
+  &.btn-xs {
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  &.btn-circle {
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  &.btn-wide {
+    width: 100%;
+  }
+}
+
+/* Replace DaisyUI input classes with PrimeNG */
+.input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--content-border-radius);
+  background: var(--surface-card);
+  color: var(--text-color);
+  font-size: 1rem;
+  width: 100%;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.2);
+  }
+  
+  &.input-bordered {
+    border: 1px solid var(--surface-border);
+  }
+  
+  &.input-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  &.input-lg {
+    padding: 0.75rem 1rem;
+    font-size: 1.125rem;
+  }
+}
+
+/* Replace DaisyUI textarea classes */
+.textarea {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--content-border-radius);
+  background: var(--surface-card);
+  color: var(--text-color);
+  font-size: 1rem;
+  width: 100%;
+  font-family: inherit;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.2);
+  }
+  
+  &.textarea-bordered {
+    border: 1px solid var(--surface-border);
+  }
+}
+
+/* Replace DaisyUI select classes */
+.select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--content-border-radius);
+  background: var(--surface-card);
+  color: var(--text-color);
+  font-size: 1rem;
+  width: 100%;
+  cursor: pointer;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.2);
+  }
+  
+  &.select-bordered {
+    border: 1px solid var(--surface-border);
+  }
+  
+  &.select-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  &.select-ghost {
+    background: transparent;
+    border: none;
+  }
+}
+
+/* Replace DaisyUI card classes */
+.card {
+  background: var(--surface-card);
+  padding: 1.5rem;
+  border-radius: var(--content-border-radius);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--surface-border);
+}
+
+/* Replace DaisyUI modal classes */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  
+  &[open] {
+    display: flex;
+  }
+}
+
+.modal-box {
+  background: var(--surface-card);
+  border-radius: var(--content-border-radius);
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+  padding: 1.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Replace DaisyUI table classes */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface-card, #ffffff);
+  
+  thead {
+    background: var(--surface-section, #f9fafb);
+    
+    th {
+      font-weight: 600;
+      color: var(--text-color, #1a1a1a);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+  }
+  
+  th, td {
+    padding: 0.875rem 1rem;
+    text-align: right;
+    border-bottom: 1px solid var(--surface-border, rgba(0, 0, 0, 0.1));
+    color: var(--text-color, #1a1a1a);
+  }
+  
+  tbody {
+    tr {
+      transition: background-color 0.15s;
+      
+      &:hover {
+        background: var(--surface-hover, rgba(0, 0, 0, 0.02));
+      }
+    }
+  }
+  
+  &.table-zebra {
+    tbody tr:nth-child(even) {
+      background: var(--surface-ground, #f9fafb);
+    }
+  }
+  
+  &.table-xs {
+    font-size: 0.75rem;
+    
+    th, td {
+      padding: 0.5rem 0.75rem;
+    }
+  }
+  
+  .text-center {
+    text-align: center;
+  }
+}
+
+/* Replace DaisyUI label classes */
+.label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.label-text {
+  display: inline-block;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+/* Replace DaisyUI form-control */
+.form-control {
+  margin-bottom: 1rem;
+}
+
+/* Utility classes */
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-gray-500 {
+  color: var(--text-color-secondary);
+}
+
+.text-gray-800 {
+  color: var(--text-color);
+}
+
+.bg-base-100 {
+  background: var(--surface-card);
+}
+
+.bg-base-200 {
+  background: var(--surface-ground);
+}
+
+.bg-base-300 {
+  background: var(--surface-section);
+}
+
+.text-base-content {
+  color: var(--text-color);
+}
+
+/* Grid utilities */
+.grid {
+  display: grid;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Flex utilities */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+/* Spacing utilities */
+.p-4 {
+  padding: 1rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.mt-6 {
+  margin-top: 1.5rem;
+}
+
+.mt-8 {
+  margin-top: 2rem;
+}
+
+/* Text utilities */
+.text-center {
+  text-align: center;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+/* Border utilities */
+.border {
+  border: 1px solid var(--surface-border);
+}
+
+.border-b {
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.border-t {
+  border-top: 1px solid var(--surface-border);
+}
+
+.rounded {
+  border-radius: var(--content-border-radius);
+}
+
+.rounded-lg {
+  border-radius: calc(var(--content-border-radius) * 1.5);
+}
+
+.rounded-xl {
+  border-radius: calc(var(--content-border-radius) * 2);
+}
+
+/* Shadow utilities */
+.shadow {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Width utilities */
+.w-full {
+  width: 100%;
+}
+
+.w-64 {
+  width: 16rem;
+}
+
+.max-w-md {
+  max-width: 28rem;
+}
+
+.max-w-lg {
+  max-width: 32rem;
+}
+
+.max-w-2xl {
+  max-width: 42rem;
+}
+
+.max-w-4xl {
+  max-width: 56rem;
+}
+
+.max-w-5xl {
+  max-width: 64rem;
+}
+
+/* Height utilities */
+.h-20 {
+  height: 5rem;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}
+
+/* Overflow utilities */
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
+.overflow-auto {
+  overflow: auto;
+}
+
+/* Space utilities */
+.space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-8 > * + * {
+  margin-top: 2rem;
+}
+
+/* List utilities */
+.list-none {
+  list-style: none;
+}
+
+.divide-y > * + * {
+  border-top: 1px solid var(--surface-border);
+}
+
+/* Responsive utilities */
+@media (min-width: 640px) {
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .sm\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  
+  .lg\:grid-cols-6 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .xl\:grid-cols-8 {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}
+

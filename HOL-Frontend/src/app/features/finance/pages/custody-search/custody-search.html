@@ -1,0 +1,90 @@
+<div dir="rtl" class="flex flex-col h-screen p-4 font-sans text-sm"
+     style="background-color: var(--surface-ground);">
+
+    <!-- Header / Title -->
+    <h1 class="text-lg font-bold mb-4 border-b pb-2"
+        style="color: var(--text-color); border-color: var(--surface-border);">
+      كل العهد الموجودة على المستشار
+    </h1>
+
+    <!-- شريط البحث (Toolbar) -->
+    <div class="p-3 rounded-lg shadow-md mb-4 flex justify-between items-center border"
+         style="background-color: var(--surface-card); border-color: var(--surface-border);">
+        
+        <!-- حقل الموكل وزر الـ Lookup -->
+        <div class="flex items-center gap-3">
+            <label class="font-bold" style="color: var(--text-color);">الموكل</label>
+            
+            <input type="text" 
+                   class="input input-sm input-bordered rounded-none w-64" 
+                   style="background-color: var(--surface-ground); border-color: var(--surface-border); color: var(--text-color);"
+                   [(ngModel)]="selectedClientName" 
+                   placeholder="اختر موكل"
+                   readonly />
+            
+            <!-- زر الـ Lookup Modal -->
+            <button class="btn btn-sm rounded-none"
+                    style="background-color: var(--surface-section); color: var(--text-color); border-color: var(--surface-border); hover:background-color: var(--surface-hover);"
+                    (click)="openClientLookup()">
+                ...
+            </button>
+            
+            <!-- زر البحث -->
+            <button class="btn btn-sm btn-primary rounded-none"
+                    (click)="searchCustodies()">
+                بحث
+            </button>
+        </div>
+
+        <!-- معلومات المستشار (يمين) -->
+        <div class="flex items-center gap-2">
+            <label class="font-bold" style="color: var(--text-color);">المستشار:</label>
+            <span class="font-mono" style="color: var(--primary-color);">{{ selectedConsultant }}</span>
+        </div>
+    </div>
+
+    <!-- منطقة الجدول (Grid) -->
+    <div class="flex-grow overflow-auto border rounded-lg shadow-lg"
+         style="background-color: var(--surface-card); border-color: var(--surface-border);">
+        
+      
+
+        <!-- الجدول نفسه -->
+        <table class="table table-sm table-pin-rows w-full border-collapse text-right whitespace-nowrap"
+               style="border-color: var(--surface-border);">
+            <thead>
+                <tr style="background-color: var(--surface-section); border-color: var(--surface-border);">
+                    <th class="w-12" style="color: var(--text-color); border-color: var(--surface-border);">الرقم</th>
+                    <th style="color: var(--text-color); border-color: var(--surface-border);">تاريخ العهدة</th>
+                    <th style="color: var(--text-color); border-color: var(--surface-border);">نوع العهدة</th>
+                    <th style="color: var(--text-color); border-color: var(--surface-border);">المبلغ</th>
+                    <th style="color: var(--text-color); border-color: var(--surface-border);">الموكل</th>
+                    <th style="color: var(--text-color); border-color: var(--surface-border);">المستخدم</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of custodyRows; let i = index"
+                    [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+                    style="color: var(--text-color);">
+                    <td class="font-mono">{{ row.id }}</td>
+                    <td>{{ row.date }}</td>
+                    <td>{{ row.type }}</td>
+                    <td class="font-bold" style="color: var(--green-500);">{{ row.amount | number }}</td>
+                    <td>{{ row.client }}</td>
+                    <td>{{ row.user }}</td>
+                </tr>
+                <tr *ngIf="custodyRows.length === 0">
+                    <td colspan="6" class="text-center p-4"
+                        style="color: var(--text-color-secondary);">لا توجد عهد لعرضها.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- استدعاء Lookup Modal (يتم وضعه في نهاية الـ Template) -->
+    <app-lookup-modal
+      #lookupModal
+      (itemSelected)="onClientSelected($event)">
+    </app-lookup-modal>
+
+</div>

@@ -1,0 +1,84 @@
+<div class="min-h-screen p-6" style="direction: rtl; background-color: var(--surface-ground);">
+
+  <!-- الكارت الرئيسي -->
+  <div class="shadow-xl rounded-2xl p-6 space-y-6"
+       style="background-color: var(--surface-card);">
+
+        <h2 class="text-3xl font-bold text-center mb-8"
+            style="color: var(--text-color);">ما يتحمله المكتب</h2>
+
+
+    <!-- الأعلى: اختيار الموكل و CODE_ACC + أزرار -->
+    <div class="flex flex-col md:flex-row gap-4 justify-start items-end mb-6">
+
+      <!-- Lookup الموكل -->
+      <input type="text"
+             placeholder="اختر الموكل"
+             [value]="selectedClient?.name || ''"
+             readonly
+             class="input input-bordered w-full md:w-64 cursor-pointer"
+             style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
+             (click)="openLookup()" />
+
+      <!-- الأزرار -->
+      <button class="btn btn-primary" (click)="search()">بحث</button>
+      <button class="btn btn-secondary" (click)="getAll()">استعلام على الكل</button>
+    </div>
+
+    <!-- جدول عرض البيانات -->
+    <div class="overflow-x-auto">
+      <table class="table table-auto w-full border shadow-md rounded-lg"
+             style="border-color: var(--surface-border);">
+        <thead style="background-color: var(--surface-section);">
+          <tr>
+            <th class="text-center" style="color: var(--text-color);">رقم ID</th>
+            <th class="text-center" style="color: var(--text-color);">الكود</th>
+            <th class="text-center" style="color: var(--text-color);">المصروف</th>
+            <th class="text-center" style="color: var(--text-color);">المبلغ</th>
+            <th class="text-center" style="color: var(--text-color);">الموكل</th>
+            <th class="text-center" style="color: var(--text-color);">الموظف</th>
+            <th class="text-center" style="color: var(--text-color);">تاريخ العهدة</th>
+            <th class="text-center" style="color: var(--text-color);">CODE_ACC</th>
+            <th class="text-center" style="color: var(--text-color);">رقم العهدة</th>
+            <th class="text-center" style="color: var(--text-color);">اسم الخصم</th>
+            <th class="text-center" style="color: var(--text-color);">الرقم الآلي</th>
+            <th class="text-center" style="color: var(--text-color);">الرقم المدني</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of data; let i = index"
+              [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+              style="color: var(--text-color); transition: background-color 0.2s;">
+            <td class="text-center">{{ item.id }}</td>
+            <td class="text-center">{{ item.code }}</td>
+            <td class="text-center">{{ item.expense }}</td>
+            <td class="text-center">{{ item.amount | number }}</td>
+            <td class="text-center">{{ item.client }}</td>
+            <td class="text-center">{{ item.employee }}</td>
+            <td class="text-center">{{ item.date }}</td>
+            <td class="text-center">{{ item.arhdaNumber }}</td>
+            <td class="text-center">{{ item.defendantName }}</td>
+            <td class="text-center">{{ item.autoNumber }}</td>
+            <td class="text-center">{{ item.civilNumber }}</td>
+          </tr>
+
+          <tr *ngIf="data.length === 0">
+            <td colspan="12" class="text-center py-6"
+                style="color: var(--text-color-secondary);">
+              لا توجد بيانات
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Lookup Modal -->
+    <app-lookup-modal #lookup
+                      title="اختيار الموكل"
+                      [columns]="clientColumns"
+                      [data]="clients"
+                      (itemSelected)="onClientSelected($event)">
+    </app-lookup-modal>
+
+  </div>
+</div>

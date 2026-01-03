@@ -1,0 +1,13 @@
+.client-follow-up {
+  background: var(--b1);
+  min-height: 100vh;
+}
+
+:host {
+  display: block;
+}
+
+h1 {
+  font-family: "Cairo", sans-serif;
+}
+

@@ -1,0 +1,130 @@
+<div class="p-6 rounded-xl shadow-md" style="background-color: var(--surface-card);">
+  <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color: var(--text-color);">
+    ⚖️ منطوق الحكم
+  </h2>
+
+  <!-- 🧾 نموذج إدخال منطوق الحكم -->
+  <!-- <form (ngSubmit)="addJudgment()" #judgmentForm="ngForm">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <div class="form-control">
+        <label class="label font-semibold">منطوق الحكم</label>
+        <textarea
+          class="textarea textarea-bordered"
+          placeholder="اكتب منطوق الحكم"
+          [(ngModel)]="newJudgment.statement"
+          name="statement"
+          required
+        ></textarea>
+      </div>
+
+      <div class="form-control">
+        <label class="label font-semibold">تاريخ الحكم</label>
+        <input
+          type="date"
+          class="input input-bordered"
+          [(ngModel)]="newJudgment.date"
+          name="date"
+          required
+        />
+      </div>
+
+      <div class="form-control">
+        <label class="label font-semibold">درجة التقاضي</label>
+        <select
+          class="select select-bordered"
+          [(ngModel)]="newJudgment.level"
+          name="level"
+          required
+        >
+          <option value="" disabled selected>اختر درجة التقاضي</option>
+          <option>ابتدائي</option>
+          <option>استئناف</option>
+          <option>تمييز</option>
+        </select>
+      </div>
+
+      <div class="form-control">
+        <label class="label font-semibold">نوع الحكم</label>
+        <input
+          type="text"
+          placeholder="مثال: مدني / جنائي"
+          class="input input-bordered"
+          [(ngModel)]="newJudgment.type"
+          name="type"
+        />
+      </div>
+
+      <div class="form-control">
+        <label class="label font-semibold">المحكمة</label>
+        <input
+          type="text"
+          placeholder="اسم المحكمة"
+          class="input input-bordered"
+          [(ngModel)]="newJudgment.court"
+          name="court"
+        />
+      </div>
+
+      <div class="form-control">
+        <label class="label font-semibold">المرفق</label>
+        <input
+          type="file"
+          (change)="onFileSelected($event)"
+          class="file-input file-input-bordered"
+        />
+      </div>
+    </div>
+
+    <div class="text-center mt-6">
+      <button
+        class="btn btn-primary"
+        type="submit"
+        [disabled]="!judgmentForm.valid"
+      >
+        💾 حفظ منطوق الحكم
+      </button>
+    </div>
+  </form> -->
+
+  <!-- 📊 جدول عرض الأحكام -->
+  <div class="overflow-x-auto mt-8">
+    <table class="table table-zebra w-full text-center" style="border-color: var(--surface-border);">
+      <thead style="background-color: var(--surface-section);">
+        <tr style="color: var(--text-color);">
+          <th style="color: var(--text-color);">منطوق الحكم</th>
+          <th style="color: var(--text-color);">تاريخ الحكم</th>
+          <th style="color: var(--text-color);">درجة التقاضي</th>
+          <th style="color: var(--text-color);">نوع الحكم</th>
+          <th style="color: var(--text-color);">المحكمة</th>
+          <th style="color: var(--text-color);">المرفق</th>
+          <th style="color: var(--text-color);">إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of judgments; let i = index" style="color: var(--text-color);">
+          <td class="max-w-xs truncate">{{ item.statement }}</td>
+          <td>{{ item.date | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ item.level }}</td>
+          <td>{{ item.type }}</td>
+          <td>{{ item.court }}</td>
+          <td>
+            <a
+              *ngIf="item.attachment"
+              [href]="item.attachment"
+              target="_blank"
+              style="color: var(--primary-color, #3b82f6);"
+              class="hover:underline"
+              >📎 عرض</a
+            >
+          </td>
+          <td>
+            <button class="btn btn-sm btn-error" (click)="deleteJudgment(i)">
+              🗑️ حذف
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

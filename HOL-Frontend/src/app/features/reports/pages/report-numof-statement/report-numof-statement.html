@@ -1,0 +1,95 @@
+<div class="p-6 min-h-screen"
+     style="background-color: var(--surface-ground);">
+
+  <!-- Header -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded-xl shadow"
+       style="background-color: var(--surface-card);">
+
+    <!-- من تاريخ -->
+    <div class="flex flex-col">
+      <label class="font-medium mb-1" style="color: var(--text-color);">من تاريخ</label>
+      <input type="date" [(ngModel)]="fromDate"
+        class="p-2 border rounded"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+    </div>
+
+    <!-- الي تاريخ -->
+    <div class="flex flex-col">
+      <label class="font-medium mb-1" style="color: var(--text-color);">الى تاريخ</label>
+      <input type="date" [(ngModel)]="toDate"
+        class="p-2 border rounded"
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+    </div>
+
+    <!-- الشركة -->
+    <div class="flex flex-col">
+      <label class="font-medium mb-1" style="color: var(--text-color);">الشركة</label>
+      <select [(ngModel)]="company" class="p-2 border rounded"
+              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);">
+        <option value="all">All</option>
+        <option value="viva">Viva</option>
+        <option value="ooredoo">Ooredoo</option>
+        <option value="zain">Zain</option>
+        <option value="car">Car</option>
+        <option value="inst">Inst</option>
+      </select>
+    </div>
+
+    <!-- الأزرار -->
+    <div class="flex items-end gap-2 justify-start md:justify-end">
+
+      <!-- تقرير الإفادات -->
+      <button
+        (click)="loadReports()"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+        تقرير الإفادات
+      </button>
+
+      <!-- زر إضافي 1 -->
+      <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
+        زر 2
+      </button>
+
+      <!-- زر إضافي 2 -->
+      <button class="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-lg">
+        زر 3
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- جدول التقرير -->
+  <div *ngIf="reportData.length" class="mt-6 p-4 shadow rounded-xl"
+       style="background-color: var(--surface-card);">
+
+    <table class="w-full text-right border-collapse"
+           style="border-color: var(--surface-border);">
+      <thead>
+        <tr style="background-color: var(--surface-section);">
+          <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">كود الموظف</th>
+          <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">الاسم</th>
+          <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">الشركة</th>
+          <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">عدد الإفادات</th>
+          <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">صافي الإفادات</th>
+          <th class="p-2 border" style="border-color: var(--surface-border); color: var(--text-color);">إجمالي الإفادات</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let row of reportData; let i = index"
+            [style.background-color]="i % 2 === 0 ? 'var(--surface-card)' : 'var(--surface-ground)'"
+            style="color: var(--text-color); transition: background-color 0.2s;">
+          <td class="p-2 border" style="border-color: var(--surface-border);">{{ row.code }}</td>
+          <td class="p-2 border" style="border-color: var(--surface-border);">{{ row.name }}</td>
+          <td class="p-2 border" style="border-color: var(--surface-border);">{{ row.company }}</td>
+          <td class="p-2 border" style="border-color: var(--surface-border);">{{ row.count }}</td>
+          <td class="p-2 border" style="border-color: var(--surface-border);">{{ row.net }}</td>
+          <td class="p-2 border" style="border-color: var(--surface-border);">{{ row.total }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+</div>
