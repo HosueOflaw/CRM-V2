@@ -3,14 +3,16 @@ import { MenuItem } from 'primeng/api';
 import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
+import { ToastModule } from 'primeng/toast';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 import { AuthService } from '../../core/services/auth';
+import { PrimeToastService } from '../../shared/services/prime-toast.service';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator],
+    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, ToastModule],
     template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -61,7 +63,8 @@ import { AuthService } from '../../core/services/auth';
                 </button>
             </div>
         </div>
-    </div>`,
+    </div>
+    <p-toast position="top-center"></p-toast>`,
     styles: [`
         .user-info {
             display: flex;
@@ -93,7 +96,8 @@ export class AppTopbar {
     constructor(
         public layoutService: LayoutService,
         public authService: AuthService,
-        private router: Router
+        private router: Router,
+        private toast: PrimeToastService
     ) {}
 
     toggleDarkMode() {
@@ -101,7 +105,32 @@ export class AppTopbar {
     }
 
     logout() {
-        this.authService.logout();
-        this.router.navigate(['/login']);
+        this.authService.logout().subscribe({
+            next: (response) => {
+                // Show success message
+                this.toast.success(
+                    response?.message || 'تم تسجيل الخروج بنجاح',
+                    'تم تسجيل الخروج',
+                    { life: 2000 }
+                );
+                
+                // Navigate to login after a short delay to show the toast
+                setTimeout(() => {
+                    this.router.navigate(['/login']);
+                }, 500);
+            },
+            error: (err) => {
+                // Even if backend logout fails, show message and navigate to login (local data already cleared)
+                this.toast.info(
+                    'تم تسجيل الخروج محلياً',
+                    'تسجيل الخروج',
+                    { life: 2000 }
+                );
+                
+                setTimeout(() => {
+                    this.router.navigate(['/login']);
+                }, 500);
+            }
+        });
     }
 }

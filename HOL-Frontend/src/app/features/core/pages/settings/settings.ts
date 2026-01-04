@@ -10,9 +10,11 @@ import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
 import { ConfirmationService } from 'primeng/api';
 import { UserService } from '../../../../services/user.service';
-import { ToastrService } from 'ngx-toastr';
+import { PrimeToastService } from '../../../../shared/services/prime-toast.service';
+import { AuthService } from '../../../../core/services/auth';
 
 @Component({
   selector: 'app-settings',
@@ -28,6 +30,7 @@ import { ToastrService } from 'ngx-toastr';
     TableModule,
     DialogModule,
     ConfirmDialogModule,
+    ToastModule,
     DatePipe,
   ],
   providers: [ConfirmationService],
@@ -38,13 +41,13 @@ export class SettingsComponent implements OnInit, OnDestroy {
   // 🧩 النماذج
   form: FormGroup;
   newUserForm: FormGroup;
-  editUserForm: FormGroup;
 
   // 💾 متغيرات عامة
-  savedAt: string | null = null;
   showNewUserForm = false;
-  showEditUserForm = false;
   uploadedFileName: string | null = null;
+  
+  // 👤 بيانات المستخدم الحالي
+  currentUser: any = null;
   
   // 👥 متغيرات المستخدمين
   users: any[] = [];
@@ -52,7 +55,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
   showUsersTable = false;
   loadingUsers = false;
   searchText = '';
-  editingUserId: number | null = null; // ID المستخدم الذي يتم تعديله
 
   // 📚 بيانات المجموعات
   groups = [
@@ -95,9 +97,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder, 
     private layoutService: LayoutService,
     private userService: UserService,
-    private toastr: ToastrService,
+    private toast: PrimeToastService,
     private confirmationService: ConfirmationService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    public authService: AuthService
   ) {
     // ⚙️ نموذج الإعدادات العامة
     this.form = this.fb.group({
@@ -124,19 +127,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
       hireDate: [''],
     });
 
-    // ✏️ نموذج تعديل المستخدم
-    this.editUserForm = this.fb.group({
-      code: [''],
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      fullName: ['', Validators.required],
-      email: ['', [Validators.email]],
-      role: ['User', Validators.required],
-      oldPassword: [''], // اختياري - فقط إذا أراد تغيير كلمة المرور
-      newPassword: [''],
-      confirmPassword: [''],
-    });
-
     this.load();
+    this.loadCurrentUser();
   }
 
   ngOnInit() {
@@ -144,12 +136,28 @@ export class SettingsComponent implements OnInit, OnDestroy {
     const currentDarkMode = this.layoutService.isDarkTheme();
     this.form.patchValue({ darkMode: currentDarkMode });
 
-    // Watch for dark mode changes
+    // Watch for dark mode changes - Auto save
     this.form.get('darkMode')?.valueChanges.subscribe((value) => {
       this.layoutService.layoutConfig.update((state: layoutConfig) => ({
         ...state,
         darkTheme: value,
       }));
+      this.saveSettings(); // Auto save
+    });
+
+    // Watch for notifications changes - Auto save
+    this.form.get('notifications')?.valueChanges.subscribe(() => {
+      this.saveSettings(); // Auto save
+    });
+
+    // Watch for display name changes - Auto save
+    this.form.get('displayName')?.valueChanges.subscribe(() => {
+      this.saveSettings(); // Auto save
+    });
+
+    // Watch for email changes - Auto save
+    this.form.get('email')?.valueChanges.subscribe(() => {
+      this.saveSettings(); // Auto save
     });
   }
 
@@ -159,16 +167,14 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.updateSidebarBlur();
   }
 
-  // 🔄 عرض/إخفاء فورم تعديل المستخدم
-  toggleEditUserForm() {
-    this.showEditUserForm = !this.showEditUserForm;
-    this.showNewUserForm = false;
-    this.updateSidebarBlur();
+  // 👤 جلب بيانات المستخدم الحالي
+  loadCurrentUser() {
+    this.currentUser = this.authService.getUser();
   }
 
   // 🎨 تطبيق/إزالة blur على الـ sidebar
   updateSidebarBlur() {
-    const isAnyModalOpen = this.showNewUserForm || this.showEditUserForm || this.showPermissions;
+    const isAnyModalOpen = this.showNewUserForm || this.showPermissions;
     if (isAnyModalOpen) {
       this.renderer.addClass(document.body, 'modal-open-sidebar-blur');
     } else {
@@ -181,10 +187,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.renderer.removeClass(document.body, 'modal-open-sidebar-blur');
   }
 
-  // 💾 حفظ الإعدادات العامة
-  save() {
+  // 💾 حفظ الإعدادات العامة تلقائياً
+  private saveSettings() {
     localStorage.setItem('app_settings', JSON.stringify(this.form.value));
-    this.savedAt = new Date().toLocaleString();
   }
 
   // ♻️ إعادة الإعدادات الافتراضية
@@ -197,7 +202,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
       notifications: true,
     });
     localStorage.removeItem('app_settings');
-    this.savedAt = null;
+    // this.savedAt = null;
   }
 
   // 📥 تحميل الإعدادات من LocalStorage
@@ -243,7 +248,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
           control.markAsTouched();
         }
       });
-      this.toastr.warning('من فضلك أكمل جميع الحقول المطلوبة', 'تحذير');
+      this.toast.warning('من فضلك أكمل جميع الحقول المطلوبة', 'تحذير');
       return;
     }
 
@@ -269,135 +274,45 @@ export class SettingsComponent implements OnInit, OnDestroy {
     // إرسال للباك إند
     this.userService.createUser(userData).subscribe({
       next: (response) => {
-        this.toastr.success('تم حفظ المستخدم الجديد بنجاح', 'نجح!', {
-          timeOut: 2000
+        this.toast.success('تم حفظ المستخدم الجديد بنجاح', 'نجح!', {
+          life: 2000
         });
         this.newUserForm.reset();
         this.showNewUserForm = false;
         this.updateSidebarBlur();
-        this.loadUsers(false); // إعادة تحميل المستخدمين بدون عرض toastr
+        // إعادة تحميل المستخدمين مع forceRefresh لأن البيانات تغيرت
+        this.loadUsers(false, true);
       },
       error: (error) => {
         const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء حفظ المستخدم';
-        this.toastr.error(errorMsg, 'خطأ');
+        this.toast.error(errorMsg, 'خطأ');
       }
     });
   }
 
-  // ✏️ حفظ تعديل المستخدم
-  saveEditUser() {
-    if (!this.editingUserId) {
-      this.toastr.error('لم يتم تحديد المستخدم للتعديل', 'خطأ');
-      return;
-    }
 
-    if (this.editUserForm.invalid) {
-      this.toastr.warning('من فضلك أكمل جميع الحقول المطلوبة', 'تحذير');
-      return;
-    }
-
-    const formValue = this.editUserForm.value;
-    const { newPassword, confirmPassword, oldPassword } = formValue;
-
-    // التحقق من كلمة المرور إذا تم إدخالها
-    if (newPassword || confirmPassword || oldPassword) {
-      if (!oldPassword || !newPassword || !confirmPassword) {
-        this.toastr.warning('يجب إدخال كلمة المرور القديمة والجديدة وتأكيدها', 'تحذير');
-        return;
-      }
-
-    if (newPassword !== confirmPassword) {
-        this.toastr.error('كلمة المرور الجديدة غير متطابقة', 'خطأ');
-      return;
-    }
-
-      if (newPassword.length < 6) {
-        this.toastr.warning('كلمة المرور يجب أن تكون 6 أحرف على الأقل', 'تحذير');
-        return;
-      }
-    }
-
-    // تحضير بيانات التعديل
-    const updateData: any = {
-      username: formValue.username,
-      fullName: formValue.fullName,
-      email: formValue.email || '',
-      role: formValue.role || 'User',
-    };
-
-    // إضافة CODE إذا كان موجود
-    if (formValue.code && formValue.code !== '' && formValue.code !== null) {
-      const codeValue = parseInt(formValue.code);
-      if (!isNaN(codeValue)) {
-        updateData.code = codeValue;
-      }
-    }
-
-    // تحديث بيانات المستخدم
-    const userId = this.editingUserId; // حفظ القيمة في متغير محلي
-    if (!userId) {
-      this.toastr.error('لم يتم تحديد المستخدم للتعديل', 'خطأ');
-      return;
-    }
-
-    this.userService.updateUser(userId, updateData).subscribe({
-      next: () => {
-        // إذا تم إدخال كلمة مرور جديدة، قم بتغييرها
-        if (newPassword && oldPassword && userId) {
-          this.userService.changePassword(userId, oldPassword, newPassword).subscribe({
-            next: () => {
-              this.toastr.success('تم تحديث بيانات المستخدم وكلمة المرور بنجاح', 'نجح!', {
-                timeOut: 2000
-              });
-              this.editUserForm.reset();
-              this.editingUserId = null;
-              this.showEditUserForm = false;
-              this.updateSidebarBlur();
-              this.loadUsers(false); // إعادة تحميل المستخدمين بدون عرض toastr
-            },
-            error: (error) => {
-              const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء تغيير كلمة المرور';
-              this.toastr.error(errorMsg, 'خطأ');
-            }
-          });
-        } else {
-          this.toastr.success('تم تحديث بيانات المستخدم بنجاح', 'نجح!', {
-            timeOut: 2000
-          });
-    this.editUserForm.reset();
-          this.editingUserId = null;
-    this.showEditUserForm = false;
-          this.updateSidebarBlur();
-          this.loadUsers(false); // إعادة تحميل المستخدمين بدون عرض toastr
-        }
-      },
-      error: (error) => {
-        const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء تحديث المستخدم';
-        this.toastr.error(errorMsg, 'خطأ');
-      }
-    });
-  }
-
-  // 👥 جلب جميع المستخدمين
-  loadUsers(showToast: boolean = true) {
+  // 👥 جلب جميع المستخدمين (مع Cache تلقائي)
+  loadUsers(showToast: boolean = true, forceRefresh: boolean = false) {
     this.loadingUsers = true;
     this.showUsersTable = true;
 
-    this.userService.getUsers().subscribe({
+    // استخدام Cache Service - سيستخدم Cache إذا موجود، أو يعمل request جديد
+    this.userService.getUsers(forceRefresh).subscribe({
       next: (users) => {
         this.users = users;
         this.filteredUsers = users;
         this.loadingUsers = false;
         if (showToast) {
-          this.toastr.success(`تم جلب ${users.length} مستخدم بنجاح`, 'نجح!', {
-            timeOut: 1500
+          const cacheStatus = forceRefresh ? ' (تم التحديث من السيرفر)' : ' (من الـ Cache)';
+          this.toast.success(`تم جلب ${users.length} مستخدم بنجاح${!forceRefresh ? cacheStatus : ''}`, 'نجح!', {
+            life: 1500
           });
         }
       },
       error: (error) => {
         this.loadingUsers = false;
         const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء جلب المستخدمين';
-        this.toastr.error(errorMsg, 'خطأ');
+        this.toast.error(errorMsg, 'خطأ');
       }
     });
   }
@@ -433,32 +348,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
     return roleColors[role] || '#6b7280';
   }
 
-  // ✏️ تعديل مستخدم
+  // ✏️ تعديل مستخدم (من الجدول مباشرة)
   editUser(user: any) {
-    this.editingUserId = user.id;
-    
-    // جلب بيانات المستخدم الكاملة من الباك إند
-    this.userService.getUserById(user.id).subscribe({
-      next: (userData) => {
-        this.editUserForm.patchValue({
-          code: userData.code || '',
-          username: userData.username || '',
-          fullName: userData.fullName || '',
-          email: userData.email || '',
-          role: userData.role || 'User',
-          oldPassword: '',
-          newPassword: '',
-          confirmPassword: '',
-        });
-        this.showEditUserForm = true;
-        this.showUsersTable = false;
-        this.updateSidebarBlur();
-      },
-      error: (error) => {
-        const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء جلب بيانات المستخدم';
-        this.toastr.error(errorMsg, 'خطأ');
-      }
-    });
+    // يمكن فتح modal للتعديل مباشرة من الجدول
+    // أو يمكن إضافة modal للتعديل هنا
+    this.toast.info('يمكنك تعديل المستخدم من الجدول', 'معلومة');
   }
 
   // 🗑️ حذف مستخدم
@@ -473,15 +367,15 @@ export class SettingsComponent implements OnInit, OnDestroy {
       accept: () => {
         this.userService.deleteUser(userId).subscribe({
           next: () => {
-            this.toastr.success('تم حذف المستخدم بنجاح', 'نجح!', {
-              timeOut: 2000
+            this.toast.success('تم حذف المستخدم بنجاح', 'نجح!', {
+              life: 2000
             });
-            // إعادة تحميل المستخدمين
-            this.loadUsers(false);
+            // إعادة تحميل المستخدمين مع forceRefresh لأن البيانات تغيرت
+            this.loadUsers(false, true);
           },
           error: (error) => {
             const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء حذف المستخدم';
-            this.toastr.error(errorMsg, 'خطأ');
+            this.toast.error(errorMsg, 'خطأ');
           }
         });
       }

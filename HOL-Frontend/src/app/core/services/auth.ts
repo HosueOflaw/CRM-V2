@@ -112,32 +112,245 @@ export class AuthService {
     return of(simulatedResponse);
   }
 
-  logout(): void {
+  /**
+   * Logout - Send POST request to backend and clear all authentication data
+   */
+  logout(): Observable<any> {
+    const token = this.getToken();
+    
+    // Prepare headers with token
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: token ? `Bearer ${token}` : '',
+    });
+
+    // Send logout request to backend
+    return this.http.post<any>(`${this.apiUrl}/Users/logout`, {}, { headers })
+      .pipe(
+        // Always clear local data regardless of backend response
+        map((response: any) => {
+          this.clearLocalAuthData();
+          return response;
+        }),
+        catchError((error: any) => {
+          // Clear local data even if backend request fails
+          this.clearLocalAuthData();
+          
+          // Log error but don't throw (user should still be logged out locally)
+          console.warn('Logout request failed, but local data cleared:', error);
+          
+          // Return success to allow logout to proceed
+          return of({ success: true, message: 'تم تسجيل الخروج محلياً' });
+        })
+      );
+  }
+
+  /**
+   * Logout without backend call (for force logout)
+   */
+  logoutLocal(): void {
+    this.clearLocalAuthData();
+  }
+
+  /**
+   * Clear all local authentication data
+   */
+  private clearLocalAuthData(): void {
+    // Clear all localStorage items related to auth
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('token_expires_at');
+    localStorage.removeItem('refresh_token');
+    
+    // Clear sessionStorage
     sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    sessionStorage.clear();
+    
+    // Clear any cached data
+    localStorage.removeItem('failed_login_attempts');
+    localStorage.removeItem('login_lockout');
   }
 
-  saveToken(token: string): void {
+  /**
+   * Save JWT Token with validation
+   */
+  saveToken(token: string): boolean {
+    if (!token || typeof token !== 'string') {
+      console.error('Invalid token provided');
+      return false;
+    }
+
+    // Validate JWT format
+    if (!this.isValidJWT(token)) {
+      console.error('Invalid JWT token format');
+      return false;
+    }
+
+    // Decode and validate JWT
+    const decodedToken = this.decodeJWT(token);
+    if (!decodedToken) {
+      console.error('Failed to decode JWT token');
+      return false;
+    }
+
+    // Check if token is expired
+    if (this.isTokenExpired(decodedToken)) {
+      console.error('Token is already expired');
+      return false;
+    }
+
+    // Save token
     localStorage.setItem('token', token);
     sessionStorage.setItem('token', token);
+
+    // Save expiration time
+    if (decodedToken.exp) {
+      const expiresAt = decodedToken.exp * 1000; // Convert to milliseconds
+      localStorage.setItem('token_expires_at', expiresAt.toString());
+    }
+
+    return true;
   }
 
+  /**
+   * Save user data
+   */
   saveUser(user: any): void {
+    if (!user || typeof user !== 'object') {
+      console.error('Invalid user data');
+      return;
+    }
     localStorage.setItem('user', JSON.stringify(user));
   }
 
+  /**
+   * Get JWT Token
+   */
   getToken(): string | null {
-    return localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    
+    // Validate token if exists
+    if (token && this.isValidJWT(token)) {
+      const decodedToken = this.decodeJWT(token);
+      if (decodedToken && !this.isTokenExpired(decodedToken)) {
+        return token;
+      } else {
+        // Token expired, clear it locally
+        this.logoutLocal();
+        return null;
+      }
+    }
+    
+    return token;
   }
 
+  /**
+   * Get user data
+   */
   getUser(): any {
     const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    if (!user) return null;
+    
+    try {
+      return JSON.parse(user);
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      return null;
+    }
   }
 
+  /**
+   * Check if user is logged in and token is valid
+   */
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    if (!token) return false;
+
+    const decodedToken = this.decodeJWT(token);
+    if (!decodedToken) return false;
+
+    return !this.isTokenExpired(decodedToken);
+  }
+
+  /**
+   * Check if JWT token is valid format
+   */
+  private isValidJWT(token: string): boolean {
+    if (!token || typeof token !== 'string') return false;
+    
+    // JWT format: header.payload.signature (3 parts separated by dots)
+    const parts = token.split('.');
+    if (parts.length !== 3) return false;
+
+    // Check if parts are base64 encoded
+    try {
+      parts.forEach(part => {
+        if (!part || part.length === 0) throw new Error('Empty part');
+        // Base64 URL decode test
+        atob(part.replace(/-/g, '+').replace(/_/g, '/'));
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Decode JWT token
+   */
+  private decodeJWT(token: string): any | null {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+
+      // Decode payload (second part)
+      const payload = parts[1];
+      const decoded = JSON.parse(
+        atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
+      );
+      
+      return decoded;
+    } catch (error) {
+      console.error('Error decoding JWT:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Check if token is expired
+   */
+  private isTokenExpired(decodedToken: any): boolean {
+    if (!decodedToken || !decodedToken.exp) return true;
+    
+    const expirationTime = decodedToken.exp * 1000; // Convert to milliseconds
+    const currentTime = Date.now();
+    
+    return currentTime >= expirationTime;
+  }
+
+  /**
+   * Get token expiration time
+   */
+  getTokenExpiration(): Date | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    const decodedToken = this.decodeJWT(token);
+    if (!decodedToken || !decodedToken.exp) return null;
+
+    return new Date(decodedToken.exp * 1000);
+  }
+
+  /**
+   * Check if token will expire soon (within 5 minutes)
+   */
+  isTokenExpiringSoon(): boolean {
+    const expiration = this.getTokenExpiration();
+    if (!expiration) return true;
+
+    const fiveMinutes = 5 * 60 * 1000;
+    return expiration.getTime() - Date.now() < fiveMinutes;
   }
 
   getCurrentUserName(): string {

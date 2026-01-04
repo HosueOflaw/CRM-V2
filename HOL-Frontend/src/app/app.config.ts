@@ -5,7 +5,7 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import Aura from '@primeuix/themes/aura';
 import { providePrimeNG } from 'primeng/config';
-import { provideToastr } from 'ngx-toastr';
+import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,14 +15,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch()),
     provideAnimationsAsync(),
     providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } }),
-    provideToastr({
-      timeOut: 3000,
-      positionClass: 'toast-top-center',
-      preventDuplicates: true,
-      progressBar: true,
-      closeButton: true,
-      enableHtml: true,
-      tapToDismiss: true
-    })
+    MessageService // PrimeNG Toast Service
   ]
 };

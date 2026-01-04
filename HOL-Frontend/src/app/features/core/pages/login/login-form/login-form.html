@@ -16,9 +16,10 @@
         <input
           type="text"
           class="form-input"
-          placeholder="admin"
-          [(ngModel)]="email"
-          name="email"
+          placeholder="اسم المستخدم أو البريد الإلكتروني"
+          [(ngModel)]="usernameOrEmail"
+          name="usernameOrEmail"
+          [disabled]="disabled"
           required
         />
       </div>
@@ -31,6 +32,7 @@
           placeholder="••••••"
           [(ngModel)]="password"
           name="password"
+          [disabled]="disabled"
           required
         />
       </div>
@@ -40,8 +42,9 @@
         <span>للدخول المؤقت: اسم المستخدم <strong>admin</strong> وكلمة المرور <strong>123456</strong></span>
       </div>
 
-      <button type="submit" class="form-button form-button-primary submit-btn">
-        تسجيل الدخول
+      <button type="submit" class="form-button form-button-primary submit-btn" [disabled]="disabled">
+        <span *ngIf="!disabled">تسجيل الدخول</span>
+        <span *ngIf="disabled">جاري تسجيل الدخول...</span>
       </button>
     </form>
   </div>

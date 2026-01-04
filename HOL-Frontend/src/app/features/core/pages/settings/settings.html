@@ -9,9 +9,6 @@
       <p class="text-sm" style="color: var(--text-color-secondary);">تحكم في إعدادات حسابك وتفضيلات التطبيق</p>
     </div>
 
-    <div class="meta text-sm" style="color: var(--text-color-secondary);">
-      <div *ngIf="savedAt">آخر حفظ: {{ savedAt }}</div>
-    </div>
   </div>
 
   <!-- الأزرار -->
@@ -37,18 +34,11 @@
     </button>
 
     <button
-      type="button"
-      (click)="toggleEditUserForm()"
-      class="btn-primary px-4 py-2 rounded-lg transition"
+      (click)="togglePermissions()"
+      class="btn-primary px-4 py-2 rounded-md transition"
+      title="إدارة الصلاحيات"
     >
-      ✏️ تعديل المستخدم
-    </button>
-
-    <button
-  (click)="togglePermissions()"
-  class="btn-primary px-4 py-2 rounded-md transition"
->
-  الصلاحيات
+      🔐 الصلاحيات
     </button>
 
   </div>
@@ -78,19 +68,30 @@
       [tableStyle]="{'min-width': '50rem'}"
     >
       <ng-template pTemplate="caption">
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center gap-3">
           <span class="text-sm" style="color: var(--text-color-secondary);">
             إجمالي المستخدمين: {{ filteredUsers.length }}
           </span>
-          <input
-            type="text"
-            pInputText
-            placeholder="بحث..."
-            [(ngModel)]="searchText"
-            (input)="filterUsers()"
-            class="p-inputtext-sm"
-            style="width: 300px;"
-          />
+          <div class="flex gap-2 items-center">
+            <button
+              type="button"
+              (click)="loadUsers(false, true)"
+              class="btn-outline px-3 py-1 rounded text-xs"
+              [disabled]="loadingUsers"
+              title="إعادة التحميل من السيرفر (تجاهل Cache)"
+            >
+              🔄 تحديث
+            </button>
+            <input
+              type="text"
+              pInputText
+              placeholder="بحث..."
+              [(ngModel)]="searchText"
+              (input)="filterUsers()"
+              class="p-inputtext-sm"
+              style="width: 300px;"
+            />
+          </div>
         </div>
       </ng-template>
 
@@ -256,42 +257,76 @@
   </div>
 </div>
 
-  <!-- ⚙️ فورم الإعدادات العامة -->
-  <form (ngSubmit)="save()" [formGroup]="form" class="grid gap-6" *ngIf="!showNewUserForm && !showEditUserForm">
-    <section class="card p-4 rounded-xl bg-white shadow-sm">
-      <h3 class="text-lg font-semibold mb-3">معلومات الحساب</h3>
-      <div class="form-grid">
-        <div class="form-field">
-          <label class="form-label">الاسم الظاهر</label>
-          <input
-            pInputText
-            formControlName="displayName"
-            type="text"
-            placeholder="اسمك"
-            class="form-input"
-          />
+  <!-- ⚙️ صفحة الإعدادات -->
+  <div class="grid gap-6" [formGroup]="form" *ngIf="!showNewUserForm">
+    <!-- معلومات المستخدم الحالي -->
+    <section class="card p-6 rounded-xl shadow-sm" style="background: var(--surface-card);">
+      <h3 class="text-xl font-semibold mb-4" style="color: var(--primary-color);">معلومات الحساب</h3>
+      <div class="grid md:grid-cols-2 gap-4" *ngIf="currentUser">
+        <div class="info-item">
+          <label class="info-label">اسم المستخدم</label>
+          <div class="info-value">{{ currentUser.username || '-' }}</div>
         </div>
+        <div class="info-item">
+          <label class="info-label">الاسم الكامل</label>
+          <div class="info-value">{{ currentUser.name || currentUser.fullName || currentUser.full_name || '-' }}</div>
+        </div>
+        <div class="info-item">
+          <label class="info-label">البريد الإلكتروني</label>
+          <div class="info-value">{{ currentUser.email || '-' }}</div>
+        </div>
+        <div class="info-item">
+          <label class="info-label">الدور</label>
+          <div class="info-value">
+            <span
+              class="px-3 py-1 rounded text-sm font-semibold"
+              [style.background]="getRoleColor(currentUser.role)"
+              [style.color]="'#fff'"
+            >
+              {{ currentUser.role || 'User' }}
+            </span>
+          </div>
+        </div>
+        <div class="info-item" *ngIf="currentUser.id">
+          <label class="info-label">رقم المستخدم</label>
+          <div class="info-value">#{{ currentUser.id }}</div>
+        </div>
+        <div class="info-item" *ngIf="currentUser.code">
+          <label class="info-label">الكود</label>
+          <div class="info-value">{{ currentUser.code }}</div>
+        </div>
+      </div>
+      <div *ngIf="!currentUser" class="text-center p-4" style="color: var(--text-color-secondary);">
+        لا توجد بيانات للمستخدم الحالي
+      </div>
+    </section>
 
-        <div class="form-field">
-          <label class="form-label">البريد الإلكتروني</label>
-          <input
-            pInputText
-            formControlName="email"
-            type="email"
-            placeholder="email@example.com"
-            class="form-input"
-          />
+    <!-- معلومات الجلسة -->
+    <section class="card p-6 rounded-xl shadow-sm" style="background: var(--surface-card);">
+      <h3 class="text-xl font-semibold mb-4" style="color: var(--primary-color);">معلومات الجلسة</h3>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="info-item">
+          <label class="info-label">حالة تسجيل الدخول</label>
+          <div class="info-value">
+            <span class="px-3 py-1 rounded text-sm font-semibold" style="background: #10b981; color: #fff;">
+              ✓ مسجل دخول
+            </span>
+          </div>
+        </div>
+        <div class="info-item" *ngIf="authService.getTokenExpiration()">
+          <label class="info-label">انتهاء صلاحية الجلسة</label>
+          <div class="info-value">{{ authService.getTokenExpiration() | date: 'yyyy-MM-dd HH:mm:ss' }}</div>
         </div>
       </div>
     </section>
 
-    <section class="card p-4 rounded-xl bg-white shadow-sm">
-      <h3 class="text-lg font-semibold mb-3">التفضيلات</h3>
-
+    <!-- التفضيلات -->
+    <section class="card p-6 rounded-xl shadow-sm" style="background: var(--surface-card);">
+      <h3 class="text-xl font-semibold mb-4" style="color: var(--primary-color);">التفضيلات</h3>
       <div class="grid gap-4">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between p-4 rounded-lg" style="background: var(--surface-section);">
           <div>
-            <div class="font-medium">الوضع الداكن</div>
+            <div class="font-medium mb-1">الوضع الداكن</div>
             <div class="text-sm" style="color: var(--text-color-secondary);">تبديل بين الوضع الفاتح والداكن</div>
           </div>
           <label class="switch">
@@ -300,9 +335,9 @@
           </label>
         </div>
 
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between p-4 rounded-lg" style="background: var(--surface-section);">
           <div>
-            <div class="font-medium">الإشعارات</div>
+            <div class="font-medium mb-1">الإشعارات</div>
             <div class="text-sm" style="color: var(--text-color-secondary);">تفعيل أو تعطيل الإشعارات</div>
           </div>
           <label class="switch">
@@ -310,32 +345,9 @@
             <span class="slider"></span>
           </label>
         </div>
-
-        <!-- <div class="form-field">
-          <label class="form-label">اللغة</label>
-          <select formControlName="language" class="form-select">
-            <option *ngFor="let option of languageOptions" [value]="option.value">{{ option.label }}</option>
-          </select>
-        </div> -->
       </div>
     </section>
-
-    <div class="form-actions">
-      <p-button
-        label="إعادة الافتراضي"
-        icon="pi pi-refresh"
-        severity="secondary"
-        (onClick)="reset()"
-      ></p-button>
-
-      <p-button
-        label="حفظ"
-        icon="pi pi-save"
-        type="submit"
-        severity="success"
-      ></p-button>
-    </div>
-  </form>
+  </div>
 
   <!-- ✅ مودال إضافة مستخدم جديد -->
   <div
@@ -493,99 +505,9 @@
     </div>
   </div>
 
-  <!-- ✅ مودال تعديل المستخدم -->
-  <div
-    *ngIf="showEditUserForm"
-    class="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50"
-  >
-    <div class="rounded-xl shadow-lg p-6 w-full max-w-2xl relative" style="background: var(--surface-card); color: var(--text-color);">
-      <button (click)="toggleEditUserForm()" class="absolute top-3 right-3 text-xl transition" style="color: var(--text-color-secondary);" onmouseover="this.style.color='var(--red-500, #ef4444)'" onmouseout="this.style.color='var(--text-color-secondary)'">
-        ×
-      </button>
-
-      <h3 class="text-xl font-bold mb-4 text-center" style="color: var(--primary-color);">تعديل بيانات المستخدم</h3>
-
-      <form [formGroup]="editUserForm" (ngSubmit)="saveEditUser()" class="grid md:grid-cols-2 gap-4">
-        <label class="flex flex-col">
-          <span class="text-sm mb-1">الكود (CODE)</span>
-          <input formControlName="code" type="number" class="input" placeholder="أدخل الكود" />
-        </label>
-
-        <label class="flex flex-col">
-          <span class="text-sm mb-1">اسم المستخدم *</span>
-          <input formControlName="username" type="text" class="input" placeholder="username" />
-          <small class="text-red-500" *ngIf="editUserForm.get('username')?.hasError('required') && editUserForm.get('username')?.touched">
-            اسم المستخدم مطلوب
-          </small>
-          <small class="text-red-500" *ngIf="editUserForm.get('username')?.hasError('minlength') && editUserForm.get('username')?.touched">
-            اسم المستخدم يجب أن يكون 3 أحرف على الأقل
-          </small>
-        </label>
-
-        <label class="flex flex-col">
-          <span class="text-sm mb-1">الاسم الكامل *</span>
-          <input formControlName="fullName" type="text" class="input" placeholder="الاسم الكامل" />
-          <small class="text-red-500" *ngIf="editUserForm.get('fullName')?.hasError('required') && editUserForm.get('fullName')?.touched">
-            الاسم الكامل مطلوب
-          </small>
-        </label>
-
-        <label class="flex flex-col">
-          <span class="text-sm mb-1">البريد الإلكتروني</span>
-          <input formControlName="email" type="email" class="input" placeholder="email@example.com" />
-          <small class="text-red-500" *ngIf="editUserForm.get('email')?.hasError('email') && editUserForm.get('email')?.touched">
-            صيغة البريد الإلكتروني غير صحيحة
-          </small>
-        </label>
-
-        <label class="flex flex-col">
-          <span class="text-sm mb-1">الدور *</span>
-          <select formControlName="role" class="input">
-            <option value="User">User</option>
-            <option value="Admin">Admin</option>
-            <option value="Employee">Employee</option>
-          </select>
-          <small class="text-red-500" *ngIf="editUserForm.get('role')?.hasError('required') && editUserForm.get('role')?.touched">
-            الدور مطلوب
-          </small>
-        </label>
-
-        <!-- قسم تغيير كلمة المرور (اختياري) -->
-        <div class="md:col-span-2 mt-2 pt-4 border-t" style="border-color: var(--surface-border);">
-          <h4 class="text-sm font-semibold mb-3" style="color: var(--text-color);">تغيير كلمة المرور (اختياري)</h4>
-
-        <label class="flex flex-col">
-            <span class="text-sm mb-1">كلمة المرور القديمة</span>
-            <input formControlName="oldPassword" type="password" class="input" placeholder="اتركه فارغاً إذا لم ترد تغيير كلمة المرور" />
-          </label>
-
-          <label class="flex flex-col mt-3">
-            <span class="text-sm mb-1">كلمة المرور الجديدة</span>
-            <input formControlName="newPassword" type="password" class="input" placeholder="اتركه فارغاً إذا لم ترد تغيير كلمة المرور" />
-            <small class="text-red-500" *ngIf="editUserForm.get('newPassword')?.value && editUserForm.get('newPassword')?.value.length < 6">
-              كلمة المرور يجب أن تكون 6 أحرف على الأقل
-            </small>
-        </label>
-
-          <label class="flex flex-col mt-3">
-            <span class="text-sm mb-1">تأكيد كلمة المرور</span>
-            <input formControlName="confirmPassword" type="password" class="input" placeholder="تأكيد كلمة المرور الجديدة" />
-            <small class="text-red-500" *ngIf="editUserForm.get('newPassword')?.value && editUserForm.get('confirmPassword')?.value && editUserForm.get('newPassword')?.value !== editUserForm.get('confirmPassword')?.value">
-              كلمة المرور غير متطابقة
-            </small>
-          </label>
-        </div>
-
-        <div class="flex justify-end gap-3 mt-4 md:col-span-2">
-          <button type="button" (click)="toggleEditUserForm()" class="btn-outline px-4 py-2 rounded-lg">
-            إلغاء
-          </button>
-          <button type="submit" class="btn-primary px-4 py-2 rounded-lg">تأكيد التعديل</button>
-        </div>
-      </form>
-    </div>
-  </div>
-  
   <!-- PrimeNG Confirm Dialog -->
   <p-confirmDialog></p-confirmDialog>
+  
+  <!-- PrimeNG Toast -->
+  <p-toast position="top-center"></p-toast>
 </div>

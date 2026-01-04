@@ -13,18 +13,21 @@ import { Location } from '@angular/common';
 export class LoginFormComponent {
   @Input() title = '';
   @Input() logo = '/assets/logo.svg';
+  @Input() disabled = false;
   @Output() submitForm = new EventEmitter<{
-    email: string;
+    usernameOrEmail: string;
     password: string;
   }>();
 
   constructor(private location: Location) {}
 
-  email = '';
+  usernameOrEmail = '';
   password = '';
 
   onSubmit() {
-    this.submitForm.emit({ email: this.email, password: this.password });
+    if (!this.disabled) {
+      this.submitForm.emit({ usernameOrEmail: this.usernameOrEmail, password: this.password });
+    }
   }
   goBack() {
     this.location.back();
