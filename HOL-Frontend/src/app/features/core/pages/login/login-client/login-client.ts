@@ -20,18 +20,19 @@ import { SweetAlertService } from '../../../../../shared/services/sweet-alert.se
 })
 export class LoginClientComponent {
   constructor(
-    private authService: AuthService, 
+    private authService: AuthService,
     private router: Router,
     private swal: SweetAlertService
-  ) {}
+  ) { }
 
-  login(data: { email: string; password: string }) {
-    this.authService.loginClient(data.email, data.password).subscribe({
+  login(data: { usernameOrEmail: string; password: string }) {
+    const email = data.usernameOrEmail;
+    this.authService.loginClient(email, data.password).subscribe({
       next: (res: any) => {
         this.authService.saveToken(res.token);
         this.authService.saveUser(res.user);
-        this.recordLogin(data.email, 'client', 'success');
-        
+        this.recordLogin(email, 'client', 'success');
+
         this.swal.success({
           title: 'مرحباً!',
           text: res.message || 'تم تسجيل الدخول بنجاح',
@@ -42,7 +43,7 @@ export class LoginClientComponent {
         });
       },
       error: (err) => {
-        this.recordLogin(data.email, 'client', 'failed');
+        this.recordLogin(email, 'client', 'failed');
         this.swal.error({
           title: 'خطأ',
           text: err.message || 'اسم المستخدم أو كلمة المرور غير صحيحة',

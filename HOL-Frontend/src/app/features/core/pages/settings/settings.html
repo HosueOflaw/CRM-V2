@@ -1,8 +1,7 @@
-
 <div class="settings-page max-w-5xl mx-auto p-6">
   <!-- العنوان -->
   <div class="header flex items-center justify-between mb-6">
-      <app-go-back></app-go-back>
+    <app-go-back></app-go-back>
 
     <div>
       <h2 class="text-2xl font-bold" style="color: var(--primary-color);">الإعدادات</h2>
@@ -12,85 +11,45 @@
   </div>
 
   <!-- الأزرار -->
-  <div class="flex justify-end gap-3 mb-6">
-    <button
-      type="button"
-      (click)="toggleNewUserForm()"
-      class="btn-primary px-4 py-2 rounded-lg transition"
-      title="إضافة مستخدم جديد"
-    >
+  <!-- الأزرار -->
+  <div class="flex justify-end gap-3 mb-6" *ngIf="authService.isAdmin()">
+    <button type="button" (click)="toggleNewUserForm()" class="btn-primary px-4 py-2 rounded-lg transition"
+      title="إضافة مستخدم جديد">
       + مستخدم جديد
     </button>
 
-    <button
-      type="button"
-      (click)="loadUsers()"
-      class="btn-primary px-4 py-2 rounded-lg transition"
-      title="عرض جميع المستخدمين"
-      [disabled]="loadingUsers"
-    >
+    <button type="button" (click)="loadUsers()" class="btn-primary px-4 py-2 rounded-lg transition"
+      title="عرض جميع المستخدمين" [disabled]="loadingUsers">
       <span *ngIf="!loadingUsers">👥 عرض المستخدمين</span>
       <span *ngIf="loadingUsers">⏳ جاري التحميل...</span>
     </button>
 
-    <button
-      (click)="togglePermissions()"
-      class="btn-primary px-4 py-2 rounded-md transition"
-      title="إدارة الصلاحيات"
-    >
+    <button (click)="togglePermissions()" class="btn-primary px-4 py-2 rounded-md transition" title="إدارة الصلاحيات">
       🔐 الصلاحيات
     </button>
 
   </div>
 
   <!-- PrimeNG Dialog: جدول المستخدمين -->
-  <p-dialog
-    [(visible)]="showUsersTable"
-    [modal]="true"
-    [style]="{ width: '90vw', maxWidth: '1200px' }"
-    [draggable]="false"
-    [resizable]="false"
-    [closable]="true"
-    [dismissableMask]="true"
-    header="قائمة المستخدمين"
-    styleClass="users-dialog"
-    [blockScroll]="true"
-  >
-    <p-table
-      #usersTable
-      [value]="filteredUsers"
-      [loading]="loadingUsers"
-      [paginator]="true"
-      [rows]="10"
+  <p-dialog [(visible)]="showUsersTable" [modal]="true" [style]="{ width: '90vw', maxWidth: '1200px' }"
+    [draggable]="false" [resizable]="false" [closable]="true" [dismissableMask]="true" header="قائمة المستخدمين"
+    styleClass="users-dialog" [blockScroll]="true">
+    <p-table #usersTable [value]="filteredUsers" [loading]="loadingUsers" [paginator]="true" [rows]="10"
       [rowsPerPageOptions]="[5, 10, 20, 50]"
-      [globalFilterFields]="['username', 'fullName', 'email', 'role', 'id', 'code']"
-      styleClass="p-datatable-striped"
-      [tableStyle]="{'min-width': '50rem'}"
-    >
+      [globalFilterFields]="['username', 'fullName', 'email', 'role', 'id', 'code']" styleClass="p-datatable-striped"
+      [tableStyle]="{'min-width': '50rem'}">
       <ng-template pTemplate="caption">
         <div class="flex justify-between items-center gap-3">
           <span class="text-sm" style="color: var(--text-color-secondary);">
             إجمالي المستخدمين: {{ filteredUsers.length }}
           </span>
           <div class="flex gap-2 items-center">
-            <button
-              type="button"
-              (click)="loadUsers(false, true)"
-              class="btn-outline px-3 py-1 rounded text-xs"
-              [disabled]="loadingUsers"
-              title="إعادة التحميل من السيرفر (تجاهل Cache)"
-            >
+            <button type="button" (click)="loadUsers(false, true)" class="btn-outline px-3 py-1 rounded text-xs"
+              [disabled]="loadingUsers" title="إعادة التحميل من السيرفر (تجاهل Cache)">
               🔄 تحديث
             </button>
-            <input
-              type="text"
-              pInputText
-              placeholder="بحث..."
-              [(ngModel)]="searchText"
-              (input)="filterUsers()"
-              class="p-inputtext-sm"
-              style="width: 300px;"
-            />
+            <input type="text" pInputText placeholder="بحث..." [(ngModel)]="searchText" (input)="filterUsers()"
+              class="p-inputtext-sm" style="width: 300px;" />
           </div>
         </div>
       </ng-template>
@@ -115,6 +74,9 @@
           <th pSortableColumn="role" style="width: 10%">
             الدور
           </th>
+          <th pSortableColumn="department" style="width: 15%">
+            القسم
+          </th>
           <th pSortableColumn="createdAt" style="width: 15%">
             تاريخ الإنشاء
           </th>
@@ -130,32 +92,21 @@
           <td>{{ user.fullName || '-' }}</td>
           <td>{{ user.email || '-' }}</td>
           <td>
-            <span
-              class="px-2 py-1 rounded text-xs font-semibold"
-              [style.background]="getRoleColor(user.role)"
-              [style.color]="'#fff'"
-            >
+            <span class="px-2 py-1 rounded text-xs font-semibold" [style.background]="getRoleColor(user.role)"
+              [style.color]="'#fff'">
               {{ user.role || 'User' }}
             </span>
           </td>
+          <td>{{ getDepartmentLabel(user.department) }}</td>
           <td>{{ user.createdAt ? (user.createdAt | date: 'yyyy-MM-dd') : '-' }}</td>
           <td>
             <div class="flex gap-2">
-              <button
-                type="button"
-                (click)="editUser(user)"
-                class="btn-outline px-2 py-1 rounded text-xs"
-                title="تعديل"
-              >
+              <button type="button" (click)="editUser(user)" class="btn-outline px-2 py-1 rounded text-xs"
+                title="تعديل">
                 ✏️
               </button>
-              <button
-                type="button"
-                (click)="deleteUser(user.id)"
-                class="btn-outline px-2 py-1 rounded text-xs"
-                style="color: var(--red-500); border-color: var(--red-500);"
-                title="حذف"
-              >
+              <button type="button" (click)="deleteUser(user.id)" class="btn-outline px-2 py-1 rounded text-xs"
+                style="color: var(--red-500); border-color: var(--red-500);" title="حذف">
                 🗑️
               </button>
             </div>
@@ -182,86 +133,81 @@
   </p-dialog>
 
   <!-- للصلاحيات المودال -->
-<div
-  *ngIf="showPermissions"
-  class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-  (click)="showPermissions = false; updateSidebarBlur()"
->
-  <div class="rounded-xl shadow-lg w-[700px] p-6 relative" style="background: var(--surface-card); color: var(--text-color);" (click)="$event.stopPropagation()">
-    <!-- رأس المودال -->
-    <h2 class="text-lg font-bold mb-4 text-center">الصلاحيات</h2>
+  <div *ngIf="showPermissions" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    (click)="showPermissions = false; updateSidebarBlur()">
+    <div class="rounded-xl shadow-lg w-[700px] p-6 relative"
+      style="background: var(--surface-card); color: var(--text-color);" (click)="$event.stopPropagation()">
+      <!-- رأس المودال -->
+      <h2 class="text-lg font-bold mb-4 text-center">الصلاحيات</h2>
 
-    <!-- نموذج الصلاحيات -->
-    <div class="grid grid-cols-3 gap-3 items-center mb-4">
-      <label class="col-span-1 text-sm font-semibold text-right">الموظف</label>
-      <input
-        type="text"
-        placeholder="اختر الموظف"
-        class="col-span-1 border rounded px-2 py-1"
-      />
-      <button class="bg-gray-300 px-3 py-1 rounded">...</button>
+      <!-- نموذج الصلاحيات -->
+      <div class="grid grid-cols-3 gap-3 items-center mb-4">
+        <label class="col-span-1 text-sm font-semibold text-right">الموظف</label>
+        <input type="text" placeholder="اختر الموظف" class="col-span-1 border rounded px-2 py-1" />
+        <button class="bg-gray-300 px-3 py-1 rounded">...</button>
 
-      <label class="col-span-1 text-sm font-semibold text-right mt-2">القسم</label>
-      <select class="col-span-2 border rounded px-2 py-1 mt-2">
-        <option value="">اختر القسم</option>
-        <option value="admin">ADMIN</option>
-        <option value="etisal">الاتصالات</option>
-        <option value="mtdawel">المتداول</option>
-        <option value="malia">الادارة المالية</option>
-        <option value="mas2ol">المسئولين</option>
-        <option value="secretary">السكرتارية</option>
-        <option value="executive">التنفيذ</option>
-      </select>
-    </div>
+        <label class="col-span-1 text-sm font-semibold text-right mt-2">القسم</label>
+        <select class="col-span-2 border rounded px-2 py-1 mt-2">
+          <option value="">اختر القسم</option>
+          <option value="admin">ADMIN</option>
+          <option value="etisal">الاتصالات</option>
+          <option value="mtdawel">المتداول</option>
+          <option value="malia">الادارة المالية</option>
+          <option value="mas2ol">المسئولين</option>
+          <option value="secretary">السكرتارية</option>
+          <option value="executive">التنفيذ</option>
+        </select>
+      </div>
 
-    <!-- أزرار البحث والإضافة -->
-    <div class="flex justify-end gap-2 mb-4">
-      <button class="btn-outline px-3 py-1 rounded">بحث</button>
-      <button class="btn-primary px-3 py-1 rounded">إضافة</button>
-    </div>
+      <!-- أزرار البحث والإضافة -->
+      <div class="flex justify-end gap-2 mb-4">
+        <button class="btn-outline px-3 py-1 rounded">بحث</button>
+        <button class="btn-primary px-3 py-1 rounded">إضافة</button>
+      </div>
 
-    <!-- الجدول -->
-    <table class="w-full border text-sm text-center mb-4">
-      <thead style="background: var(--surface-section);">
-        <tr>
-          <th class="border px-2 py-1">إلغاء</th>
-          <th class="border px-2 py-1">القسم</th>
-          <th class="border px-2 py-1">الصلاحية</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let row of permissions">
-          <td class="border px-2 py-1">
-            <button class="text-red-500 hover:text-red-700">❌</button>
-          </td>
-          <td class="border px-2 py-1">{{ row.department }}</td>
-          <td class="border px-2 py-1">{{ row.role }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <!-- الجدول -->
+      <table class="w-full border text-sm text-center mb-4">
+        <thead style="background: var(--surface-section);">
+          <tr>
+            <th class="border px-2 py-1">إلغاء</th>
+            <th class="border px-2 py-1">القسم</th>
+            <th class="border px-2 py-1">الصلاحية</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of permissions">
+            <td class="border px-2 py-1">
+              <button class="text-red-500 hover:text-red-700">❌</button>
+            </td>
+            <td class="border px-2 py-1">{{ row.department }}</td>
+            <td class="border px-2 py-1">{{ row.role }}</td>
+          </tr>
+        </tbody>
+      </table>
 
-    <!-- الأزرار السفلية -->
-    <div class="flex justify-end gap-3">
-      <button
-        (click)="showPermissions = false; updateSidebarBlur()"
-        class="btn-outline px-4 py-2 rounded"
-      >
-        إلغاء
-      </button>
-      <button
-        class="btn-primary px-4 py-2 rounded"
-      >
-        حفظ
-      </button>
+      <!-- الأزرار السفلية -->
+      <div class="flex justify-end gap-3">
+        <button (click)="showPermissions = false; updateSidebarBlur()" class="btn-outline px-4 py-2 rounded">
+          إلغاء
+        </button>
+        <button class="btn-primary px-4 py-2 rounded">
+          حفظ
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
   <!-- ⚙️ صفحة الإعدادات -->
   <div class="grid gap-6" [formGroup]="form" *ngIf="!showNewUserForm">
     <!-- معلومات المستخدم الحالي -->
     <section class="card p-6 rounded-xl shadow-sm" style="background: var(--surface-card);">
-      <h3 class="text-xl font-semibold mb-4" style="color: var(--primary-color);">معلومات الحساب</h3>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold" style="color: var(--primary-color);">معلومات الحساب</h3>
+        <button (click)="toggleChangePasswordPopup()"
+          class="btn-outline px-3 py-1 rounded text-sm transition hover:bg-primary hover:text-white">
+          🔒 تغيير كلمة المرور
+        </button>
+      </div>
       <div class="grid md:grid-cols-2 gap-4" *ngIf="currentUser">
         <div class="info-item">
           <label class="info-label">اسم المستخدم</label>
@@ -278,11 +224,8 @@
         <div class="info-item">
           <label class="info-label">الدور</label>
           <div class="info-value">
-            <span
-              class="px-3 py-1 rounded text-sm font-semibold"
-              [style.background]="getRoleColor(currentUser.role)"
-              [style.color]="'#fff'"
-            >
+            <span class="px-3 py-1 rounded text-sm font-semibold" [style.background]="getRoleColor(currentUser.role)"
+              [style.color]="'#fff'">
               {{ currentUser.role || 'User' }}
             </span>
           </div>
@@ -350,12 +293,13 @@
   </div>
 
   <!-- ✅ مودال إضافة مستخدم جديد -->
-  <div
-    *ngIf="showNewUserForm"
-    class="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50"
-  >
-    <div class="rounded-xl shadow-lg p-6 w-full max-w-2xl relative" style="background: var(--surface-card); color: var(--text-color);">
-      <button (click)="toggleNewUserForm()" class="absolute top-3 right-3 text-xl transition" style="color: var(--text-color-secondary);" onmouseover="this.style.color='var(--red-500, #ef4444)'" onmouseout="this.style.color='var(--text-color-secondary)'">
+  <div *ngIf="showNewUserForm"
+    class="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50">
+    <div class="rounded-xl shadow-lg p-6 w-full max-w-2xl relative"
+      style="background: var(--surface-card); color: var(--text-color);">
+      <button (click)="toggleNewUserForm()" class="absolute top-3 right-3 text-xl transition"
+        style="color: var(--text-color-secondary);" onmouseover="this.style.color='var(--red-500, #ef4444)'"
+        onmouseout="this.style.color='var(--text-color-secondary)'">
         ×
       </button>
       <h3 class="text-xl font-bold mb-4 text-center" style="color: var(--primary-color);">إضافة موظف جديد</h3>
@@ -368,33 +312,28 @@
 
         <label class="flex flex-col">
           <span class="text-sm mb-1">اسم المستخدم *</span>
-          <input 
-            formControlName="username" 
-            type="text" 
-            class="input" 
+          <input formControlName="username" type="text" class="input"
             [class.border-red-500]="newUserForm.get('username')?.invalid && newUserForm.get('username')?.touched"
             [class.border-2]="newUserForm.get('username')?.invalid && newUserForm.get('username')?.touched"
-            placeholder="username" 
-          />
-          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('username')?.hasError('required') && newUserForm.get('username')?.touched">
+            placeholder="username" />
+          <small class="text-red-500 mt-1"
+            *ngIf="newUserForm.get('username')?.hasError('required') && newUserForm.get('username')?.touched">
             اسم المستخدم مطلوب
           </small>
-          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('username')?.hasError('minlength') && newUserForm.get('username')?.touched">
+          <small class="text-red-500 mt-1"
+            *ngIf="newUserForm.get('username')?.hasError('minlength') && newUserForm.get('username')?.touched">
             يجب أن يكون اسم المستخدم 3 أحرف على الأقل
           </small>
         </label>
 
         <label class="flex flex-col">
           <span class="text-sm mb-1">الاسم الكامل *</span>
-          <input 
-            formControlName="fullName" 
-            type="text" 
-            class="input" 
+          <input formControlName="fullName" type="text" class="input"
             [class.border-red-500]="newUserForm.get('fullName')?.invalid && newUserForm.get('fullName')?.touched"
             [class.border-2]="newUserForm.get('fullName')?.invalid && newUserForm.get('fullName')?.touched"
-            placeholder="الاسم الكامل" 
-          />
-          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('fullName')?.hasError('required') && newUserForm.get('fullName')?.touched">
+            placeholder="الاسم الكامل" />
+          <small class="text-red-500 mt-1"
+            *ngIf="newUserForm.get('fullName')?.hasError('required') && newUserForm.get('fullName')?.touched">
             الاسم الكامل مطلوب
           </small>
         </label>
@@ -411,49 +350,50 @@
 
         <label class="flex flex-col">
           <span class="text-sm mb-1">الرقم السري *</span>
-          <input 
-            formControlName="password" 
-            type="password" 
-            class="input"
+          <input formControlName="password" type="password" class="input"
             [class.border-red-500]="newUserForm.get('password')?.invalid && newUserForm.get('password')?.touched"
-            [class.border-2]="newUserForm.get('password')?.invalid && newUserForm.get('password')?.touched"
-          />
-          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('password')?.hasError('required') && newUserForm.get('password')?.touched">
+            [class.border-2]="newUserForm.get('password')?.invalid && newUserForm.get('password')?.touched" />
+          <small class="text-red-500 mt-1"
+            *ngIf="newUserForm.get('password')?.hasError('required') && newUserForm.get('password')?.touched">
             الرقم السري مطلوب
           </small>
-          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('password')?.hasError('minlength') && newUserForm.get('password')?.touched">
+          <small class="text-red-500 mt-1"
+            *ngIf="newUserForm.get('password')?.hasError('minlength') && newUserForm.get('password')?.touched">
             يجب أن يكون الرقم السري 6 أحرف على الأقل
           </small>
         </label>
 
         <label class="flex flex-col">
           <span class="text-sm mb-1">الدور *</span>
-          <select 
-            formControlName="role" 
-            class="input"
+          <select formControlName="role" class="input"
             [class.border-red-500]="newUserForm.get('role')?.invalid && newUserForm.get('role')?.touched"
-            [class.border-2]="newUserForm.get('role')?.invalid && newUserForm.get('role')?.touched"
-          >
+            [class.border-2]="newUserForm.get('role')?.invalid && newUserForm.get('role')?.touched">
             <option value="User">User</option>
             <option value="admin">Admin</option>
             <option value="employee">Employee</option>
           </select>
-          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('role')?.hasError('required') && newUserForm.get('role')?.touched">
+          <small class="text-red-500 mt-1"
+            *ngIf="newUserForm.get('role')?.hasError('required') && newUserForm.get('role')?.touched">
             الدور مطلوب
           </small>
         </label>
 
+        <label class="flex flex-col"
+          *ngIf="newUserForm.get('role')?.value === 'employee' || newUserForm.get('role')?.value === 'Employee'">
+          <span class="text-sm mb-1">القسم *</span>
+          <select formControlName="department" class="input">
+            <option value="">اختر القسم</option>
+            <option *ngFor="let dep of departments" [value]="dep.value">{{ dep.label }}</option>
+          </select>
+        </label>
+
         <label class="flex flex-col">
           <span class="text-sm mb-1" style="color: var(--text-color-secondary);">البريد الإلكتروني</span>
-          <input 
-            formControlName="email" 
-            type="email" 
-            placeholder="email@example.com" 
-            class="input"
+          <input formControlName="email" type="email" placeholder="email@example.com" class="input"
             [class.border-red-500]="newUserForm.get('email')?.invalid && newUserForm.get('email')?.touched"
-            [class.border-2]="newUserForm.get('email')?.invalid && newUserForm.get('email')?.touched"
-          />
-          <small class="text-red-500 mt-1" *ngIf="newUserForm.get('email')?.hasError('email') && newUserForm.get('email')?.touched">
+            [class.border-2]="newUserForm.get('email')?.invalid && newUserForm.get('email')?.touched" />
+          <small class="text-red-500 mt-1"
+            *ngIf="newUserForm.get('email')?.hasError('email') && newUserForm.get('email')?.touched">
             البريد الإلكتروني غير صحيح
           </small>
         </label>
@@ -485,20 +425,68 @@
         </label>
 
         <div class="flex justify-end gap-3 mt-4 md:col-span-2">
-          <button 
-            type="button" 
-            (click)="toggleNewUserForm()" 
-            class="btn-outline px-4 py-2 rounded-lg"
-            title="إلغاء إضافة المستخدم"
-          >
+          <button type="button" (click)="toggleNewUserForm()" class="btn-outline px-4 py-2 rounded-lg"
+            title="إلغاء إضافة المستخدم">
             إلغاء
           </button>
-          <button 
-            type="submit" 
-            class="btn-primary px-4 py-2 rounded-lg"
-            title="حفظ بيانات المستخدم الجديد"
-          >
+          <button type="submit" class="btn-primary px-4 py-2 rounded-lg" title="حفظ بيانات المستخدم الجديد">
             حفظ المستخدم
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 🔒 مودال تغيير كلمة المرور -->
+  <div *ngIf="showChangePasswordPopup"
+    class="fixed inset-0 bg-black/30 backdrop-blur-[2px] flex items-center justify-center z-50">
+    <div class="rounded-xl shadow-lg p-6 w-full max-w-md relative"
+      style="background: var(--surface-card); color: var(--text-color);">
+      <button (click)="toggleChangePasswordPopup()" class="absolute top-3 right-3 text-xl transition"
+        style="color: var(--text-color-secondary);" onmouseover="this.style.color='var(--red-500, #ef4444)'"
+        onmouseout="this.style.color='var(--text-color-secondary)'">
+        ×
+      </button>
+      <h3 class="text-xl font-bold mb-4 text-center" style="color: var(--primary-color);">تغيير كلمة المرور</h3>
+
+      <form [formGroup]="changePasswordForm" (ngSubmit)="saveChangePassword()" class="grid gap-4">
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">كلمة المرور الحالية</span>
+          <input formControlName="oldPassword" type="password" class="input" />
+          <small class="text-red-500 mt-1"
+            *ngIf="changePasswordForm.get('oldPassword')?.invalid && changePasswordForm.get('oldPassword')?.touched">
+            مطلوب
+          </small>
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">كلمة المرور الجديدة</span>
+          <input formControlName="newPassword" type="password" class="input" />
+          <small class="text-red-500 mt-1"
+            *ngIf="changePasswordForm.get('newPassword')?.errors?.['required'] && changePasswordForm.get('newPassword')?.touched">
+            مطلوب
+          </small>
+          <small class="text-red-500 mt-1"
+            *ngIf="changePasswordForm.get('newPassword')?.errors?.['minlength'] && changePasswordForm.get('newPassword')?.touched">
+            يجب أن تكون 6 أحرف على الأقل
+          </small>
+        </label>
+
+        <label class="flex flex-col">
+          <span class="text-sm mb-1">تأكيد كلمة المرور الجديدة</span>
+          <input formControlName="confirmPassword" type="password" class="input" />
+          <small class="text-red-500 mt-1"
+            *ngIf="changePasswordForm.errors?.['mismatch'] && changePasswordForm.get('confirmPassword')?.touched">
+            كلمة المرور غير متطابقة
+          </small>
+        </label>
+
+        <div class="flex justify-end gap-3 mt-4">
+          <button type="button" (click)="toggleChangePasswordPopup()" class="btn-outline px-4 py-2 rounded-lg">
+            إلغاء
+          </button>
+          <button type="submit" class="btn-primary px-4 py-2 rounded-lg">
+            حفظ التغييرات
           </button>
         </div>
       </form>
@@ -507,7 +495,7 @@
 
   <!-- PrimeNG Confirm Dialog -->
   <p-confirmDialog></p-confirmDialog>
-  
+
   <!-- PrimeNG Toast -->
   <p-toast position="top-center"></p-toast>
 </div>

@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { Signalr } from '../../services/signalr';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,10 @@ export class AuthService {
 
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private signalr: Signalr
+  ) { }
 
   // Admin login (temporary - works with admin/123456)
   loginAdmin(username: string, password: string): Observable<any> {
@@ -49,9 +53,14 @@ export class AuthService {
         map((response: any) => {
           // Handle API response - LoginResponseDto from backend
           if (response && response.success) {
+            const token = response.token || response.userId?.toString();
+
+            // Start SignalR connection
+            this.signalr.startConnection(token);
+
             return {
               status: 'success',
-              token: response.token || response.userId?.toString(), // JWT Token from backend
+              token: token, // JWT Token from backend
               user: {
                 id: response.userId,
                 username: response.username,
@@ -70,7 +79,7 @@ export class AuthService {
         catchError((error: any) => {
           // Handle different error types
           let errorMessage = 'اسم المستخدم أو كلمة المرور غير صحيحة';
-          
+
           if (error.error) {
             if (error.error.message) {
               errorMessage = error.error.message;
@@ -117,7 +126,7 @@ export class AuthService {
    */
   logout(): Observable<any> {
     const token = this.getToken();
-    
+
     // Prepare headers with token
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -130,15 +139,17 @@ export class AuthService {
         // Always clear local data regardless of backend response
         map((response: any) => {
           this.clearLocalAuthData();
+          this.signalr.stopConnection();
           return response;
         }),
         catchError((error: any) => {
           // Clear local data even if backend request fails
           this.clearLocalAuthData();
-          
+          this.signalr.stopConnection();
+
           // Log error but don't throw (user should still be logged out locally)
           console.warn('Logout request failed, but local data cleared:', error);
-          
+
           // Return success to allow logout to proceed
           return of({ success: true, message: 'تم تسجيل الخروج محلياً' });
         })
@@ -150,6 +161,19 @@ export class AuthService {
    */
   logoutLocal(): void {
     this.clearLocalAuthData();
+    this.signalr.stopConnection();
+  }
+
+  /**
+   * Initialize SignalR if user is logged in (for page refresh)
+   */
+  initSignalRIfLoggedIn(): void {
+    if (this.isLoggedIn()) {
+      const token = this.getToken();
+      if (token) {
+        this.signalr.startConnection(token);
+      }
+    }
   }
 
   /**
@@ -161,12 +185,12 @@ export class AuthService {
     localStorage.removeItem('user');
     localStorage.removeItem('token_expires_at');
     localStorage.removeItem('refresh_token');
-    
+
     // Clear sessionStorage
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
     sessionStorage.clear();
-    
+
     // Clear any cached data
     localStorage.removeItem('failed_login_attempts');
     localStorage.removeItem('login_lockout');
@@ -229,7 +253,7 @@ export class AuthService {
    */
   getToken(): string | null {
     const token = localStorage.getItem('token');
-    
+
     // Validate token if exists
     if (token && this.isValidJWT(token)) {
       const decodedToken = this.decodeJWT(token);
@@ -241,7 +265,7 @@ export class AuthService {
         return null;
       }
     }
-    
+
     return token;
   }
 
@@ -251,7 +275,7 @@ export class AuthService {
   getUser(): any {
     const user = localStorage.getItem('user');
     if (!user) return null;
-    
+
     try {
       return JSON.parse(user);
     } catch (error) {
@@ -278,7 +302,7 @@ export class AuthService {
    */
   private isValidJWT(token: string): boolean {
     if (!token || typeof token !== 'string') return false;
-    
+
     // JWT format: header.payload.signature (3 parts separated by dots)
     const parts = token.split('.');
     if (parts.length !== 3) return false;
@@ -309,7 +333,7 @@ export class AuthService {
       const decoded = JSON.parse(
         atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
       );
-      
+
       return decoded;
     } catch (error) {
       console.error('Error decoding JWT:', error);
@@ -322,10 +346,10 @@ export class AuthService {
    */
   private isTokenExpired(decodedToken: any): boolean {
     if (!decodedToken || !decodedToken.exp) return true;
-    
+
     const expirationTime = decodedToken.exp * 1000; // Convert to milliseconds
     const currentTime = Date.now();
-    
+
     return currentTime >= expirationTime;
   }
 
@@ -355,6 +379,31 @@ export class AuthService {
 
   getCurrentUserName(): string {
     const user = this.getUser();
-    return user?.name || 'مستخدم';
+    return user?.name || user?.fullName || 'مستخدم';
+  }
+
+  /**
+   * Check if current user is Admin
+   */
+  isAdmin(): boolean {
+    const user = this.getUser();
+    // Check for both 'admin' and 'Admin' to be safe
+    return user && (user.role === 'admin' || user.role === 'Admin');
+  }
+
+  /**
+   * Check if current user is Employee
+   */
+  isEmployee(): boolean {
+    const user = this.getUser();
+    return user && (user.role === 'employee' || user.role === 'Employee');
+  }
+
+  /**
+   * Get current user's department
+   */
+  getUserDepartment(): string | null {
+    const user = this.getUser();
+    return user?.department || null;
   }
 }

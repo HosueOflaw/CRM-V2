@@ -4,6 +4,8 @@ import { ActivatedRoute, NavigationEnd, Router, RouterModule } from '@angular/ro
 import { filter, map, mergeMap } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 
+import { AuthService } from './core/services/auth';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -15,10 +17,13 @@ export class App implements OnInit {
     public es: ElectronService,
     private titleService: Title,
     private router: Router,
-    private activatedRoute: ActivatedRoute
-  ) {}
+    private activatedRoute: ActivatedRoute,
+    private authService: AuthService
+  ) { }
   ngOnInit(): void {
-      this.router.events
+    // Initialize SignalR connection if user is logged in (for "one device" check)
+    this.authService.initSignalRIfLoggedIn();
+    this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
         map(() => {

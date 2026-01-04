@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
+import { AuthService } from '../../core/services/auth';
 
 @Component({
     selector: 'app-menu',
@@ -23,15 +24,27 @@ import { AppMenuitem } from './app.menuitem';
 export class AppMenu implements OnInit {
     homeItem: MenuItem = {};
     menuSections: MenuItem[] = [];
+    departmentsMap: { [key: string]: string } = {
+        'negotiations': 'المفاوضات',
+        'secretariat': 'السكرتارية',
+        'execution': 'التنفيذ',
+        'finance': 'الإدارة المالية',
+        'discussions': 'المداولات',
+        'reports': 'التقارير',
+        'car-management': 'السيارات',
+        'management': 'الشؤون الإدارية'
+    };
+
+    constructor(private authService: AuthService) { }
 
     ngOnInit() {
-        this.homeItem = { 
-            label: 'الصفحة الرئيسية', 
-            icon: 'pi pi-fw pi-home', 
-            routerLink: ['/'] 
+        this.homeItem = {
+            label: 'الصفحة الرئيسية',
+            icon: 'pi pi-fw pi-home',
+            routerLink: ['/']
         };
 
-        this.menuSections = [
+        const allSections: MenuItem[] = [
             {
                 label: 'المفاوضات',
                 icon: 'pi pi-fw pi-comments',
@@ -151,12 +164,28 @@ export class AppMenu implements OnInit {
                     { label: 'كشف الطعون', icon: 'pi pi-fw pi-list', routerLink: ['/discussions/appeals-overview'] },
                     { label: 'التقارير العامة', icon: 'pi pi-fw pi-file', routerLink: ['/discussions/general-reports'] }
                 ]
-            },
-            // {
-            //     label: 'الإعدادات',
-            //     icon: 'pi pi-fw pi-cog',
-            //     routerLink: ['/settings']
-            // }
+            }
         ];
+
+        // Filter functionality
+        if (this.authService.isAdmin()) {
+            // Admin sees all
+            this.menuSections = allSections;
+        } else if (this.authService.isEmployee()) {
+            // Employee sees only their department
+            const depKey = this.authService.getUserDepartment();
+            if (depKey && this.departmentsMap[depKey]) {
+                const targetLabel = this.departmentsMap[depKey];
+                this.menuSections = allSections.filter(section => section.label === targetLabel);
+            } else {
+                // If no department assigned or invalid, maybe show nothing or default?
+                // Showing nothing to be safe as per "but not any other section"
+                this.menuSections = [];
+            }
+        } else {
+            // Regular User/Client - Logic not defined in prompt, assume empty or limited.
+            // For now, let's just leave it empty or maybe show Home only.
+            this.menuSections = [];
+        }
     }
 }

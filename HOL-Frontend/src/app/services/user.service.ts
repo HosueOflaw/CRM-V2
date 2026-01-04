@@ -10,6 +10,7 @@ export interface CreateUserDto {
   fullName?: string;
   email?: string;
   role?: string;
+  department?: string;
   password: string;
   code?: number;
 }
@@ -19,6 +20,7 @@ export interface UpdateUserDto {
   fullName?: string;
   email?: string;
   role?: string;
+  department?: string;
   code?: number;
 }
 
@@ -29,6 +31,7 @@ export interface UserDto {
   fullName?: string;
   email?: string;
   role?: string;
+  department?: string;
   createdAt?: string;
 }
 
@@ -42,7 +45,7 @@ export class UserService {
   constructor(
     private http: HttpClient,
     private cacheService: CacheService
-  ) {}
+  ) { }
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -173,12 +176,8 @@ export class UserService {
   /**
    * Change password (no caching needed)
    */
-  changePassword(userId: number, oldPassword: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/change-password`, {
-      userId,
-      oldPassword,
-      newPassword
-    }, { headers: this.getHeaders() });
+  changePassword(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/change-password`, data, { headers: this.getHeaders() });
   }
 
   /**

@@ -45,10 +45,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
   // 💾 متغيرات عامة
   showNewUserForm = false;
   uploadedFileName: string | null = null;
-  
+
   // 👤 بيانات المستخدم الحالي
   currentUser: any = null;
-  
+
   // 👥 متغيرات المستخدمين
   users: any[] = [];
   filteredUsers: any[] = [];
@@ -83,9 +83,17 @@ export class SettingsComponent implements OnInit, OnDestroy {
     { department: 'الاتصالات', role: 'تحكم كامل' }
   ];
 
-  // Language options
-  languageOptions = [
-    { label: 'العربية', value: 'ar' },
+  // 🏢 الأقسام
+  // 🏢 الأقسام
+  departments = [
+    { label: 'المفاوضات', value: 'negotiations' },
+    { label: 'السكرتارية', value: 'secretariat' },
+    { label: 'التنفيذ', value: 'execution' },
+    { label: 'الإدارة المالية', value: 'finance' },
+    { label: 'المداولات', value: 'discussions' },
+    { label: 'التقارير', value: 'reports' },
+    { label: 'السيارات', value: 'car-management' },
+    { label: 'شؤون إدارية', value: 'management' }
   ];
 
   togglePermissions() {
@@ -93,8 +101,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.updateSidebarBlur();
   }
 
+
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private layoutService: LayoutService,
     private userService: UserService,
     private toast: PrimeToastService,
@@ -121,11 +130,19 @@ export class SettingsComponent implements OnInit, OnDestroy {
       email: ['', [Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       role: ['User', Validators.required],
+      department: [''],
       group: [''],
       active: ['active'],
       phone: [''],
       hireDate: [''],
     });
+
+    // 🔒 نموذج تغيير كلمة المرور
+    this.changePasswordForm = this.fb.group({
+      oldPassword: ['', Validators.required],
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required]
+    }, { validators: this.passwordMatchValidator });
 
     this.load();
     this.loadCurrentUser();
@@ -172,15 +189,75 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.currentUser = this.authService.getUser();
   }
 
+  // 🔒 تغيير كلمة المرور
+  showChangePasswordPopup = false;
+  changePasswordForm: FormGroup;
+
+  // ... (previous code)
+
+
+
+  // ✅ التحقق من تطابق كلمتي المرور
+  passwordMatchValidator(g: FormGroup) {
+    return g.get('newPassword')?.value === g.get('confirmPassword')?.value
+      ? null : { mismatch: true };
+  }
+
+  // 🔄 عرض/إخفاء نافذة تغيير كلمة المرور
+  toggleChangePasswordPopup() {
+    this.showChangePasswordPopup = !this.showChangePasswordPopup;
+    if (!this.showChangePasswordPopup) {
+      this.changePasswordForm.reset();
+    }
+    this.updateSidebarBlur();
+  }
+
+  // 💾 حفظ كلمة المرور الجديدة
+  saveChangePassword() {
+    if (this.changePasswordForm.invalid) {
+      this.changePasswordForm.markAllAsTouched();
+      return;
+    }
+
+    const { oldPassword, newPassword } = this.changePasswordForm.value;
+
+    // Create the DTO object
+    const changePasswordDto = {
+      userId: this.currentUser?.id,
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+      confirmNewPassword: newPassword
+    };
+
+    if (!changePasswordDto.userId) {
+      this.toast.error('لم يتم العثور على معرف المستخدم', 'خطأ');
+      return;
+    }
+
+    this.userService.changePassword(changePasswordDto).subscribe({
+      next: (res: any) => {
+        this.toast.success('تم تغيير كلمة المرور بنجاح', 'نجح');
+        this.toggleChangePasswordPopup();
+      },
+      error: (err) => {
+        const msg = err.error?.message || 'حدث خطأ أثناء تغيير كلمة المرور';
+        this.toast.error(msg, 'خطأ');
+      }
+    });
+  }
+
   // 🎨 تطبيق/إزالة blur على الـ sidebar
   updateSidebarBlur() {
-    const isAnyModalOpen = this.showNewUserForm || this.showPermissions;
+    const isAnyModalOpen = this.showNewUserForm || this.showPermissions || this.showChangePasswordPopup;
     if (isAnyModalOpen) {
       this.renderer.addClass(document.body, 'modal-open-sidebar-blur');
     } else {
       this.renderer.removeClass(document.body, 'modal-open-sidebar-blur');
     }
   }
+
+  // ... (rest of the component)
+
 
   ngOnDestroy() {
     // إزالة blur class عند تدمير الـ component
@@ -252,14 +329,25 @@ export class SettingsComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // تحقق إضافي: الموظف يجب أن يكون له قسم
+    const currentRole = this.newUserForm.get('role')?.value;
+    const currentDepartment = this.newUserForm.get('department')?.value;
+
+    if ((currentRole === 'employee' || currentRole === 'Employee') && !currentDepartment) {
+      this.toast.warning('يرجى اختيار القسم للموظف', 'تحذير');
+      this.newUserForm.get('department')?.markAsTouched();
+      return;
+    }
+
     const formValue = this.newUserForm.value;
-    
+
     // تحضير البيانات للباك إند
     const userData: any = {
       username: formValue.username,
       fullName: formValue.fullName || formValue.arabicName || formValue.latinName,
       email: formValue.email || '',
       role: formValue.role || 'User',
+      department: formValue.department,
       password: formValue.password
     };
 
@@ -325,7 +413,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     }
 
     const searchLower = this.searchText.toLowerCase().trim();
-    this.filteredUsers = this.users.filter(user => 
+    this.filteredUsers = this.users.filter(user =>
       (user.username?.toLowerCase().includes(searchLower)) ||
       (user.fullName?.toLowerCase().includes(searchLower)) ||
       (user.email?.toLowerCase().includes(searchLower)) ||
@@ -346,6 +434,14 @@ export class SettingsComponent implements OnInit, OnDestroy {
       'User': '#10b981',
     };
     return roleColors[role] || '#6b7280';
+  }
+
+  // 🏷️ الحصول على اسم القسم
+  getDepartmentLabel(value: string | undefined): string {
+    if (!value) return '-';
+    // البحث في مصفوفة الكائنات
+    const dept = this.departments.find(d => d.value === value);
+    return dept ? dept.label : value;
   }
 
   // ✏️ تعديل مستخدم (من الجدول مباشرة)
