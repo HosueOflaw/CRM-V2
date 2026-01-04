@@ -26,6 +26,9 @@ public class User
     [Column("role")]
     public string? Role { get; set; }
 
+    [Column("department")]
+    public string? Department { get; set; }
+
     [Column("created_at")]
     public DateTime? CreatedAt { get; set; }
 

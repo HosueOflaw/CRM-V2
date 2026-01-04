@@ -8,6 +8,7 @@ public interface INotificationService
     Task BroadcastToAllAsync(string eventType, object payload);
     Task BroadcastToChannelAsync(string channel, string eventType, object payload);
     Task BroadcastToUserAsync(string userId, string eventType, object payload);
+    Task SendForceLogoutAsync(string userId, string reason = "logged_in_elsewhere");
 }
 
 public class NotificationService : INotificationService
@@ -54,6 +55,17 @@ public class NotificationService : INotificationService
         {
             type = eventType,
             data = payload,
+            timestamp = DateTime.UtcNow
+        });
+    }
+    /// <summary>
+    /// يرسل إشارة تسجيل خروج قسري لمستخدم معين
+    /// </summary>
+    public async Task SendForceLogoutAsync(string userId, string reason = "logged_in_elsewhere")
+    {
+        await _hubContext.Clients.User(userId).SendAsync("force_logout", new
+        {
+            reason = reason,
             timestamp = DateTime.UtcNow
         });
     }

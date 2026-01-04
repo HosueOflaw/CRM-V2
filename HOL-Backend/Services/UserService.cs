@@ -12,17 +12,20 @@ public class UserService : IUserService
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtService _jwtService;
+    private readonly INotificationService _notificationService;
     private readonly ILogger<UserService> _logger;
 
     public UserService(
         IUserRepository userRepository,
         IPasswordHasher passwordHasher,
         IJwtService jwtService,
+        INotificationService notificationService,
         ILogger<UserService> logger)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _jwtService = jwtService;
+        _notificationService = notificationService;
         _logger = logger;
     }
 
@@ -59,6 +62,7 @@ public class UserService : IUserService
             FullName = createDto.FullName,
             Email = createDto.Email,
             Role = createDto.Role,
+            Department = createDto.Department,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -105,6 +109,9 @@ public class UserService : IUserService
 
         if (!string.IsNullOrEmpty(updateDto.Role))
             user.Role = updateDto.Role;
+
+        if (!string.IsNullOrEmpty(updateDto.Department))
+            user.Department = updateDto.Department;
 
         await _userRepository.UpdateAsync(user);
         _logger.LogInformation("User updated: {UserId}", user.Id);
@@ -176,6 +183,9 @@ public class UserService : IUserService
 
         _logger.LogInformation("User logged in: {UserId}, Username: {Username}", user.Id, user.Username);
 
+        // إرسال إشارة تسجيل خروج لأي أجهزة أخرى قبل تسجيل الدخول الجديد (One Session per User)
+        await _notificationService.SendForceLogoutAsync(user.Id.ToString());
+
         // Generate JWT Token
         var token = _jwtService.GenerateToken(user.Id, user.Username ?? "", user.Role);
 
@@ -187,6 +197,7 @@ public class UserService : IUserService
             FullName = user.FullName,
             Email = user.Email,
             Role = user.Role,
+            Department = user.Department,
             Token = token,
             ExpiresIn = 3600,
             Message = "Login successful"
@@ -238,6 +249,7 @@ public class UserService : IUserService
             FullName = user.FullName,
             Email = user.Email,
             Role = user.Role,
+            Department = user.Department,
             CreatedAt = user.CreatedAt
         };
     }
