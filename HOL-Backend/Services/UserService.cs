@@ -13,6 +13,7 @@ public class UserService : IUserService
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtService _jwtService;
     private readonly INotificationService _notificationService;
+    private readonly IEmailService _emailService;
     private readonly ILogger<UserService> _logger;
 
     public UserService(
@@ -20,12 +21,14 @@ public class UserService : IUserService
         IPasswordHasher passwordHasher,
         IJwtService jwtService,
         INotificationService notificationService,
+        IEmailService emailService,
         ILogger<UserService> logger)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _jwtService = jwtService;
         _notificationService = notificationService;
+        _emailService = emailService;
         _logger = logger;
     }
 
@@ -112,6 +115,17 @@ public class UserService : IUserService
 
         if (!string.IsNullOrEmpty(updateDto.Department))
             user.Department = updateDto.Department;
+
+        // تحديث كلمة المرور إذا تم إرسالها (خاص بالآدمن أو تغيير كلمة المرور بدون القديمة)
+        if (!string.IsNullOrEmpty(updateDto.Password))
+        {
+            user.PasswordHashed = _passwordHasher.HashPassword(updateDto.Password);
+            user.PasswordSalt = null;
+            _logger.LogInformation("Password updated for user: {UserId} during profile update", user.Id);
+            
+            // تسجيل خروج قسري لضمان أن المستخدم سيدخل بالباسورد الجديد
+            await _notificationService.SendForceLogoutAsync(user.Id.ToString(), "password_updated_by_admin");
+        }
 
         await _userRepository.UpdateAsync(user);
         _logger.LogInformation("User updated: {UserId}", user.Id);
@@ -235,6 +249,79 @@ public class UserService : IUserService
 
         await _userRepository.UpdateAsync(user);
         _logger.LogInformation("Password changed for user: {UserId}", user.Id);
+
+        return true;
+    }
+
+    public async Task<bool> AdminResetPasswordAsync(AdminResetPasswordDto resetDto)
+    {
+        var user = await _userRepository.GetByIdAsync(resetDto.UserId);
+        if (user == null)
+        {
+            return false;
+        }
+
+        // Hash new password
+        var hashedPassword = _passwordHasher.HashPassword(resetDto.NewPassword);
+        user.PasswordHashed = hashedPassword;
+        user.PasswordSalt = null;
+
+        await _userRepository.UpdateAsync(user);
+        _logger.LogInformation("Password reset by Admin for user: {UserId}", user.Id);
+
+        // إرسال إشارة تسجيل خروج قسري للمستخدم لكي يضطر للدخول بكلمة المرور الجديدة
+        await _notificationService.SendForceLogoutAsync(user.Id.ToString(), "password_reset_by_admin");
+
+        return true;
+    }
+
+    public async Task<bool> ForgotPasswordAsync(string email)
+    {
+        var users = await _userRepository.GetAllAsync();
+        var user = users.FirstOrDefault(u => u.Email == email);
+        
+        if (user == null) return false;
+
+        // Generate a random 6-digit code
+        var code = new Random().Next(100000, 999999).ToString();
+        
+        user.ResetToken = code;
+        user.ResetTokenExpiry = DateTime.UtcNow.AddMinutes(15);
+        
+        await _userRepository.UpdateAsync(user);
+
+        // Send Email
+        await _emailService.SendEmailAsync(
+            user.Email!, 
+            "Password Reset Code", 
+            $"Your verification code is: {code}. It will expire in 15 minutes."
+        );
+
+        return true;
+    }
+
+    public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetDto)
+    {
+        var users = await _userRepository.GetAllAsync();
+        var user = users.FirstOrDefault(u => u.Email == resetDto.Email);
+
+        if (user == null || user.ResetToken != resetDto.Token || user.ResetTokenExpiry < DateTime.UtcNow)
+        {
+            return false;
+        }
+
+        // Hash new password
+        user.PasswordHashed = _passwordHasher.HashPassword(resetDto.NewPassword);
+        user.PasswordSalt = null;
+        user.ResetToken = null;
+        user.ResetTokenExpiry = null;
+
+        await _userRepository.UpdateAsync(user);
+        
+        _logger.LogInformation("Password reset via email for user: {UserId}", user.Id);
+        
+        // Force logout from all sessions
+        await _notificationService.SendForceLogoutAsync(user.Id.ToString(), "password_reset_via_forgot");
 
         return true;
     }

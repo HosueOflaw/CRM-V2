@@ -239,6 +239,56 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
+    /// إعادة تعيين كلمة مرور مستخدم (للمسؤول فقط)
+    /// POST: api/users/admin-reset-password
+    /// </summary>
+    [HttpPost("admin-reset-password")]
+    [Authorize(Roles = "admin")]
+    public async Task<IActionResult> AdminResetPassword(AdminResetPasswordDto resetDto)
+    {
+        var success = await _userService.AdminResetPasswordAsync(resetDto);
+
+        if (!success)
+        {
+            return NotFound(new { message = "User not found" });
+        }
+
+        return Ok(new { message = "User password has been reset successfully" });
+    }
+
+    /// <summary>
+    /// طلب إعادة تعيين كلمة المرور (إرسال كود للبريد)
+    /// POST: api/users/forgot-password
+    /// </summary>
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotDto)
+    {
+        var success = await _userService.ForgotPasswordAsync(forgotDto.Email);
+        
+        // أمنياً: لا نخبر المستخدم إذا كان البريد موجوداً أم لا
+        return Ok(new { message = "If your email is registered, you will receive a verification code." });
+    }
+
+    /// <summary>
+    /// إعادة تعيين كلمة المرور باستخدام الكود
+    /// POST: api/users/reset-password
+    /// </summary>
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword(ResetPasswordDto resetDto)
+    {
+        var success = await _userService.ResetPasswordAsync(resetDto);
+
+        if (!success)
+        {
+            return BadRequest(new { message = "Invalid code, email, or code expired" });
+        }
+
+        return Ok(new { message = "Password has been reset successfully" });
+    }
+
+    /// <summary>
     /// تسجيل الخروج
     /// POST: api/users/logout
     /// Headers: Authorization: Bearer {token}

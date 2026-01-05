@@ -29,6 +29,12 @@ public class User
     [Column("department")]
     public string? Department { get; set; }
 
+    [Column("reset_token")]
+    public string? ResetToken { get; set; }
+
+    [Column("reset_token_expiry")]
+    public DateTime? ResetTokenExpiry { get; set; }
+
     [Column("created_at")]
     public DateTime? CreatedAt { get; set; }
 

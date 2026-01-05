@@ -16,4 +16,7 @@ public interface IUserService
     Task<IEnumerable<UserDto>> GetUsersByRoleAsync(string role);
     Task<LoginResponseDto> LoginAsync(LoginDto loginDto);
     Task<bool> ChangePasswordAsync(ChangePasswordDto changePasswordDto);
+    Task<bool> AdminResetPasswordAsync(AdminResetPasswordDto resetDto);
+    Task<bool> ForgotPasswordAsync(string email);
+    Task<bool> ResetPasswordAsync(ResetPasswordDto resetDto);
 }

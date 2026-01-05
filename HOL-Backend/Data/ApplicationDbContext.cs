@@ -23,6 +23,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<CallcenterStatement> CallcenterStatements => Set<CallcenterStatement>();
     public DbSet<AdditionalAmount> AdditionalAmounts => Set<AdditionalAmount>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<UserBreak> UserBreaks => Set<UserBreak>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -4,6 +4,7 @@ using House_of_law_api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace House_of_law_api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260105095320_AddResetTokenToUser")]
+    partial class AddResetTokenToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -780,65 +783,6 @@ namespace House_of_law_api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("users");
-                });
-
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.UserBreak", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("BreakDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("break_date");
-
-                    b.Property<int?>("DurationMinutes")
-                        .HasColumnType("int")
-                        .HasColumnName("duration_minutes");
-
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("end_time");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit")
-                        .HasColumnName("is_completed");
-
-                    b.Property<int?>("LateMinutes")
-                        .HasColumnType("int")
-                        .HasColumnName("late_minutes");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("start_time");
-
-                    b.Property<int?>("UnusedMinutes")
-                        .HasColumnType("int")
-                        .HasColumnName("unused_minutes");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("user_breaks");
-                });
-
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.UserBreak", b =>
-                {
-                    b.HasOne("House_of_law_api.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

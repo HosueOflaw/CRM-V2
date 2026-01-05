@@ -26,3 +26,21 @@ public class ChangePasswordDto
     public string OldPassword { get; set; } = string.Empty;
     public string NewPassword { get; set; } = string.Empty;
 }
+
+public class AdminResetPasswordDto
+{
+    public int UserId { get; set; }
+    public string NewPassword { get; set; } = string.Empty;
+}
+
+public class ForgotPasswordDto
+{
+    public string Email { get; set; } = string.Empty;
+}
+
+public class ResetPasswordDto
+{
+    public string Email { get; set; } = string.Empty;
+    public string Token { get; set; } = string.Empty;
+    public string NewPassword { get; set; } = string.Empty;
+}
