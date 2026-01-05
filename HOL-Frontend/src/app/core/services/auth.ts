@@ -53,6 +53,7 @@ export class AuthService {
         map((response: any) => {
           // Handle API response - LoginResponseDto from backend
           if (response && response.success) {
+            console.log('--- Raw Login Response from API ---', response);
             const token = response.token || response.userId?.toString();
 
             // Start SignalR connection
@@ -62,11 +63,13 @@ export class AuthService {
               status: 'success',
               token: token, // JWT Token from backend
               user: {
+                ...response, // Include all fields from API response
                 id: response.userId,
                 username: response.username,
                 full_name: response.fullName,
                 email: response.email,
                 role: response.role,
+                department: response.department || response.section || response.Section || response.Group || response.group || response.Department,
                 name: response.fullName || response.username
               },
               expiresIn: response.expiresIn || 3600,
@@ -277,7 +280,10 @@ export class AuthService {
     if (!user) return null;
 
     try {
-      return JSON.parse(user);
+      const parsedUser = JSON.parse(user);
+      // 🔥 Debug log added to help identify property names
+      console.log('AuthService Debug - Current User:', parsedUser);
+      return parsedUser;
     } catch (error) {
       console.error('Error parsing user data:', error);
       return null;
@@ -387,8 +393,9 @@ export class AuthService {
    */
   isAdmin(): boolean {
     const user = this.getUser();
-    // Check for both 'admin' and 'Admin' to be safe
-    return user && (user.role === 'admin' || user.role === 'Admin');
+    if (!user) return false;
+    const role = (user.role || user.Role || user.userRole || user.UserRole || '').toLowerCase().trim();
+    return role === 'admin' || role === 'administrator';
   }
 
   /**
@@ -396,7 +403,9 @@ export class AuthService {
    */
   isEmployee(): boolean {
     const user = this.getUser();
-    return user && (user.role === 'employee' || user.role === 'Employee');
+    if (!user) return false;
+    const role = (user.role || user.Role || user.userRole || user.UserRole || '').toLowerCase().trim();
+    return role === 'employee';
   }
 
   /**
@@ -404,6 +413,13 @@ export class AuthService {
    */
   getUserDepartment(): string | null {
     const user = this.getUser();
-    return user?.department || null;
+    if (!user) return null;
+
+    // Log available keys to help debug
+    const dep = user.department || user.Department || user.section || user.Section ||
+      user.group || user.Group || user.dept || user.Dept;
+
+    console.log('AuthService: Detected Department:', dep, 'from user object:', user);
+    return dep || null;
   }
 }

@@ -115,3 +115,78 @@
 .login-form .form-label {
   color: var(--text-color-secondary) !important;
 }
+
+/* Password toggle styles */
+.password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrap .form-input {
+  width: 100%;
+  padding-left: 3rem;
+  /* Space for the icon on the left (since it's RTL) */
+}
+
+.password-toggle {
+  position: absolute;
+  left: 0.75rem;
+  /* Positioned on the left for RTL layout */
+  background: transparent;
+  border: none;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  z-index: 10;
+}
+
+.password-toggle:hover:not(:disabled) {
+  color: var(--primary-color);
+}
+
+.password-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.password-toggle i {
+  font-size: 1.1rem;
+}
+
+.forgot-link {
+  text-decoration: none;
+  transition: all 0.2s;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+  opacity: 1;
+  color: var(--primary-color) !important;
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-start {
+  justify-content: flex-start;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.p-1 {
+  padding: 0.25rem;
+}

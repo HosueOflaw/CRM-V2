@@ -22,6 +22,17 @@ export interface UpdateUserDto {
   role?: string;
   department?: string;
   code?: number;
+  password?: string;
+}
+
+export interface ForgotPasswordDto {
+  email: string;
+}
+
+export interface ResetPasswordDto {
+  email: string;
+  token: string;
+  newPassword: string;
 }
 
 export interface UserDto {
@@ -178,6 +189,20 @@ export class UserService {
    */
   changePassword(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/change-password`, data, { headers: this.getHeaders() });
+  }
+
+  /**
+   * Request password reset code
+   */
+  forgotPassword(data: ForgotPasswordDto): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, data);
+  }
+
+  /**
+   * Reset password using verification code
+   */
+  resetPassword(data: ResetPasswordDto): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, data);
   }
 
   /**

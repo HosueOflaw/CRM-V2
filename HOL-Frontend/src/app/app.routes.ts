@@ -6,6 +6,7 @@ import { ErrorPage } from './shared/pages/404/error-page/error-page';
 import NegotiationsDashboard from './features/negotiations/pages/negotiations-dashboard/negotiations-dashboard';
 import { MainLayout } from './features/execution/pages/main/main-layout/main-layout';
 import { authGuard } from './guards/auth.guard';
+import { departmentGuard } from './guards/department.guard';
 
 export const routes: Routes = [
   // Login Routes (without guard)
@@ -39,10 +40,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', component: HomePage, data: { title: 'الرئيسية' } },
-      
+
       // Negotiations
       {
         path: 'negotiations',
+        canActivate: [departmentGuard],
         data: { title: 'المفاوضات' },
         children: [
           { path: '', component: NegotiationsDashboard },
@@ -58,6 +60,7 @@ export const routes: Routes = [
       // Management
       {
         path: 'management',
+        canActivate: [departmentGuard],
         data: { title: 'الشؤون الإدارية' },
         loadChildren: () =>
           import('./features/managments/managments-routes').then((m) => m.MANAGEMENT_ROUTES),
@@ -66,6 +69,7 @@ export const routes: Routes = [
       // Secretariat
       {
         path: 'secretariat',
+        canActivate: [departmentGuard],
         data: { title: 'السكرتارية' },
         children: [
           {
@@ -175,6 +179,7 @@ export const routes: Routes = [
       // Execution
       {
         path: 'execution',
+        canActivate: [departmentGuard],
         data: { title: 'التنفيذ' },
         children: [
           {
@@ -285,6 +290,7 @@ export const routes: Routes = [
       // Car Management
       {
         path: 'car-management',
+        canActivate: [departmentGuard],
         data: { title: 'السيارات' },
         children: [
           {
@@ -304,6 +310,7 @@ export const routes: Routes = [
       // Reports
       {
         path: 'reports',
+        canActivate: [departmentGuard],
         data: { title: 'التقارير' },
         children: [
           {
@@ -342,6 +349,12 @@ export const routes: Routes = [
               import('./features/reports/pages/reports-zain-six-months/reports-zain-six-months.component').then((m) => m.ReportsZainSixMonths),
           },
           {
+            path: 'daily-breaks',
+            data: { title: 'ساعة الراحة اليومية | التقارير' },
+            loadComponent: () =>
+              import('./features/reports/pages/daily-breaks/daily-breaks').then((m) => m.DailyBreaksComponent),
+          },
+          {
             path: 'reports-zain-twenty-months',
             data: { title: 'باتشات زين 20 شهور | التقارير' },
             loadComponent: () =>
@@ -359,6 +372,7 @@ export const routes: Routes = [
       // Finance
       {
         path: 'finance',
+        canActivate: [departmentGuard],
         data: { title: 'الإدارة المالية' },
         children: [
           {
@@ -462,6 +476,7 @@ export const routes: Routes = [
       // Discussions
       {
         path: 'discussions',
+        canActivate: [departmentGuard],
         data: { title: 'المداولات' },
         children: [
           {

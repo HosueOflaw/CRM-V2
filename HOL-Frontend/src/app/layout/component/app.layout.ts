@@ -6,7 +6,6 @@ import { AppTopbar } from './app.topbar';
 import { AppSidebar } from './app.sidebar';
 import { AppFooter } from './app.footer';
 import { LayoutService } from '../service/layout.service';
-
 @Component({
     selector: 'app-layout',
     standalone: true,
@@ -24,6 +23,7 @@ import { LayoutService } from '../service/layout.service';
     </div> `
 })
 export class AppLayout implements OnDestroy {
+    isElectron = !!(window as any).appWindow;
     overlayMenuOpenSubscription: Subscription;
 
     menuOutsideClickListener: any;
@@ -65,7 +65,7 @@ export class AppLayout implements OnDestroy {
     }
 
     hideMenu() {
-        this.layoutService.layoutState.update((prev) => ({ ...prev, overlayMenuActive: false, staticMenuMobileActive: false, menuHoverActive: false }));
+        this.layoutService.layoutState.update((prev: any) => ({ ...prev, overlayMenuActive: false, staticMenuMobileActive: false, menuHoverActive: false }));
         if (this.menuOutsideClickListener) {
             this.menuOutsideClickListener();
             this.menuOutsideClickListener = null;

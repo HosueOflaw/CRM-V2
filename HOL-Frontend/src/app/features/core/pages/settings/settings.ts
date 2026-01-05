@@ -44,6 +44,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   // 💾 متغيرات عامة
   showNewUserForm = false;
+  isEditUser = false;
+  selectedUser: any = null;
   uploadedFileName: string | null = null;
 
   // 👤 بيانات المستخدم الحالي
@@ -76,14 +78,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   // الصلاحيات
   showPermissions = false;
+  permissionForm: FormGroup;
+  selectedUserForPermissions: any = null;
 
-  // ✅ عرّف نوع العناصر هنا
-  permissions: { department: string; role: string }[] = [
-    { department: 'الإدارة المالية', role: 'قراءة فقط' },
-    { department: 'الاتصالات', role: 'تحكم كامل' }
-  ];
-
-  // 🏢 الأقسام
   // 🏢 الأقسام
   departments = [
     { label: 'المفاوضات', value: 'negotiations' },
@@ -98,9 +95,50 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   togglePermissions() {
     this.showPermissions = !this.showPermissions;
+    if (this.showPermissions && this.users.length === 0) {
+      // Fetch users silently without showing the table
+      this.loadUsers(false, false, false);
+    }
     this.updateSidebarBlur();
   }
 
+  onUserSelect(event: any) {
+    const userId = event.target.value;
+    this.selectedUserForPermissions = this.users.find(u => u.id == userId);
+
+    if (this.selectedUserForPermissions) {
+      this.permissionForm.patchValue({
+        userId: this.selectedUserForPermissions.id,
+        role: this.selectedUserForPermissions.role,
+        department: this.selectedUserForPermissions.department || ''
+      });
+    }
+  }
+
+  saveUserPermissions() {
+    if (this.permissionForm.invalid) {
+      this.toast.error('يرجى اختيار موظف', 'خطأ');
+      return;
+    }
+
+    const { userId, role, department } = this.permissionForm.value;
+
+    this.userService.updateUser(userId, { role, department }).subscribe({
+      next: () => {
+        this.toast.success('تم تحديث الصلاحيات بنجاح', 'نجاح');
+        this.loadUsers(false, true, false); // Refresh users list silently
+        this.togglePermissions();
+      },
+      error: (err) => {
+        const msg = err.error?.message || 'حدث خطأ أثناء تحديث الصلاحيات';
+        this.toast.error(msg, 'خطأ');
+      }
+    });
+  }
+
+  get employeeUsers() {
+    return this.users.filter(u => u.role?.toLowerCase() === 'employee');
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -122,10 +160,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
     // 👤 نموذج المستخدم الجديد
     this.newUserForm = this.fb.group({
-      code: [''],
+      code: ['', Validators.required],
       username: ['', [Validators.required, Validators.minLength(3)]],
-      latinName: [''],
-      arabicName: [''],
       fullName: ['', Validators.required],
       email: ['', [Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -143,6 +179,13 @@ export class SettingsComponent implements OnInit, OnDestroy {
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
+
+    // 🔐 نموذج الصلاحيات
+    this.permissionForm = this.fb.group({
+      userId: ['', Validators.required],
+      role: [''],
+      department: ['']
+    });
 
     this.load();
     this.loadCurrentUser();
@@ -180,7 +223,23 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   // 🔄 عرض/إخفاء فورم المستخدم الجديد
   toggleNewUserForm() {
+    const wasEditing = this.isEditUser;
     this.showNewUserForm = !this.showNewUserForm;
+    if (!this.showNewUserForm) {
+      this.isEditUser = false;
+      this.selectedUser = null;
+      this.newUserForm.reset({
+        role: 'User',
+        active: 'active'
+      });
+      // Ensure password validator is present when not editing
+      this.newUserForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
+
+      // If we were editing, return to the table
+      if (wasEditing) {
+        this.showUsersTable = true;
+      }
+    }
     this.updateSidebarBlur();
   }
 
@@ -315,7 +374,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // 👨‍💼 حفظ مستخدم جديد
+  // 👨‍💼 حفظ بيانات المستخدم (إضافة أو تعديل)
   saveNewUser() {
     // تعليم جميع الحقول كـ touched لعرض أخطاء validation
     if (this.newUserForm.invalid) {
@@ -329,60 +388,66 @@ export class SettingsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // تحقق إضافي: الموظف يجب أن يكون له قسم
-    const currentRole = this.newUserForm.get('role')?.value;
-    const currentDepartment = this.newUserForm.get('department')?.value;
-
-    if ((currentRole === 'employee' || currentRole === 'Employee') && !currentDepartment) {
-      this.toast.warning('يرجى اختيار القسم للموظف', 'تحذير');
-      this.newUserForm.get('department')?.markAsTouched();
-      return;
-    }
-
     const formValue = this.newUserForm.value;
 
-    // تحضير البيانات للباك إند
+    // تحضير البيانات
     const userData: any = {
       username: formValue.username,
-      fullName: formValue.fullName || formValue.arabicName || formValue.latinName,
+      fullName: formValue.fullName,
       email: formValue.email || '',
       role: formValue.role || 'User',
       department: formValue.department,
-      password: formValue.password
+      active: formValue.active,
+      phone: formValue.phone,
+      hireDate: formValue.hireDate,
+      group: formValue.group
     };
 
-    // إضافة CODE إذا كان موجود
-    if (formValue.code && formValue.code !== '' && formValue.code !== null) {
-      const codeValue = parseInt(formValue.code);
-      if (!isNaN(codeValue)) {
-        userData.code = codeValue;
-      }
-    }
+    if (formValue.code) userData.code = parseInt(formValue.code);
+    if (formValue.password) userData.password = formValue.password;
 
-    // إرسال للباك إند
-    this.userService.createUser(userData).subscribe({
-      next: (response) => {
-        this.toast.success('تم حفظ المستخدم الجديد بنجاح', 'نجح!', {
-          life: 2000
-        });
-        this.newUserForm.reset();
-        this.showNewUserForm = false;
-        this.updateSidebarBlur();
-        // إعادة تحميل المستخدمين مع forceRefresh لأن البيانات تغيرت
-        this.loadUsers(false, true);
-      },
-      error: (error) => {
-        const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء حفظ المستخدم';
-        this.toast.error(errorMsg, 'خطأ');
-      }
-    });
+    if (this.isEditUser && this.selectedUser) {
+      // ✏️ تحديث مستخدم موجود
+      this.userService.updateUser(this.selectedUser.id, userData).subscribe({
+        next: () => {
+          this.toast.success('تم تحديث بيانات المستخدم بنجاح', 'نجح!');
+          this.finishUserForm();
+        },
+        error: (error) => {
+          this.toast.error(error.error?.message || 'خطأ أثناء التحديث', 'خطأ');
+        }
+      });
+    } else {
+      // ➕ إضافة مستخدم جديد
+      this.userService.createUser(userData).subscribe({
+        next: () => {
+          this.toast.success('تم إضافة المستخدم بنجاح', 'نجح!');
+          this.finishUserForm();
+        },
+        error: (error) => {
+          this.toast.error(error.error?.message || 'خطأ أثناء الإضافة', 'خطأ');
+        }
+      });
+    }
+  }
+
+  private finishUserForm() {
+    const shouldReopenTable = this.isEditUser;
+    this.newUserForm.reset();
+    this.showNewUserForm = false;
+    this.isEditUser = false;
+    this.selectedUser = null;
+    this.updateSidebarBlur();
+    this.loadUsers(false, true, shouldReopenTable); // Re-open table if we were editing
   }
 
 
   // 👥 جلب جميع المستخدمين (مع Cache تلقائي)
-  loadUsers(showToast: boolean = true, forceRefresh: boolean = false) {
+  loadUsers(showToast: boolean = true, forceRefresh: boolean = false, showTable: boolean = true) {
     this.loadingUsers = true;
-    this.showUsersTable = true;
+    if (showTable) {
+      this.showUsersTable = true;
+    }
 
     // استخدام Cache Service - سيستخدم Cache إذا موجود، أو يعمل request جديد
     this.userService.getUsers(forceRefresh).subscribe({
@@ -444,11 +509,31 @@ export class SettingsComponent implements OnInit, OnDestroy {
     return dept ? dept.label : value;
   }
 
-  // ✏️ تعديل مستخدم (من الجدول مباشرة)
+  // ✏️ تعديل بيانات الموظف (البيانات الشخصية)
   editUser(user: any) {
-    // يمكن فتح modal للتعديل مباشرة من الجدول
-    // أو يمكن إضافة modal للتعديل هنا
-    this.toast.info('يمكنك تعديل المستخدم من الجدول', 'معلومة');
+    this.isEditUser = true;
+    this.selectedUser = user;
+    this.showUsersTable = false; // Close users table dialog
+
+    this.newUserForm.patchValue({
+      code: user.code,
+      username: user.username,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+      department: user.department,
+      group: user.group,
+      active: user.active || 'active',
+      phone: user.phone,
+      hireDate: user.hireDate ? new Date(user.hireDate).toISOString().substring(0, 10) : ''
+    });
+
+    // Password is not required when editing unless the user wants to change it
+    this.newUserForm.get('password')?.clearValidators();
+    this.newUserForm.get('password')?.updateValueAndValidity();
+
+    this.showNewUserForm = true;
+    this.updateSidebarBlur();
   }
 
   // 🗑️ حذف مستخدم
@@ -463,11 +548,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
       accept: () => {
         this.userService.deleteUser(userId).subscribe({
           next: () => {
-            this.toast.success('تم حذف المستخدم بنجاح', 'نجح!', {
+            this.toast.success('تم حذف المستخدم بنجاح', 'نجاح!', {
               life: 2000
             });
             // إعادة تحميل المستخدمين مع forceRefresh لأن البيانات تغيرت
-            this.loadUsers(false, true);
+            this.loadUsers(false, true, this.showUsersTable);
           },
           error: (error) => {
             const errorMsg = error.error?.error || error.error?.message || 'حدث خطأ أثناء حذف المستخدم';

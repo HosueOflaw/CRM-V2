@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { Subject, Observable } from 'rxjs';
 import { Router } from '@angular/router';
-import { AuthService } from '../core/services/auth';
+import { SweetAlertService } from '../shared/services/sweet-alert.service';
 
 export interface SignalRMessage {
     type: string;
@@ -24,6 +24,7 @@ export class Signalr {
         private router: Router,
         // Inject AuthService via injector or directly if no circular dependency, 
         // avoiding circular dependency might require different architecture but let's try direct first or use token getter
+        private swal: SweetAlertService
     ) { }
 
     public async startConnection(token: string): Promise<void> {
@@ -61,8 +62,15 @@ export class Signalr {
         // Clear local storage manually to avoid circular dependency with AuthService if possible
         localStorage.clear();
         sessionStorage.clear();
-        this.router.navigate(['/login']);
-        alert('تم تسجيل خروجك لأن الحساب تم استخدامه من جهاز آخر.');
+
+        this.swal.error({
+            title: 'تنبيه: دخول من جهاز آخر',
+            text: 'تم تسجيل خروجك لأن حسابك مفتوح حالياً على جهاز أو متصفح آخر. لضمان الأمان، لا يسمح بفتح الحساب على أكثر من جهاز في نفس الوقت.',
+            confirmButtonText: 'العودة إلى صفحة الدخول',
+            allowOutsideClick: false
+        }).then(() => {
+            this.router.navigate(['/login']);
+        });
     }
 
     /**

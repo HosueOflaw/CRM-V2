@@ -10,12 +10,50 @@
 @import './tailwind.css';
 @import 'primeicons/primeicons.css';
 
+/* Electron Titlebar Global Offsets */
+.electron-mode {
+  .layout-topbar {
+    top: 32px !important;
+  }
+
+  .layout-sidebar {
+    top: 32px !important;
+    height: calc(100vh - 32px) !important;
+  }
+
+  .layout-main-container {
+    padding-top: calc(5rem + 32px) !important;
+  }
+
+  /* Full screen pages like Login */
+  .login-page {
+    padding-top: 32px !important;
+  }
+
+  /* Adjust Notifications (Toast) */
+  .p-toast {
+    top: calc(20px + 32px) !important;
+    /* PrimeNG Toast */
+  }
+
+  .toast-container {
+    top: calc(20px + 32px) !important;
+    /* ngx-toastr */
+  }
+
+  /* Custom titlebar drag region support */
+  .electron-titlebar {
+    -webkit-app-region: drag;
+  }
+}
+
 /* Global Styles */
 * {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -194,11 +232,11 @@ html:not(.app-dark) body {
   border-radius: 50%;
 }
 
-input:checked + .slider {
+input:checked+.slider {
   background-color: var(--primary-color, #2196F3);
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
   transform: translateX(26px);
 }
 
@@ -237,4 +275,3 @@ input:checked + .slider:before {
 .p-6 {
   padding: 1.5rem;
 }
-

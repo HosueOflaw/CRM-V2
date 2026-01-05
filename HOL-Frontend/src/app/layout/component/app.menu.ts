@@ -168,23 +168,62 @@ export class AppMenu implements OnInit {
         ];
 
         // Filter functionality
-        if (this.authService.isAdmin()) {
-            // Admin sees all
+        const isAdmin = this.authService.isAdmin();
+        const isEmployee = this.authService.isEmployee();
+
+        const userDep = (this.authService.getUserDepartment() || '').toLowerCase().trim();
+
+        console.log('--- Menu Filtering Logic ---');
+        console.log('Is Admin:', isAdmin);
+        console.log('Is Employee:', isEmployee);
+        console.log('Department Key:', userDep);
+
+        if (isAdmin) {
             this.menuSections = allSections;
-        } else if (this.authService.isEmployee()) {
-            // Employee sees only their department
-            const depKey = this.authService.getUserDepartment();
-            if (depKey && this.departmentsMap[depKey]) {
-                const targetLabel = this.departmentsMap[depKey];
-                this.menuSections = allSections.filter(section => section.label === targetLabel);
+        } else if (isEmployee) {
+            const mapping: { [key: string]: string } = {
+                'negotiations': 'المفاوضات',
+                'المفاوضات': 'المفاوضات',
+                'secretariat': 'السكرتارية',
+                'السكرتارية': 'السكرتارية',
+                'secretary': 'السكرتارية',
+                'secrtrya': 'السكرتارية',
+                'execution': 'التنفيذ',
+                'التنفيذ': 'التنفيذ',
+                'finance': 'الإدارة المالية',
+                'الإدارة المالية': 'الإدارة المالية',
+                'المالية': 'الإدارة المالية',
+                'discussions': 'المداولات',
+                'المداولات': 'المداولات',
+                'reports': 'التقارير',
+                'التقارير': 'التقارير',
+                'report': 'التقارير',
+                'car-management': 'السيارات',
+                'السيارات': 'السيارات',
+                'management': 'الشؤون الإدارية',
+                'الشؤون الإدارية': 'الشؤون الإدارية',
+                'شؤون إدارية': 'الشؤون الإدارية',
+                'hr': 'الشؤون الإدارية',
+                'managment': 'الشؤون الإدارية'
+            };
+
+            const targetLabel = userDep ? (mapping[userDep] || mapping[Object.keys(mapping).find(k => k.length > 0 && k.includes(userDep)) || '']) : null;
+
+            if (targetLabel) {
+                const targetSection = allSections.find(s => s.label === targetLabel);
+                if (targetSection && targetSection.items) {
+                    // Flattened view for employees as requested
+                    this.menuSections = targetSection.items;
+                    console.log('Successfully flattened menu for:', targetLabel);
+                } else {
+                    console.error('Target label found but section/items missing:', targetLabel);
+                    this.menuSections = [];
+                }
             } else {
-                // If no department assigned or invalid, maybe show nothing or default?
-                // Showing nothing to be safe as per "but not any other section"
+                console.warn('No mapping match for department:', userDep);
                 this.menuSections = [];
             }
         } else {
-            // Regular User/Client - Logic not defined in prompt, assume empty or limited.
-            // For now, let's just leave it empty or maybe show Home only.
             this.menuSections = [];
         }
     }

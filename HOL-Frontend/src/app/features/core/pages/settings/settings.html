@@ -141,59 +141,40 @@
       <h2 class="text-lg font-bold mb-4 text-center">الصلاحيات</h2>
 
       <!-- نموذج الصلاحيات -->
-      <div class="grid grid-cols-3 gap-3 items-center mb-4">
-        <label class="col-span-1 text-sm font-semibold text-right">الموظف</label>
-        <input type="text" placeholder="اختر الموظف" class="col-span-1 border rounded px-2 py-1" />
-        <button class="bg-gray-300 px-3 py-1 rounded">...</button>
+      <form [formGroup]="permissionForm" (ngSubmit)="saveUserPermissions()"
+        class="grid grid-cols-3 gap-4 items-center mb-6">
+        <label class="col-span-1 text-sm font-semibold text-right">الموظف *</label>
+        <div class="col-span-2">
+          <select formControlName="userId" class="input w-full" (change)="onUserSelect($event)">
+            <option value="">اختر الموظف</option>
+            <option *ngFor="let u of employeeUsers" [value]="u.id">
+              {{ u.fullName || u.username }}
+            </option>
+          </select>
+        </div>
 
         <label class="col-span-1 text-sm font-semibold text-right mt-2">القسم</label>
-        <select class="col-span-2 border rounded px-2 py-1 mt-2">
-          <option value="">اختر القسم</option>
-          <option value="admin">ADMIN</option>
-          <option value="etisal">الاتصالات</option>
-          <option value="mtdawel">المتداول</option>
-          <option value="malia">الادارة المالية</option>
-          <option value="mas2ol">المسئولين</option>
-          <option value="secretary">السكرتارية</option>
-          <option value="executive">التنفيذ</option>
-        </select>
-      </div>
+        <div class="col-span-2 mt-2">
+          <select formControlName="department" class="input w-full">
+            <option value="">بدون قسم</option>
+            <option *ngFor="let dep of departments" [value]="dep.value">{{ dep.label }}</option>
+          </select>
+        </div>
 
-      <!-- أزرار البحث والإضافة -->
-      <div class="flex justify-end gap-2 mb-4">
-        <button class="btn-outline px-3 py-1 rounded">بحث</button>
-        <button class="btn-primary px-3 py-1 rounded">إضافة</button>
-      </div>
+        <label class="col-span-1 text-sm font-semibold text-right mt-2">الدور</label>
+        <div class="col-span-2 mt-2">
+          <select formControlName="role" class="input w-full">
+            <option value="Admin">Admin</option>
+            <option value="Employee">Employee</option>
+            <option value="User">User</option>
+          </select>
+        </div>
 
-      <!-- الجدول -->
-      <table class="w-full border text-sm text-center mb-4">
-        <thead style="background: var(--surface-section);">
-          <tr>
-            <th class="border px-2 py-1">إلغاء</th>
-            <th class="border px-2 py-1">القسم</th>
-            <th class="border px-2 py-1">الصلاحية</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of permissions">
-            <td class="border px-2 py-1">
-              <button class="text-red-500 hover:text-red-700">❌</button>
-            </td>
-            <td class="border px-2 py-1">{{ row.department }}</td>
-            <td class="border px-2 py-1">{{ row.role }}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- الأزرار السفلية -->
-      <div class="flex justify-end gap-3">
-        <button (click)="showPermissions = false; updateSidebarBlur()" class="btn-outline px-4 py-2 rounded">
-          إلغاء
-        </button>
-        <button class="btn-primary px-4 py-2 rounded">
-          حفظ
-        </button>
-      </div>
+        <div class="col-span-3 flex justify-center gap-3 mt-6">
+          <button type="button" (click)="togglePermissions()" class="btn-outline px-6 py-2 rounded-lg">إلغاء</button>
+          <button type="submit" class="btn-primary px-6 py-2 rounded-lg">حفظ الصلاحيات</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -227,6 +208,14 @@
             <span class="px-3 py-1 rounded text-sm font-semibold" [style.background]="getRoleColor(currentUser.role)"
               [style.color]="'#fff'">
               {{ currentUser.role || 'User' }}
+            </span>
+          </div>
+        </div>
+        <div class="info-item" *ngIf="currentUser.department">
+          <label class="info-label">القسم</label>
+          <div class="info-value">
+            <span class="px-3 py-1 rounded text-sm font-semibold bg-primary text-white">
+              {{ getDepartmentLabel(currentUser.department) }}
             </span>
           </div>
         </div>
@@ -302,12 +291,21 @@
         onmouseout="this.style.color='var(--text-color-secondary)'">
         ×
       </button>
-      <h3 class="text-xl font-bold mb-4 text-center" style="color: var(--primary-color);">إضافة موظف جديد</h3>
+      <h3 class="text-xl font-bold mb-4 text-center" style="color: var(--primary-color);">
+        {{ isEditUser ? 'تعديل بيانات المستخدم' : 'إضافة مستخدم جديد' }}
+      </h3>
 
       <form [formGroup]="newUserForm" (ngSubmit)="saveNewUser()" class="grid md:grid-cols-2 gap-4">
         <label class="flex flex-col">
-          <span class="text-sm mb-1">الكود (CODE)</span>
-          <input formControlName="code" type="number" class="input" placeholder="أدخل الكود" />
+          <span class="text-sm mb-1">الكود (CODE) *</span>
+          <input formControlName="code" type="number" class="input"
+            [class.border-red-500]="newUserForm.get('code')?.invalid && newUserForm.get('code')?.touched"
+            [class.border-2]="newUserForm.get('code')?.invalid && newUserForm.get('code')?.touched"
+            placeholder="أدخل الكود" />
+          <small class="text-red-500 mt-1"
+            *ngIf="newUserForm.get('code')?.hasError('required') && newUserForm.get('code')?.touched">
+            الكود مطلوب
+          </small>
         </label>
 
         <label class="flex flex-col">
@@ -338,21 +336,13 @@
           </small>
         </label>
 
-        <label class="flex flex-col">
-          <span class="text-sm mb-1">الاسم اللاتيني</span>
-          <input formControlName="latinName" type="text" class="input" />
-        </label>
 
         <label class="flex flex-col">
-          <span class="text-sm mb-1">الاسم العربي</span>
-          <input formControlName="arabicName" type="text" class="input" />
-        </label>
-
-        <label class="flex flex-col">
-          <span class="text-sm mb-1">الرقم السري *</span>
+          <span class="text-sm mb-1">الرقم السري {{ isEditUser ? '(اختياري)' : '*' }}</span>
           <input formControlName="password" type="password" class="input"
             [class.border-red-500]="newUserForm.get('password')?.invalid && newUserForm.get('password')?.touched"
-            [class.border-2]="newUserForm.get('password')?.invalid && newUserForm.get('password')?.touched" />
+            [class.border-2]="newUserForm.get('password')?.invalid && newUserForm.get('password')?.touched"
+            [placeholder]="isEditUser ? 'اتركها فارغة إذا لم ترد التغيير' : 'كلمة المرور'" />
           <small class="text-red-500 mt-1"
             *ngIf="newUserForm.get('password')?.hasError('required') && newUserForm.get('password')?.touched">
             الرقم السري مطلوب
@@ -425,12 +415,11 @@
         </label>
 
         <div class="flex justify-end gap-3 mt-4 md:col-span-2">
-          <button type="button" (click)="toggleNewUserForm()" class="btn-outline px-4 py-2 rounded-lg"
-            title="إلغاء إضافة المستخدم">
+          <button type="button" (click)="toggleNewUserForm()" class="btn-outline px-4 py-2 rounded-lg">
             إلغاء
           </button>
-          <button type="submit" class="btn-primary px-4 py-2 rounded-lg" title="حفظ بيانات المستخدم الجديد">
-            حفظ المستخدم
+          <button type="submit" class="btn-primary px-4 py-2 rounded-lg">
+            {{ isEditUser ? 'تحديث البيانات' : 'حفظ المستخدم' }}
           </button>
         </div>
       </form>
@@ -498,4 +487,3 @@
 
   <!-- PrimeNG Toast -->
   <p-toast position="top-center"></p-toast>
-</div>

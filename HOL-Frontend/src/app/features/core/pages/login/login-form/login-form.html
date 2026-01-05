@@ -1,45 +1,37 @@
 <div class="login-page" dir="rtl">
   <div class="login-bg"></div>
-  
+
   <div class="login-card">
     <button class="back-btn" (click)="goBack()">← رجوع</button>
-    
+
     <div class="login-header">
       <div class="login-icon">⚖️</div>
       <h2>{{ title }}</h2>
       <p class="subtitle">يرجى إدخال بيانات الدخول</p>
     </div>
-    
+
     <form (ngSubmit)="onSubmit()" class="login-form">
       <div class="form-field">
         <label class="form-label">اسم المستخدم / البريد الإلكتروني</label>
-        <input
-          type="text"
-          class="form-input"
-          placeholder="اسم المستخدم أو البريد الإلكتروني"
-          [(ngModel)]="usernameOrEmail"
-          name="usernameOrEmail"
-          [disabled]="disabled"
-          required
-        />
+        <input type="text" class="form-input" placeholder="اسم المستخدم أو البريد الإلكتروني"
+          [(ngModel)]="usernameOrEmail" name="usernameOrEmail" [disabled]="disabled" required />
       </div>
 
       <div class="form-field">
         <label class="form-label">كلمة المرور</label>
-        <input
-          type="password"
-          class="form-input"
-          placeholder="••••••"
-          [(ngModel)]="password"
-          name="password"
-          [disabled]="disabled"
-          required
-        />
+        <div class="password-wrap">
+          <input [type]="showPassword ? 'text' : 'password'" class="form-input" placeholder="••••••"
+            [(ngModel)]="password" name="password" [disabled]="disabled" required />
+          <button type="button" class="password-toggle" (click)="togglePassword()" [disabled]="disabled"
+            [title]="showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'">
+            <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+          </button>
+        </div>
       </div>
 
-      <div class="hint-box">
-        <span>🔐</span>
-        <span>للدخول المؤقت: اسم المستخدم <strong>admin</strong> وكلمة المرور <strong>123456</strong></span>
+      <div class="flex justify-start mb-6">
+        <a href="javascript:void(0)" class="forgot-link text-sm p-1" (click)="openForgotPassword()"
+          style="color: var(--primary-color);">نسيت كلمة المرور؟</a>
       </div>
 
       <button type="submit" class="form-button form-button-primary submit-btn" [disabled]="disabled">
@@ -49,3 +41,43 @@
     </form>
   </div>
 </div>
+
+<!-- مودال استعادة كلمة المرور -->
+<p-dialog [(visible)]="showForgotPassword" [modal]="true" [header]="'استعادة كلمة المرور'"
+  [style]="{ width: '400px', maxWidth: '90vw' }" [draggable]="false" [resizable]="false">
+
+  <!-- الخطوة الأولى: إدخال البريد الإلكتروني -->
+  <div *ngIf="forgotPasswordStep === 1" class="flex flex-col gap-4 p-2">
+    <p class="text-sm text-secondary">أدخل بريدك الإلكتروني المسجل لإرسال كود التحقق</p>
+    <div class="flex flex-col gap-2">
+      <label class="text-xs font-bold">البريد الإلكتروني</label>
+      <input pInputText type="email" [(ngModel)]="resetEmail" placeholder="example@law.com" class="w-full" />
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <button pButton label="إلغاء" class="p-button-text" (click)="closeForgotPassword()"></button>
+      <button pButton label="إرسال الكود" [loading]="isRequesting" (click)="requestResetCode()"></button>
+    </div>
+  </div>
+
+  <!-- الخطوة الثانية: إدخال الكود وكلمة المرور الجديدة -->
+  <div *ngIf="forgotPasswordStep === 2" class="flex flex-col gap-4 p-2">
+    <p class="text-sm text-secondary">تم إرسال كود التحقق للبريد {{ resetEmail }}</p>
+
+    <div class="flex flex-col gap-2">
+      <label class="text-xs font-bold">كود التحقق (6 أرقام)</label>
+      <input pInputText type="text" [(ngModel)]="resetToken" placeholder="123456"
+        class="w-full text-center tracking-widest" maxlength="6" />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="text-xs font-bold">كلمة المرور الجديدة</label>
+      <input pInputText type="password" [(ngModel)]="newPassword" placeholder="••••••" class="w-full" />
+    </div>
+
+    <div class="flex justify-end gap-2 mt-4">
+      <button pButton label="رجوع" class="p-button-text" (click)="forgotPasswordStep = 1"></button>
+      <button pButton label="حفظ وتغيير" [loading]="isRequesting" class="p-button-success"
+        (click)="submitNewPassword()"></button>
+    </div>
+  </div>
+</p-dialog>
