@@ -36,8 +36,6 @@ export class HomePage {
     const isEmployee = this.authService.isEmployee();
     const userDep = (this.authService.getUserDepartment() || '').toLowerCase().trim();
 
-    console.log('--- Home Filtering Debug ---');
-    console.log({ isAdmin, isEmployee, userDep });
 
     if (isAdmin) {
       this.filteredDepartments = this.departments;

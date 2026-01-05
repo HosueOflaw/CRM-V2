@@ -173,11 +173,6 @@ export class AppMenu implements OnInit {
 
         const userDep = (this.authService.getUserDepartment() || '').toLowerCase().trim();
 
-        console.log('--- Menu Filtering Logic ---');
-        console.log('Is Admin:', isAdmin);
-        console.log('Is Employee:', isEmployee);
-        console.log('Department Key:', userDep);
-
         if (isAdmin) {
             this.menuSections = allSections;
         } else if (isEmployee) {

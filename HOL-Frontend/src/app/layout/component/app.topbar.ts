@@ -209,7 +209,6 @@ export class AppTopbar implements OnInit, OnDestroy {
     ) { }
 
     ngOnInit() {
-        console.log('AppTopbar: Initializing Break System components...');
         if (this.authService.isLoggedIn()) {
             this.checkBreakStatus();
         }
