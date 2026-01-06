@@ -43,4 +43,10 @@ public class User
 
     [Column("PasswordSalt")]
     public string? PasswordSalt { get; set; }
+
+    [Column("access_failed_count")]
+    public int AccessFailedCount { get; set; }
+
+    [Column("lockout_end")]
+    public DateTime? LockoutEnd { get; set; }
 }

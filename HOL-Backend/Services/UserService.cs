@@ -172,6 +172,17 @@ public class UserService : IUserService
             };
         }
 
+        // 1. تحقق مما إذا كان الحساب مقفلاً حالياً
+        if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
+        {
+            var remainingTime = user.LockoutEnd.Value - DateTime.UtcNow;
+            return new LoginResponseDto
+            {
+                Success = false,
+                Message = $"حساب مقفل مؤقتاً. يرجى المحاولة بعد {Math.Ceiling(remainingTime.TotalMinutes)} دقيقة."
+            };
+        }
+
         if (string.IsNullOrWhiteSpace(user.PasswordHashed))
         {
             return new LoginResponseDto
@@ -188,12 +199,34 @@ public class UserService : IUserService
 
         if (!isValid)
         {
+            // 2. زيادة عداد المحاولات الفاشلة
+            user.AccessFailedCount++;
+            
+            if (user.AccessFailedCount >= 5)
+            {
+                user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
+                _logger.LogWarning("Account locked due to too many failed attempts: {Username}", user.Username);
+                
+                await _userRepository.UpdateAsync(user);
+                return new LoginResponseDto
+                {
+                    Success = false,
+                    Message = "تم قفل الحساب لمدة 15 دقيقة بسبب كثرة المحاولات الفاشلة."
+                };
+            }
+
+            await _userRepository.UpdateAsync(user);
             return new LoginResponseDto
             {
                 Success = false,
-                Message = "Invalid username or password"
+                Message = $"اسم المستخدم أو كلمة المرور غير صحيحة. المحاولات المتبقية: {5 - user.AccessFailedCount}"
             };
         }
+
+        // 3. تصفير العداد عند نجاح تسجيل الدخول
+        user.AccessFailedCount = 0;
+        user.LockoutEnd = null;
+        await _userRepository.UpdateAsync(user);
 
         _logger.LogInformation("User logged in: {UserId}, Username: {Username}", user.Id, user.Username);
 
