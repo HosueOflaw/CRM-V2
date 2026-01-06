@@ -4,6 +4,8 @@ import { Subject, Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { SweetAlertService } from '../shared/services/sweet-alert.service';
 
+import { environment } from '../../environments/environment';
+
 export interface SignalRMessage {
     type: string;
     data: any;
@@ -18,7 +20,7 @@ export class Signalr {
     private messageSubject = new Subject<SignalRMessage>();
     public message$ = this.messageSubject.asObservable();
 
-    private readonly hubUrl = 'https://localhost:7112/hubs/notifications'; // Backend URL
+    private readonly hubUrl = environment.apiUrl.replace('/api', '') + '/hubs/notifications';
 
     constructor(
         private router: Router,
@@ -27,8 +29,11 @@ export class Signalr {
         private swal: SweetAlertService
     ) { }
 
+    private connectionTimestamp: number = 0;
+
     public async startConnection(token: string): Promise<void> {
         try {
+            this.connectionTimestamp = Date.now();
             this.hubConnection = new HubConnectionBuilder()
                 .withUrl(this.hubUrl, {
                     accessTokenFactory: () => token
@@ -54,22 +59,36 @@ export class Signalr {
             console.log('✅ SignalR Connected!');
         } catch (error) {
             console.error('❌ SignalR Connection Error:', error);
-            // throw error; // Don't crash app if SignalR fails
         }
     }
 
     private handleForceLogout() {
-        // Clear local storage manually to avoid circular dependency with AuthService if possible
+        const elapsedTime = Date.now() - this.connectionTimestamp;
+
+        // إذا كان الاتصال جديداً (أقل من 5 ثواني)، فهذا يعني أننا نحن من دخلنا للتو وطردنا الآخرين
+        if (elapsedTime < 5000) {
+            this.swal.success({
+                title: 'تم تأمين الحساب بنجاح ✅',
+                text: 'تم اكتشاف جلسة نشطة أخرى لهذا الحساب، وقام النظام بإغلاقها فوراً لضمان أمان بياناتك. حسابك الآن محمي ويعمل على هذا الجهاز فقط.',
+                confirmButtonText: 'حسناً، استكمال العمل',
+                confirmButtonColor: '#10b981',
+                allowOutsideClick: false
+            });
+            return;
+        }
+
+        // أما إذا كان الاتصال قديماً، فهذا يعني أن هناك شخص آخر دخل وطردنا نحن
         localStorage.clear();
         sessionStorage.clear();
 
         this.swal.error({
-            title: 'تنبيه: دخول من جهاز آخر',
+            title: 'تنبيه: دخول من جهاز آخر ⚠️',
             text: 'تم تسجيل خروجك لأن حسابك مفتوح حالياً على جهاز أو متصفح آخر. لضمان الأمان، لا يسمح بفتح الحساب على أكثر من جهاز في نفس الوقت.',
             confirmButtonText: 'العودة إلى صفحة الدخول',
+            confirmButtonColor: '#ef4444',
             allowOutsideClick: false
         }).then(() => {
-            this.router.navigate(['/login']);
+            window.location.href = '/login';
         });
     }
 

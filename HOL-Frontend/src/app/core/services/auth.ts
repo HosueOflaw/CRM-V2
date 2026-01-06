@@ -17,25 +17,53 @@ export class AuthService {
     private signalr: Signalr
   ) { }
 
-  /**
-   * Universal Login - Authenticates users against the real API
-   */
-  login(username: string, password: string): Observable<any> {
-    const loginData = { username, password };
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  // Admin login (temporary - works with admin/123456)
+  loginAdmin(username: string, password: string): Observable<any> {
+    if (username === 'admin' && password === '123456') {
+      const response = {
+        status: 'success',
+        token: 'admin-token-' + Date.now(),
+        user: {
+          id: 1,
+          username: 'admin',
+          name: 'مدير النظام',
+          role: 'admin'
+        },
+        message: 'تم تسجيل الدخول بنجاح'
+      };
+      return of(response);
+    } else {
+      return throwError(() => new Error('اسم المستخدم أو كلمة المرور غير صحيحة'));
+    }
+  }
+
+  loginEmployee(username: string, password: string): Observable<any> {
+    // Use real API endpoint: POST /api/Users/login
+    const loginData = {
+      username: username,
+      password: password
+    };
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
 
     return this.http.post<any>(`${this.apiUrl}/Users/login`, loginData, { headers })
       .pipe(
         map((response: any) => {
+          // Handle API response - LoginResponseDto from backend
           if (response && response.success) {
+            console.log('--- Raw Login Response from API ---', response);
             const token = response.token || response.userId?.toString();
+
+            // Start SignalR connection
             this.signalr.startConnection(token);
 
             return {
               status: 'success',
-              token: token,
+              token: token, // JWT Token from backend
               user: {
-                ...response,
+                ...response, // Include all fields from API response
                 id: response.userId,
                 username: response.username,
                 full_name: response.fullName,
@@ -51,42 +79,49 @@ export class AuthService {
             throw new Error(response.message || 'فشل تسجيل الدخول');
           }
         }),
-        catchError(this.handleError)
+        catchError((error: any) => {
+          // Handle different error types
+          let errorMessage = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+
+          if (error.error) {
+            if (error.error.message) {
+              errorMessage = error.error.message;
+            } else if (typeof error.error === 'string') {
+              errorMessage = error.error;
+            } else if (error.error.error) {
+              errorMessage = error.error.error;
+            }
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+
+          if (error.status === 401 || error.status === 403) {
+            errorMessage = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+          } else if (error.status === 0) {
+            errorMessage = 'خطأ في الاتصال بالخادم. تأكد من تشغيل الباك إند';
+          } else if (error.status >= 500) {
+            errorMessage = 'خطأ في الخادم. يرجى المحاولة مرة أخرى';
+          }
+
+          return throwError(() => new Error(errorMessage));
+        })
       );
   }
 
-  loginAdmin(username: string, password: string): Observable<any> {
-    return this.login(username, password);
-  }
-
-  loginEmployee(username: string, password: string): Observable<any> {
-    return this.login(username, password);
-  }
-
   loginClient(email: string, password: string): Observable<any> {
-    return this.login(email, password);
+    // Temporary: use admin credentials (email as username)
+    return this.loginAdmin(email, password);
   }
 
   loginViaHawiyati(): Observable<any> {
-    return throwError(() => new Error('خدمة هويتي غير مفعلة حالياً على هذا النظام. يرجى تسجيل الدخول يدويأً.'));
-  }
-
-  private handleError(error: any) {
-    let errorMessage = 'اسم المستخدم أو كلمة المرور غير صحيحة';
-    if (error.error) {
-      errorMessage = error.error.message || (typeof error.error === 'string' ? error.error : error.error.error) || errorMessage;
-    } else if (error.message) {
-      errorMessage = error.message;
-    }
-
-    if (error.status === 401 || error.status === 403) {
-      errorMessage = 'اسم المستخدم أو كلمة المرور غير صحيحة';
-    } else if (error.status === 0) {
-      errorMessage = 'خطأ في الاتصال بالخادم. تأكد من تشغيل الباك إند';
-    } else if (error.status >= 500) {
-      errorMessage = 'خطأ في الخادم. يرجى المحاولة مرة أخرى';
-    }
-    return throwError(() => new Error(errorMessage));
+    const simulatedResponse = {
+      status: 'success',
+      token: 'hawiyati-token-' + Date.now(),
+      name: 'أحمد محمد',
+      nationalId: '1234567890',
+      message: 'تم تسجيل الدخول بنجاح (محاكاة هويتي)'
+    };
+    return of(simulatedResponse);
   }
 
   /**
@@ -382,7 +417,6 @@ export class AuthService {
     const dep = user.department || user.Department || user.section || user.Section ||
       user.group || user.Group || user.dept || user.Dept;
 
-    console.log('AuthService: Detected Department:', dep, 'from user object:', user);
     return dep || null;
   }
 }
