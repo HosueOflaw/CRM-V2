@@ -1,5 +1,6 @@
 using House_of_law_api.Data;
 using House_of_law_api.Infrastructure.Cloudflare;
+using House_of_law_api.Infrastructure.Security;
 using House_of_law_api.Infrastructure.SignalR;
 using House_of_law_api.Infrastructure.Swagger;
 using House_of_law_api.Interfaces;
@@ -140,7 +141,10 @@ builder.Services.AddSignalR(options =>
 builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IBreakService, BreakService>();
-builder.Services.AddControllers()
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<SessionValidationFilter>();
+})
     .AddJsonOptions(options =>
     {
         // Use camelCase to match Angular/JavaScript conventions

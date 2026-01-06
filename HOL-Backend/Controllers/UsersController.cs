@@ -308,9 +308,11 @@ public class UsersController : ControllerBase
         _logger.LogInformation("Logout request from IP: {Ip}, UserId: {UserId}, Username: {Username}", 
             clientIp, userId, username);
 
-        // إشعار SignalR للمستخدمين الآخرين
+        // إشعار SignalR للمستخدمين الآخرين ومسح الجلسة من السيرفر
         if (userId.HasValue)
         {
+            await _userService.LogoutAsync(userId.Value);
+            
             await _notificationService.BroadcastToAllAsync("user:logged_out", new
             {
                 userId = userId.Value,

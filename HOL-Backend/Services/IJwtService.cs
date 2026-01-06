@@ -2,7 +2,7 @@ namespace House_of_law_api.Services;
 
 public interface IJwtService
 {
-    string GenerateToken(int userId, string username, string? role);
+    string GenerateToken(int userId, string username, string? role, string? securityStamp = null);
     bool ValidateToken(string token);
     int? GetUserIdFromToken(string token);
     

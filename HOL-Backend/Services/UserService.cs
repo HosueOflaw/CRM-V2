@@ -223,18 +223,23 @@ public class UserService : IUserService
             };
         }
 
-        // 3. تصفير العداد عند نجاح تسجيل الدخول
+        // التحقق مما إذا كان هناك جلسة سابقة مفتوحة لتحديد رسالة النجاح
+        bool wasLoggedInElsewhere = !string.IsNullOrEmpty(user.SecurityStamp);
+
+        // 3. تصفير العداد عند نجاح تسجيل الدخول وتوليد SecurityStamp جديد
         user.AccessFailedCount = 0;
         user.LockoutEnd = null;
+        user.SecurityStamp = Guid.NewGuid().ToString(); // توليد بصمة جديدة للجلسة
+        
         await _userRepository.UpdateAsync(user);
 
         _logger.LogInformation("User logged in: {UserId}, Username: {Username}", user.Id, user.Username);
 
-        // إرسال إشارة تسجيل خروج لأي أجهزة أخرى قبل تسجيل الدخول الجديد (One Session per User)
+        // إرسال إشارة تسجيل خروج لأي أجهزة أخرى قبل تسجيل الدخول الجديد (One Session per User - SignalR)
         await _notificationService.SendForceLogoutAsync(user.Id.ToString());
 
-        // Generate JWT Token
-        var token = _jwtService.GenerateToken(user.Id, user.Username ?? "", user.Role);
+        // Generate JWT Token with SecurityStamp
+        var token = _jwtService.GenerateToken(user.Id, user.Username ?? "", user.Role, user.SecurityStamp);
 
         return new LoginResponseDto
         {
@@ -247,7 +252,9 @@ public class UserService : IUserService
             Department = user.Department,
             Token = token,
             ExpiresIn = 3600,
-            Message = "Login successful"
+            Message = wasLoggedInElsewhere 
+                ? "تم تسجيل الدخول بنجاح، وقد قمنا بإغلاق جلسة كانت مفتوحة على جهاز آخر" 
+                : "تم تسجيل الدخول بنجاح"
         };
     }
 
@@ -357,6 +364,17 @@ public class UserService : IUserService
         await _notificationService.SendForceLogoutAsync(user.Id.ToString(), "password_reset_via_forgot");
 
         return true;
+    }
+
+    public async Task LogoutAsync(int userId)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user != null)
+        {
+            user.SecurityStamp = null; // مسح بصمة الجلسة عند تسجيل الخروج
+            await _userRepository.UpdateAsync(user);
+            _logger.LogInformation("User logged out and security stamp cleared: {UserId}", userId);
+        }
     }
 
     private static UserDto MapToDto(User user)

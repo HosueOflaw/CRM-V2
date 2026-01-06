@@ -49,4 +49,7 @@ public class User
 
     [Column("lockout_end")]
     public DateTime? LockoutEnd { get; set; }
+
+    [Column("security_stamp")]
+    public string? SecurityStamp { get; set; }
 }

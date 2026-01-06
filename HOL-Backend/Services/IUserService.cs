@@ -19,4 +19,5 @@ public interface IUserService
     Task<bool> AdminResetPasswordAsync(AdminResetPasswordDto resetDto);
     Task<bool> ForgotPasswordAsync(string email);
     Task<bool> ResetPasswordAsync(ResetPasswordDto resetDto);
+    Task LogoutAsync(int userId);
 }

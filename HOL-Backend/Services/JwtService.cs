@@ -16,7 +16,7 @@ public class JwtService : IJwtService
         _logger = logger;
     }
 
-    public string GenerateToken(int userId, string username, string? role)
+    public string GenerateToken(int userId, string username, string? role, string? securityStamp = null)
     {
         var secretKey = _configuration["Jwt:SecretKey"] 
             ?? throw new InvalidOperationException("JWT SecretKey not configured");
@@ -28,7 +28,7 @@ public class JwtService : IJwtService
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             // Standard JWT Claims
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()), // Subject (User ID)
@@ -45,6 +45,11 @@ public class JwtService : IJwtService
             new Claim(ClaimTypes.Name, username), // Username
             new Claim(ClaimTypes.Role, role ?? "User"), // Role
         };
+
+        if (!string.IsNullOrEmpty(securityStamp))
+        {
+            claims.Add(new Claim("SecurityStamp", securityStamp));
+        }
 
         var token = new JwtSecurityToken(
             issuer: issuer,
