@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { BreakService, ActiveBreak, DailyBreakReport } from '../../../../services/break.service';
 import { PrimeToastService } from '../../../../shared/services/prime-toast.service';
 import { ToastModule } from 'primeng/toast';
+import { AuthService } from '../../../../core/services/auth';
 
 @Component({
   selector: 'app-daily-breaks',
@@ -142,7 +143,8 @@ export class DailyBreaksComponent implements OnInit {
 
   constructor(
     private breakService: BreakService,
-    private toast: PrimeToastService
+    private toast: PrimeToastService,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
@@ -248,7 +250,28 @@ export class DailyBreaksComponent implements OnInit {
     this.loadingActive = true;
     this.breakService.getActiveBreaks().subscribe({
       next: (data) => {
-        this.activeBreaks = data;
+        if (this.authService.isSupervisor()) {
+          const myDept = (this.authService.getUserDepartment() || '').toLowerCase().trim();
+          const depAliases: { [key: string]: string } = {
+            'negotiations': 'negotiations', 'المفاوضات': 'negotiations',
+            'execution': 'execution', 'التنفيذ': 'execution',
+            'finance': 'finance', 'المالية': 'finance', 'الإدارة المالية': 'finance',
+            'discussions': 'discussions', 'المداولات': 'discussions',
+            'reports': 'reports', 'التقارير': 'reports', 'report': 'reports',
+            'car-management': 'car-management', 'السيارات': 'car-management',
+            'secretariat': 'secretariat', 'السكرتارية': 'secretariat',
+            'management': 'management', 'الشؤون الإدارية': 'management', 'managment': 'management'
+          };
+          const normMyDept = depAliases[myDept] || myDept;
+
+          this.activeBreaks = data.filter(b => {
+            const bDep = (b.department || '').toLowerCase().trim();
+            const normBDep = depAliases[bDep] || bDep;
+            return normBDep === normMyDept;
+          });
+        } else {
+          this.activeBreaks = data;
+        }
         this.loadingActive = false;
       },
       error: () => this.loadingActive = false
@@ -264,16 +287,36 @@ export class DailyBreaksComponent implements OnInit {
     const day = String(this.selectedDate.getDate()).padStart(2, '0');
     const dateStr = `${year}-${month}-${day}`;
 
-    console.log('Fetching break reports for date:', dateStr);
-
     this.breakService.getDailyReport(dateStr).subscribe({
       next: (data) => {
-        this.dailyReports = data;
+        if (this.authService.isSupervisor()) {
+          const myDept = (this.authService.getUserDepartment() || '').toLowerCase().trim();
+          const depAliases: { [key: string]: string } = {
+            'negotiations': 'negotiations', 'المفاوضات': 'negotiations',
+            'execution': 'execution', 'التنفيذ': 'execution',
+            'finance': 'finance', 'المالية': 'finance', 'الإدارة المالية': 'finance',
+            'discussions': 'discussions', 'المداولات': 'discussions',
+            'reports': 'reports', 'التقارير': 'reports', 'report': 'reports',
+            'car-management': 'car-management', 'السيارات': 'car-management',
+            'secretariat': 'secretariat', 'السكرتارية': 'secretariat',
+            'management': 'management', 'الشؤون الإدارية': 'management', 'managment': 'management'
+          };
+          const normMyDept = depAliases[myDept] || myDept;
+
+          this.dailyReports = data.filter(r => {
+            const rDep = (r.department || '').toLowerCase().trim();
+            const normRDep = depAliases[rDep] || rDep;
+            return normRDep === normMyDept;
+          });
+        } else {
+          this.dailyReports = data;
+        }
+
         this.loadingDaily = false;
-        if (data.length === 0) {
+        if (this.dailyReports.length === 0) {
           this.toast.info('لا توجد بيانات مسجلة لهذا التاريخ', 'تنبيه');
         } else {
-          this.toast.success(`تم تحميل ${data.length} سجل بنجاح`, 'تم التحديث');
+          this.toast.success(`تم تحميل ${this.dailyReports.length} سجل بنجاح`, 'تم التحديث');
         }
       },
       error: (err) => {

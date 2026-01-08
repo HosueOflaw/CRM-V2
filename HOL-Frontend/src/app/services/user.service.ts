@@ -43,6 +43,7 @@ export interface UserDto {
   email?: string;
   role?: string;
   department?: string;
+  accessibleDepartments?: string[] | string;
   createdAt?: string;
 }
 

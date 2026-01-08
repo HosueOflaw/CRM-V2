@@ -12,8 +12,8 @@ export const departmentGuard: CanActivateFn = (route: ActivatedRouteSnapshot) =>
         return true;
     }
 
-    // Check if user is an employee
-    if (authService.isEmployee()) {
+    // Check if user is an employee or supervisor
+    if (authService.isEmployee() || authService.isSupervisor()) {
         const userDepartment = (authService.getUserDepartment() || '').toLowerCase().trim();
         const segment = (route.routeConfig?.path || '').toLowerCase();
 
@@ -48,13 +48,16 @@ export const departmentGuard: CanActivateFn = (route: ActivatedRouteSnapshot) =>
         const normalizedDep = depAliases[userDepartment] || userDepartment;
         console.log('Normalized Dep:', normalizedDep);
 
-        // Access allowed if matching department or home page
-        const isMatch = (normalizedDep && (segment.includes(normalizedDep) || normalizedDep.includes(segment))) || segment === '';
+        // Use the new centralized check that accounts for Primary and Additional departments
+        const isMatch = authService.canAccessDepartment(segment);
 
-        console.log('Is Match:', isMatch);
+        console.log('Final Access Check for', segment, ':', isMatch);
         console.log('--- Guard Debug End ---');
 
-        if (isMatch) {
+        if (isMatch ||
+            segment === '' ||
+            segment === 'management' ||
+            (segment === 'reports' && authService.isSupervisor())) {
             return true;
         }
 

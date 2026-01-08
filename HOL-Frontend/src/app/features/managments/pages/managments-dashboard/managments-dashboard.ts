@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { CommonModule } from '@angular/common';
+import { DelegatePermissionModal } from './components/delegate-permission-modal';
+import { AuthService } from '../../../../core/services/auth';
+import { BreakService, ActiveBreak } from '../../../../services/break.service';
+import { UserService, UserDto } from '../../../../services/user.service';
 
 Chart.register(...registerables);
 
@@ -12,6 +16,15 @@ Chart.register(...registerables);
   styleUrls: ['./managments-dashboard.css'],
 })
 export class ManagementDashboard implements OnInit {
+  activeBreaks: ActiveBreak[] = [];
+  myEmployees: UserDto[] = [];
+  loadingStats = false;
+
+  constructor(
+    public authService: AuthService,
+    private breakService: BreakService,
+    private userService: UserService
+  ) { }
 
   selectedChart: string | null = null;
 

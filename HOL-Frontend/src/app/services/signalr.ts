@@ -45,7 +45,16 @@ export class Signalr {
             // الاستماع للأحداث
             this.hubConnection.on('broadcast', (message: SignalRMessage) => {
                 console.log('📨 SignalR Message:', message);
-                this.messageSubject.next(message);
+
+                // If the message is a permission update, refresh the user data
+                if (message.type === 'permissions_updated' || message.type === 'ApprovePermission') {
+                    // We need AuthService here. Since we are in standalone/modern Angular,
+                    // we can't easily inject it without circular deps in some cases,
+                    // but we can try to use the message to trigger a refresh.
+                    this.messageSubject.next(message);
+                } else {
+                    this.messageSubject.next(message);
+                }
             });
 
             // الاستماع لحدث تسجيل الخروج القسري

@@ -8,14 +8,15 @@ import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 import { AuthService } from '../../core/services/auth';
 import { PrimeToastService } from '../../shared/services/prime-toast.service';
-import { BreakService, BreakStatus } from '../../services/break.service';
+import { BreakService, BreakStatus, DailyBreakReport } from '../../services/break.service';
+import { PermissionRequestModal } from '../../features/managments/pages/managments-dashboard/components/permission-request-modal';
 import { Subscription, interval } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, ToastModule],
+    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, ToastModule, PermissionRequestModal],
     template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -30,6 +31,27 @@ import Swal from 'sweetalert2';
             <!-- User Info -->
             <div class="user-info" *ngIf="authService.isLoggedIn()">
                 <span class="user-name">{{ authService.getCurrentUserName() }}</span>
+            </div>
+
+            <!-- Permission System Actions -->
+            <div class="permission-actions flex items-center gap-2" *ngIf="authService.isLoggedIn()">
+                <!-- Break Stats (Supervisor only) -->
+                <button type="button" class="layout-topbar-action !bg-purple-50 dark:!bg-purple-900/20 !text-purple-600 dark:!text-purple-400 border !border-purple-100 dark:!border-purple-800/30 rounded-xl" 
+                    *ngIf="authService.isSupervisor()" routerLink="/reports/daily-breaks" title="إحصائيات استراحات القسم">
+                    <i class="pi pi-chart-line"></i>
+                </button>
+
+                <!-- Request Permission (Supervisor only) -->
+                <button type="button" class="layout-topbar-action !bg-blue-50 dark:!bg-blue-900/20 !text-blue-600 dark:!text-blue-400 border !border-blue-100 dark:!border-blue-800/30 rounded-xl" 
+                    *ngIf="authService.isSupervisor()" (click)="permModal.open()" title="طلب صلاحية">
+                    <i class="pi pi-shield"></i>
+                </button>
+
+                <!-- Pending Requests Admin View -->
+                <button type="button" class="layout-topbar-action !bg-orange-50 dark:!bg-orange-900/20 !text-orange-600 dark:!text-orange-400 border !border-orange-100 dark:!border-orange-800/30 rounded-xl" 
+                    *ngIf="authService.isAdmin()" routerLink="/management/pending-permissions" title="طلبات الصلاحيات المعلقة">
+                    <i class="pi pi-bell animate-pulse"></i>
+                </button>
             </div>
 
             <!-- Break System for Employees ONLY (Higher visibility) -->
@@ -94,6 +116,7 @@ import Swal from 'sweetalert2';
             </div>
         </div>
     </div>
+    <app-permission-request-modal #permModal></app-permission-request-modal>
     <p-toast position="top-center"></p-toast>`,
     styles: [`
         .user-info {
@@ -161,7 +184,6 @@ import Swal from 'sweetalert2';
 
         .active-break {
             background: rgba(var(--primary-color-rgb), 0.05) !important;
-            padding: 8px 18px;
             border-radius: 50px;
             border: 2px solid var(--primary-color) !important;
             backdrop-filter: blur(10px);
@@ -209,9 +231,7 @@ export class AppTopbar implements OnInit, OnDestroy {
     ) { }
 
     ngOnInit() {
-        if (this.authService.isLoggedIn()) {
-            this.checkBreakStatus();
-        }
+        this.checkBreakStatus();
     }
 
     ngOnDestroy() {
@@ -220,12 +240,64 @@ export class AppTopbar implements OnInit, OnDestroy {
 
     checkBreakStatus() {
         this.breakService.getStatus().subscribe({
-            next: (status) => {
-                if (status.isOnBreak && status.startTime) {
+            next: (status: any) => {
+                console.log('--- Break Status Fetched ---', status);
+
+                // Handle potentially PascalCase properties from Backend (C# default) or mismatched names (isInBreak vs isOnBreak)
+                const isOnBreak = status.isInBreak || status.IsInBreak || status.isOnBreak || status.IsOnBreak;
+                const startTimeStr = status.startTime || status.StartTime;
+
+                if (status && isOnBreak) {
                     this.isOnBreak = true;
-                    this.breakStartTime = new Date(status.startTime);
+                    // If backend sends startTime, use it. Otherwise use current time as fallback
+                    this.breakStartTime = startTimeStr ? new Date(startTimeStr) : new Date();
                     this.startTimer();
+                } else {
+                    // Fallback: Check Daily Report for any active break (missing endTime)
+                    // This handles cases where /status might be inconsistent
+                    this.verifyActiveBreakFromReport();
                 }
+            },
+            error: (err) => {
+                console.error('Failed to fetch break status', err);
+                // Also try fallback on error
+                this.verifyActiveBreakFromReport();
+            }
+        });
+    }
+
+    private verifyActiveBreakFromReport() {
+        // Get today's report
+        const today = new Date().toISOString().split('T')[0];
+
+        this.breakService.getDailyReport(today).subscribe({
+            next: (reports: any[]) => {
+                // Look for any report without an EndTime
+                // Handle casing for endTime/EndTime
+                // User requested checking is_completed column specifically
+                const active = reports.find(r => {
+                    const isCompleted = r.isCompleted === true || r.IsCompleted === true || r.is_completed === true;
+                    // It is active if NOT completed AND has no end time
+                    return !isCompleted && !r.endTime && !(r as any).EndTime;
+                });
+
+
+                if (active) {
+                    console.log('--- Found Active Break via Report Fallback ---', active);
+                    this.isOnBreak = true;
+                    // Handle casing for startTime/StartTime
+                    const activeStart = active.startTime || (active as any).StartTime;
+                    this.breakStartTime = activeStart ? new Date(activeStart) : new Date();
+                    this.startTimer();
+                } else {
+                    this.isOnBreak = false;
+                    this.stopTimer();
+                }
+            },
+            error: (err) => {
+                console.error('Failed to fetch daily report fallback', err);
+                this.isOnBreak = false;
+                this.stopTimer();
             }
         });
     }

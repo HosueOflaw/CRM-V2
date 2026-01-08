@@ -495,6 +495,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
       'Admin': '#ef4444',
       'employee': '#3b82f6',
       'Employee': '#3b82f6',
+      'supervisor': '#f59e0b',
+      'Supervisor': '#f59e0b',
       'user': '#10b981',
       'User': '#10b981',
     };

@@ -1,226 +1,233 @@
-<div class="page-container">
-  <div class="page-header">
-    <h1>لوحة متابعة الأداء والإحصائيات</h1>
-  </div>
+<div class="page-header flex justify-between items-center">
+  <h1>لوحة متابعة الأداء والإحصائيات</h1>
 
-  <!-- KPIs -->
-  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">
-    <div class="card text-center">
-      <div class="card-body">
-        <p style="color: var(--text-color-secondary);">إجمالي الرسوم</p>
-        <h2 style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">21,500 د.ك</h2>
-      </div>
-    </div>
-    <div class="card text-center">
-      <div class="card-body">
-        <p style="color: var(--text-color-secondary);">إجمالي العمولة</p>
-        <h2 style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">5,100 د.ك</h2>
-      </div>
-    </div>
-    <div class="card text-center">
-      <div class="card-body">
-        <p style="color: var(--text-color-secondary);">الملفات الجاهزة للمحكمة</p>
-        <h2 style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">14 ملف</h2>
-      </div>
-    </div>
-    <div class="card text-center">
-      <div class="card-body">
-        <p style="color: var(--text-color-secondary);">العملاء المغادرين</p>
-        <h2 style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">6</h2>
-      </div>
+</div>
+
+<!-- KPIs -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">
+  <div class="card text-center">
+    <div class="card-body">
+      <p style="color: var(--text-color-secondary);">إجمالي الرسوم</p>
+      <h2 style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">21,500 د.ك</h2>
     </div>
   </div>
-  
-  <!-- Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-    <div class="card cursor-pointer" (click)="openChart('companyChart')">
-      <div class="card-body">
-        <h3 class="font-semibold mb-2">مقارنة الشركات</h3>
-        <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">21,500 د.ك</p>
-        <p style="color: var(--text-color-secondary); font-size: 0.875rem;">اضغط لعرض التفاصيل</p>
-      </div>
-    </div>
-    <div class="card cursor-pointer" (click)="openChart('employeeChart')">
-      <div class="card-body">
-        <h3 class="font-semibold mb-2">أداء الموظفين</h3>
-        <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">+18%</p>
-        <p style="color: var(--text-color-secondary); font-size: 0.875rem;">اضغط لعرض التفاصيل</p>
-      </div>
-    </div>
-    <div class="card cursor-pointer" (click)="openChart('debtChart')">
-      <div class="card-body">
-        <h3 class="font-semibold mb-2">مديونية الشركات</h3>
-        <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">12,000 د.ك</p>
-        <p style="color: var(--text-color-secondary); font-size: 0.875rem;">اضغط لعرض التفاصيل</p>
-      </div>
-    </div>
-    <div class="card cursor-pointer" (click)="openChart('clientsGrowthChart')">
-      <div class="card-body">
-        <h3 class="font-semibold mb-2">نمو العملاء</h3>
-        <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">+35%</p>
-        <p style="color: var(--text-color-secondary); font-size: 0.875rem;">اضغط لعرض التفاصيل</p>
-      </div>
-    </div>
-    <div class="card cursor-pointer" (click)="openChart('monthlyRevenueChart')">
-      <div class="card-body">
-        <h3 class="font-semibold mb-2">الإيرادات الشهرية</h3>
-        <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">56,000 د.ك</p>
-        <p style="color: var(--text-color-secondary); font-size: 0.875rem;">اضغط لعرض التفاصيل</p>
-      </div>
-    </div>
-    <div class="card cursor-pointer" (click)="openChart('casesSolvedChart')">
-      <div class="card-body">
-        <h3 class="font-semibold mb-2">القضايا المنجزة</h3>
-        <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">87%</p>
-        <p style="color: var(--text-color-secondary); font-size: 0.875rem;">اضغط لعرض التفاصيل</p>
-      </div>
+  <div class="card text-center">
+    <div class="card-body">
+      <p style="color: var(--text-color-secondary);">إجمالي العمولة</p>
+      <h2 style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">5,100 د.ك</h2>
     </div>
   </div>
-
-
-  <!-- Filters & Stat Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-    <div class="card">
-      <div class="card-header">
-        <h3>حالة الفرصة</h3>
-        <select class="form-select" style="width: auto;">
-          <option>All Pipelines</option>
-          <option>Active</option>
-          <option>Closed</option>
-        </select>
-      </div>
-      <div class="card-body">
-        <div class="flex flex-col items-center justify-center" style="min-height: 160px;">
-          <div style="width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--surface-hover); display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;"></div>
-          <p style="color: var(--text-color-secondary); font-weight: 500;">No Data Found</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <h3>نظرة عامة</h3>
-        <select class="form-select" style="width: auto;">
-          <option>All Pipelines</option>
-          <option>Pending</option>
-          <option>Won</option>
-        </select>
-      </div>
-      <div class="card-body">
-        <div class="flex flex-col items-center justify-center" style="min-height: 160px;">
-          <div style="width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--surface-hover); display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;"></div>
-          <p style="color: var(--text-color-secondary); font-weight: 500;">No Data Found</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <h3>معدل التغير</h3>
-        <select class="form-select" style="width: auto;">
-          <option>All Pipelines</option>
-          <option>Q1</option>
-          <option>Q2</option>
-        </select>
-      </div>
-      <div class="card-body">
-        <div class="flex flex-col items-center justify-center">
-          <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">0 د.ك</p>
-          <div class="flex items-center" style="color: var(--green-500); font-size: 0.875rem; margin-top: 0.25rem;">
-            <span style="margin-left: 0.25rem;">↑</span>
-            <span>0% vs Last 31 Days</span>
-          </div>
-          <div class="relative mt-4">
-            <svg style="width: 6rem; height: 6rem; transform: rotate(-90deg);">
-              <circle style="color: var(--surface-border);" stroke-width="6" stroke="currentColor" fill="transparent" r="40" cx="50%" cy="50%" />
-              <circle style="color: var(--primary-color);" stroke-width="6" stroke-linecap="round" stroke="currentColor" fill="transparent" r="40" cx="50%" cy="50%" stroke-dasharray="251.2" stroke-dashoffset="251.2" />
-            </svg>
-            <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.125rem; font-weight: 600;">
-              0%
-            </span>
-          </div>
-          <p style="margin-top: 0.75rem; font-size: 0.875rem; color: var(--text-color-secondary);">Won revenue</p>
-          <p style="font-weight: 600; color: var(--primary-color);">0 د.ك</p>
-        </div>
-      </div>
+  <div class="card text-center">
+    <div class="card-body">
+      <p style="color: var(--text-color-secondary);">الملفات الجاهزة للمحكمة</p>
+      <h2 style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">14 ملف</h2>
     </div>
   </div>
+  <div class="card text-center">
+    <div class="card-body">
+      <p style="color: var(--text-color-secondary);">العملاء المغادرين</p>
+      <h2 style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">6</h2>
+    </div>
+  </div>
+</div>
 
-  <div class="card mb-6">
+<!-- Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+  <div class="card cursor-pointer" (click)="openChart('companyChart')">
+    <div class="card-body">
+      <h3 class="font-semibold mb-2">مقارنة الشركات</h3>
+      <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">21,500 د.ك</p>
+      <p style="color: var(--text-color-secondary); font-size: 0.875rem;">اضغط لعرض التفاصيل</p>
+    </div>
+  </div>
+  <div class="card cursor-pointer" (click)="openChart('employeeChart')">
+    <div class="card-body">
+      <h3 class="font-semibold mb-2">أداء الموظفين</h3>
+      <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">+18%</p>
+      <p style="color: var(--text-color-secondary); font-size: 0.875rem;">اضغط لعرض التفاصيل</p>
+    </div>
+  </div>
+  <div class="card cursor-pointer" (click)="openChart('debtChart')">
+    <div class="card-body">
+      <h3 class="font-semibold mb-2">مديونية الشركات</h3>
+      <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">12,000 د.ك</p>
+      <p style="color: var(--text-color-secondary); font-size: 0.875rem;">اضغط لعرض التفاصيل</p>
+    </div>
+  </div>
+  <div class="card cursor-pointer" (click)="openChart('clientsGrowthChart')">
+    <div class="card-body">
+      <h3 class="font-semibold mb-2">نمو العملاء</h3>
+      <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">+35%</p>
+      <p style="color: var(--text-color-secondary); font-size: 0.875rem;">اضغط لعرض التفاصيل</p>
+    </div>
+  </div>
+  <div class="card cursor-pointer" (click)="openChart('monthlyRevenueChart')">
+    <div class="card-body">
+      <h3 class="font-semibold mb-2">الإيرادات الشهرية</h3>
+      <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">56,000 د.ك</p>
+      <p style="color: var(--text-color-secondary); font-size: 0.875rem;">اضغط لعرض التفاصيل</p>
+    </div>
+  </div>
+  <div class="card cursor-pointer" (click)="openChart('casesSolvedChart')">
+    <div class="card-body">
+      <h3 class="font-semibold mb-2">القضايا المنجزة</h3>
+      <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">87%</p>
+      <p style="color: var(--text-color-secondary); font-size: 0.875rem;">اضغط لعرض التفاصيل</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- Filters & Stat Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+  <div class="card">
     <div class="card-header">
-      <h3>احصائيات</h3>
+      <h3>حالة الفرصة</h3>
+      <select class="form-select" style="width: auto;">
+        <option>All Pipelines</option>
+        <option>Active</option>
+        <option>Closed</option>
+      </select>
     </div>
     <div class="card-body">
-      <div class="grid grid-cols-2 gap-4 text-center">
-        <div>
-          <p style="color: var(--text-color-secondary);">Total</p>
-          <h2 style="color: var(--primary-color); font-size: 1.25rem; font-weight: 700;">0</h2>
+      <div class="flex flex-col items-center justify-center" style="min-height: 160px;">
+        <div
+          style="width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--surface-hover); display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
         </div>
-        <div>
-          <p style="color: var(--text-color-secondary);">Total</p>
-          <h2 style="color: var(--primary-color); font-size: 1.25rem; font-weight: 700;">0 د.ك</h2>
-        </div>
-        <div>
-          <p style="color: var(--text-color-secondary);">CPC</p>
-          <h2 style="color: var(--primary-color); font-size: 1.25rem; font-weight: 700;">0 د.ك</h2>
-        </div>
-        <div>
-          <p style="color: var(--text-color-secondary);">CTR</p>
-          <h2 style="color: var(--primary-color); font-size: 1.25rem; font-weight: 700;">0%</h2>
-        </div>
+        <p style="color: var(--text-color-secondary); font-weight: 500;">No Data Found</p>
       </div>
     </div>
   </div>
 
-  <!-- Charts -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div class="card">
-      <div class="card-header">
-        <h3>📊 مقارنة الشركات</h3>
-      </div>
-      <div class="card-body">
-        <canvas id="companyChart"></canvas>
+  <div class="card">
+    <div class="card-header">
+      <h3>نظرة عامة</h3>
+      <select class="form-select" style="width: auto;">
+        <option>All Pipelines</option>
+        <option>Pending</option>
+        <option>Won</option>
+      </select>
+    </div>
+    <div class="card-body">
+      <div class="flex flex-col items-center justify-center" style="min-height: 160px;">
+        <div
+          style="width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--surface-hover); display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+        </div>
+        <p style="color: var(--text-color-secondary); font-weight: 500;">No Data Found</p>
       </div>
     </div>
-    <div class="card">
-      <div class="card-header">
-        <h3>🥧 توزيع الحالات</h3>
-      </div>
-      <div class="card-body">
-        <canvas id="statusChart"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>معدل التغير</h3>
+      <select class="form-select" style="width: auto;">
+        <option>All Pipelines</option>
+        <option>Q1</option>
+        <option>Q2</option>
+      </select>
+    </div>
+    <div class="card-body">
+      <div class="flex flex-col items-center justify-center">
+        <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 700;">0 د.ك</p>
+        <div class="flex items-center" style="color: var(--green-500); font-size: 0.875rem; margin-top: 0.25rem;">
+          <span style="margin-left: 0.25rem;">↑</span>
+          <span>0% vs Last 31 Days</span>
+        </div>
+        <div class="relative mt-4">
+          <svg style="width: 6rem; height: 6rem; transform: rotate(-90deg);">
+            <circle style="color: var(--surface-border);" stroke-width="6" stroke="currentColor" fill="transparent"
+              r="40" cx="50%" cy="50%" />
+            <circle style="color: var(--primary-color);" stroke-width="6" stroke-linecap="round" stroke="currentColor"
+              fill="transparent" r="40" cx="50%" cy="50%" stroke-dasharray="251.2" stroke-dashoffset="251.2" />
+          </svg>
+          <span
+            style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.125rem; font-weight: 600;">
+            0%
+          </span>
+        </div>
+        <p style="margin-top: 0.75rem; font-size: 0.875rem; color: var(--text-color-secondary);">Won revenue</p>
+        <p style="font-weight: 600; color: var(--primary-color);">0 د.ك</p>
       </div>
     </div>
-    <div class="card">
-      <div class="card-header">
-        <h3>📈 أداء الموظفين</h3>
+  </div>
+</div>
+
+
+<div class="card mb-6">
+  <div class="card-header">
+    <h3>احصائيات</h3>
+  </div>
+  <div class="card-body">
+    <div class="grid grid-cols-2 gap-4 text-center">
+      <div>
+        <p style="color: var(--text-color-secondary);">Total</p>
+        <h2 style="color: var(--primary-color); font-size: 1.25rem; font-weight: 700;">0</h2>
       </div>
-      <div class="card-body">
-        <canvas id="employeeChart"></canvas>
+      <div>
+        <p style="color: var(--text-color-secondary);">Total</p>
+        <h2 style="color: var(--primary-color); font-size: 1.25rem; font-weight: 700;">0 د.ك</h2>
+      </div>
+      <div>
+        <p style="color: var(--text-color-secondary);">CPC</p>
+        <h2 style="color: var(--primary-color); font-size: 1.25rem; font-weight: 700;">0 د.ك</h2>
+      </div>
+      <div>
+        <p style="color: var(--text-color-secondary);">CTR</p>
+        <h2 style="color: var(--primary-color); font-size: 1.25rem; font-weight: 700;">0%</h2>
       </div>
     </div>
-    <div class="card">
-      <div class="card-header">
-        <h3>📉 مديونية الشركات</h3>
-      </div>
-      <div class="card-body">
-        <canvas id="debtChart"></canvas>
-      </div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <div class="card">
+    <div class="card-header">
+      <h3>📊 مقارنة الشركات</h3>
     </div>
-    <div class="card">
-      <div class="card-header">
-        <h3>📆 نشاط القضايا الشهري</h3>
-      </div>
-      <div class="card-body">
-        <canvas id="casesChart"></canvas>
-      </div>
+    <div class="card-body">
+      <canvas id="companyChart"></canvas>
     </div>
-    <div class="card">
-      <div class="card-header">
-        <h3>💼 أداء الإدارات</h3>
-      </div>
-      <div class="card-body">
-        <canvas id="departmentChart"></canvas>
-      </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h3>🥧 توزيع الحالات</h3>
+    </div>
+    <div class="card-body">
+      <canvas id="statusChart"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h3>📈 أداء الموظفين</h3>
+    </div>
+    <div class="card-body">
+      <canvas id="employeeChart"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h3>📉 مديونية الشركات</h3>
+    </div>
+    <div class="card-body">
+      <canvas id="debtChart"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h3>📆 نشاط القضايا الشهري</h3>
+    </div>
+    <div class="card-body">
+      <canvas id="casesChart"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h3>💼 أداء الإدارات</h3>
+    </div>
+    <div class="card-body">
+      <canvas id="departmentChart"></canvas>
     </div>
   </div>
 </div>
