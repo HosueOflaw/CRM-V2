@@ -14,8 +14,8 @@ public interface IBreakService
     Task<UserBreakDto?> StartBreakAsync(int userId);
     Task<UserBreakDto?> EndBreakAsync(int userId);
     Task<BreakStatusDto> GetCurrentStatusAsync(int userId);
-    Task<IEnumerable<UserBreakDto>> GetDailyBreaksAsync(DateTime date);
-    Task<IEnumerable<UserBreakDto>> GetActiveBreaksAsync();
+    Task<IEnumerable<UserBreakDto>> GetDailyBreaksAsync(DateTime date, string? department = null);
+    Task<IEnumerable<UserBreakDto>> GetActiveBreaksAsync(string? department = null);
 }
 
 public class BreakService : IBreakService
@@ -29,9 +29,36 @@ public class BreakService : IBreakService
         _logger = logger;
     }
 
+    private DateTime GetEgyptTime()
+    {
+        // Egypt Standard Time ID (Windows: "Egypt Standard Time", Linux: "Africa/Cairo")
+        var timeZoneId = "Egypt Standard Time";
+        try
+        {
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            // Fallback for Linux/Docker environments if needed
+            try 
+            {
+                var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Africa/Cairo");
+                return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+            }
+            catch
+            {
+                // Absolute fallback: UTC+2 (Standard) or UTC+3 (DST) manually if timezone db is missing
+                // For safety, defaulting to UTC+2 here, but configuring OS timezone is better.
+                return DateTime.UtcNow.AddHours(2); 
+            }
+        }
+    }
+
     public async Task<UserBreakDto?> StartBreakAsync(int userId)
     {
-        var today = DateTime.UtcNow.Date;
+        var egyptNow = GetEgyptTime();
+        var today = egyptNow.Date;
         
         // التحقق مما إذا كان لديه بريك مفتوح بالفعل أو انتهى منه اليوم
         var existingBreak = await _context.UserBreaks
@@ -46,7 +73,7 @@ public class BreakService : IBreakService
         {
             UserId = userId,
             BreakDate = today,
-            StartTime = DateTime.UtcNow,
+            StartTime = egyptNow,
             IsCompleted = false
         };
 
@@ -69,7 +96,7 @@ public class BreakService : IBreakService
             throw new InvalidOperationException("No active break found to end.");
         }
 
-        activeBreak.EndTime = DateTime.UtcNow;
+        activeBreak.EndTime = GetEgyptTime();
         activeBreak.IsCompleted = true;
         
         // حساب المدة
@@ -107,7 +134,7 @@ public class BreakService : IBreakService
             return new BreakStatusDto { IsInBreak = false };
         }
 
-        var duration = DateTime.UtcNow - activeBreak.StartTime;
+        var duration = GetEgyptTime() - activeBreak.StartTime;
 
         return new BreakStatusDto
         {
@@ -117,23 +144,36 @@ public class BreakService : IBreakService
         };
     }
 
-    public async Task<IEnumerable<UserBreakDto>> GetDailyBreaksAsync(DateTime date)
+    public async Task<IEnumerable<UserBreakDto>> GetDailyBreaksAsync(DateTime date, string? department = null)
     {
-        var breaks = await _context.UserBreaks
+        var query = _context.UserBreaks
             .Include(b => b.User)
-            .Where(b => b.BreakDate == date.Date)
+            .Where(b => b.BreakDate == date.Date);
+
+        if (!string.IsNullOrEmpty(department))
+        {
+            query = query.Where(b => b.User != null && b.User.Department == department);
+        }
+
+        var breaks = await query
             .OrderByDescending(b => b.StartTime)
             .ToListAsync();
 
         return breaks.Select(MapToDto);
     }
 
-    public async Task<IEnumerable<UserBreakDto>> GetActiveBreaksAsync()
+    public async Task<IEnumerable<UserBreakDto>> GetActiveBreaksAsync(string? department = null)
     {
-        var breaks = await _context.UserBreaks
+        var query = _context.UserBreaks
             .Include(b => b.User)
-            .Where(b => !b.IsCompleted)
-            .ToListAsync();
+            .Where(b => !b.IsCompleted);
+
+        if (!string.IsNullOrEmpty(department))
+        {
+            query = query.Where(b => b.User != null && b.User.Department == department);
+        }
+
+        var breaks = await query.ToListAsync();
 
         return breaks.Select(MapToDto);
     }

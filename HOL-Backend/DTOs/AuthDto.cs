@@ -14,6 +14,9 @@ public class LoginResponseDto
     public string? Email { get; set; }
     public string? Role { get; set; }
     public string? Department { get; set; }
+    public string? SupervisedDepartment { get; set; }
+    public string? AccessibleDepartments { get; set; }
+    public string? AccessibleFeatures { get; set; }
     public bool Success { get; set; }
     public string? Message { get; set; }
     public string? Token { get; set; }

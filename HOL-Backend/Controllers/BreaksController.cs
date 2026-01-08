@@ -59,19 +59,32 @@ public class BreaksController : ControllerBase
     }
 
     [HttpGet("active")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "admin,supervisor")]
     public async Task<IActionResult> GetActiveBreaks()
     {
-        var result = await _breakService.GetActiveBreaksAsync();
+        string? department = null;
+        if (User.IsInRole("supervisor"))
+        {
+            department = User.FindFirst("SupervisedDepartment")?.Value;
+        }
+
+        var result = await _breakService.GetActiveBreaksAsync(department);
         return Ok(result);
     }
 
     [HttpGet("daily")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "admin,supervisor")]
     public async Task<IActionResult> GetDailyReport([FromQuery] DateTime? date)
     {
         var reportDate = date ?? DateTime.UtcNow;
-        var result = await _breakService.GetDailyBreaksAsync(reportDate);
+        
+        string? department = null;
+        if (User.IsInRole("supervisor"))
+        {
+            department = User.FindFirst("SupervisedDepartment")?.Value;
+        }
+
+        var result = await _breakService.GetDailyBreaksAsync(reportDate, department);
         return Ok(result);
     }
 }

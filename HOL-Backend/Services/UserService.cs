@@ -66,8 +66,17 @@ public class UserService : IUserService
             Email = createDto.Email,
             Role = createDto.Role,
             Department = createDto.Department,
+            SupervisedDepartment = createDto.SupervisedDepartment,
+            AccessibleDepartments = createDto.AccessibleDepartments,
+            AccessibleFeatures = createDto.AccessibleFeatures,
             CreatedAt = DateTime.UtcNow
         };
+
+        // Auto-set SupervisedDepartment for Supervisor if not provided
+        if (createDto.Role == "supervisor" && string.IsNullOrEmpty(createDto.SupervisedDepartment))
+        {
+            user.SupervisedDepartment = createDto.Department;
+        }
 
         // Hash password if provided
         if (!string.IsNullOrEmpty(createDto.Password))
@@ -115,6 +124,21 @@ public class UserService : IUserService
 
         if (!string.IsNullOrEmpty(updateDto.Department))
             user.Department = updateDto.Department;
+
+        if (updateDto.SupervisedDepartment != null)
+            user.SupervisedDepartment = updateDto.SupervisedDepartment;
+
+        if (updateDto.AccessibleDepartments != null)
+            user.AccessibleDepartments = updateDto.AccessibleDepartments;
+
+        if (updateDto.AccessibleFeatures != null)
+            user.AccessibleFeatures = updateDto.AccessibleFeatures;
+
+        // Auto-set SupervisedDepartment if Role is Supervisor and it's null
+        if (user.Role == "supervisor" && string.IsNullOrEmpty(user.SupervisedDepartment))
+        {
+            user.SupervisedDepartment = user.Department;
+        }
 
         // تحديث كلمة المرور إذا تم إرسالها (خاص بالآدمن أو تغيير كلمة المرور بدون القديمة)
         if (!string.IsNullOrEmpty(updateDto.Password))
@@ -238,8 +262,15 @@ public class UserService : IUserService
         // إرسال إشارة تسجيل خروج لأي أجهزة أخرى قبل تسجيل الدخول الجديد (One Session per User - SignalR)
         await _notificationService.SendForceLogoutAsync(user.Id.ToString());
 
-        // Generate JWT Token with SecurityStamp
-        var token = _jwtService.GenerateToken(user.Id, user.Username ?? "", user.Role, user.SecurityStamp);
+        // Generate JWT Token with SecurityStamp and permissions
+        var token = _jwtService.GenerateToken(
+            user.Id, 
+            user.Username ?? "", 
+            user.Role, 
+            user.SecurityStamp,
+            user.SupervisedDepartment,
+            user.AccessibleDepartments,
+            user.AccessibleFeatures);
 
         return new LoginResponseDto
         {
@@ -388,6 +419,9 @@ public class UserService : IUserService
             Email = user.Email,
             Role = user.Role,
             Department = user.Department,
+            SupervisedDepartment = user.SupervisedDepartment,
+            AccessibleDepartments = user.AccessibleDepartments,
+            AccessibleFeatures = user.AccessibleFeatures,
             CreatedAt = user.CreatedAt
         };
     }

@@ -52,4 +52,13 @@ public class User
 
     [Column("security_stamp")]
     public string? SecurityStamp { get; set; }
+
+    [Column("supervised_department")]
+    public string? SupervisedDepartment { get; set; }
+
+    [Column("accessible_departments")]
+    public string? AccessibleDepartments { get; set; }
+
+    [Column("accessible_features")]
+    public string? AccessibleFeatures { get; set; }
 }

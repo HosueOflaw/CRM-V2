@@ -11,6 +11,9 @@ public class UserDto
     public string? Email { get; set; }
     public string? Role { get; set; }
     public string? Department { get; set; }
+    public string? SupervisedDepartment { get; set; }
+    public string? AccessibleDepartments { get; set; }
+    public string? AccessibleFeatures { get; set; }
     public DateTime? CreatedAt { get; set; }
 }
 
@@ -23,6 +26,9 @@ public class CreateUserDto
     public string? Email { get; set; }
     public string? Role { get; set; }
     public string? Department { get; set; }
+    public string? SupervisedDepartment { get; set; }
+    public string? AccessibleDepartments { get; set; }
+    public string? AccessibleFeatures { get; set; }
     [Required(ErrorMessage = "Password is required")]
     [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
     public string? Password { get; set; }
@@ -36,5 +42,8 @@ public class UpdateUserDto
     public string? Email { get; set; }
     public string? Role { get; set; }
     public string? Department { get; set; }
+    public string? SupervisedDepartment { get; set; }
+    public string? AccessibleDepartments { get; set; }
+    public string? AccessibleFeatures { get; set; }
     public string? Password { get; set; }
 }

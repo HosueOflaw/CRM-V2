@@ -24,6 +24,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<AdditionalAmount> AdditionalAmounts => Set<AdditionalAmount>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<UserBreak> UserBreaks => Set<UserBreak>();
+    public DbSet<PermissionRequest> PermissionRequests => Set<PermissionRequest>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

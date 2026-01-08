@@ -16,7 +16,7 @@ public class JwtService : IJwtService
         _logger = logger;
     }
 
-    public string GenerateToken(int userId, string username, string? role, string? securityStamp = null)
+    public string GenerateToken(int userId, string username, string? role, string? securityStamp = null, string? supervisedDept = null, string? accessibleDepts = null, string? accessibleFeatures = null)
     {
         var secretKey = _configuration["Jwt:SecretKey"] 
             ?? throw new InvalidOperationException("JWT SecretKey not configured");
@@ -47,9 +47,16 @@ public class JwtService : IJwtService
         };
 
         if (!string.IsNullOrEmpty(securityStamp))
-        {
             claims.Add(new Claim("SecurityStamp", securityStamp));
-        }
+
+        if (!string.IsNullOrEmpty(supervisedDept))
+            claims.Add(new Claim("SupervisedDepartment", supervisedDept));
+
+        if (!string.IsNullOrEmpty(accessibleDepts))
+            claims.Add(new Claim("AccessibleDepartments", accessibleDepts));
+
+        if (!string.IsNullOrEmpty(accessibleFeatures))
+            claims.Add(new Claim("AccessibleFeatures", accessibleFeatures));
 
         var token = new JwtSecurityToken(
             issuer: issuer,
