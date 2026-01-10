@@ -142,6 +142,7 @@ builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IBreakService, BreakService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<SessionValidationFilter>();

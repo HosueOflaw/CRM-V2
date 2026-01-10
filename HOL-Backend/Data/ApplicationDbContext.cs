@@ -25,6 +25,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<UserBreak> UserBreaks => Set<UserBreak>();
     public DbSet<PermissionRequest> PermissionRequests => Set<PermissionRequest>();
+    public DbSet<EmployeeTask> EmployeeTasks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -41,5 +42,18 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<Payment>().Property(x => x.Value)
             .HasColumnType("decimal(18,3)");
+
+        // Configure EmployeeTask to avoid cascade delete conflicts
+        modelBuilder.Entity<EmployeeTask>()
+            .HasOne(t => t.AssignedTo)
+            .WithMany()
+            .HasForeignKey(t => t.AssignedToId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<EmployeeTask>()
+            .HasOne(t => t.CreatedBy)
+            .WithMany()
+            .HasForeignKey(t => t.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
