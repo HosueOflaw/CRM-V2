@@ -59,7 +59,11 @@ export class AuthService {
             const token = response.token || response.userId?.toString();
 
             // Start SignalR connection
-            this.signalr.startConnection(token);
+            this.signalr.startConnection(token).then(() => {
+              if (this.isAdmin()) {
+                this.signalr.joinChannel('admins');
+              }
+            });
 
             // --- Robust extraction of accessible departments ---
             let rawDeps = response.accessibleDepartments || response.AccessibleDepartments || [];
@@ -199,10 +203,19 @@ export class AuthService {
   initSignalRIfLoggedIn(): void {
     const token = this.getToken();
     if (token) {
-      this.signalr.startConnection(token);
+      this.signalr.startConnection(token).then(() => {
+        if (this.isAdmin()) {
+          this.signalr.joinChannel('admins');
+        }
+      });
 
-      // Listen for permissions updates in real-time
+      // Listen for SignalR messages
       this.signalr.message$.subscribe(msg => {
+        if (msg.type === 'reconnected') {
+          if (this.isAdmin()) {
+            this.signalr.joinChannel('admins');
+          }
+        }
         if (msg.type === 'permissions_updated' || msg.type === 'ApprovePermission') {
           console.log('🔄 Permission update notification received via SignalR. Refreshing user data...');
           this.refreshCurrentUser().subscribe();

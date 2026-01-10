@@ -18,6 +18,12 @@ import { Subscription } from 'rxjs';
             <!-- Performance Dashboard for Admin/Supervisor -->
             <li *ngIf="isAdminOrSupervisor" app-menuitem [item]="performanceItem" [index]="1"></li>
 
+            <!-- My Tasks (Always visible) -->
+            <li app-menuitem [item]="myTasksItem" [index]="2"></li>
+
+            <!-- Management Tasks (Admins/Supervisors only) -->
+            <li *ngIf="isAdminOrSupervisor" app-menuitem [item]="managementTasksItem" [index]="3"></li>
+
             <!-- Dropdown sections -->
             <ng-container *ngFor="let item of menuSections; let i = index">
                 <li app-menuitem [item]="item" [index]="i + 2"></li>
@@ -37,6 +43,18 @@ export class AppMenu implements OnInit, OnDestroy {
         icon: 'pi pi-fw pi-users',
         routerLink: ['/management/team-performance'],
         styleClass: 'dashboard-menu-item'
+    };
+
+    myTasksItem: MenuItem = {
+        label: 'مهامي',
+        icon: 'pi pi-fw pi-user',
+        routerLink: ['/management/my-tasks']
+    };
+
+    managementTasksItem: MenuItem = {
+        label: 'إدارة المهام',
+        icon: 'pi pi-fw pi-check-square',
+        routerLink: ['/management/tasks']
     };
 
     isAdminOrSupervisor = false;

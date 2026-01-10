@@ -25,5 +25,26 @@ export const MANAGEMENT_ROUTES: Routes = [
     loadComponent: () =>
       import('./pages/team-performance/team-performance').then((m) => m.TeamPerformancePage),
   },
+  {
+    path: 'tasks',
+    data: { roles: ['admin', 'supervisor'], mode: 'management' },
+    canActivate: [roleGuard],
+    loadComponent: () =>
+      import('./pages/tasks/tasks').then((m) => m.TasksPage),
+  },
+  {
+    path: 'my-tasks',
+    data: { roles: ['admin', 'supervisor', 'employee'], mode: 'personal' },
+    canActivate: [roleGuard],
+    loadComponent: () =>
+      import('./pages/tasks/tasks').then((m) => m.TasksPage),
+  },
+  {
+    path: 'tasks/:id',
+    data: { roles: ['admin', 'supervisor', 'employee'] },
+    canActivate: [roleGuard],
+    loadComponent: () =>
+      import('./pages/tasks/task-details').then((m) => m.TaskDetailsPage),
+  },
 ];
 

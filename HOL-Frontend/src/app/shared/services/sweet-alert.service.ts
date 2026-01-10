@@ -6,17 +6,17 @@ import { LayoutService } from '../../layout/service/layout.service';
   providedIn: 'root'
 })
 export class SweetAlertService {
-  constructor(private layoutService: LayoutService) {}
+  constructor(private layoutService: LayoutService) { }
 
   /**
    * Get SweetAlert2 configuration with dark mode support
    */
   private getSwalConfig(options: SweetAlertOptions = {}): SweetAlertOptions {
     // Check if dark mode is active by checking document class
-    const isDark = document.documentElement.classList.contains('app-dark') || 
-                   document.body.classList.contains('app-dark') ||
-                   this.layoutService.isDarkTheme();
-    
+    const isDark = document.documentElement.classList.contains('app-dark') ||
+      document.body.classList.contains('app-dark') ||
+      this.layoutService.isDarkTheme();
+
     return {
       ...options,
       customClass: {
@@ -85,6 +85,39 @@ export class SweetAlertService {
    */
   fire(options: SweetAlertOptions) {
     return Swal.fire(this.getSwalConfig(options));
+  }
+
+  /**
+   * Show Toast Notification
+   */
+  toast(options: SweetAlertOptions) {
+    const isDark = document.documentElement.classList.contains('app-dark') ||
+      document.body.classList.contains('app-dark') ||
+      this.layoutService.isDarkTheme();
+
+    // Check if running in Electron to adjust position (avoiding title bar overlap)
+    const isElectron = navigator.userAgent.toLowerCase().includes('electron');
+
+    return Swal.fire({
+      toast: true,
+      position: isElectron ? 'top-end' : 'top-end',
+      showConfirmButton: false,
+      timer: 4000,
+      timerProgressBar: true,
+      background: isDark ? '#1f2937' : '#fff',
+      color: isDark ? '#fff' : '#000',
+      ...options,
+      didOpen: (toast) => {
+        if (isElectron) {
+          toast.style.marginTop = '45px'; // Push down to avoid Electron title bar
+        }
+        if (options.didOpen) options.didOpen(toast);
+      },
+      customClass: {
+        popup: isDark ? 'swal2-dark-toast' : '',
+        ...options.customClass
+      }
+    });
   }
 
   /**

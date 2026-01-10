@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { Subject, Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { SweetAlertService } from '../shared/services/sweet-alert.service';
+import { TaskService, TaskStatus } from './task.service';
 
 import { environment } from '../../environments/environment';
 
@@ -24,14 +25,19 @@ export class Signalr {
 
     constructor(
         private router: Router,
-        // Inject AuthService via injector or directly if no circular dependency, 
-        // avoiding circular dependency might require different architecture but let's try direct first or use token getter
-        private swal: SweetAlertService
+        private swal: SweetAlertService,
+        private injector: Injector
     ) { }
+
+    private get taskService(): TaskService {
+        return this.injector.get(TaskService);
+    }
 
     private connectionTimestamp: number = 0;
 
     public async startConnection(token: string): Promise<void> {
+        if (this.hubConnection?.state === 'Connected') return;
+
         try {
             this.connectionTimestamp = Date.now();
             this.hubConnection = new HubConnectionBuilder()
@@ -42,30 +48,37 @@ export class Signalr {
                 .configureLogging(LogLevel.Information)
                 .build();
 
-            // الاستماع للأحداث
-            this.hubConnection.on('broadcast', (message: SignalRMessage) => {
-                console.log('📨 SignalR Message:', message);
+            // بدء الاتصال
+            await this.hubConnection.start();
+            console.log('✅ SignalR Connected!');
 
-                // If the message is a permission update, refresh the user data
-                if (message.type === 'permissions_updated' || message.type === 'ApprovePermission') {
-                    // We need AuthService here. Since we are in standalone/modern Angular,
-                    // we can't easily inject it without circular deps in some cases,
-                    // but we can try to use the message to trigger a refresh.
-                    this.messageSubject.next(message);
-                } else {
-                    this.messageSubject.next(message);
+            // --- Robust Handling for Admin Channel ---
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                const role = (user.role || '').toLowerCase().trim();
+                if (role === 'admin' || role === 'administrator') {
+                    this.joinChannel('admins');
                 }
+            }
+
+            // --- Unified Broadcast Listener ---
+            this.hubConnection.on('broadcast', (message: SignalRMessage) => {
+                console.log('📨 SignalR Broadcast:', message);
+                this.handleTaskMessage(message);
             });
 
             // الاستماع لحدث تسجيل الخروج القسري
             this.hubConnection.on('force_logout', (data: any) => {
-                console.warn('⚠️ Force Logout received:', data);
                 this.handleForceLogout();
             });
 
-            // بدء الاتصال
-            await this.hubConnection.start();
-            console.log('✅ SignalR Connected!');
+            // Re-join channels on reconnected
+            this.hubConnection.onreconnected(() => {
+                console.log('🔄 SignalR Reconnected. Re-joining channels...');
+                this.messageSubject.next({ type: 'reconnected', data: null, timestamp: new Date().toISOString() });
+            });
+
         } catch (error) {
             console.error('❌ SignalR Connection Error:', error);
         }
@@ -99,6 +112,56 @@ export class Signalr {
         }).then(() => {
             window.location.href = '/login';
         });
+    }
+
+    private handleTaskMessage(message: SignalRMessage) {
+        const data = message.data;
+        const type = message.type;
+
+        // Show UI Notification
+        switch (type) {
+            case 'new_task_assigned':
+                this.swal.toast({
+                    icon: 'info',
+                    title: 'مهمة جديدة 📋',
+                    text: `${data.title} - يُسندها: ${data.assignedBy}`,
+                    timer: 8000,
+                    showConfirmButton: true,
+                    confirmButtonText: 'عرض التفاصيل'
+                }).then(result => {
+                    if (result.isConfirmed && data.taskId) {
+                        this.router.navigate(['/management/tasks', data.taskId]);
+                    }
+                });
+                break;
+            case 'task_updated':
+                this.swal.toast({ icon: 'info', title: 'تعديل مهمة ✏️', text: `تم تعديل المهمة: ${data.title}`, timer: 5000 });
+                break;
+            case 'task_status_updated':
+                if (data.status === 'InProgress' && data.supervisorComment) {
+                    this.swal.toast({
+                        icon: 'warning',
+                        title: 'تحتاج مراجعة! ⚠️',
+                        text: `أعاد المشرف فتح المهمة: ${data.title}. ملاحظة: ${data.supervisorComment}`,
+                        timer: 10000
+                    });
+                } else {
+                    const statusLabel = this.taskService.getStatusLabel(data.newStatus || data.status);
+                    this.swal.toast({
+                        icon: 'success',
+                        title: 'تحديث حالة 🔄',
+                        text: `المهمة "${data.title}" أصبحت: ${statusLabel}`,
+                        timer: 5000
+                    });
+                }
+                break;
+            case 'task_deleted':
+                this.swal.toast({ icon: 'warning', title: 'حذف مهمة 🗑️', text: `تم حذف المهمة: ${data.title}`, timer: 5000 });
+                break;
+        }
+
+        // Notify subscribers to refresh UI
+        this.messageSubject.next(message);
     }
 
     /**

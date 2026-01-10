@@ -1,0 +1,174 @@
+<div
+    class="card bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 animate-fadein">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
+                <i class="pi" [ngClass]="viewMode === 'personal' ? 'pi-user' : 'pi-check-square'"
+                    class="text-primary text-3xl"></i>
+                <span>{{ viewMode === 'personal' ? 'مهامي الشخصية' : 'إدارة المهام' }}</span>
+            </h1>
+            <p class="text-gray-500 text-sm">
+                {{ viewMode === 'personal' ? 'قائمة مهامي ومتابعة الإنجاز' : 'إسناد ومتابعة مهام الفريق' }}
+            </p>
+        </div>
+
+        <div class="flex gap-2" *ngIf="viewMode === 'management'">
+            <p-button label="مهمة جديدة" icon="pi pi-plus" (click)="openCreateModal()"
+                styleClass="p-button-primary p-button-rounded"></p-button>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div
+        class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700">
+        <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-gray-500 mr-2">الحالة</label>
+            <p-select [options]="statuses" [(ngModel)]="filterParams.status" (onChange)="onFilterChange()"
+                placeholder="تصفية حسب الحالة" class="w-full" appendTo="body"></p-select>
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-gray-500 mr-2">الأولوية</label>
+            <p-select [options]="priorities" [(ngModel)]="filterParams.priority" (onChange)="onFilterChange()"
+                placeholder="تصفية حسب الأولوية" class="w-full" appendTo="body"></p-select>
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-gray-500 mr-2">من تاريخ</label>
+            <input type="date" pInputText [(ngModel)]="filterParams.startDate" (change)="onFilterChange()"
+                class="w-full" />
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-gray-500 mr-2">إلى تاريخ</label>
+            <div class="flex gap-2">
+                <input type="date" pInputText [(ngModel)]="filterParams.endDate" (change)="onFilterChange()"
+                    class="col-span-3" />
+                <p-button icon="pi pi-refresh" (click)="clearFilters()" [text]="true" severity="secondary"
+                    pTooltip="إعادة تعيين"></p-button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <p-table [value]="tasks" [loading]="loading" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
+        responsiveLayout="scroll" styleClass="p-datatable-lg" [rowHover]="true"
+        [globalFilterFields]="['title', 'assignedToName', 'description']">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 5%">#</th>
+                <th style="width: 25%">المهمة</th>
+                <th style="width: 15%">{{ viewMode === 'management' ? 'الموظف المسند إليه' : 'بواسطة' }}</th>
+                <th style="width: 15%">الأولوية</th>
+                <th style="width: 15%">آخر موعد</th>
+                <th style="width: 15%">الحالة</th>
+                <th style="width: 10%">إجراءات</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-task let-i="rowIndex">
+            <tr class="transition-colors duration-200">
+                <td class="font-medium text-gray-500">{{ i + 1 }}</td>
+
+                <td>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-gray-800 dark:text-gray-200 text-lg">{{ task.title }}</span>
+                        <span class="text-xs text-gray-400 truncate max-w-xs" *ngIf="task.description">{{
+                            task.description }}</span>
+                    </div>
+                </td>
+
+                <td>
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center font-bold text-xs">
+                            {{ (viewMode === 'management' ? task.assignedToName : task.createdByName)?.charAt(0) }}
+                        </div>
+                        <span class="text-sm font-medium">{{ viewMode === 'management' ? task.assignedToName :
+                            task.createdByName }}</span>
+                    </div>
+                </td>
+
+                <td>
+                    <p-tag [severity]="getPrioritySeverity(task.priority)" [value]="getPriorityLabel(task.priority)"
+                        [rounded]="true">
+                        <ng-template pTemplate="icon">
+                            <i class="pi" [ngClass]="{
+                                'pi-arrow-up text-xs mr-1': task.priority === 'High',
+                                'pi-minus text-xs mr-1': task.priority === 'Medium',
+                                'pi-arrow-down text-xs mr-1': task.priority === 'Low'
+                            }"></i>
+                        </ng-template>
+                    </p-tag>
+                </td>
+
+                <td>
+                    <div class="flex flex-col">
+                        <span class="text-sm font-semibold" [ngClass]="{'text-red-500': isOverdue(task)}">
+                            {{ task.dueDate | date:'mediumDate' }}
+                        </span>
+                        <span class="text-xs text-gray-400">
+                            {{ task.dueDate | date:'shortTime' }}
+                        </span>
+                    </div>
+                </td>
+
+                <td>
+                    <p-tag [severity]="getStatusSeverity(task.status)" [value]="getStatusLabel(task.status)">
+                    </p-tag>
+                </td>
+
+                <td>
+                    <div class="flex gap-2">
+                        <!-- Common View Action -->
+                        <p-button icon="pi pi-eye" [routerLink]="['/management/tasks', task.id]" [rounded]="true"
+                            [text]="true" severity="secondary" pTooltip="عرض التفاصيل">
+                        </p-button>
+
+                        <!-- Personal Work Actions (User is the Receiver) -->
+                        <ng-container *ngIf="viewMode === 'personal'">
+                            <p-button *ngIf="task.status === TaskStatus.Pending" icon="pi pi-play"
+                                (click)="updateStatus(task, TaskStatus.InProgress)" pTooltip="بدء التنفيذ"
+                                [rounded]="true" [text]="true" severity="info">
+                            </p-button>
+
+                            <p-button *ngIf="task.status === TaskStatus.InProgress" icon="pi pi-check"
+                                (click)="updateStatus(task, TaskStatus.Completed)" pTooltip="إتمام المهمة"
+                                [rounded]="true" [text]="true" severity="success">
+                            </p-button>
+                        </ng-container>
+
+                        <!-- Management Actions (User is the Admin/Creator) -->
+                        <ng-container *ngIf="viewMode === 'management'">
+                            <p-button
+                                *ngIf="task.status === TaskStatus.Completed || task.status === TaskStatus.Cancelled"
+                                icon="pi pi-refresh" (click)="updateStatus(task, TaskStatus.InProgress)"
+                                [rounded]="true" [text]="true" severity="warn" pTooltip="إعادة فتح المهمة">
+                            </p-button>
+                            <p-button icon="pi pi-pencil" (click)="editTask(task)" [rounded]="true" [text]="true"
+                                severity="primary" pTooltip="تعديل المهمة">
+                            </p-button>
+                            <p-button icon="pi pi-trash" (click)="deleteTask(task)" [rounded]="true" [text]="true"
+                                severity="danger" pTooltip="حذف المهمة">
+                            </p-button>
+                        </ng-container>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="7" class="text-center py-8">
+                    <div class="flex flex-col items-center gap-3 text-gray-400">
+                        <i class="pi pi-inbox text-4xl"></i>
+                        <p>لا توجد مهام حالياً</p>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+    </p-table>
+</div>
+
+<!-- Modals -->
+<app-create-task-modal #createModal (onComplete)="loadTasks()"></app-create-task-modal>
+<p-confirmDialog [style]="{width: '450px'}" acceptLabel="نعم" rejectLabel="لا"></p-confirmDialog>

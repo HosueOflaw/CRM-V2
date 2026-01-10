@@ -1,0 +1,183 @@
+<div class="animate-fadein p-2 md:p-6">
+    <!-- Breadcrumbs / Back -->
+    <div class="mb-6 flex items-center gap-4">
+        <p-button icon="pi pi-arrow-right" [text]="true" routerLink="/management/tasks" label="العودة للمهام"
+            severity="secondary"></p-button>
+        <span class="text-gray-300">|</span>
+        <h2 class="text-xl font-bold text-gray-800 dark:text-white">تفاصيل المهمة #{{task?.id}}</h2>
+    </div>
+
+    <div *ngIf="loading" class="flex flex-col items-center justify-center py-20 gap-4">
+        <i class="pi pi-spin pi-spinner text-4xl text-primary"></i>
+        <p class="text-gray-500">جاري تحميل التفاصيل...</p>
+    </div>
+
+    <div *ngIf="!loading && task" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left Side: Main Info -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+            <p-card styleClass="shadow-sm border-0 overflow-hidden">
+                <div class="flex flex-col gap-6">
+                    <!-- Title & Status Header -->
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="flex flex-col gap-2">
+                            <h1 class="text-3xl font-black text-gray-900 dark:text-white leading-tight">
+                                {{task.title}}
+                            </h1>
+                            <div class="flex items-center gap-3">
+                                <p-tag [severity]="getStatusSeverity(task.status)" [value]="getStatusLabel(task.status)"
+                                    [rounded]="true"></p-tag>
+                                <p-tag [severity]="getPrioritySeverity(task.priority)"
+                                    [value]="getPriorityLabel(task.priority)" [rounded]="true"></p-tag>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="h-px bg-gray-100 dark:bg-gray-700"></div>
+
+                    <!-- Description -->
+                    <div class="flex flex-col gap-3">
+                        <label class="font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                            <i class="pi pi-align-right text-primary"></i>
+                            الوصف والتفاصيل
+                        </label>
+                        <div
+                            class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap bg-gray-50/50 dark:bg-gray-800/30 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                            {{task.description || 'لا يوجد وصف مضاف لهذه المهمة'}}
+                        </div>
+                    </div>
+
+                    <!-- Supervisor Comment -->
+                    <div class="flex flex-col gap-3" *ngIf="task.supervisorComment">
+                        <label class="font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                            <i class="pi pi-comment text-orange-500"></i>
+                            ملاحظات المشرف
+                        </label>
+                        <div
+                            class="text-md text-gray-600 dark:text-gray-400 leading-relaxed bg-orange-50/30 dark:bg-orange-900/10 p-4 rounded-xl border border-orange-100 dark:border-orange-900/30 italic">
+                            {{task.supervisorComment}}
+                        </div>
+                    </div>
+
+                    <!-- Employee Comment -->
+                    <div class="flex flex-col gap-3" *ngIf="task.employeeComment">
+                        <label class="font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                            <i class="pi pi-user text-green-500"></i>
+                            ملاحظات الموظف
+                        </label>
+                        <div
+                            class="text-md text-gray-600 dark:text-gray-400 leading-relaxed bg-green-50/30 dark:bg-green-900/10 p-4 rounded-xl border border-green-100 dark:border-green-900/30 italic">
+                            {{task.employeeComment}}
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="flex flex-col gap-2 p-4 bg-primary/5 rounded-xl">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-bold text-primary">نسبة الإنجاز التقريبية</span>
+                            <span class="text-sm font-bold text-primary">{{getProgress()}}%</span>
+                        </div>
+                        <p-progressBar [value]="getProgress()" [showValue]="false"
+                            styleClass="h-2 rounded-full"></p-progressBar>
+                    </div>
+                </div>
+            </p-card>
+
+            <!-- Status Update Action (Card) -->
+            <p-card styleClass="shadow-sm border-0 bg-gradient-to-r from-primary/5 to-transparent">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                            <i class="pi pi-cog text-primary text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-900 dark:text-white">تحديث الحالة</h3>
+                            <p class="text-sm text-gray-500">قم بتغيير حالة المهمة بناءً على تقدمك</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <p-button *ngIf="task.status === TaskStatus.Pending" label="بدء التنفيذ" icon="pi pi-play"
+                            (click)="updateStatus(TaskStatus.InProgress)" severity="info" [loading]="updatingStatus"
+                            styleClass="p-button-raised"></p-button>
+
+                        <p-button *ngIf="task.status === TaskStatus.InProgress" label="تم الإنجاز" icon="pi pi-check"
+                            (click)="updateStatus(TaskStatus.Completed)" severity="success" [loading]="updatingStatus"
+                            styleClass="p-button-raised"></p-button>
+
+                        <p-button *ngIf="task.status !== TaskStatus.Cancelled && task.status !== TaskStatus.Completed"
+                            label="إلغاء المهمة" icon="pi pi-times" (click)="updateStatus(TaskStatus.Cancelled)"
+                            [text]="true" severity="danger" [loading]="updatingStatus"></p-button>
+
+                        <p-button
+                            *ngIf="canManage() && (task.status === TaskStatus.Completed || task.status === TaskStatus.Cancelled)"
+                            label="إعادة فتح (تكرار)" icon="pi pi-refresh" (click)="updateStatus(TaskStatus.InProgress)"
+                            severity="warn" [loading]="updatingStatus" styleClass="p-button-raised"></p-button>
+                    </div>
+                </div>
+            </p-card>
+        </div>
+
+        <!-- Right Side: Sidebar Meta Info -->
+        <div class="flex flex-col gap-6">
+            <p-card header="معلومات المهمة" styleClass="shadow-sm border-0">
+                <div class="flex flex-col gap-4">
+
+                    <div class="detail-item">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">المسؤول عن التنفيذ</span>
+                        <div class="flex items-center gap-3 mt-1">
+                            <div
+                                class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                                {{task.assignedToName.charAt(0)}}
+                            </div>
+                            <span class="font-bold text-gray-800 dark:text-gray-200">{{task.assignedToName}}</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">تم الإسناد بواسطة</span>
+                        <div class="flex items-center gap-3 mt-1">
+                            <i class="pi pi-user-edit text-gray-400"></i>
+                            <span class="font-medium text-gray-700 dark:text-gray-300">{{task.createdByName}}</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">تاريخ الاستحقاق</span>
+                        <div class="flex items-center gap-3 mt-1">
+                            <i class="pi pi-calendar-times text-red-400"></i>
+                            <span class="font-bold text-gray-800 dark:text-gray-200">{{task.dueDate |
+                                date:'medium'}}</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">تاريخ الإنشاء</span>
+                        <div class="flex items-center gap-3 mt-1">
+                            <i class="pi pi-calendar-plus text-green-400"></i>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">{{task.createdAt |
+                                date:'medium'}}</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-item" *ngIf="task.completedAt">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">تاريخ الإنجاز</span>
+                        <div class="flex items-center gap-3 mt-1">
+                            <i class="pi pi-check-circle text-success font-bold"></i>
+                            <span class="font-bold text-success">{{task.completedAt | date:'medium'}}</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">القسم</span>
+                        <div class="flex items-center gap-3 mt-1">
+                            <i class="pi pi-building text-gray-400"></i>
+                            <span class="text-sm font-bold text-gray-700 dark:text-gray-300">{{task.department}}</span>
+                        </div>
+                    </div>
+
+                </div>
+            </p-card>
+        </div>
+    </div>
+</div>
