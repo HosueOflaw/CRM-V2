@@ -14,7 +14,8 @@ public interface IUserService
     Task<bool> DeleteUserAsync(int id);
     Task<UserDto?> GetUserByUsernameAsync(string username);
     Task<IEnumerable<UserDto>> GetUsersByRoleAsync(string role);
-    Task<LoginResponseDto> LoginAsync(LoginDto loginDto);
+    Task<LoginResponseDto> LoginAsync(LoginDto loginDto, string? ipAddress, string? userAgent);
+    Task<IEnumerable<LoginHistoryDto>> GetLoginHistoryAsync(int? userId = null, DateTime? fromDate = null, DateTime? toDate = null);
     Task<bool> ChangePasswordAsync(ChangePasswordDto changePasswordDto);
     Task<bool> AdminResetPasswordAsync(AdminResetPasswordDto resetDto);
     Task<bool> ForgotPasswordAsync(string email);

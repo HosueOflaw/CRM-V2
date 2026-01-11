@@ -1,6 +1,8 @@
 using House_of_law_api.Domain.Entities;
 using House_of_law_api.DTOs;
 using House_of_law_api.Interfaces;
+using House_of_law_api.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace House_of_law_api.Services;
 
@@ -14,6 +16,7 @@ public class UserService : IUserService
     private readonly IJwtService _jwtService;
     private readonly INotificationService _notificationService;
     private readonly IEmailService _emailService;
+    private readonly ApplicationDbContext _context;
     private readonly ILogger<UserService> _logger;
 
     public UserService(
@@ -22,6 +25,7 @@ public class UserService : IUserService
         IJwtService jwtService,
         INotificationService notificationService,
         IEmailService emailService,
+        ApplicationDbContext context,
         ILogger<UserService> logger)
     {
         _userRepository = userRepository;
@@ -29,6 +33,7 @@ public class UserService : IUserService
         _jwtService = jwtService;
         _notificationService = notificationService;
         _emailService = emailService;
+        _context = context;
         _logger = logger;
     }
 
@@ -183,7 +188,7 @@ public class UserService : IUserService
         return users.Select(u => MapToDto(u));
     }
 
-    public async Task<LoginResponseDto> LoginAsync(LoginDto loginDto)
+    public async Task<LoginResponseDto> LoginAsync(LoginDto loginDto, string? ipAddress, string? userAgent)
     {
         var user = await _userRepository.GetByUsernameAsync(loginDto.Username);
 
@@ -258,6 +263,27 @@ public class UserService : IUserService
         await _userRepository.UpdateAsync(user);
 
         _logger.LogInformation("User logged in: {UserId}, Username: {Username}", user.Id, user.Username);
+
+        // Record Login History
+        try 
+        {
+            var history = new LoginHistory
+            {
+                UserId = user.Id,
+                LoginTime = DateTime.UtcNow.AddHours(2), // Egypt Time
+                IpAddress = ipAddress,
+                UserAgent = userAgent,
+                Role = user.Role,
+                Email = user.Email
+            };
+            _context.LoginHistories.Add(history);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to save login history for user {UserId}", user.Id);
+            // Don't fail the login if history fails (resilience)
+        }
 
         // إرسال إشارة تسجيل خروج لأي أجهزة أخرى قبل تسجيل الدخول الجديد (One Session per User - SignalR)
         await _notificationService.SendForceLogoutAsync(user.Id.ToString());
@@ -424,5 +450,50 @@ public class UserService : IUserService
             AccessibleFeatures = user.AccessibleFeatures,
             CreatedAt = user.CreatedAt
         };
+    }
+
+    public async Task<IEnumerable<LoginHistoryDto>> GetLoginHistoryAsync(int? userId = null, DateTime? fromDate = null, DateTime? toDate = null)
+    {
+        var query = _context.LoginHistories
+            .Include(h => h.User)
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (userId.HasValue)
+        {
+            query = query.Where(h => h.UserId == userId);
+        }
+
+        if (fromDate.HasValue)
+        {
+            var start = fromDate.Value.Date;
+            query = query.Where(h => h.LoginTime >= start);
+        }
+
+        if (toDate.HasValue)
+        {
+            var end = toDate.Value.Date;
+            // End of the day
+            query = query.Where(h => h.LoginTime < end.AddDays(1));
+        }
+
+        // Limit to reasonable amount if no filters - e.g., last 1000
+        var histories = await query
+            .OrderByDescending(h => h.LoginTime)
+            .Take(1000) 
+            .Select(h => new LoginHistoryDto
+            {
+                Id = h.Id,
+                UserId = h.UserId,
+                UserName = h.User != null ? h.User.FullName : "Unknown",
+                Role = h.Role,
+                Email = h.Email,
+                LoginTime = h.LoginTime,
+                IpAddress = h.IpAddress,
+                UserAgent = h.UserAgent
+            })
+            .ToListAsync();
+
+        return histories;
     }
 }

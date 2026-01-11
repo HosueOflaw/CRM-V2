@@ -41,13 +41,21 @@ public class PermissionService : IPermissionService
         _context.PermissionRequests.Add(request);
         await _context.SaveChangesAsync();
 
+        // Get pending count and user name
+        var pendingCount = await _context.PermissionRequests.CountAsync(r => r.Status == "Pending");
+        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
+
         // Notify Admins
-        await _notificationService.BroadcastToAllAsync("new_permission_request", new
+        await _notificationService.BroadcastToChannelAsync("admins", "new_permission_request", new
         {
             requestId = request.Id,
-            userId = userId,
-            type = dto.RequestType,
-            value = dto.RequestedValue
+            requesterName = user?.FullName ?? "Unknown",
+            requestType = dto.RequestType,
+            requestedValue = dto.RequestedValue,
+            type = dto.RequestType, // Backup for old name
+            value = dto.RequestedValue, // Backup for old name
+            reason = dto.Reason ?? "لا يوجد سبب",
+            pendingCount = pendingCount
         });
 
         return MapToDto(request);
@@ -110,13 +118,27 @@ public class PermissionService : IPermissionService
 
         await _context.SaveChangesAsync();
         
+        // Get updated pending count for admins
+        var pendingCount = await _context.PermissionRequests.CountAsync(r => r.Status == "Pending");
+
         // Notify User
-        await _notificationService.BroadcastToUserAsync(request.UserId.ToString(), "permission_request_processed", new
+        var updatePayload = new
         {
             requestId = request.Id,
             status = request.Status,
-            comment = request.AdminComment
-        });
+            type = request.RequestType,
+            requestType = request.RequestType, // Consistent name
+            value = request.RequestedValue,
+            requestedValue = request.RequestedValue, // Consistent name
+            comment = request.AdminComment ?? "",
+            adminComment = request.AdminComment ?? "", // Backup name
+            pendingCount = pendingCount
+        };
+
+        await _notificationService.BroadcastToUserAsync(request.UserId.ToString(), "permission_request_processed", updatePayload);
+        
+        // Also notify admins channel
+        await _notificationService.BroadcastToChannelAsync("admins", "permission_request_processed", updatePayload);
 
         return true;
     }
@@ -185,6 +207,24 @@ public class PermissionService : IPermissionService
         }
 
         await _context.SaveChangesAsync();
+        
+        // Notify Employee
+        await _notificationService.BroadcastToUserAsync(dto.EmployeeId.ToString(), "permissions_delegated", new
+        {
+            supervisorName = supervisor.FullName,
+            accessibleDepartments = employee.AccessibleDepartments,
+            accessibleFeatures = employee.AccessibleFeatures
+        });
+
+        // Notify Admins
+        await _notificationService.BroadcastToChannelAsync("admins", "permissions_delegated", new
+        {
+            supervisorId = supervisorId,
+            employeeId = dto.EmployeeId,
+            employeeName = employee.FullName,
+            departments = employee.AccessibleDepartments
+        });
+
         _logger.LogInformation("DelegatePermission success: Supervisor {SupId} updated permissions for Employee {EmpId}", supervisorId, dto.EmployeeId);
         return (true, "Permissions delegated successfully");
     }

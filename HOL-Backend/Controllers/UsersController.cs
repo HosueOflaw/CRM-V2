@@ -193,10 +193,16 @@ public class UsersController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<LoginResponseDto>> Login(LoginDto loginDto)
     {
-        var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+        // Get Real IP (considering proxies and Cloudflare)
+        var clientIp = HttpContext.Request.Headers["CF-Connecting-IP"].FirstOrDefault()
+                     ?? HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                     ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+        
+        var userAgent = Request.Headers["User-Agent"].ToString();
+
         _logger.LogInformation("Login attempt from IP: {Ip}, Username: {Username}", clientIp, loginDto.Username);
 
-        var result = await _userService.LoginAsync(loginDto);
+        var result = await _userService.LoginAsync(loginDto, clientIp, userAgent);
 
         if (!result.Success)
         {
@@ -328,5 +334,21 @@ public class UsersController : ControllerBase
             message = "Logout successful",
             timestamp = DateTime.UtcNow
         });
+    }
+    /// <summary>
+    /// جلب سجل دخول المستخدمين (للأدمن فقط)
+    /// GET: api/users/login-history?date=2026-01-11
+    /// </summary>
+    [HttpGet("login-history")]
+    [Authorize(Roles = "admin")]
+    public async Task<ActionResult<IEnumerable<LoginHistoryDto>>> GetLoginHistory([FromQuery] DateTime? date = null)
+    {
+        // If date is provided, get records for that specific day
+        // If no date, get all recent records (last 1000)
+        DateTime? fromDate = date?.Date;
+        DateTime? toDate = date?.Date.AddDays(1).AddSeconds(-1);
+
+        var history = await _userService.GetLoginHistoryAsync(null, fromDate, toDate);
+        return Ok(history);
     }
 }

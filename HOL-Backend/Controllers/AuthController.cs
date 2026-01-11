@@ -34,11 +34,15 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<LoginResponseDto>> Login(LoginDto loginDto)
     {
-        // استخدام Cloudflare IP
-        var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+        // Get Real IP (considering proxies and Cloudflare)
+        var clientIp = HttpContext.Request.Headers["CF-Connecting-IP"].FirstOrDefault()
+                     ?? HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                     ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+        
+        var userAgent = Request.Headers["User-Agent"].ToString();
         _logger.LogInformation("Login attempt from IP: {Ip}, Username: {Username}", clientIp, loginDto.Username);
 
-        var result = await _userService.LoginAsync(loginDto);
+        var result = await _userService.LoginAsync(loginDto, clientIp, userAgent);
 
         if (!result.Success)
         {

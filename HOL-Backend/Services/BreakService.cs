@@ -22,11 +22,13 @@ public class BreakService : IBreakService
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<BreakService> _logger;
+    private readonly INotificationService _notificationService;
 
-    public BreakService(ApplicationDbContext context, ILogger<BreakService> logger)
+    public BreakService(ApplicationDbContext context, ILogger<BreakService> logger, INotificationService notificationService)
     {
         _context = context;
         _logger = logger;
+        _notificationService = notificationService;
     }
 
     private DateTime GetEgyptTime()
@@ -83,6 +85,22 @@ public class BreakService : IBreakService
         // Reload to include User for mapping
         await _context.Entry(newBreak).Reference(b => b.User).LoadAsync();
 
+        // Notify Admins and Supervisor Channel
+        var startPayload = new
+        {
+            userId = userId,
+            fullName = newBreak.User?.FullName,
+            department = newBreak.User?.Department,
+            startTime = newBreak.StartTime,
+            type = "break_started"
+        };
+        
+        await _notificationService.BroadcastToChannelAsync("admins", "break_started", startPayload);
+        if (!string.IsNullOrEmpty(newBreak.User?.Department))
+        {
+            await _notificationService.BroadcastToChannelAsync($"dept_{newBreak.User.Department}", "break_started", startPayload);
+        }
+
         return MapToDto(newBreak);
     }
 
@@ -120,6 +138,24 @@ public class BreakService : IBreakService
         // Ensure User is loaded for mapping
         if (activeBreak.User == null)
             await _context.Entry(activeBreak).Reference(b => b.User).LoadAsync();
+
+        // Notify Admins and Supervisor Channel
+        var endPayload = new
+        {
+            userId = userId,
+            fullName = activeBreak.User?.FullName,
+            department = activeBreak.User?.Department,
+            endTime = activeBreak.EndTime,
+            durationMinutes = activeBreak.DurationMinutes,
+            lateMinutes = activeBreak.LateMinutes,
+            type = "break_ended"
+        };
+        
+        await _notificationService.BroadcastToChannelAsync("admins", "break_ended", endPayload);
+        if (!string.IsNullOrEmpty(activeBreak.User?.Department))
+        {
+            await _notificationService.BroadcastToChannelAsync($"dept_{activeBreak.User.Department}", "break_ended", endPayload);
+        }
 
         return MapToDto(activeBreak);
     }

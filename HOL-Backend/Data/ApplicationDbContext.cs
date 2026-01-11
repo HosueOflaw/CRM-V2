@@ -26,6 +26,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<UserBreak> UserBreaks => Set<UserBreak>();
     public DbSet<PermissionRequest> PermissionRequests => Set<PermissionRequest>();
     public DbSet<EmployeeTask> EmployeeTasks { get; set; }
+    public DbSet<LoginHistory> LoginHistories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
