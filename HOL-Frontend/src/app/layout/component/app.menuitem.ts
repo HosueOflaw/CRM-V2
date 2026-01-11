@@ -25,6 +25,7 @@ import { LayoutService } from '../service/layout.service';
                pRipple>
                 <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
                 <span class="layout-menuitem-text">{{ item.label }}</span>
+                <span class="layout-menuitem-badge" *ngIf="item.badge" [ngClass]="item.badgeStyleClass">{{item.badge}}</span>
                 <i class="pi pi-fw layout-submenu-toggler" 
                    [ngClass]="{'pi-angle-down': !active, 'pi-angle-up': active}"></i>
             </a>
@@ -49,6 +50,7 @@ import { LayoutService } from '../service/layout.service';
             >
                 <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
                 <span class="layout-menuitem-text">{{ item.label }}</span>
+                <span class="layout-menuitem-badge" *ngIf="item.badge" [ngClass]="item.badgeStyleClass">{{item.badge}}</span>
             </a>
 
             <!-- External link -->
@@ -61,6 +63,7 @@ import { LayoutService } from '../service/layout.service';
                pRipple>
                 <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
                 <span class="layout-menuitem-text">{{ item.label }}</span>
+                <span class="layout-menuitem-badge" *ngIf="item.badge" [ngClass]="item.badgeStyleClass">{{item.badge}}</span>
             </a>
 
             <!-- Children submenu -->
@@ -142,10 +145,34 @@ import { LayoutService } from '../service/layout.service';
             font-weight: 600;
         }
 
+        :host ::ng-deep .layout-submenu a .layout-menuitem-text {
+            flex: 1;
+        }
+
         :host ::ng-deep .layout-submenu .layout-menuitem-icon {
             margin-left: 0.5rem;
             font-size: 0.9rem;
             opacity: 0.7;
+        }
+
+        .layout-menuitem-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ef4444 !important;
+            color: #ffffff !important;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 12px;
+            margin-right: auto;
+            margin-left: 0.5rem;
+            min-width: 1.4rem;
+            height: 1.2rem;
+            text-align: center;
+            z-index: 100;
+            line-height: 1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
     `],
     animations: [

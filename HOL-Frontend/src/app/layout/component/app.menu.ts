@@ -4,6 +4,8 @@ import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
 import { AuthService } from '../../core/services/auth';
+import { PermissionRequest, PermissionService } from '../../core/services/permission.service';
+import { Signalr } from '../../services/signalr';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -14,19 +16,22 @@ import { Subscription } from 'rxjs';
         <ul class="layout-menu">
             <!-- Home is always visible -->
             <li app-menuitem [item]="homeItem" [index]="0"></li>
-            
+
+          
+
             <!-- Performance Dashboard for Admin/Supervisor -->
             <li *ngIf="isAdminOrSupervisor" app-menuitem [item]="performanceItem" [index]="1"></li>
 
-            <!-- My Tasks (Always visible) -->
+            <!-- My Tasks & Permissions (Always visible for non-admins) -->
             <li app-menuitem [item]="myTasksItem" [index]="2"></li>
+            <li *ngIf="!isAdmin" app-menuitem [item]="myPermissionsItem" [index]="3"></li>
 
             <!-- Management Tasks (Admins/Supervisors only) -->
-            <li *ngIf="isAdminOrSupervisor" app-menuitem [item]="managementTasksItem" [index]="3"></li>
+            <li *ngIf="isAdminOrSupervisor" app-menuitem [item]="managementTasksItem" [index]="4"></li>
 
             <!-- Dropdown sections -->
             <ng-container *ngFor="let item of menuSections; let i = index">
-                <li app-menuitem [item]="item" [index]="i + 2"></li>
+                <li app-menuitem [item]="item" [index]="i + 5"></li>
             </ng-container>
         </ul>
     `
@@ -57,21 +62,75 @@ export class AppMenu implements OnInit, OnDestroy {
         routerLink: ['/management/tasks']
     };
 
+    myPermissionsItem: MenuItem = {
+        label: 'طلبات صلاحياتي',
+        icon: 'pi pi-fw pi-shield',
+        routerLink: ['/management/my-permissions']
+    };
+
     isAdminOrSupervisor = false;
+    isAdmin = false;
+    pendingRequestsCount: string | undefined = undefined;
     menuSections: MenuItem[] = [];
     private userSub?: Subscription;
 
-    constructor(private authService: AuthService) { }
+    constructor(
+        private authService: AuthService,
+        private permissionService: PermissionService,
+        private signalr: Signalr
+    ) { }
 
     ngOnInit() {
         this.updateAuthFlags();
         this.buildMenu();
+        if (this.isAdmin) {
+            this.fetchPendingCount();
+        }
 
-        // Watch for user profile updates (e.g. after approval)
+        // Watch for user profile updates
         this.userSub = this.authService.userUpdated$.subscribe(() => {
-            console.log('--- Sidebar: Rebuilding menu due to user update ---');
             this.updateAuthFlags();
             this.buildMenu();
+            if (this.isAdmin) this.fetchPendingCount();
+        });
+
+        // Listen for SignalR to update badge count
+        this.signalr.message$.subscribe((msg: any) => {
+            if (this.isAdmin && (msg.type === 'new_permission_request' || msg.type === 'permission_request_processed')) {
+                this.fetchPendingCount();
+            }
+        });
+
+        // Listen for internal processed event
+        this.permissionService.requestProcessed$.subscribe(() => {
+            if (this.isAdmin) this.fetchPendingCount();
+        });
+    }
+
+    private fetchPendingCount() {
+        // Try to load from cache first for instant UI response
+        const cached = localStorage.getItem('pending_permissions_count');
+        if (cached && !this.pendingRequestsCount) {
+            this.pendingRequestsCount = cached;
+            console.log('📦 Badge Count loaded from Cache:', cached);
+            this.buildMenu();
+        }
+
+        this.permissionService.getPendingRequests().subscribe((reqs: PermissionRequest[]) => {
+            const count = reqs.length > 0 ? reqs.length.toString() : undefined;
+            console.log('📡 Pending Requests API result count:', reqs.length);
+
+            // Only update and rebuild if the count actually changed
+            if (this.pendingRequestsCount !== count) {
+                this.pendingRequestsCount = count;
+                if (count) {
+                    localStorage.setItem('pending_permissions_count', count);
+                } else {
+                    localStorage.removeItem('pending_permissions_count');
+                }
+                console.log('🔄 Rebuilding Menu with Badge:', count || 'None');
+                this.buildMenu(); // Rebuild to apply badge
+            }
         });
     }
 
@@ -80,7 +139,8 @@ export class AppMenu implements OnInit, OnDestroy {
     }
 
     private updateAuthFlags() {
-        this.isAdminOrSupervisor = this.authService.isAdmin() || this.authService.isSupervisor();
+        this.isAdmin = this.authService.isAdmin();
+        this.isAdminOrSupervisor = this.isAdmin || this.authService.isSupervisor();
     }
 
     private buildMenu() {
@@ -99,7 +159,14 @@ export class AppMenu implements OnInit, OnDestroy {
                 items: [
                     { label: 'لوحة التحكم', icon: 'pi pi-fw pi-th-large', routerLink: ['/management'] },
                     { label: 'الحضور والانصراف', icon: 'pi pi-fw pi-calendar-times', routerLink: ['/management/attendance'] },
-                    { label: 'سجل تسجيلات الدخول', icon: 'pi pi-fw pi-sign-in', routerLink: ['/management/logins-admin'] }
+                    { label: 'سجل تسجيلات الدخول', icon: 'pi pi-fw pi-sign-in', routerLink: ['/management/logins-admin'] },
+                    ...(this.isAdmin ? [{
+                        label: 'طلبات الصلاحيات المعلقة',
+                        icon: 'pi pi-fw pi-shield',
+                        routerLink: ['/management/pending-permissions'],
+                        badge: this.pendingRequestsCount,
+                        badgeStyleClass: 'p-badge-danger'
+                    }] : [])
                 ]
             },
             {

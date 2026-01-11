@@ -52,20 +52,13 @@ export class Signalr {
             await this.hubConnection.start();
             console.log('✅ SignalR Connected!');
 
-            // --- Robust Handling for Admin Channel ---
-            const userStr = localStorage.getItem('user');
-            if (userStr) {
-                const user = JSON.parse(userStr);
-                const role = (user.role || '').toLowerCase().trim();
-                if (role === 'admin' || role === 'administrator') {
-                    this.joinChannel('admins');
-                }
-            }
+            // Join appropriate channels based on role
+            this.joinRoleChannels();
 
             // --- Unified Broadcast Listener ---
             this.hubConnection.on('broadcast', (message: SignalRMessage) => {
                 console.log('📨 SignalR Broadcast:', message);
-                this.handleTaskMessage(message);
+                this.handleNotificationMessage(message);
             });
 
             // الاستماع لحدث تسجيل الخروج القسري
@@ -76,11 +69,34 @@ export class Signalr {
             // Re-join channels on reconnected
             this.hubConnection.onreconnected(() => {
                 console.log('🔄 SignalR Reconnected. Re-joining channels...');
+                this.joinRoleChannels();
                 this.messageSubject.next({ type: 'reconnected', data: null, timestamp: new Date().toISOString() });
             });
 
         } catch (error) {
             console.error('❌ SignalR Connection Error:', error);
+        }
+    }
+
+    /**
+     * Join role-specific channels (admins for Admin, dept_name for Supervisor)
+     */
+    private joinRoleChannels() {
+        const userStr = localStorage.getItem('user');
+        if (!userStr) return;
+
+        const user = JSON.parse(userStr);
+        const role = (user.role || '').toLowerCase().trim();
+
+        // 1. Admins join the global admins channel
+        if (role === 'admin' || role === 'administrator') {
+            this.joinChannel('admins');
+        }
+
+        // 2. Supervisors join their department channel
+        const supervisedDept = user.supervisedDepartment || user.department;
+        if (role === 'supervisor' && supervisedDept) {
+            this.joinChannel(`dept_${supervisedDept.toLowerCase()}`);
         }
     }
 
@@ -114,50 +130,181 @@ export class Signalr {
         });
     }
 
-    private handleTaskMessage(message: SignalRMessage) {
-        const data = message.data;
-        const type = message.type;
+    private getProp(obj: any, keys: string[]): any {
+        if (!obj) return null;
+
+        // 1. Try exact and common naming conventions
+        for (const key of keys) {
+            if (obj[key] !== undefined && obj[key] !== null) return obj[key];
+
+            const pascal = key.charAt(0).toUpperCase() + key.slice(1);
+            if (obj[pascal] !== undefined && obj[pascal] !== null) return obj[pascal];
+
+            const upper = key.toUpperCase();
+            if (obj[upper] !== undefined && obj[upper] !== null) return obj[upper];
+        }
+
+        // 2. Last resort: Case-insensitive search on all keys
+        const allObjKeys = Object.keys(obj);
+        for (const key of keys) {
+            const targetLower = key.toLowerCase();
+            const foundKey = allObjKeys.find(k => k.toLowerCase() === targetLower);
+            if (foundKey && obj[foundKey] !== undefined && obj[foundKey] !== null) {
+                return obj[foundKey];
+            }
+        }
+
+        console.warn(`⚠️ [SignalR] Could not find any of keys [${keys.join(', ')}] in data:`, obj);
+        return null;
+    }
+
+    private handleNotificationMessage(message: SignalRMessage) {
+        if (!message) return;
+
+        const data = message.data || {};
+        const type = (message.type || '').toLowerCase().trim();
+
+        console.log(`[SignalR] Processing notification type: ${type}`, data);
 
         // Show UI Notification
         switch (type) {
             case 'new_task_assigned':
+                const ntTitle = this.getProp(data, ['title', 'Title']);
+                const ntBy = this.getProp(data, ['assignedBy', 'AssignedBy']);
+                const ntId = this.getProp(data, ['taskId', 'TaskId', 'Id']);
+
                 this.swal.toast({
                     icon: 'info',
                     title: 'مهمة جديدة 📋',
-                    text: `${data.title} - يُسندها: ${data.assignedBy}`,
+                    text: `${ntTitle} - يُسندها: ${ntBy}`,
                     timer: 8000,
                     showConfirmButton: true,
                     confirmButtonText: 'عرض التفاصيل'
                 }).then(result => {
-                    if (result.isConfirmed && data.taskId) {
-                        this.router.navigate(['/management/tasks', data.taskId]);
+                    if (result.isConfirmed && ntId) {
+                        this.router.navigate(['/management/tasks', ntId]);
                     }
                 });
                 break;
+
             case 'task_updated':
-                this.swal.toast({ icon: 'info', title: 'تعديل مهمة ✏️', text: `تم تعديل المهمة: ${data.title}`, timer: 5000 });
+                const tuTitle = this.getProp(data, ['title', 'Title']);
+                this.swal.toast({ icon: 'info', title: 'تعديل مهمة ✏️', text: `تم تعديل المهمة: ${tuTitle}`, timer: 5000 });
                 break;
+
             case 'task_status_updated':
-                if (data.status === 'InProgress' && data.supervisorComment) {
+                const tsuStatus = this.getProp(data, ['status', 'Status']);
+                const tsuNewStatus = this.getProp(data, ['newStatus', 'NewStatus']);
+                const tsuComment = this.getProp(data, ['supervisorComment', 'SupervisorComment']);
+                const tsuTitle = this.getProp(data, ['title', 'Title']);
+
+                if ((tsuStatus === 'InProgress' || tsuNewStatus === 'InProgress') && tsuComment) {
                     this.swal.toast({
                         icon: 'warning',
                         title: 'تحتاج مراجعة! ⚠️',
-                        text: `أعاد المشرف فتح المهمة: ${data.title}. ملاحظة: ${data.supervisorComment}`,
+                        text: `أعاد المشرف فتح المهمة: ${tsuTitle}. ملاحظة: ${tsuComment}`,
                         timer: 10000
                     });
                 } else {
-                    const statusLabel = this.taskService.getStatusLabel(data.newStatus || data.status);
+                    const statusLabel = this.taskService.getStatusLabel(tsuNewStatus || tsuStatus);
                     this.swal.toast({
                         icon: 'success',
                         title: 'تحديث حالة 🔄',
-                        text: `المهمة "${data.title}" أصبحت: ${statusLabel}`,
+                        text: `المهمة "${tsuTitle}" أصبحت: ${statusLabel}`,
                         timer: 5000
                     });
                 }
                 break;
+
             case 'task_deleted':
-                this.swal.toast({ icon: 'warning', title: 'حذف مهمة 🗑️', text: `تم حذف المهمة: ${data.title}`, timer: 5000 });
+                const tdTitle = this.getProp(data, ['title', 'Title']);
+                this.swal.toast({ icon: 'warning', title: 'حذف مهمة 🗑️', text: `تم حذف المهمة: ${tdTitle}`, timer: 5000 });
                 break;
+
+            // --- Permissions ---
+            case 'new_permission_request':
+                const nprName = this.getProp(data, ['fullName', 'userName', 'requesterName', 'FullName']) || 'موظف';
+                const nprVal = this.getProp(data, ['requestedValue', 'value', 'requestValue', 'RequestedValue']) || '';
+                const nprReason = this.getProp(data, ['reason', 'notes', 'note', 'description', 'Reason']) || 'بدون سبب مذكور';
+                const nprAdminComment = this.getProp(data, ['adminComment', 'adminNotes', 'AdminComment']);
+
+                let nprText = `الطلب: ${nprVal} - السبب: ${nprReason}`;
+                if (nprAdminComment) {
+                    nprText += ` - ملاحظة الأدمن: ${nprAdminComment}`;
+                }
+
+                this.swal.toast({
+                    icon: 'info',
+                    title: `طلب صلاحية: ${nprName}`,
+                    text: nprText,
+                    timer: 8000
+                });
+                break;
+
+            case 'permission_request_processed':
+                const prpStatus = this.getProp(data, ['status', 'Status']);
+                const prpVal = this.getProp(data, ['requestedValue', 'value', 'requestValue', 'RequestedValue']) || '';
+                const prpComment = this.getProp(data, ['adminComment', 'comment', 'notes', 'AdminComment']);
+
+                const statusText = prpStatus === 'Approved' ? 'تمت الموافقة على' : 'تم رفض';
+                this.swal.toast({
+                    icon: prpStatus === 'Approved' ? 'success' : 'error',
+                    title: 'تحديث الصلاحيات',
+                    text: `${statusText} طلبك الخاص بـ ${prpVal}. ملاحظة: ${prpComment || ''}`,
+                    timer: 7000
+                });
+                break;
+
+            case 'permissions_delegated':
+                const pdBy = this.getProp(data, ['supervisorName', 'fullName', 'userName', 'delegatedBy', 'SupervisorName']) || 'المشرف';
+                const pdDept = this.getProp(data, ['departmentName', 'department', 'value', 'DepartmentName']) || '';
+
+                this.swal.toast({
+                    icon: 'success',
+                    title: 'تحديث الصلاحيات',
+                    text: `لقد قام ${pdBy} بتحديث صلاحياتك. لديك الآن وصول للقسم: ${pdDept}`,
+                    timer: 8000
+                });
+                break;
+
+            // --- Breaks ---
+            case 'break_started':
+            case 'startbreak':
+            case 'breakstarted':
+                const bsName = this.getProp(data, ['fullName', 'userName', 'name', 'FullName', 'Name']) || 'موظف';
+                const bsDept = this.getProp(data, ['department', 'section', 'Department', 'Section']) || '';
+
+                this.swal.toast({
+                    icon: 'info',
+                    title: 'بداية استراحة ☕',
+                    text: `${bsName} بدأ استراحته الآن (القسم: ${bsDept})`,
+                    timer: 6000
+                });
+                break;
+
+            case 'break_ended':
+            case 'endbreak':
+            case 'breakended':
+                const beName = this.getProp(data, ['fullName', 'userName', 'name', 'FullName', 'Name']) || 'موظف';
+                const beDept = this.getProp(data, ['department', 'section', 'Department', 'Section']) || '';
+                const beDuration = this.getProp(data, ['durationMinutes', 'minutes', 'duration', 'DurationMinutes']) || '?';
+                const beLate = this.getProp(data, ['lateMinutes', 'late', 'LateMinutes']) || 0;
+
+                let beText = `${beName} عاد من الاستراحة. المدة: ${beDuration} دقيقة.`;
+                if (beLate > 0) {
+                    beText += ` (تأخير: ${beLate} دقيقة ⚠️)`;
+                }
+
+                this.swal.toast({
+                    icon: beLate > 0 ? 'warning' : 'success',
+                    title: 'نهاية استراحة ✅',
+                    text: beText,
+                    timer: 8000
+                });
+                break;
+
+            default:
+                console.log(`⚠️ Unhandled SignalR notification type: ${type}`, data);
         }
 
         // Notify subscribers to refresh UI

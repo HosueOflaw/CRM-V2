@@ -1,73 +1,120 @@
-<div class="page-container">
-  <div class="page-header">
-    <h1>سجل تسجيلات الدخول</h1>
+<div class="page-container fade-in">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">سجل الدخول للنظام</h1>
+      <p class="text-gray-500 dark:text-gray-400">مراقبة وتتبع جميع محاولات الدخول للنظام</p>
+    </div>
+    <div class="flex gap-2">
+      <button pButton icon="pi pi-refresh" label="تحديث" class="p-button-outlined" (click)="refresh()"
+        [loading]="loading"></button>
+      <button pButton icon="pi pi-file-excel" label="تصدير" class="p-button-success" (click)="exportToExcel()"></button>
+    </div>
   </div>
 
-  <div class="page-content">
-    <!-- Search Section -->
-    <div class="search-section">
-      <div class="search-filters">
-        <div class="form-field">
-          <label class="form-label">بحث</label>
-          <input
-            type="text"
-            pInputText
-            [(ngModel)]="searchTerm"
-            (input)="onSearch()"
-            placeholder="ابحث بالاسم، البريد الإلكتروني، أو عنوان IP"
-            class="form-input"
-          />
-        </div>
-      </div>
-      <div class="search-actions">
-        <p-button label="تصدير Excel" icon="pi pi-file-excel" (onClick)="exportToExcel()" />
-      </div>
-    </div>
+  <div class="card p-0 overflow-hidden shadow-lg border-none">
+    <p-table #dt [value]="logins" [rows]="10" [paginator]="true" [loading]="loading"
+      [globalFilterFields]="['username', 'email', 'ipAddress', 'browser']" [rowHover]="true" styleClass="p-datatable-lg"
+      [rowsPerPageOptions]="[10, 25, 50]" currentPageReportTemplate="عرض {first} إلى {last} من أصل {totalRecords} سجل"
+      [showCurrentPageReport]="true">
+      <ng-template pTemplate="caption">
+        <div
+          class="flex flex-wrap md:flex-row md:items-center md:justify-between gap-3 p-4 bg-gray-50 dark:bg-gray-800/50">
+          <span class="p-input-icon-left w-full md:w-auto">
+            <i class="pi pi-search"></i>
+            <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+              placeholder="بحث في السجلات..." class="w-full md:w-80 p-inputtext-sm" />
+          </span>
 
-    <!-- Table -->
-    <div class="table-container">
-      <p-table
-        [value]="filteredLogins"
-        [paginator]="true"
-        [rows]="10"
-        [rowsPerPageOptions]="[10, 20, 50]"
-        [globalFilterFields]="['username', 'email', 'ipAddress']"
-        styleClass="p-datatable-striped"
-        [tableStyle]="{ 'min-width': '50rem' }"
-      >
-        <ng-template pTemplate="header">
-          <tr>
-            <th>ID</th>
-            <th>الاسم</th>
-            <th>البريد الإلكتروني</th>
-            <th>نوع الدخول</th>
-            <th>وقت الدخول</th>
-            <th>عنوان IP</th>
-            <th>الحالة</th>
-            <th>المتصفح</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-login>
-          <tr>
-            <td>{{ login.id }}</td>
-            <td>{{ login.username }}</td>
-            <td>{{ login.email }}</td>
-            <td>{{ getLoginTypeLabel(login.loginType) }}</td>
-            <td>{{ login.loginTime | date: 'short' }}</td>
-            <td>{{ login.ipAddress }}</td>
-            <td>
-              <p-tag [value]="login.status === 'success' ? 'نجح' : 'فشل'" [severity]="getSeverity(login.status)" />
-            </td>
-            <td>{{ login.userAgent }}</td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="8" class="text-center">لا توجد بيانات</td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
+          <div class="flex gap-2 flex-wrap items-center">
+            <!-- Date Range Filter -->
+            <div class="flex items-center gap-2">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">من:</label>
+              <input type="date" [(ngModel)]="startDate" (change)="applyDateFilter(dt)"
+                class="p-inputtext p-inputtext-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none text-gray-700 dark:text-gray-200" />
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">إلى:</label>
+              <input type="date" [(ngModel)]="endDate" (change)="applyDateFilter(dt)"
+                class="p-inputtext p-inputtext-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none text-gray-700 dark:text-gray-200" />
+            </div>
+
+            <!-- Status Filter -->
+            <select [(ngModel)]="selectedStatus" (change)="dt.filter(selectedStatus, 'status', 'equals')"
+              class="p-inputtext p-inputtext-sm w-full md:w-48 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none text-gray-700 dark:text-gray-200 h-[42px]">
+              <option [ngValue]="null">الكل</option>
+              <option value="success">نجح</option>
+              <option value="failed">فشل</option>
+            </select>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="id" class="w-[80px]"># <p-sortIcon field="id"></p-sortIcon></th>
+          <th pSortableColumn="username">المستخدم <p-sortIcon field="username"></p-sortIcon></th>
+          <th pSortableColumn="loginType">النوع <p-sortIcon field="loginType"></p-sortIcon></th>
+          <th pSortableColumn="loginTime">الوقت والتاريخ <p-sortIcon field="loginTime"></p-sortIcon></th>
+          <th pSortableColumn="ipAddress">IP Address <p-sortIcon field="ipAddress"></p-sortIcon></th>
+          <th pSortableColumn="browser">الجهاز / المتصفح <p-sortIcon field="browser"></p-sortIcon></th>
+          <th pSortableColumn="status">الحالة <p-sortIcon field="status"></p-sortIcon></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-login>
+        <tr>
+          <td><span class="text-gray-500 font-mono text-sm">#{{ login.id }}</span></td>
+          <td>
+            <div class="flex flex-col">
+              <span class="font-bold text-gray-800 dark:text-gray-200">{{ login.username }}</span>
+              <span class="text-xs text-gray-400">{{ login.email }}</span>
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="getLoginTypeLabel(login.loginType)" [severity]="getLoginTypeSeverity(login.loginType)"
+              [rounded]="true">
+            </p-tag>
+          </td>
+          <td>
+            <div class="flex flex-col">
+              <span class="font-medium">{{ login.loginTime | date: 'dd/MM/yyyy' }}</span>
+              <span class="text-xs text-gray-500">{{ login.loginTime | date: 'hh:mm a' }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="flex items-center gap-1 font-mono text-sm bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded w-fit">
+              <i class="pi pi-globe text-xs text-blue-500"></i>
+              {{ login.ipAddress }}
+            </div>
+          </td>
+          <td>
+            <div class="flex items-center gap-2" [pTooltip]="login.userAgent">
+              <i class="pi" [ngClass]="{
+                     'pi-desktop': login.os.includes('Windows') || login.os.includes('Mac'), 
+                     'pi-mobile': login.os.includes('Android') || login.os.includes('iOS')
+                   }"></i>
+              <span class="text-sm text-gray-600 dark:text-gray-300">{{ login.browser }} on {{ login.os }}</span>
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="getStatusLabel(login.status)" [severity]="getSeverity(login.status)"
+              [icon]="login.status === 'success' ? 'pi pi-check' : 'pi pi-times'">
+            </p-tag>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center p-8">
+            <div class="flex flex-col items-center justify-center text-gray-500">
+              <i class="pi pi-search text-4xl mb-3"></i>
+              <span class="text-lg">لا توجد سجلات مطابقة للبحث</span>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
   </div>
 </div>
-

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface PermissionRequest {
@@ -22,8 +22,14 @@ export interface PermissionRequest {
 })
 export class PermissionService {
     private apiUrl = `${environment.apiUrl}/permissions`;
+    private requestProcessedSource = new Subject<void>();
+    requestProcessed$ = this.requestProcessedSource.asObservable();
 
     constructor(private http: HttpClient) { }
+
+    notifyProcessed() {
+        this.requestProcessedSource.next();
+    }
 
     // For User/Supervisor: Send a new request
     sendRequest(request: Partial<PermissionRequest>): Observable<any> {

@@ -1,4 +1,5 @@
 @media screen and (min-width: 1960px) {
+
     .layout-main,
     .landing-wrapper {
         width: 1504px;
@@ -19,11 +20,11 @@
                 transform: translateX(100%);
                 right: 0;
                 left: auto;
-                top: 0;
-                height: 100vh;
+                top: 5rem;
+                height: calc(100vh - 6rem);
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
-                border-left: 1px solid var(--surface-border);
+                border: none;
                 transition:
                     transform 0.4s cubic-bezier(0.05, 0.74, 0.2, 0.99),
                     right 0.4s cubic-bezier(0.05, 0.74, 0.2, 0.99);
@@ -80,8 +81,8 @@
             transform: translateX(100%);
             right: 0;
             left: auto;
-            top: 0;
-            height: 100vh;
+            top: 5rem;
+            height: calc(100vh - 6rem);
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
             transition:
@@ -111,4 +112,3 @@
         }
     }
 }
-

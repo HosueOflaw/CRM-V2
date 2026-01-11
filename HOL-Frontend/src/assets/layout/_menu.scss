@@ -3,11 +3,11 @@
 .layout-sidebar {
     position: fixed;
     width: 20rem;
-    height: calc(100vh - 8rem);
+    height: calc(100vh - 6rem);
     z-index: 999;
     overflow-y: auto;
     user-select: none;
-    top: 6rem;
+    top: 5rem;
     right: 2rem;
     left: auto;
     transition:
@@ -17,20 +17,20 @@
     border-radius: var(--content-border-radius);
     padding: 1rem;
     direction: rtl;
-    
+
     /* Custom scrollbar */
     &::-webkit-scrollbar {
         width: 6px;
     }
-    
+
     &::-webkit-scrollbar-track {
         background: transparent;
     }
-    
+
     &::-webkit-scrollbar-thumb {
         background: var(--surface-border);
         border-radius: 3px;
-        
+
         &:hover {
             background: var(--text-color-secondary);
         }
@@ -47,7 +47,7 @@
         margin: 0.75rem 0;
     }
 
-    > li {
+    >li {
         margin-bottom: 0.25rem;
     }
 
@@ -94,7 +94,7 @@
     }
 
     li.active-menuitem {
-        > a {
+        >a {
             .layout-submenu-toggler {
                 transform: rotate(-180deg);
             }

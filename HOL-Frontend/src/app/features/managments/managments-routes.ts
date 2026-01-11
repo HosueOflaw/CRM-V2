@@ -40,6 +40,13 @@ export const MANAGEMENT_ROUTES: Routes = [
       import('./pages/tasks/tasks').then((m) => m.TasksPage),
   },
   {
+    path: 'my-permissions',
+    data: { roles: ['supervisor', 'employee'] },
+    canActivate: [roleGuard],
+    loadComponent: () =>
+      import('./pages/my-permissions/my-permissions').then((m) => m.MyPermissionsPage),
+  },
+  {
     path: 'tasks/:id',
     data: { roles: ['admin', 'supervisor', 'employee'] },
     canActivate: [roleGuard],

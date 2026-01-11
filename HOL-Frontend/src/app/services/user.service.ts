@@ -44,6 +44,7 @@ export interface UserDto {
   role?: string;
   department?: string;
   accessibleDepartments?: string[] | string;
+  accessibleFeatures?: string[] | string;
   createdAt?: string;
 }
 

@@ -58,12 +58,8 @@ export class AuthService {
             console.log('--- Raw Login Response from API ---', response);
             const token = response.token || response.userId?.toString();
 
-            // Start SignalR connection
-            this.signalr.startConnection(token).then(() => {
-              if (this.isAdmin()) {
-                this.signalr.joinChannel('admins');
-              }
-            });
+            // Start SignalR connection (Role-based channel joining happens internally)
+            this.signalr.startConnection(token);
 
             // --- Robust extraction of accessible departments ---
             let rawDeps = response.accessibleDepartments || response.AccessibleDepartments || [];
@@ -203,20 +199,20 @@ export class AuthService {
   initSignalRIfLoggedIn(): void {
     const token = this.getToken();
     if (token) {
-      this.signalr.startConnection(token).then(() => {
-        if (this.isAdmin()) {
-          this.signalr.joinChannel('admins');
-        }
-      });
+      this.signalr.startConnection(token);
 
       // Listen for SignalR messages
       this.signalr.message$.subscribe(msg => {
         if (msg.type === 'reconnected') {
-          if (this.isAdmin()) {
-            this.signalr.joinChannel('admins');
-          }
+          // SignalR service handles automatic re-join of role-based channels
+          console.log('🔄 SignalR reconnected event acknowledged.');
         }
-        if (msg.type === 'permissions_updated' || msg.type === 'ApprovePermission') {
+        if (
+          msg.type === 'permissions_updated' ||
+          msg.type === 'ApprovePermission' ||
+          msg.type === 'permission_request_processed' ||
+          msg.type === 'permissions_delegated'
+        ) {
           console.log('🔄 Permission update notification received via SignalR. Refreshing user data...');
           this.refreshCurrentUser().subscribe();
         }

@@ -17,8 +17,8 @@
   }
 
   .layout-sidebar {
-    top: 32px !important;
-    height: calc(100vh - 32px) !important;
+    top: calc(5rem + 32px) !important;
+    height: calc(100vh - (5rem + 32px + 1rem)) !important;
   }
 
   .layout-main-container {

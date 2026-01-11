@@ -7,6 +7,8 @@ import { ToastModule } from 'primeng/toast';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 import { AuthService } from '../../core/services/auth';
+import { PermissionRequest, PermissionService } from '../../core/services/permission.service';
+import { Signalr } from '../../services/signalr';
 import { PrimeToastService } from '../../shared/services/prime-toast.service';
 import { BreakService, BreakStatus, DailyBreakReport } from '../../services/break.service';
 import { PermissionRequestModal } from '../../features/managments/pages/managments-dashboard/components/permission-request-modal';
@@ -29,16 +31,23 @@ import Swal from 'sweetalert2';
 
         <div class="layout-topbar-actions">
             <!-- User Info -->
-            <div class="user-info" *ngIf="authService.isLoggedIn()">
-                <span class="user-name">{{ authService.getCurrentUserName() }}</span>
+            <div class="user-info flex items-center gap-2" *ngIf="authService.isLoggedIn()">
+                <span class="user-name font-bold">{{ authService.getCurrentUserName() }}</span>
+                <span class="px-2 py-1 rounded text-xs font-bold border" [ngClass]="getUserRoleSeverity()">
+                    {{ getUserRoleLabel() }}
+                </span>
             </div>
 
             <!-- Permission System Actions -->
             <div class="permission-actions flex items-center gap-2" *ngIf="authService.isLoggedIn()">
                 <!-- Break Stats (Supervisor only) -->
-                <button type="button" class="layout-topbar-action !bg-purple-50 dark:!bg-purple-900/20 !text-purple-600 dark:!text-purple-400 border !border-purple-100 dark:!border-purple-800/30 rounded-xl" 
+                <button type="button" class="layout-topbar-action !bg-purple-50 dark:!bg-purple-900/20 !text-purple-600 dark:!text-purple-400 border !border-purple-100 dark:!border-purple-800/30 rounded-xl relative" 
                     *ngIf="authService.isSupervisor()" routerLink="/reports/daily-breaks" title="إحصائيات استراحات القسم">
                     <i class="pi pi-chart-line"></i>
+                    <!-- Active Breaks Badge -->
+                    <span *ngIf="activeBreaksCount > 0" class="topbar-badge !bg-purple-500">
+                        {{activeBreaksCount}}
+                    </span>
                 </button>
 
                 <!-- Request Permission (Supervisor only) -->
@@ -47,11 +56,20 @@ import Swal from 'sweetalert2';
                     <i class="pi pi-shield"></i>
                 </button>
 
+              
                 <!-- Pending Requests Admin View -->
-                <button type="button" class="layout-topbar-action !bg-orange-50 dark:!bg-orange-900/20 !text-orange-600 dark:!text-orange-400 border !border-orange-100 dark:!border-orange-800/30 rounded-xl" 
-                    *ngIf="authService.isAdmin()" routerLink="/management/pending-permissions" title="طلبات الصلاحيات المعلقة">
-                    <i class="pi pi-bell animate-pulse"></i>
-                </button>
+                <div class="relative flex items-center" *ngIf="authService.isAdmin()">
+                    <a routerLink="/management/pending-permissions" 
+                       class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
+                       pTooltip="طلبات الصلاحيات المعلقة" tooltipPosition="bottom">
+                        <i class="pi pi-bell text-xl text-orange-500"></i>
+                        <!-- Red Dot Badge for Navbar -->
+                        <span *ngIf="pendingRequestsCount" 
+                              class="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-gray-900 animate-bounce">
+                            {{pendingRequestsCount}}
+                        </span>
+                    </a>
+                </div>
             </div>
 
             <!-- Break System for Employees ONLY (Higher visibility) -->
@@ -211,6 +229,28 @@ import Swal from 'sweetalert2';
         .break-btn-end:hover {
             background: rgba(245, 158, 11, 0.1) !important;
         }
+
+        .topbar-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ef4444;
+            color: #ffffff;
+            font-size: 0.65rem;
+            font-weight: 800;
+            min-width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        :host-context(.dark) .topbar-badge {
+            border-color: #1e1e1e;
+        }
     `]
 })
 export class AppTopbar implements OnInit, OnDestroy {
@@ -220,22 +260,100 @@ export class AppTopbar implements OnInit, OnDestroy {
     breakStartTime: Date | null = null;
     displayTimer = '00:00';
     isBreakLate = false;
+    pendingRequestsCount: string | undefined = undefined;
+    activeBreaksCount: number = 0;
     private timerSubscription?: Subscription;
+    private destroy$ = new Subscription();
 
     constructor(
         public layoutService: LayoutService,
         public authService: AuthService,
         private router: Router,
         private toast: PrimeToastService,
-        private breakService: BreakService
+        private breakService: BreakService,
+        private permissionService: PermissionService,
+        private signalr: Signalr
     ) { }
 
     ngOnInit() {
         this.checkBreakStatus();
+
+        // Admin specific logic
+        if (this.authService.isAdmin()) {
+            this.fetchPendingCount();
+        }
+
+        // Supervisor specific logic
+        if (this.authService.isSupervisor()) {
+            this.fetchActiveBreaksCount();
+        }
+
+        // Listen for SignalR updates (Shared for Admin / Supervisor)
+        this.destroy$.add(
+            this.signalr.message$.subscribe((msg: any) => {
+                const type = (msg.type || '').toLowerCase();
+
+                // Permission updates (Admin)
+                if (this.authService.isAdmin() && (type === 'new_permission_request' || type === 'permission_request_processed')) {
+                    this.fetchPendingCount();
+                }
+
+                // Break updates (Supervisor)
+                if (this.authService.isSupervisor() && (type === 'break_started' || type === 'break_ended' || type === 'startbreak' || type === 'endbreak')) {
+                    this.fetchActiveBreaksCount();
+                }
+            })
+        );
+
+        // Listen for global user updates
+        this.destroy$.add(
+            this.authService.userUpdated$.subscribe(() => {
+                if (this.authService.isAdmin()) this.fetchPendingCount();
+                if (this.authService.isSupervisor()) this.fetchActiveBreaksCount();
+            })
+        );
+
+        // Listen for internal processed event
+        this.destroy$.add(
+            this.permissionService.requestProcessed$.subscribe(() => {
+                if (this.authService.isAdmin()) this.fetchPendingCount();
+            })
+        );
+    }
+
+    private fetchActiveBreaksCount() {
+        this.breakService.getActiveBreaks().subscribe({
+            next: (activeBreaks) => {
+                this.activeBreaksCount = activeBreaks.length;
+                console.log('📊 Active Breaks Count Updated:', this.activeBreaksCount);
+            },
+            error: (err) => console.error('Failed to fetch active breaks', err)
+        });
+    }
+
+    private fetchPendingCount() {
+        // Use the same localStorage cache as Sidebar for consistency
+        const cached = localStorage.getItem('pending_permissions_count');
+        if (cached && !this.pendingRequestsCount) {
+            this.pendingRequestsCount = cached;
+        }
+
+        this.permissionService.getPendingRequests().subscribe((reqs: PermissionRequest[]) => {
+            const count = reqs.length > 0 ? reqs.length.toString() : undefined;
+            if (this.pendingRequestsCount !== count) {
+                this.pendingRequestsCount = count;
+                if (count) {
+                    localStorage.setItem('pending_permissions_count', count);
+                } else {
+                    localStorage.removeItem('pending_permissions_count');
+                }
+            }
+        });
     }
 
     ngOnDestroy() {
         this.stopTimer();
+        this.destroy$.unsubscribe();
     }
 
     checkBreakStatus() {
@@ -413,5 +531,41 @@ export class AppTopbar implements OnInit, OnDestroy {
                 }, 500);
             }
         });
+    }
+
+    getUserRoleLabel(): string {
+        const user = this.authService.getUser();
+        const role = (user?.role || '').toLowerCase();
+
+        switch (role) {
+            case 'admin':
+            case 'administrator':
+                return 'مدير النظام'; // Admin
+            case 'supervisor':
+                return 'مشرف قسم'; // Supervisor
+            case 'employee':
+            case 'user':
+                return 'موظف'; // Employee
+            default:
+                return role || 'مستخدم';
+        }
+    }
+
+    getUserRoleSeverity(): string {
+        const user = this.authService.getUser();
+        const role = (user?.role || '').toLowerCase();
+
+        switch (role) {
+            case 'admin':
+            case 'administrator':
+                return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800/30';
+            case 'supervisor':
+                return 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800/30';
+            case 'employee':
+            case 'user':
+                return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800/30';
+            default:
+                return 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700';
+        }
     }
 }

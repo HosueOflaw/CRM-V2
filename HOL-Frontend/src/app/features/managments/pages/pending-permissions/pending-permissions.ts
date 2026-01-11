@@ -141,6 +141,7 @@ export class PendingPermissionsPage implements OnInit {
                     text: `تم ${this.modalAction === 'Approved' ? 'الموافقة على' : 'رفض'} الطلب بنجاح.`,
                     timer: 2000
                 });
+                this.permissionService.notifyProcessed();
                 this.loadRequests();
             },
             error: () => {

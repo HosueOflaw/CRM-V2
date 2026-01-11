@@ -243,28 +243,55 @@ export class DelegatePermissionModal implements OnInit {
         if (!this.isValid() || !this.selectedEmployeeId) return;
 
         this.loading = true;
-        this.permissionService.delegatePermission(
-            this.selectedEmployeeId,
-            this.selectedDep || '',
-            this.featureCode || ''
-        ).subscribe({
-            next: () => {
-                this.loading = false;
-                this.swal.success({
-                    title: 'تم التفويض بنجاح',
-                    text: 'تم منح الصلاحيات المحددة للموظف.',
-                    confirmButtonText: 'ممتاز'
+
+        // 1. Fetch target user's current permissions first to avoid overwriting
+        this.userService.getUserById(this.selectedEmployeeId).subscribe({
+            next: (targetUser: any) => {
+                let currentDeps = targetUser.accessibleDepartments || [];
+                let currentFeatures = targetUser.accessibleFeatures || [];
+
+                // Convert to array if string
+                if (typeof currentDeps === 'string') currentDeps = (currentDeps as string).split(',').filter(x => !!x);
+                if (typeof currentFeatures === 'string') currentFeatures = (currentFeatures as string).split(',').filter(x => !!x);
+
+                // 2. Add new selections if not already present
+                if (this.selectedDep && !currentDeps.includes(this.selectedDep)) {
+                    currentDeps.push(this.selectedDep);
+                }
+
+                if (this.featureCode.trim() && !currentFeatures.includes(this.featureCode.trim())) {
+                    currentFeatures.push(this.featureCode.trim());
+                }
+
+                // 3. Send combined permissions to backend
+                this.permissionService.delegatePermission(
+                    this.selectedEmployeeId!,
+                    currentDeps.join(','),
+                    currentFeatures.join(',')
+                ).subscribe({
+                    next: () => {
+                        this.loading = false;
+                        this.swal.success({
+                            title: 'تم التفويض بنجاح',
+                            text: 'تم منح الصلاحيات مع الحفاظ على الصلاحيات السابقة للموظف.',
+                            confirmButtonText: 'ممتاز'
+                        });
+                        this.visible = false;
+                        this.onComplete.emit();
+                    },
+                    error: (err: any) => {
+                        this.loading = false;
+                        this.swal.error({
+                            title: 'فشل التفويض',
+                            text: err.error?.message || 'حدث خطأ أثناء عملية التفويض.',
+                            confirmButtonText: 'حسناً'
+                        });
+                    }
                 });
-                this.visible = false;
-                this.onComplete.emit();
             },
-            error: (err: any) => {
+            error: (err) => {
                 this.loading = false;
-                this.swal.error({
-                    title: 'فشل التفويض',
-                    text: err.error?.message || 'حدث خطأ أثناء عملية التفويض.',
-                    confirmButtonText: 'حسناً'
-                });
+                this.swal.error({ title: 'خطأ', text: 'فشل استرجاع بيانات الموظف لتحديث صلاحياته.' });
             }
         });
     }

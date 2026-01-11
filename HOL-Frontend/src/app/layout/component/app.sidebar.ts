@@ -10,6 +10,6 @@ import { AppMenu } from './app.menu';
     </div>`
 })
 export class AppSidebar {
-    constructor(public el: ElementRef) {}
+    constructor(public el: ElementRef) { }
 }
 
