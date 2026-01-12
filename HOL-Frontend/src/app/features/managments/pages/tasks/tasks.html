@@ -19,6 +19,20 @@
         </div>
     </div>
 
+    <!-- View Period Selector -->
+    <div
+        class="mb-4 flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+        <i class="pi pi-calendar text-blue-600 dark:text-blue-400 text-xl"></i>
+        <label class="text-sm font-bold text-blue-700 dark:text-blue-300">عرض المهام:</label>
+        <p-select [options]="viewPeriodOptions" [(ngModel)]="viewPeriod" (onChange)="onViewPeriodChange()" class="w-48"
+            appendTo="body">
+        </p-select>
+        <span class="text-xs text-blue-600 dark:text-blue-400 mr-auto">
+            <i class="pi pi-info-circle"></i>
+            {{ viewPeriod === 'today' ? 'عرض مهام اليوم فقط' : 'عرض جميع المهام' }}
+        </span>
+    </div>
+
     <!-- Filters Section -->
     <div
         class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700">

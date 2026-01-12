@@ -1,63 +1,252 @@
-<div class="page-header flex justify-between items-center mb-6">
+<div class="page-header flex justify-between items-center mb-8">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800">أداء الموظفين وإدارة الصلاحيات</h1>
-        <p class="text-gray-500 mt-1" *ngIf="isAdmin">عرض جميع الموظفين والمشرفين بالشركة</p>
-        <p class="text-gray-500 mt-1" *ngIf="isSupervisor">عرض موظفي قسمك الحاليين</p>
+        <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">مركز قيادة الفريق</h1>
+        <p class="text-gray-500 mt-2 text-lg" *ngIf="isAdmin">لوحة تحكم شاملة لجميع أقسام الشركة والتحليلات المتقدمة</p>
+        <p class="text-gray-500 mt-2 text-lg" *ngIf="isSupervisor">مراقبة حية لأداء فريق قسم ({{
+            authService.getUserDepartment() }})</p>
     </div>
 
-    <div *ngIf="isSupervisor">
-        <button (click)="delModal.open()"
-            class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-purple-500/20 transition-all flex items-center gap-2">
-            <i class="pi pi-user-plus"></i>
-            <span>تفويض صلاحية جديدة</span>
+    <div class="flex gap-4">
+        <button pButton icon="pi pi-refresh" (click)="loadTeamData()"
+            class="p-button-outlined p-button-secondary rounded-2xl w-12 h-12 shadow-sm bg-white dark:bg-gray-800"></button>
+        <button *ngIf="isSupervisor" (click)="delModal.open()"
+            class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl shadow-xl shadow-indigo-500/20 transition-all font-bold flex items-center gap-3">
+            <i class="pi pi-shield"></i>
+            <span>إدارة الصلاحيات</span>
         </button>
     </div>
 </div>
 
-<div class="card bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-    <p-table [value]="users" [loading]="loading" [rowHover]="true" styleClass="p-datatable-sm"
-        responsiveLayout="scroll">
+<!-- Premium Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-10">
+    <!-- Team Size -->
+    <div
+        class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+        <div
+            class="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 -mr-8 -mt-8 rounded-full transition-transform group-hover:scale-110">
+        </div>
+        <div class="text-gray-500 dark:text-gray-400 text-sm font-bold mb-3">قوة الفريق</div>
+        <div class="flex items-end gap-2">
+            <div class="text-4xl font-black text-gray-900 dark:text-white">{{ totalEmployees }}</div>
+            <div class="text-xs text-blue-500 mb-2 font-bold">عضو</div>
+        </div>
+    </div>
+
+    <!-- Active Working -->
+    <div
+        class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+        <div
+            class="absolute top-0 right-0 w-24 h-24 bg-yellow-500/5 -mr-8 -mt-8 rounded-full transition-transform group-hover:scale-110">
+        </div>
+        <div class="text-gray-500 dark:text-gray-400 text-sm font-bold mb-3">يعملون الآن</div>
+        <div class="flex items-end gap-2">
+            <div class="text-4xl font-black text-gray-900 dark:text-white">{{ activeOnTasks }}</div>
+            <div class="flex items-center text-xs text-yellow-600 mb-2 font-bold gap-1">
+                <i class="pi pi-spin pi-spinner text-[10px]"></i>
+                <span>جارٍ العمل</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- On Break -->
+    <div
+        class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+        <div
+            class="absolute top-0 right-0 w-24 h-24 bg-orange-500/5 -mr-8 -mt-8 rounded-full transition-transform group-hover:scale-110">
+        </div>
+        <div class="text-gray-500 dark:text-gray-400 text-sm font-bold mb-3">في استراحة</div>
+        <div class="flex items-end gap-2">
+            <div class="text-4xl font-black text-gray-900 dark:text-white">{{ onBreakCount }}</div>
+            <div class="text-xs text-orange-500 mb-2 font-bold">موظف</div>
+        </div>
+    </div>
+
+    <!-- Efficiency -->
+    <div
+        class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+        <div
+            class="absolute top-0 right-0 w-24 h-24 bg-green-500/5 -mr-8 -mt-8 rounded-full transition-transform group-hover:scale-110">
+        </div>
+        <div class="text-gray-500 dark:text-gray-400 text-sm font-bold mb-3">كفاءة الفريق</div>
+        <div class="flex items-end gap-2">
+            <div class="text-4xl font-black text-green-600">{{ teamEfficiency }}%</div>
+            <div class="text-xs text-green-500 mb-2 font-bold">متوسط</div>
+        </div>
+    </div>
+
+    <!-- Today's Done -->
+    <div
+        class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+        <div
+            class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 -mr-8 -mt-8 rounded-full transition-transform group-hover:scale-110">
+        </div>
+        <div class="text-gray-500 dark:text-gray-400 text-sm font-bold mb-3">إنجاز اليوم</div>
+        <div class="flex items-end gap-2">
+            <div class="text-4xl font-black text-indigo-600">{{ completedToday }}</div>
+            <div class="text-xs text-indigo-500 mb-2 font-bold">مهمة</div>
+        </div>
+    </div>
+
+    <!-- Critical Tasks -->
+    <div
+        class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-red-100 dark:border-red-900/30 relative overflow-hidden group">
+        <div
+            class="absolute top-0 right-0 w-24 h-24 bg-red-500/5 -mr-8 -mt-8 rounded-full transition-transform group-hover:scale-110">
+        </div>
+        <div class="text-gray-500 dark:text-gray-400 text-sm font-bold mb-3 text-red-600">مهام حرجة</div>
+        <div class="flex items-end gap-2">
+            <div class="text-4xl font-black text-red-600">{{ criticalTasksCount }}</div>
+            <div class="text-xs text-red-500 mb-2 font-bold italic">High Risk</div>
+        </div>
+    </div>
+</div>
+
+<!-- Advanced Charts Layout -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-10">
+    <!-- Main Workload Chart -->
+    <div
+        class="xl:col-span-2 bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-8">
+            <h3 class="text-xl font-black text-gray-900 dark:text-white flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-xl bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <i class="pi pi-chart-bar"></i>
+                </div>
+                توزيع ضغط العمل (Workload)
+            </h3>
+            <span class="text-xs text-gray-400">أكثر 5 موظفين لديهم مهام نشطة</span>
+        </div>
+        <p-chart type="bar" [data]="workloadChartData" [options]="chartOptions" height="350px"></p-chart>
+    </div>
+
+    <!-- Secondary Charts Stack -->
+    <div class="flex flex-col gap-8">
+        <!-- Priorities Distribution -->
+        <div
+            class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex-1">
+            <h3 class="text-lg font-black text-gray-900 dark:text-white mb-6">توازن الأولويات</h3>
+            <p-chart type="doughnut" [data]="priorityChartData" [options]="doughnutOptions" height="250px"></p-chart>
+        </div>
+
+        <!-- Permissions Heatmap -->
+        <div
+            class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 flex-1">
+            <h3 class="text-lg font-black text-gray-900 dark:text-white mb-6">تغطية الأقسام (صلاحيات)</h3>
+            <p-chart type="radar" [data]="permissionChartData" [options]="chartOptions" height="250px"></p-chart>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Team Radar Table -->
+<div
+    class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+    <div
+        class="p-8 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-900/20">
+        <div>
+            <h3 class="text-xl font-black text-gray-900 dark:text-white">رادار الموظفين</h3>
+            <p class="text-xs text-gray-400 mt-1">عرض تفصيلي للكفاءة والحالة اللحظية</p>
+        </div>
+        <span class="p-input-icon-left">
+            <i class="pi pi-search text-gray-400"></i>
+            <input type="text" pInputText placeholder="بحث سريع بالمصطلح..."
+                class="p-inputtext-sm rounded-2xl w-72 pr-10 border-gray-200 dark:border-gray-700 dark:bg-gray-800"
+                (input)="dt.filterGlobal($any($event.target).value, 'contains')">
+        </span>
+    </div>
+
+    <p-table #dt [value]="users" [loading]="loading" [rowHover]="true" [rows]="10" [paginator]="true"
+        styleClass="p-datatable-sm no-border-table" responsiveLayout="scroll"
+        [globalFilterFields]="['fullName', 'username', 'department']">
         <ng-template pTemplate="header">
-            <tr>
-                <th pSortableColumn="fullName">الاسم <p-sortIcon field="fullName"></p-sortIcon></th>
-                <th pSortableColumn="department">القسم <p-sortIcon field="department"></p-sortIcon></th>
-                <th pSortableColumn="role">الدور <p-sortIcon field="role"></p-sortIcon></th>
-                <th>الصلاحيات</th>
-                <th class="text-center">إجراءات</th>
+            <tr class="bg-transparent">
+                <th class="py-5 bg-transparent border-none">الموظف</th>
+                <th class="py-5 bg-transparent border-none">الحالة</th>
+                <th class="py-5 bg-transparent border-none">الكفاءة</th>
+                <th class="py-5 bg-transparent border-none">المهام (معلقة/نشطة)</th>
+                <th class="py-5 bg-transparent border-none text-center">الإجراءات</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-user>
-            <tr>
-                <td class="font-medium">{{ user.fullName || user.username }}</td>
-                <td>
-                    <span class="px-2 py-1 rounded bg-gray-100 text-gray-600 text-xs">
-                        {{ user.department || 'غير محدد' }}
-                    </span>
+            <tr class="group hover:bg-gray-50/80 dark:hover:bg-gray-900/40 transition-colors">
+                <td class="py-4">
+                    <div class="flex items-center gap-4">
+                        <div class="relative">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-500/20">
+                                {{ (user.fullName || user.username).substring(0, 1) }}
+                            </div>
+                            <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-gray-800 shadow-sm"
+                                [class.bg-green-500]="!user.isOnBreak" [class.bg-orange-500]="user.isOnBreak"></div>
+                        </div>
+                        <div>
+                            <div class="font-black text-gray-900 dark:text-white">{{ user.fullName || user.username }}
+                            </div>
+                            <div class="text-xs text-gray-400">{{ user.department }} • {{ user.role }}</div>
+                        </div>
+                    </div>
                 </td>
                 <td>
-                    <span [class]="'px-2 py-1 rounded text-xs font-bold ' + 
-            (user.role?.toLowerCase()?.includes('admin') ? 'bg-red-50 text-red-600' : 
-             user.role?.toLowerCase()?.includes('supervisor') ? 'bg-purple-50 text-purple-600' : 
-             'bg-blue-50 text-blue-600')">
-                        {{ user.role }}
-                    </span>
+                    <p-tag *ngIf="user.isOnBreak" value="في استراحة" severity="warn" [rounded]="true"
+                        styleClass="px-3 py-1 font-bold text-[10px]"></p-tag>
+                    <p-tag *ngIf="!user.isOnBreak" value="نشط الآن" severity="success" [rounded]="true"
+                        styleClass="px-3 py-1 font-bold text-[10px]"></p-tag>
                 </td>
-                <td class="text-xs text-gray-600">
-                    {{ getPermissionsDisplay(user) }}
+                <td class="w-48">
+                    <div class="flex flex-col gap-1">
+                        <div class="flex justify-between text-[10px] font-bold">
+                            <span class="text-gray-400">إنجاز</span>
+                            <span [class.text-green-500]="user.efficiency >= 70"
+                                [class.text-yellow-600]="user.efficiency < 70 && user.efficiency >= 40"
+                                [class.text-red-500]="user.efficiency < 40">
+                                {{ user.efficiency }}%
+                            </span>
+                        </div>
+                        <div class="w-full h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div class="h-full transition-all duration-500" [style.width]="user.efficiency + '%'"
+                                [class.bg-green-500]="user.efficiency >= 70"
+                                [class.bg-yellow-500]="user.efficiency < 70 && user.efficiency >= 40"
+                                [class.bg-red-500]="user.efficiency < 40"></div>
+                        </div>
+                    </div>
                 </td>
-                <td class="text-center">
-                    <button (click)="openDelegateModal(user.id)"
-                        class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                        title="تفويض صلاحية">
-                        <i class="pi pi-key"></i>
-                    </button>
+                <td>
+                    <div class="flex items-center gap-4">
+                        <div class="flex -space-x-2 rtl:space-x-reverse">
+                            <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 border-2 border-white dark:border-gray-800 flex items-center justify-center text-xs font-bold text-gray-500"
+                                title="معلقة">{{ user.pendingTasks }}</div>
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 border-2 border-white dark:border-gray-800 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400"
+                                title="قيد التنفيذ">{{ user.inProgressTasks }}</div>
+                            <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 border-2 border-white dark:border-gray-800 flex items-center justify-center text-xs font-bold text-green-600 dark:text-green-400"
+                                title="مكتملة">{{ user.completedTasks }}</div>
+                        </div>
+                        <div *ngIf="user.highPriorityTasks > 0"
+                            class="flex items-center gap-1 text-[10px] text-red-600 animate-pulse font-bold">
+                            <i class="pi pi-exclamation-triangle"></i>
+                            <span>{{ user.highPriorityTasks }} حرجة</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="text-center group-hover:opacity-100 opacity-50 transition-opacity">
+                    <button pButton icon="pi pi-key"
+                        class="p-button-text p-button-sm p-button-rounded p-button-secondary hover:bg-white"
+                        (click)="openDelegateModal(user.id)" title="تفويض صلاحية"></button>
+                    <button pButton icon="pi pi-arrow-left"
+                        class="p-button-text p-button-sm p-button-rounded p-button-indigo hover:bg-white"
+                        [routerLink]="['/management/tasks']" [queryParams]="{ assignedToId: user.id }"
+                        title="مركز المهام"></button>
                 </td>
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="5" class="text-center p-4 text-gray-500">
-                    لا يوجد بيانات للعرض حالياً.
+                <td colspan="5" class="text-center py-20 bg-gray-50/50 dark:bg-gray-900/10">
+                    <div class="flex flex-col items-center gap-4">
+                        <div
+                            class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-300 transform rotate-12">
+                            <i class="pi pi-users text-5xl"></i>
+                        </div>
+                        <p class="text-gray-400 font-bold">لا يوجد موظفون في هذا النطاق حالياً</p>
+                    </div>
                 </td>
             </tr>
         </ng-template>

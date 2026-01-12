@@ -1,43 +1,240 @@
-<div class="p-4 space-y-8" style="background: var(--surface-ground); color: var(--text-color);">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold" style="color: var(--text-color);">
-      👋 أهلاً {{ currentUser?.fullName || currentUser?.username || 'بك' }}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+      👋 مرحباً {{ currentUser?.fullName || currentUser?.username }}
     </h1>
-    <div class="flex gap-3">
-      <input pInputText type="text" placeholder="بحث..." style="width: 16rem;" />
-      <p-button label="إعدادات" icon="pi pi-cog" routerLink="/settings"></p-button>
+    <p class="text-gray-600 dark:text-gray-400">
+      {{ authService.isAdmin() ? 'لوحة تحكم المدير' : authService.isSupervisor() ? 'لوحة تحكم المشرف' : 'لوحة التحكم
+      الشخصية' }}
+    </p>
+  </div>
+
+  <!-- Employee Dashboard -->
+  <div *ngIf="authService.isEmployee() && !authService.isSupervisor() && !authService.isAdmin()">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Today's Tasks -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-4">
+          <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+            <i class="pi pi-calendar text-2xl text-blue-600 dark:text-blue-400"></i>
+          </div>
+          <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ dashboardStats.todayTasks }}</span>
+        </div>
+        <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">مهام اليوم</h3>
+      </div>
+
+      <!-- Pending Tasks -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-4">
+          <div class="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+            <i class="pi pi-clock text-2xl text-orange-600 dark:text-orange-400"></i>
+          </div>
+          <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ dashboardStats.pendingTasks }}</span>
+        </div>
+        <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">قيد الانتظار</h3>
+      </div>
+
+      <!-- In Progress -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-4">
+          <div class="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+            <i class="pi pi-spin pi-spinner text-2xl text-purple-600 dark:text-purple-400"></i>
+          </div>
+          <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ dashboardStats.inProgressTasks }}</span>
+        </div>
+        <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">جاري التنفيذ</h3>
+      </div>
+
+      <!-- Completed This Week -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-4">
+          <div class="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
+            <i class="pi pi-check-circle text-2xl text-green-600 dark:text-green-400"></i>
+          </div>
+          <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ dashboardStats.completedThisWeek }}</span>
+        </div>
+        <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">مكتملة هذا الأسبوع</h3>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Today's Tasks List -->
+      <div
+        class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white">📋 مهام اليوم</h2>
+          <p-button label="عرض الكل" icon="pi pi-arrow-left" [text]="true" routerLink="/management/tasks"></p-button>
+        </div>
+
+        <div *ngIf="todayTasks.length === 0" class="text-center py-12">
+          <i class="pi pi-check-circle text-6xl text-green-500 mb-4"></i>
+          <p class="text-gray-500 dark:text-gray-400">لا توجد مهام لليوم! 🎉</p>
+        </div>
+
+        <div *ngFor="let task of todayTasks"
+          class="mb-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+          [routerLink]="['/management/tasks', task.id]">
+          <div class="flex items-start justify-between mb-2">
+            <h3 class="font-semibold text-gray-900 dark:text-white">{{ task.title }}</h3>
+            <p-tag [value]="getStatusLabel(task.status)" [severity]="getStatusSeverity(task.status)"
+              [rounded]="true"></p-tag>
+          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ task.description }}</p>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <i class="pi pi-calendar"></i>
+            <span>{{ task.dueDate | date: 'dd/MM/yyyy' }}</span>
+            <p-tag [value]="task.priority" [severity]="getPrioritySeverity(task.priority)" size="small"></p-tag>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions & Break Status -->
+      <div class="space-y-6">
+        <!-- Break Status Card -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">☕ حالة الاستراحة</h2>
+
+          <!-- Not Started & Not Completed -->
+          <div *ngIf="!isOnBreak && !todayBreakCompleted" class="text-center py-6">
+            <i class="pi pi-coffee text-4xl text-gray-400 mb-3"></i>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">لست في استراحة حالياً</p>
+            <p-button label="بدء استراحة" icon="pi pi-play" (click)="startBreak()" styleClass="w-full"></p-button>
+          </div>
+
+          <!-- On Break -->
+          <div *ngIf="isOnBreak" class="text-center py-6">
+            <i class="pi pi-pause-circle text-4xl text-orange-500 mb-3 animate-pulse"></i>
+            <p class="text-gray-600 dark:text-gray-400 mb-2">أنت في استراحة</p>
+            <p class="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-4">{{ breakTimeRemaining }}</p>
+            <p-button label="إنهاء الاستراحة" icon="pi pi-stop" severity="danger" (click)="endBreak()"
+              styleClass="w-full"></p-button>
+          </div>
+
+          <!-- Completed Today -->
+          <div *ngIf="todayBreakCompleted"
+            class="text-center py-6 bg-green-50/50 dark:bg-green-900/10 rounded-xl border border-green-100 dark:border-green-900/20">
+            <i class="pi pi-check-circle text-4xl text-green-500 mb-3"></i>
+            <p class="text-gray-700 dark:text-green-400 font-semibold mb-4">تم أخذ استراحة اليوم بنجاح ✨</p>
+            <p-button label="تم أخذ استراحة اليوم" icon="pi pi-check" [disabled]="true"
+              styleClass="w-full p-button-success p-button-outlined"></p-button>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">⚡ إجراءات سريعة</h2>
+          <div class="space-y-3">
+            <p-button label="مهامي" icon="pi pi-list" [outlined]="true" routerLink="/management/my-tasks"
+              styleClass="w-full justify-start"></p-button>
+            <p-button label="طلب صلاحية" icon="pi pi-key" [outlined]="true" routerLink="/management/my-permissions"
+              styleClass="w-full justify-start"></p-button>
+            <p-button label="الإعدادات" icon="pi pi-cog" [outlined]="true" routerLink="/settings"
+              styleClass="w-full justify-start"></p-button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    <div *ngFor="let dep of filteredDepartments" [routerLink]="dep.route"
-      class="card cursor-pointer transform transition hover:scale-105 hover:shadow-lg">
-      <div class="flex items-center gap-3 mb-3">
-        <span class="text-2xl">{{ dep.icon }}</span>
-        <h2 class="text-lg font-semibold" style="color: var(--text-color);">{{ dep.name }}</h2>
+  <!-- Supervisor Dashboard -->
+  <div *ngIf="authService.isSupervisor() || authService.isAdmin()">
+    <!-- Supervisor Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Active Employees -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-4">
+          <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+            <i class="pi pi-users text-2xl text-blue-600 dark:text-blue-400"></i>
+          </div>
+          <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ teamStats.activeEmployees }}</span>
+        </div>
+        <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">الموظفون النشطون</h3>
       </div>
-      <p class="text-xs" style="color: var(--text-color-secondary);">انقر للدخول إلى قسم {{ dep.name }}</p>
+
+      <!-- Employees on Break -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-4">
+          <div class="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+            <i class="pi pi-coffee text-2xl text-orange-600 dark:text-orange-400"></i>
+          </div>
+          <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ teamStats.employeesOnBreak }}</span>
+        </div>
+        <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">في استراحة</h3>
+      </div>
+
+      <!-- Active Tasks -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-4">
+          <div class="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+            <i class="pi pi-check-square text-2xl text-purple-600 dark:text-purple-400"></i>
+          </div>
+          <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ teamStats.activeTasks }}</span>
+        </div>
+        <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">المهام النشطة</h3>
+      </div>
+
+      <!-- Pending Requests -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-4">
+          <div class="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
+            <i class="pi pi-bell text-2xl text-red-600 dark:text-red-400"></i>
+          </div>
+          <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ teamStats.pendingRequests }}</span>
+        </div>
+        <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">طلبات معلقة</h3>
+      </div>
     </div>
 
-    <!-- Admin always sees settings -->
-    <div *ngIf="authService.isAdmin()" routerLink="/settings"
-      class="card cursor-pointer transform transition hover:scale-105 hover:shadow-lg border-dashed border-2">
-      <div class="flex items-center gap-3 mb-3">
-        <span class="text-2xl">⚙️</span>
-        <h2 class="text-lg font-semibold" style="color: var(--text-color);">الإعدادات</h2>
+    <!-- Supervisor Quick Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:shadow-xl transition-shadow"
+        routerLink="/management/tasks">
+        <i class="pi pi-plus-circle text-4xl mb-3"></i>
+        <h3 class="text-xl font-bold mb-2">إنشاء مهمة جديدة</h3>
+        <p class="text-blue-100">إسناد مهمة لأحد أعضاء الفريق</p>
       </div>
-      <p class="text-xs" style="color: var(--text-color-secondary);">إدارة النظام والمستخدمين</p>
+
+      <div
+        class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:shadow-xl transition-shadow"
+        routerLink="/management/team-performance">
+        <i class="pi pi-chart-bar text-4xl mb-3"></i>
+        <h3 class="text-xl font-bold mb-2">إحصائيات الفريق</h3>
+        <p class="text-purple-100">عرض تفاصيل أداء الفريق</p>
+      </div>
+
+      <div
+        class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white cursor-pointer hover:shadow-xl transition-shadow"
+        routerLink="/management/pending-permissions">
+        <i class="pi pi-bell text-4xl mb-3"></i>
+        <h3 class="text-xl font-bold mb-2">مراجعة الطلبات</h3>
+        <p class="text-orange-100">الطلبات المعلقة للموافقة</p>
+      </div>
     </div>
   </div>
 
-  <!-- Recent Activities (Static for now, but can be filtered later) -->
-  <div class="card" *ngIf="filteredDepartments.length > 0 || authService.isAdmin()">
-    <h2 class="text-xl font-semibold mb-4" style="color: var(--text-color);">🕓 الأنشطة الأخيرة</h2>
-    <ul class="list-none p-0 m-0">
-      <li class="py-3 border-b" style="border-color: var(--surface-border); color: var(--text-color);">تم تحديث ملفات
-        القسم بنجاح</li>
-      <li class="py-3 border-b" style="border-color: var(--surface-border); color: var(--text-color);">جميع الأنظمة تعمل
-        بشكل مستقر</li>
-    </ul>
+  <!-- Departments Navigation -->
+  <div class="mt-8" *ngIf="filteredDepartments.length > 0">
+    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+      <i class="pi pi-compass text-2xl text-primary"></i>
+      <span>الأقسام المتاحة</span>
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div *ngFor="let dep of filteredDepartments" [routerLink]="dep.route"
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700 cursor-pointer transform transition hover:scale-105 hover:shadow-lg">
+        <div class="flex items-center gap-4 mb-3">
+          <span class="text-3xl">{{ dep.icon }}</span>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ dep.name }}</h2>
+        </div>
+        <p class="text-xs text-gray-500">انقر للدخول إلى قسم {{ dep.name }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex items-center justify-center py-20">
+    <i class="pi pi-spin pi-spinner text-4xl text-blue-500"></i>
   </div>
 </div>

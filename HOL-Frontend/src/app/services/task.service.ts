@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { CacheService, CacheOptions } from './cache.service';
+import { tap } from 'rxjs/operators';
 
 export enum TaskStatus {
     Pending = 'Pending',
@@ -71,16 +73,18 @@ export interface TaskFilterParams {
 })
 export class TaskService {
     private apiUrl = `${environment.apiUrl}/tasks`;
+    private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-    constructor(private http: HttpClient) { }
+    constructor(
+        private http: HttpClient,
+        private cacheService: CacheService
+    ) { }
 
     /**
      * Get all tasks with optional filters
-     * GET /api/tasks?status=Pending&priority=High
      */
-    getTasks(filters?: TaskFilterParams): Observable<EmployeeTaskDto[]> {
+    getTasks(filters?: TaskFilterParams, forceRefresh: boolean = false): Observable<EmployeeTaskDto[]> {
         let params = new HttpParams();
-
         if (filters) {
             if (filters.status) params = params.set('status', filters.status);
             if (filters.priority) params = params.set('priority', filters.priority);
@@ -90,36 +94,61 @@ export class TaskService {
             if (filters.endDate) params = params.set('endDate', filters.endDate);
         }
 
-        return this.http.get<EmployeeTaskDto[]>(this.apiUrl, { params });
+        const cacheKey = `tasks_list_${params.toString()}`;
+        const options: CacheOptions = {
+            ttl: this.CACHE_TTL,
+            forceRefresh,
+            key: cacheKey
+        };
+
+        return this.cacheService.get(
+            cacheKey,
+            () => this.http.get<EmployeeTaskDto[]>(this.apiUrl, { params }),
+            options
+        );
     }
 
     /**
      * Get a single task by ID
-     * GET /api/tasks/5
      */
-    getTaskById(id: number): Observable<EmployeeTaskDto> {
-        return this.http.get<EmployeeTaskDto>(`${this.apiUrl}/${id}`);
+    getTaskById(id: number, forceRefresh: boolean = false): Observable<EmployeeTaskDto> {
+        const cacheKey = `task_item_${id}`;
+        const options: CacheOptions = {
+            ttl: this.CACHE_TTL,
+            forceRefresh,
+            key: cacheKey
+        };
+
+        return this.cacheService.get(
+            cacheKey,
+            () => this.http.get<EmployeeTaskDto>(`${this.apiUrl}/${id}`),
+            options
+        );
     }
 
     /**
      * Create a new task
-     * POST /api/tasks
      */
     createTask(task: CreateTaskDto): Observable<EmployeeTaskDto> {
-        return this.http.post<EmployeeTaskDto>(this.apiUrl, task);
+        return this.http.post<EmployeeTaskDto>(this.apiUrl, task).pipe(
+            tap(() => this.clearTasksCache())
+        );
     }
 
     /**
-     * Update task details (title, description, etc.)
-     * PUT /api/tasks/5
+     * Update task details
      */
     updateTask(id: number, task: UpdateTaskDto): Observable<EmployeeTaskDto> {
-        return this.http.put<EmployeeTaskDto>(`${this.apiUrl}/${id}`, task);
+        return this.http.put<EmployeeTaskDto>(`${this.apiUrl}/${id}`, task).pipe(
+            tap(() => {
+                this.cacheService.clear(`task_item_${id}`);
+                this.clearTasksCache();
+            })
+        );
     }
 
     /**
      * Update task status only
-     * PUT /api/tasks/5/status
      */
     updateStatus(id: number, status: TaskStatus, comment?: string, isSupervisor: boolean = false): Observable<void> {
         const payload: UpdateTaskStatusDto = {
@@ -127,15 +156,31 @@ export class TaskService {
             employeeComment: isSupervisor ? undefined : comment,
             supervisorComment: isSupervisor ? comment : undefined
         };
-        return this.http.put<void>(`${this.apiUrl}/${id}/status`, payload);
+        return this.http.put<void>(`${this.apiUrl}/${id}/status`, payload).pipe(
+            tap(() => {
+                this.cacheService.clear(`task_item_${id}`);
+                this.clearTasksCache();
+            })
+        );
     }
 
     /**
      * Delete a task
-     * DELETE /api/tasks/5
      */
     deleteTask(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.apiUrl}/${id}`);
+        return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+            tap(() => {
+                this.cacheService.clear(`task_item_${id}`);
+                this.clearTasksCache();
+            })
+        );
+    }
+
+    /**
+     * Clear all tasks related cache
+     */
+    private clearTasksCache(): void {
+        this.cacheService.clearByPattern('tasks_list');
     }
 
     // Helper methods for UI

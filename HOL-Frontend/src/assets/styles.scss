@@ -169,7 +169,6 @@ html:not(.app-dark) body {
 /* Ensure buttons work in dark mode */
 .app-dark button:not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-warning) {
   color: var(--text-color) !important;
-  background: var(--surface-card) !important;
   border-color: var(--surface-border) !important;
 }
 

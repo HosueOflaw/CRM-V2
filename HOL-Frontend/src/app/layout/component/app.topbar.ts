@@ -10,7 +10,7 @@ import { AuthService } from '../../core/services/auth';
 import { PermissionRequest, PermissionService } from '../../core/services/permission.service';
 import { Signalr } from '../../services/signalr';
 import { PrimeToastService } from '../../shared/services/prime-toast.service';
-import { BreakService, BreakStatus, DailyBreakReport } from '../../services/break.service';
+import { BreakService, BreakStatus, DailyBreakReport, ActiveBreak } from '../../services/break.service';
 import { PermissionRequestModal } from '../../features/managments/pages/managments-dashboard/components/permission-request-modal';
 import { Subscription, interval } from 'rxjs';
 import Swal from 'sweetalert2';
@@ -58,30 +58,37 @@ import Swal from 'sweetalert2';
 
               
                 <!-- Pending Requests Admin View -->
-                <div class="relative flex items-center" *ngIf="authService.isAdmin()">
-                    <a routerLink="/management/pending-permissions" 
-                       class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
-                       pTooltip="طلبات الصلاحيات المعلقة" tooltipPosition="bottom">
-                        <i class="pi pi-bell text-xl text-orange-500"></i>
-                        <!-- Red Dot Badge for Navbar -->
-                        <span *ngIf="pendingRequestsCount" 
-                              class="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-gray-900 animate-bounce">
-                            {{pendingRequestsCount}}
-                        </span>
-                    </a>
-                </div>
+                <a routerLink="/management/pending-permissions" 
+                   *ngIf="authService.isAdmin()"
+                   class="layout-topbar-action relative hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                   pTooltip="طلبات الصلاحيات المعلقة" tooltipPosition="bottom">
+                    <i class="pi pi-bell text-xl text-orange-500"></i>
+                    <!-- Notification Badge -->
+                    <span *ngIf="pendingRequestsCount" class="topbar-badge animate-bounce">
+                        {{pendingRequestsCount}}
+                    </span>
+                </a>
+
+                
             </div>
 
             <!-- Break System for Employees ONLY (Higher visibility) -->
             <div class="break-container flex items-center" *ngIf="authService.isEmployee()">
-                <!-- Start Break Button -->
+                <!-- Start Break Button (Not started & Not completed) -->
                 <button type="button" class="break-btn-pulse flex items-center gap-2 px-3 py-2 bg-green-500 text-white rounded-full transition-all hover:bg-green-600 shadow-md" 
-                    *ngIf="!isOnBreak" (click)="startBreak()" title="بدء ساعة الراحة">
+                    *ngIf="!isOnBreak && !todayBreakCompleted" (click)="startBreak()" title="بدء ساعة الراحة">
                     <i class="pi pi-clock"></i>
                     <span class="text-xs font-bold whitespace-nowrap">بداية الراحة</span>
                 </button>
 
-                <!-- End Break Button & Timer -->
+                <!-- Break Completed Today -->
+                <button type="button" class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 text-gray-500 rounded-full cursor-not-allowed border border-gray-200 dark:border-gray-700" 
+                    *ngIf="!isOnBreak && todayBreakCompleted" disabled title="تم أخذ الاستراحة اليوم">
+                    <i class="pi pi-check-circle text-green-500"></i>
+                    <span class="text-xs font-bold whitespace-nowrap">تم أخذ استراحة اليوم</span>
+                </button>
+
+                <!-- End Break Button & Timer (On Break) -->
                 <div class="active-break flex items-center gap-2" *ngIf="isOnBreak">
                     <span class="break-timer" [ngClass]="{'text-red-500': isBreakLate}">
                         {{ displayTimer }}
@@ -257,6 +264,7 @@ export class AppTopbar implements OnInit, OnDestroy {
     items!: MenuItem[];
 
     isOnBreak = false;
+    todayBreakCompleted = false;
     breakStartTime: Date | null = null;
     displayTimer = '00:00';
     isBreakLate = false;
@@ -323,11 +331,11 @@ export class AppTopbar implements OnInit, OnDestroy {
 
     private fetchActiveBreaksCount() {
         this.breakService.getActiveBreaks().subscribe({
-            next: (activeBreaks) => {
+            next: (activeBreaks: ActiveBreak[]) => {
                 this.activeBreaksCount = activeBreaks.length;
                 console.log('📊 Active Breaks Count Updated:', this.activeBreaksCount);
             },
-            error: (err) => console.error('Failed to fetch active breaks', err)
+            error: (err: any) => console.error('Failed to fetch active breaks', err)
         });
     }
 
@@ -376,7 +384,7 @@ export class AppTopbar implements OnInit, OnDestroy {
                     this.verifyActiveBreakFromReport();
                 }
             },
-            error: (err) => {
+            error: (err: any) => {
                 console.error('Failed to fetch break status', err);
                 // Also try fallback on error
                 this.verifyActiveBreakFromReport();
@@ -389,14 +397,15 @@ export class AppTopbar implements OnInit, OnDestroy {
         const today = new Date().toISOString().split('T')[0];
 
         this.breakService.getDailyReport(today).subscribe({
-            next: (reports: any[]) => {
+            next: (reports: DailyBreakReport[]) => {
                 // Look for any report without an EndTime
                 // Handle casing for endTime/EndTime
                 // User requested checking is_completed column specifically
                 const active = reports.find(r => {
-                    const isCompleted = r.isCompleted === true || r.IsCompleted === true || r.is_completed === true;
+                    const rAny = r as any;
+                    const isCompleted = rAny.isCompleted === true || rAny.IsCompleted === true || rAny.is_completed === true;
                     // It is active if NOT completed AND has no end time
-                    return !isCompleted && !r.endTime && !(r as any).EndTime;
+                    return !isCompleted && !rAny.endTime && !rAny.EndTime;
                 });
 
 
@@ -410,9 +419,34 @@ export class AppTopbar implements OnInit, OnDestroy {
                 } else {
                     this.isOnBreak = false;
                     this.stopTimer();
+
+                    // If not on break, check if it was completed today
+                    const currentUser = this.authService.getUser();
+                    const currentUserId = currentUser?.id || currentUser?.userId;
+
+                    const myReport = reports.find(r => {
+                        const rAny = r as any;
+                        const rId = rAny.userId || rAny.UserId || rAny.id || rAny.Id;
+                        return String(rId) === String(currentUserId);
+                    });
+
+                    if (myReport) {
+                        const myReportAny = myReport as any;
+                        const isCompFlag = myReportAny.isCompleted === true || myReportAny.IsCompleted === true ||
+                            String(myReportAny.isCompleted) === 'True' || String(myReportAny.IsCompleted) === 'True' ||
+                            String(myReportAny.isCompleted) === 'true' || String(myReportAny.IsCompleted) === 'true';
+
+                        const endTime = myReportAny.endTime || myReportAny.EndTime;
+                        const hasEndTime = endTime && String(endTime) !== '0001-01-01T00:00:00' && String(endTime) !== '0001-01-01 00:00:00';
+
+                        if (isCompFlag || hasEndTime) {
+                            this.todayBreakCompleted = true;
+                            console.log('✅ Topbar: Daily break confirmed as completed.', { currentUserId, report: myReport });
+                        }
+                    }
                 }
             },
-            error: (err) => {
+            error: (err: any) => {
                 console.error('Failed to fetch daily report fallback', err);
                 this.isOnBreak = false;
                 this.stopTimer();
@@ -434,13 +468,13 @@ export class AppTopbar implements OnInit, OnDestroy {
         }).then((result) => {
             if (result.isConfirmed) {
                 this.breakService.startBreak().subscribe({
-                    next: (res) => {
+                    next: (res: any) => {
                         this.isOnBreak = true;
                         this.breakStartTime = new Date();
                         this.startTimer();
                         this.toast.success('بدأت ساعة الراحة الآن', 'موفق');
                     },
-                    error: (err) => {
+                    error: (err: any) => {
                         this.toast.error(err.error?.message || 'فشل بدء الراحة', 'خطأ');
                     }
                 });
@@ -468,6 +502,7 @@ export class AppTopbar implements OnInit, OnDestroy {
                         this.breakStartTime = null;
                         this.displayTimer = '00:00';
                         this.toast.success(res.message || 'تمت العودة من الراحة بنجاح', 'الحمد لله على السلامة');
+                        this.checkBreakStatus();
                     },
                     error: (err) => {
                         this.toast.error(err.error?.message || 'فشل إنهاء الراحة', 'خطأ');

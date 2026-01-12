@@ -1,45 +1,40 @@
 import { AfterViewInit, Component } from '@angular/core';
-import { gsap, Linear } from 'gsap';
+import { CommonModule, Location } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { gsap } from 'gsap';
 
 @Component({
   selector: 'app-error-page',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, RouterModule, ButtonModule],
   templateUrl: './error-page.html',
   styleUrl: './error-page.css'
 })
-export class ErrorPage implements AfterViewInit{
+export class ErrorPage implements AfterViewInit {
+
+  constructor(private location: Location) { }
 
   ngAfterViewInit(): void {
-    const t1 = gsap.timeline();
-    const t2 = gsap.timeline();
-    const t3 = gsap.timeline();
-
-    t1.to('.cog1', {
-      transformOrigin: '50% 50%',
-      rotation: '+=360',
+    // Subtle float animation for the error code
+    gsap.to('.error-code-container h1', {
+      y: -20,
+      duration: 2,
       repeat: -1,
-      ease: Linear.easeNone,
-      duration: 8
+      yoyo: true,
+      ease: "power1.inOut"
     });
 
-    t2.to('.cog2', {
-      transformOrigin: '50% 50%',
-      rotation: '-=360',
-      repeat: -1,
-      ease: Linear.easeNone,
-      duration: 8
+    // Fade in content
+    gsap.from('.glass-card', {
+      opacity: 0,
+      y: 50,
+      duration: 1,
+      ease: "out"
     });
+  }
 
-    t3.fromTo('.wrong-para',
-      { opacity: 0 },
-      {
-        opacity: 1,
-        duration: 1,
-        stagger: {
-          repeat: -1,
-          yoyo: true
-        }
-      }
-    );
+  goBack() {
+    this.location.back();
   }
 }

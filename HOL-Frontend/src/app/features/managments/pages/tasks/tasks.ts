@@ -71,6 +71,14 @@ export class TasksPage implements OnInit, OnDestroy {
         { label: 'منخفض', value: TaskPriority.Low }
     ];
 
+    // View period filter
+    viewPeriod: 'all' | 'today' = 'today'; // Default to today's tasks
+
+    viewPeriodOptions = [
+        { label: 'جميع المهام', value: 'all' },
+        { label: 'مهام اليوم', value: 'today' }
+    ];
+
     filterParams: TaskFilterParams = {
         status: undefined,
         priority: undefined,
@@ -89,6 +97,10 @@ export class TasksPage implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.viewMode = this.route.snapshot.data['mode'] || 'personal';
+
+        // Apply daily filter by default
+        this.applyViewPeriodFilter();
+
         this.loadTasks();
 
         // Listen for real-time task updates (with debounce to avoid multiple reloads)
@@ -149,6 +161,27 @@ export class TasksPage implements OnInit, OnDestroy {
             endDate: undefined
         };
         this.loadTasks();
+    }
+
+    onViewPeriodChange() {
+        this.applyViewPeriodFilter();
+        this.loadTasks();
+    }
+
+    applyViewPeriodFilter() {
+        if (this.viewPeriod === 'today') {
+            // Set filter to today's date range
+            const today = new Date();
+            const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+            this.filterParams.startDate = startOfDay.toISOString();
+            this.filterParams.endDate = endOfDay.toISOString();
+        } else {
+            // Clear date filters to show all tasks
+            this.filterParams.startDate = undefined;
+            this.filterParams.endDate = undefined;
+        }
     }
 
     isOverdue(task: EmployeeTaskDto): boolean {
