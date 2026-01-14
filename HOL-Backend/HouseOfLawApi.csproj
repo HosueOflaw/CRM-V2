@@ -28,6 +28,7 @@
     <Folder Include="Controllers\" />
     <Folder Include="Data\Migrations\" />
     <Folder Include="DTOs\" />
+    <Folder Include="uploads\attachments\" />
   </ItemGroup>
 
 </Project>
