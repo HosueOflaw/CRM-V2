@@ -62,6 +62,13 @@ export class LayoutService {
 
     overlayOpen$ = this.overlayOpen.asObservable();
 
+    private commandPaletteOpen = new Subject<void>();
+    commandPaletteOpen$ = this.commandPaletteOpen.asObservable();
+
+    showCommandPalette() {
+        this.commandPaletteOpen.next();
+    }
+
     theme = computed(() => (this.layoutConfig()?.darkTheme ? 'light' : 'dark'));
 
     isSidebarActive = computed(() => this.layoutState().overlayMenuActive || this.layoutState().staticMenuMobileActive);
@@ -116,17 +123,21 @@ export class LayoutService {
             .then(() => {
                 this.onTransitionEnd();
             })
-            .catch(() => {});
+            .catch(() => { });
     }
 
     toggleDarkMode(config?: layoutConfig): void {
         const _config = config || this.layoutConfig();
         if (_config.darkTheme) {
             document.documentElement.classList.add('app-dark');
+            document.documentElement.classList.add('dark');
             document.body.classList.add('app-dark');
+            document.body.classList.add('dark');
         } else {
             document.documentElement.classList.remove('app-dark');
+            document.documentElement.classList.remove('dark');
             document.body.classList.remove('app-dark');
+            document.body.classList.remove('dark');
         }
     }
 

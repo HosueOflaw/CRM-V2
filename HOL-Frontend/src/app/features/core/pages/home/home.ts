@@ -10,6 +10,8 @@ import { TaskService, EmployeeTaskDto, TaskStatus } from '../../../../services/t
 import { BreakService, BreakStatus, ActiveBreak, DailyBreakReport } from '../../../../services/break.service';
 import { UserService, UserDto } from '../../../../services/user.service';
 import { PermissionService } from '../../../../core/services/permission.service';
+import { SkeletonModule } from 'primeng/skeleton';
+import Swal from 'sweetalert2';
 
 interface DashboardStats {
   todayTasks: number;
@@ -29,7 +31,7 @@ interface TeamStats {
   selector: 'app-home',
   standalone: true,
   templateUrl: './home.html',
-  imports: [RouterModule, CommonModule, InputTextModule, ButtonModule, CardModule, TagModule],
+  imports: [RouterModule, CommonModule, InputTextModule, ButtonModule, CardModule, TagModule, SkeletonModule],
 })
 export class HomePage implements OnInit {
   currentUser: any;
@@ -82,6 +84,11 @@ export class HomePage implements OnInit {
   ngOnInit() {
     this.filterDepartments();
     this.loadDashboardData();
+
+    // Subscribe to reactive break refreshes
+    this.breakService.refresh$.subscribe(() => {
+      this.loadBreakStatus();
+    });
   }
 
   filterDepartments() {
@@ -102,19 +109,28 @@ export class HomePage implements OnInit {
   loadDashboardData() {
     this.loading = true;
 
+    // We'll use a simple counter to track multiple async calls
+    let loadersCount = 0;
+    const TOTAL_LOADERS = (this.authService.isSupervisor() || this.authService.isAdmin()) ? 3 : 2;
+
+    const checkLoading = () => {
+      loadersCount++;
+      if (loadersCount >= TOTAL_LOADERS) {
+        this.loading = false;
+      }
+    };
+
     // Always load personal stats if applicable
-    this.loadTaskStats();
-    this.loadBreakStatus();
+    this.loadTaskStats(checkLoading);
+    this.loadBreakStatus(checkLoading);
 
     // Load team stats for supervisors/admins
     if (this.authService.isSupervisor() || this.authService.isAdmin()) {
-      this.loadTeamStats();
+      this.loadTeamStats(checkLoading);
     }
-
-    this.loading = false;
   }
 
-  loadTaskStats() {
+  loadTaskStats(callback?: () => void) {
     const today = new Date();
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
@@ -130,10 +146,12 @@ export class HomePage implements OnInit {
         this.dashboardStats.todayTasks = myTasks.length;
         this.dashboardStats.pendingTasks = myTasks.filter(t => t.status === TaskStatus.Pending).length;
         this.dashboardStats.inProgressTasks = myTasks.filter(t => t.status === TaskStatus.InProgress).length;
-      }
+        if (callback) callback();
+      },
+      error: () => { if (callback) callback(); }
     });
 
-    // Get completed tasks this week
+    // Get completed tasks this week (optional independent call)
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - today.getDay());
 
@@ -147,7 +165,7 @@ export class HomePage implements OnInit {
     });
   }
 
-  loadBreakStatus() {
+  loadBreakStatus(callback?: () => void) {
     this.breakService.getStatus().subscribe({
       next: (status: BreakStatus) => {
         this.isOnBreak = status.isOnBreak;
@@ -164,61 +182,106 @@ export class HomePage implements OnInit {
         }
 
         // If not on break, check if it was completed today
+        const today = new Date().toISOString().split('T')[0];
+        const userId = this.currentUser?.id || this.currentUser?.userId;
+        const storageKey = `break_completed_${userId}_${today}`;
+
+        // Check local storage first as a fast fallback/sync
+        if (localStorage.getItem(storageKey) === 'true') {
+          this.todayBreakCompleted = true;
+          console.log('✅ Home: Daily break confirmed from local storage.');
+          if (callback) callback();
+          return;
+        }
+
         if (!this.isOnBreak) {
-          const today = new Date().toISOString().split('T')[0];
-          this.breakService.getDailyReport(today).subscribe((reports: DailyBreakReport[]) => {
-            const currentId = this.currentUser?.id || this.currentUser?.userId;
+          this.breakService.getDailyReport(today).subscribe({
+            next: (reports: DailyBreakReport[]) => {
+              const currentId = userId;
 
-            const myReport = reports.find((r: DailyBreakReport) => {
-              const rAny = r as any;
-              const rId = rAny.userId || rAny.UserId || rAny.id || rAny.Id;
-              return String(rId) === String(currentId);
-            });
+              const myReport = reports.find((r: DailyBreakReport) => {
+                const rAny = r as any;
+                const rId = rAny.userId || rAny.UserId || rAny.id || rAny.Id;
+                return String(rId) === String(currentId);
+              });
 
-            if (myReport) {
-              const myReportAny = myReport as any;
-              const isCompFlag = myReportAny.isCompleted === true || myReportAny.IsCompleted === true ||
-                String(myReportAny.isCompleted) === 'True' || String(myReportAny.IsCompleted) === 'True' ||
-                String(myReportAny.isCompleted) === 'true' || String(myReportAny.IsCompleted) === 'true';
+              if (myReport) {
+                const myReportAny = myReport as any;
+                const isCompFlag = myReportAny.isCompleted === true || myReportAny.IsCompleted === true ||
+                  String(myReportAny.isCompleted) === 'True' || String(myReportAny.IsCompleted) === 'True' ||
+                  String(myReportAny.isCompleted) === 'true' || String(myReportAny.IsCompleted) === 'true';
 
-              const endTime = myReportAny.endTime || myReportAny.EndTime;
-              const hasEndTime = endTime && String(endTime) !== '0001-01-01T00:00:00' && String(endTime) !== '0001-01-01 00:00:00';
+                const endTime = myReportAny.endTime || myReportAny.EndTime;
+                const hasEndTime = endTime && String(endTime) !== '0001-01-01T00:00:00' && String(endTime) !== '0001-01-01 00:00:00';
 
-              if (isCompFlag || hasEndTime) {
-                this.todayBreakCompleted = true;
-                console.log('✅ Home: Daily break confirmed as completed.', { currentId, report: myReport });
+                if (isCompFlag || hasEndTime) {
+                  this.todayBreakCompleted = true;
+                  localStorage.setItem(storageKey, 'true'); // Sync to local storage
+                  console.log('✅ Home: Daily break confirmed as completed.', { currentId, report: myReport });
+                }
               }
+              if (callback) callback();
+            },
+            error: (err: any) => {
+              console.warn('⚠️ Home: Failed to load daily report (likely permission restricted). Using local state only.', err);
+              if (callback) callback();
             }
           });
+        } else {
+          if (callback) callback();
         }
       },
       error: (err: any) => {
         console.error('Failed to load break status', err);
         this.isOnBreak = false;
+        if (callback) callback();
       }
     });
   }
 
-  loadTeamStats() {
+  loadTeamStats(callback?: () => void) {
+    let internalCount = 0;
+    const TOTAL_INTERNAL = this.authService.isAdmin() ? 4 : 3;
+    const checkInternal = () => {
+      internalCount++;
+      if (internalCount >= TOTAL_INTERNAL && callback) callback();
+    };
+
     // Active Employees
-    this.userService.getUsers().subscribe((users: UserDto[]) => {
-      this.teamStats.activeEmployees = users.length;
+    this.userService.getUsers().subscribe({
+      next: (users: UserDto[]) => {
+        this.teamStats.activeEmployees = users.length;
+        checkInternal();
+      },
+      error: () => checkInternal()
     });
 
     // Employees on Break
-    this.breakService.getActiveBreaks().subscribe((breaks: ActiveBreak[]) => {
-      this.teamStats.employeesOnBreak = breaks.length;
+    this.breakService.getActiveBreaks().subscribe({
+      next: (breaks: ActiveBreak[]) => {
+        this.teamStats.employeesOnBreak = breaks.length;
+        checkInternal();
+      },
+      error: () => checkInternal()
     });
 
     // Active Tasks
-    this.taskService.getTasks({ status: TaskStatus.InProgress }).subscribe((tasks: EmployeeTaskDto[]) => {
-      this.teamStats.activeTasks = tasks.length;
+    this.taskService.getTasks({ status: TaskStatus.InProgress }).subscribe({
+      next: (tasks: EmployeeTaskDto[]) => {
+        this.teamStats.activeTasks = tasks.length;
+        checkInternal();
+      },
+      error: () => checkInternal()
     });
 
     // Pending Requests
     if (this.authService.isAdmin()) {
-      this.permissionService.getPendingRequests().subscribe(requests => {
-        this.teamStats.pendingRequests = requests.length;
+      this.permissionService.getPendingRequests().subscribe({
+        next: requests => {
+          this.teamStats.pendingRequests = requests.length;
+          checkInternal();
+        },
+        error: () => checkInternal()
       });
     }
   }
@@ -236,10 +299,60 @@ export class HomePage implements OnInit {
   }
 
   startBreak() {
-    this.breakService.startBreak().subscribe(() => this.loadBreakStatus());
+    Swal.fire({
+      title: 'بدء ساعة الراحة؟',
+      text: 'هل أنت متأكد من رغبتك في بدء وقت الاستراحة الآن؟',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#10b981',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'نعم، ابدأ',
+      cancelButtonText: 'إلغاء',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.breakService.startBreak().subscribe({
+          next: () => {
+            this.isOnBreak = true;
+            this.loadBreakStatus();
+          },
+          error: (err: any) => {
+            const msg = err.error?.message || 'فشل بدء الراحة';
+            Swal.fire('خطأ', msg, 'error');
+          }
+        });
+      }
+    });
   }
 
   endBreak() {
-    this.breakService.endBreak().subscribe(() => this.loadBreakStatus());
+    Swal.fire({
+      title: 'إنهاء الاستراحة؟',
+      text: 'هل أنت متأكد من العودة للعمل الآن؟',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#f59e0b',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'نعم، عودة للعمل',
+      cancelButtonText: 'إلغاء',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.breakService.endBreak().subscribe({
+          next: () => {
+            const today = new Date().toISOString().split('T')[0];
+            const userId = this.currentUser?.id || this.currentUser?.userId;
+            localStorage.setItem(`break_completed_${userId}_${today}`, 'true');
+            this.todayBreakCompleted = true;
+            this.isOnBreak = false;
+            this.loadBreakStatus();
+          },
+          error: (err: any) => {
+            const msg = err.error?.message || 'فشل إنهاء الاستراحة';
+            Swal.fire('خطأ', msg, 'error');
+          }
+        });
+      }
+    });
   }
 }

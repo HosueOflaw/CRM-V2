@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CacheService, CacheOptions } from './cache.service';
 import { tap } from 'rxjs/operators';
@@ -39,10 +39,18 @@ export class BreakService {
     private apiUrl = `${environment.apiUrl}/breaks`;
     private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+    // Subject to notify components when break state changes
+    private refreshSubject = new Subject<void>();
+    public refresh$ = this.refreshSubject.asObservable();
+
     constructor(
         private http: HttpClient,
         private cacheService: CacheService
     ) { }
+
+    notifyRefresh(): void {
+        this.refreshSubject.next();
+    }
 
     private getHeaders(): HttpHeaders {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -54,13 +62,19 @@ export class BreakService {
 
     startBreak(): Observable<any> {
         return this.http.post(`${this.apiUrl}/start`, {}, { headers: this.getHeaders() }).pipe(
-            tap(() => this.clearBreaksCache())
+            tap(() => {
+                this.clearBreaksCache();
+                this.notifyRefresh();
+            })
         );
     }
 
     endBreak(): Observable<any> {
         return this.http.post(`${this.apiUrl}/end`, {}, { headers: this.getHeaders() }).pipe(
-            tap(() => this.clearBreaksCache())
+            tap(() => {
+                this.clearBreaksCache();
+                this.notifyRefresh();
+            })
         );
     }
 

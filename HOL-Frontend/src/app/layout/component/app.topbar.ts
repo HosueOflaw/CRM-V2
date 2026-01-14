@@ -12,14 +12,17 @@ import { Signalr } from '../../services/signalr';
 import { PrimeToastService } from '../../shared/services/prime-toast.service';
 import { BreakService, BreakStatus, DailyBreakReport, ActiveBreak } from '../../services/break.service';
 import { PermissionRequestModal } from '../../features/managments/pages/managments-dashboard/components/permission-request-modal';
+import { NotificationService, Notification } from '../../services/notification.service';
+import { PopoverModule } from 'primeng/popover';
+import { BadgeModule } from 'primeng/badge';
 import { Subscription, interval } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, ToastModule, PermissionRequestModal],
-    template: ` <div class="layout-topbar">
+    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, ToastModule, PermissionRequestModal, PopoverModule, BadgeModule],
+    template: ` <div class="layout-topbar" #topbarRef>
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
                 <i class="pi pi-bars"></i>
@@ -29,20 +32,83 @@ import Swal from 'sweetalert2';
             </a>
         </div>
 
+        <!-- Global Search Trigger (Desktop) -->
+        <div class="hidden md:flex items-center mx-6 cursor-pointer group" (click)="layoutService.showCommandPalette()">
+            <div class="relative flex items-center bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2.5 border border-gray-200 dark:border-gray-700 group-hover:border-primary-500/50 group-hover:shadow-[0_0_0_4px_rgba(var(--primary-color-rgb),0.1)] transition-all duration-300 w-64 text-gray-400 dark:text-gray-500">
+                <i class="pi pi-search text-lg group-hover:text-primary-500 transition-colors"></i>
+                <span class="ml-3 text-sm font-medium group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">بحث سريع...</span>
+                <span class="ml-auto text-[10px] font-bold bg-white dark:bg-gray-700 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-600 shadow-sm text-gray-500 font-mono group-hover:border-primary-200 dark:group-hover:border-primary-900/50 transition-colors">Ctrl+K</span>
+            </div>
+        </div>
+
         <div class="layout-topbar-actions">
-            <!-- User Info -->
-            <div class="user-info flex items-center gap-2" *ngIf="authService.isLoggedIn()">
+            <!-- Mobile Search Icon (Only visible on mobile via CSS) -->
+            <button class="layout-topbar-action mobile-search-btn" (click)="layoutService.showCommandPalette()">
+                <i class="pi pi-search"></i>
+            </button>
+
+            <!-- User Info (Hidden on Mobile) -->
+            <div class="user-info flex items-center gap-2 hidden md:flex" *ngIf="authService.isLoggedIn()">
                 <span class="user-name font-bold">{{ authService.getCurrentUserName() }}</span>
                 <span class="px-2 py-1 rounded text-xs font-bold border" [ngClass]="getUserRoleSeverity()">
                     {{ getUserRoleLabel() }}
                 </span>
             </div>
 
+            <!-- Advanced Global Notification Center -->
+            <div class="notification-container relative flex items-center" *ngIf="authService.isLoggedIn()">
+                <button type="button" class="layout-topbar-action relative !bg-transparent !border-none" (click)="notifPanel.toggle($event)">
+                    <i class="pi pi-bell text-xl"></i>
+                    <span *ngIf="(notifService.unreadCount$ | async) || 0 > 0" class="topbar-badge !bg-red-500">
+                        {{ notifService.unreadCount$ | async }}
+                    </span>
+                </button>
+
+                <p-popover #notifPanel styleClass="notif-overlay-panel" [appendTo]="topbarRef">
+                    <div class="notif-wrapper custom-scrollbar">
+                        <div class="notif-header flex justify-between items-center p-3 border-b border-gray-100 dark:border-gray-800">
+                            <span class="font-bold text-lg">الإشعارات 🔔</span>
+                            <div class="flex gap-2">
+                                <button (click)="notifService.markAllAsRead()" class="text-xs text-blue-500 hover:text-blue-600 transition-colors">تحديد الكل كمقروء</button>
+                                <button (click)="notifService.clearAll()" class="text-xs text-gray-400 hover:text-red-500 transition-colors">مسح الكل</button>
+                            </div>
+                        </div>
+                        
+                        <div class="notif-list max-h-[400px] overflow-y-auto">
+                            <ng-container *ngIf="(notifService.notifications$ | async)?.length; else emptyNotifs">
+                                <div *ngFor="let n of (notifService.notifications$ | async)" 
+                                     class="notif-item p-3 border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-all cursor-pointer relative"
+                                     [class.unread]="!n.isRead"
+                                     (click)="handleNotifClick(n, notifPanel)">
+                                    
+                                    <div class="flex gap-3">
+                                        <div class="notif-icon shrink-0 w-10 h-10 rounded-full flex items-center justify-center" [ngClass]="getNotifTypeClass(n.type)">
+                                            <i [class]="getNotifIcon(n.type)"></i>
+                                        </div>
+                                        <div class="notif-content flex-1 min-w-0">
+                                            <h4 class="text-sm font-bold mb-1 truncate">{{ n.title }}</h4>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">{{ n.message }}</p>
+                                            <span class="text-[10px] text-gray-400 mt-2 block">{{ notifService.getRelativeTime(n.timestamp) }}</span>
+                                        </div>
+                                        <div *ngIf="!n.isRead" class="unread-dot w-2 h-2 bg-blue-500 rounded-full absolute left-3 top-1/2 -translate-y-1/2"></div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-template #emptyNotifs>
+                                <div class="p-8 text-center bg-gray-50/50 dark:bg-gray-800/20 rounded-xl m-2 border border-dashed border-gray-200 dark:border-gray-700/50">
+                                    <p class="text-gray-500 dark:text-gray-400 font-medium">لا توجد إشعارات حالياً</p>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </p-popover>
+            </div>
+
             <!-- Permission System Actions -->
             <div class="permission-actions flex items-center gap-2" *ngIf="authService.isLoggedIn()">
-                <!-- Break Stats (Supervisor only) -->
-                <button type="button" class="layout-topbar-action !bg-purple-50 dark:!bg-purple-900/20 !text-purple-600 dark:!text-purple-400 border !border-purple-100 dark:!border-purple-800/30 rounded-xl relative" 
-                    *ngIf="authService.isSupervisor()" routerLink="/reports/daily-breaks" title="إحصائيات استراحات القسم">
+                <!-- Break Stats (Supervisor) -->
+                <button type="button" class="layout-topbar-action purple-btn !bg-purple-50 dark:!bg-purple-900/20 !text-purple-600 dark:!text-purple-400 border !border-purple-100 dark:!border-purple-800/30 rounded-xl relative" 
+                    *ngIf="authService.isSupervisor()" routerLink="/reports/daily-breaks" routerLinkActive="topbar-item-active" title="إحصائيات استراحات القسم">
                     <i class="pi pi-chart-line"></i>
                     <!-- Active Breaks Badge -->
                     <span *ngIf="activeBreaksCount > 0" class="topbar-badge !bg-purple-500">
@@ -50,21 +116,21 @@ import Swal from 'sweetalert2';
                     </span>
                 </button>
 
-                <!-- Request Permission (Supervisor only) -->
+                <!-- Request Permission -->
                 <button type="button" class="layout-topbar-action !bg-blue-50 dark:!bg-blue-900/20 !text-blue-600 dark:!text-blue-400 border !border-blue-100 dark:!border-blue-800/30 rounded-xl" 
                     *ngIf="authService.isSupervisor()" (click)="permModal.open()" title="طلب صلاحية">
                     <i class="pi pi-shield"></i>
                 </button>
 
               
-                <!-- Pending Requests Admin View -->
-                <a routerLink="/management/pending-permissions" 
+                 <!-- Pending Requests Admin View -->
+                <a routerLink="/management/pending-permissions" routerLinkActive="topbar-item-active"
                    *ngIf="authService.isAdmin()"
                    class="layout-topbar-action relative hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                    pTooltip="طلبات الصلاحيات المعلقة" tooltipPosition="bottom">
-                    <i class="pi pi-bell text-xl text-orange-500"></i>
+                    <i class="pi pi-inbox text-xl text-orange-500"></i>
                     <!-- Notification Badge -->
-                    <span *ngIf="pendingRequestsCount" class="topbar-badge animate-bounce">
+                    <span *ngIf="pendingRequestsCount" class="topbar-badge !bg-orange-500 animate-bounce">
                         {{pendingRequestsCount}}
                     </span>
                 </a>
@@ -72,23 +138,23 @@ import Swal from 'sweetalert2';
                 
             </div>
 
-            <!-- Break System for Employees ONLY (Higher visibility) -->
+            <!-- Break System -->
             <div class="break-container flex items-center" *ngIf="authService.isEmployee()">
-                <!-- Start Break Button (Not started & Not completed) -->
+                <!-- Start Break -->
                 <button type="button" class="break-btn-pulse flex items-center gap-2 px-3 py-2 bg-green-500 text-white rounded-full transition-all hover:bg-green-600 shadow-md" 
                     *ngIf="!isOnBreak && !todayBreakCompleted" (click)="startBreak()" title="بدء ساعة الراحة">
                     <i class="pi pi-clock"></i>
-                    <span class="text-xs font-bold whitespace-nowrap">بداية الراحة</span>
+                    <span class="text-xs font-bold whitespace-nowrap break-text">بداية الراحة</span>
                 </button>
 
-                <!-- Break Completed Today -->
+                <!-- Break Completed -->
                 <button type="button" class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 text-gray-500 rounded-full cursor-not-allowed border border-gray-200 dark:border-gray-700" 
                     *ngIf="!isOnBreak && todayBreakCompleted" disabled title="تم أخذ الاستراحة اليوم">
                     <i class="pi pi-check-circle text-green-500"></i>
-                    <span class="text-xs font-bold whitespace-nowrap">تم أخذ استراحة اليوم</span>
+                    <span class="text-xs font-bold whitespace-nowrap break-text">تم أخذ استراحة اليوم</span>
                 </button>
 
-                <!-- End Break Button & Timer (On Break) -->
+                <!-- Active Break -->
                 <div class="active-break flex items-center gap-2" *ngIf="isOnBreak">
                     <span class="break-timer" [ngClass]="{'text-red-500': isBreakLate}">
                         {{ displayTimer }}
@@ -102,7 +168,7 @@ import Swal from 'sweetalert2';
 
             <div class="layout-config-menu">
                 <!-- Settings Button -->
-                <button type="button" class="layout-topbar-action" routerLink="/settings" title="الإعدادات">
+                <button type="button" class="layout-topbar-action" routerLink="/settings" routerLinkActive="topbar-item-active" title="الإعدادات">
                     <i class="pi pi-cog"></i>
                 </button>
 
@@ -128,13 +194,13 @@ import Swal from 'sweetalert2';
                     <app-configurator />
                 </div>
 
-                <!-- Break Reports for Admin -->
+                <!-- Break Reports Admin -->
                 <button type="button" class="layout-topbar-action" 
-                    *ngIf="authService.isAdmin()" routerLink="/reports/daily-breaks" title="تقارير الاستراحة اليومية">
+                    *ngIf="authService.isAdmin()" routerLink="/reports/daily-breaks" routerLinkActive="topbar-item-active" title="تقارير الاستراحة اليومية">
                     <i class="pi pi-list"></i>
                 </button>
 
-                <!-- Logout Button -->
+                <!-- Logout -->
                 <button type="button" class="layout-topbar-action logout-btn" (click)="logout()" title="تسجيل الخروج" *ngIf="authService.isLoggedIn()">
                     <i class="pi pi-sign-out"></i>
                 </button>
@@ -258,6 +324,78 @@ import Swal from 'sweetalert2';
         :host-context(.dark) .topbar-badge {
             border-color: #1e1e1e;
         }
+
+        /* Notification Styles */
+        :host ::ng-deep .notif-overlay-panel {
+            width: 380px;
+            padding: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        :host-context(.dark) ::ng-deep .notif-overlay-panel {
+            background: rgba(30, 41, 59, 0.95);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Active State for Topbar Icons - Stronger Visibility */
+        .topbar-item-active {
+            background-color: var(--primary-100) !important;
+            color: var(--primary-700) !important;
+            border: 2px solid var(--primary-500) !important; /* Clearly visible border */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.2);
+            font-weight: bold;
+        }
+        
+        :host-context(.dark) .topbar-item-active {
+            background-color: rgba(var(--primary-color-rgb), 0.3) !important;
+            color: var(--primary-200) !important;
+            border-color: var(--primary-400) !important;
+        }
+
+        /* Specific Active Overrides for Colored Buttons */
+        .topbar-item-active.purple-btn {
+            background-color: #f3e8ff !important;
+            border-color: #9333ea !important; /* Stronger purple */
+            color: #6b21a8 !important;
+        }
+        :host-context(.dark) .topbar-item-active.purple-btn {
+            background-color: rgba(147, 51, 234, 0.2) !important;
+            border-color: #c084fc !important;
+            color: #f3e8ff !important;
+        }
+
+        /* Mobile Search Visibility Control */
+        .mobile-search-btn {
+            display: none; /* Default hidden */
+        }
+
+        /* Responsive Adjustments */
+        @media screen and (max-width: 960px) {
+            .user-info { display: none !important; }
+            .break-text { display: none !important; }
+            .break-btn-pulse { padding: 8px !important; border-radius: 50% !important; width: 40px; height: 40px; justify-content: center; }
+            .layout-topbar-action { margin-left: 0.2rem; }
+            .break-container { margin: 0 0.5rem; }
+            
+            /* Show mobile search only on small screens */
+            .mobile-search-btn {
+                display: flex !important;
+            }
+        }
+
+        .notif-item.unread { background: rgba(59, 130, 246, 0.03); }
+        .notif-item { border-left: 3px solid transparent; }
+        .notif-item.unread { border-left-color: #3b82f6; }
+
+        .notif-wrapper.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .notif-wrapper.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
     `]
 })
 export class AppTopbar implements OnInit, OnDestroy {
@@ -280,11 +418,19 @@ export class AppTopbar implements OnInit, OnDestroy {
         private toast: PrimeToastService,
         private breakService: BreakService,
         private permissionService: PermissionService,
-        private signalr: Signalr
+        private signalr: Signalr,
+        public notifService: NotificationService
     ) { }
 
     ngOnInit() {
         this.checkBreakStatus();
+
+        // Subscribe to reactive break refreshes
+        this.destroy$.add(
+            this.breakService.refresh$.subscribe(() => {
+                this.checkBreakStatus();
+            })
+        );
 
         // Admin specific logic
         if (this.authService.isAdmin()) {
@@ -395,12 +541,22 @@ export class AppTopbar implements OnInit, OnDestroy {
     private verifyActiveBreakFromReport() {
         // Get today's report
         const today = new Date().toISOString().split('T')[0];
+        const currentUser = this.authService.getUser();
+        const currentUserId = currentUser?.id || currentUser?.userId;
+        const storageKey = `break_completed_${currentUserId}_${today}`;
+
+        // Fast local check
+        if (localStorage.getItem(storageKey) === 'true') {
+            this.todayBreakCompleted = true;
+            this.isOnBreak = false;
+            this.stopTimer();
+            console.log('✅ Topbar: Daily break confirmed from local storage.');
+            return;
+        }
 
         this.breakService.getDailyReport(today).subscribe({
             next: (reports: DailyBreakReport[]) => {
                 // Look for any report without an EndTime
-                // Handle casing for endTime/EndTime
-                // User requested checking is_completed column specifically
                 const active = reports.find(r => {
                     const rAny = r as any;
                     const isCompleted = rAny.isCompleted === true || rAny.IsCompleted === true || rAny.is_completed === true;
@@ -421,9 +577,6 @@ export class AppTopbar implements OnInit, OnDestroy {
                     this.stopTimer();
 
                     // If not on break, check if it was completed today
-                    const currentUser = this.authService.getUser();
-                    const currentUserId = currentUser?.id || currentUser?.userId;
-
                     const myReport = reports.find(r => {
                         const rAny = r as any;
                         const rId = rAny.userId || rAny.UserId || rAny.id || rAny.Id;
@@ -441,15 +594,17 @@ export class AppTopbar implements OnInit, OnDestroy {
 
                         if (isCompFlag || hasEndTime) {
                             this.todayBreakCompleted = true;
+                            localStorage.setItem(storageKey, 'true'); // Sync to local storage
                             console.log('✅ Topbar: Daily break confirmed as completed.', { currentUserId, report: myReport });
                         }
                     }
                 }
             },
             error: (err: any) => {
-                console.error('Failed to fetch daily report fallback', err);
+                console.warn('⚠️ Topbar: Failed to fetch daily report (likely permission restricted). Using local state.', err);
                 this.isOnBreak = false;
                 this.stopTimer();
+                // If local check failed above, we stay as false
             }
         });
     }
@@ -497,12 +652,17 @@ export class AppTopbar implements OnInit, OnDestroy {
             if (result.isConfirmed) {
                 this.breakService.endBreak().subscribe({
                     next: (res) => {
+                        const today = new Date().toISOString().split('T')[0];
+                        const currentUser = this.authService.getUser();
+                        const userId = currentUser?.id || currentUser?.userId;
+                        localStorage.setItem(`break_completed_${userId}_${today}`, 'true');
+                        this.todayBreakCompleted = true;
+
                         this.stopTimer();
                         this.isOnBreak = false;
                         this.breakStartTime = null;
                         this.displayTimer = '00:00';
-                        this.toast.success(res.message || 'تمت العودة من الراحة بنجاح', 'الحمد لله على السلامة');
-                        this.checkBreakStatus();
+                        this.toast.success('تم إنهاء الاستراحة بنجاح', 'عودة محفزة للعمل!');
                     },
                     error: (err) => {
                         this.toast.error(err.error?.message || 'فشل إنهاء الراحة', 'خطأ');
@@ -601,6 +761,36 @@ export class AppTopbar implements OnInit, OnDestroy {
                 return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800/30';
             default:
                 return 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700';
+        }
+    }
+
+    getNotifIcon(type: string): string {
+        switch (type) {
+            case 'task': return 'pi pi-check-square';
+            case 'permission': return 'pi pi-shield';
+            case 'success': return 'pi pi-check-circle';
+            case 'warn': return 'pi pi-exclamation-triangle';
+            case 'error': return 'pi pi-times-circle';
+            default: return 'pi pi-info-circle';
+        }
+    }
+
+    getNotifTypeClass(type: string): string {
+        switch (type) {
+            case 'task': return 'bg-blue-50 text-blue-500 dark:bg-blue-900/40';
+            case 'permission': return 'bg-orange-50 text-orange-500 dark:bg-orange-900/40';
+            case 'success': return 'bg-green-50 text-green-500 dark:bg-green-900/40';
+            case 'warn': return 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/40';
+            case 'error': return 'bg-red-50 text-red-500 dark:bg-red-900/40';
+            default: return 'bg-gray-50 text-gray-500 dark:bg-gray-800';
+        }
+    }
+
+    handleNotifClick(n: Notification, panel: any) {
+        this.notifService.markAsRead(n.id);
+        panel.hide();
+        if (n.route) {
+            this.router.navigate([n.route]);
         }
     }
 }

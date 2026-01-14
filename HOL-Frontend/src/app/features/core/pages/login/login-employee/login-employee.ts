@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthService } from '../../../../../core/services/auth';
 import { LoginFormComponent } from '../login-form/login-form';
 import { Router } from '@angular/router';
@@ -17,15 +17,17 @@ import { Subject, takeUntil } from 'rxjs';
       logo="/assets/employee-logo.svg"
       (submitForm)="login($event)"
       [disabled]="isLoading"
+      [initialLoading]="initialLoading"
     >
     </app-login-form>
     <p-toast position="top-center"></p-toast>
   `,
   styleUrls: ['./login-employee.css'],
 })
-export class LoginEmployeeComponent implements OnDestroy {
+export class LoginEmployeeComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   isLoading = false;
+  initialLoading = true;
 
   // Security constants
   private readonly MAX_INPUT_LENGTH = 255;
@@ -38,6 +40,13 @@ export class LoginEmployeeComponent implements OnDestroy {
     private toast: PrimeToastService,
     private swal: SweetAlertService
   ) { }
+
+  ngOnInit() {
+    // Simulate initial loading for requested skeleton effect
+    setTimeout(() => {
+      this.initialLoading = false;
+    }, 500);
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();

@@ -5,6 +5,7 @@ import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
+import { SkeletonModule } from 'primeng/skeleton';
 import { FormsModule } from '@angular/forms';
 import { BreakService, ActiveBreak, DailyBreakReport } from '../../../../services/break.service';
 import { PrimeToastService } from '../../../../shared/services/prime-toast.service';
@@ -14,7 +15,7 @@ import { AuthService } from '../../../../core/services/auth';
 @Component({
   selector: 'app-daily-breaks',
   standalone: true,
-  imports: [CommonModule, TableModule, CardModule, TagModule, ButtonModule, ToastModule, DatePickerModule, FormsModule],
+  imports: [CommonModule, TableModule, CardModule, TagModule, ButtonModule, ToastModule, DatePickerModule, FormsModule, SkeletonModule],
   template: `
     <div class="p-6" dir="rtl">
       <div class="flex justify-between items-center mb-6">
@@ -34,7 +35,20 @@ import { AuthService } from '../../../../core/services/auth';
 
       <!-- Active Breaks Section (Only for Today) -->
       <p-card header="موظفون في فترة راحة حالياً" class="mb-6 shadow-sm" *ngIf="isToday(selectedDate)">
-        <p-table [value]="activeBreaks" [loading]="loadingActive" styleClass="p-datatable-striped">
+        <div *ngIf="loadingActive" class="p-4">
+            <p-table [value]="[1,2,3]" styleClass="p-datatable-striped">
+                <ng-template pTemplate="body">
+                    <tr>
+                        <td><p-skeleton width="8rem"></p-skeleton></td>
+                        <td><p-skeleton width="6rem"></p-skeleton></td>
+                        <td><p-skeleton width="5rem"></p-skeleton></td>
+                        <td><p-skeleton width="5rem"></p-skeleton></td>
+                        <td><p-skeleton width="4rem" height="1.5rem" borderRadius="1rem"></p-skeleton></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        <p-table *ngIf="!loadingActive" [value]="activeBreaks" styleClass="p-datatable-striped">
           <ng-template pTemplate="header">
             <tr>
               <th class="text-center">الموظف</th>
@@ -66,7 +80,22 @@ import { AuthService } from '../../../../core/services/auth';
 
       <!-- Daily Report Section -->
       <p-card [header]="'سجل الاستراحات لليوم: ' + (selectedDate | date:'yyyy-MM-dd')" class="shadow-sm">
-        <p-table [value]="dailyReports" [loading]="loadingDaily" [paginator]="true" [rows]="10" styleClass="p-datatable-gridlines">
+        <div *ngIf="loadingDaily" class="p-4">
+            <p-table [value]="[1,2,3,4,5]" styleClass="p-datatable-gridlines">
+                <ng-template pTemplate="body">
+                    <tr>
+                        <td><p-skeleton width="10rem"></p-skeleton></td>
+                        <td><p-skeleton width="6rem"></p-skeleton></td>
+                        <td><p-skeleton width="5rem"></p-skeleton></td>
+                        <td><p-skeleton width="5rem"></p-skeleton></td>
+                        <td><p-skeleton width="5rem"></p-skeleton></td>
+                        <td><p-skeleton width="5rem"></p-skeleton></td>
+                        <td><p-skeleton width="5rem"></p-skeleton></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        <p-table *ngIf="!loadingDaily" [value]="dailyReports" [paginator]="true" [rows]="10" styleClass="p-datatable-gridlines">
           <ng-template pTemplate="header">
             <tr>
               <th class="text-center">الموظف</th>

@@ -7,6 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { ChartModule } from 'primeng/chart';
+import { SkeletonModule } from 'primeng/skeleton';
 import { AuthService } from '../../../../core/services/auth';
 import { UserService, UserDto } from '../../../../services/user.service';
 import { TaskService, TaskStatus, EmployeeTaskDto } from '../../../../services/task.service';
@@ -37,7 +38,8 @@ interface UserPerformance extends UserDto {
         TagModule,
         ChartModule,
         RouterModule,
-        DelegatePermissionModal
+        DelegatePermissionModal,
+        SkeletonModule
     ],
     templateUrl: './team-performance.html'
 })

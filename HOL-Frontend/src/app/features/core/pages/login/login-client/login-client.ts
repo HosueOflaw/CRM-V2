@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../../../core/services/auth';
 import { LoginFormComponent } from '../login-form/login-form';
 import { Router } from '@angular/router';
@@ -14,16 +14,26 @@ import { SweetAlertService } from '../../../../../shared/services/sweet-alert.se
       title="تسجيل دخول العملاء"
       logo="/assets/client-logo.svg"
       (submitForm)="login($event)"
+      [initialLoading]="initialLoading"
     >
     </app-login-form>
   `,
 })
-export class LoginClientComponent {
+export class LoginClientComponent implements OnInit {
+  initialLoading = true;
+
   constructor(
     private authService: AuthService,
     private router: Router,
     private swal: SweetAlertService
   ) { }
+
+  ngOnInit() {
+    // Simulate initial loading for requested skeleton effect
+    setTimeout(() => {
+      this.initialLoading = false;
+    }, 500);
+  }
 
   login(data: { usernameOrEmail: string; password: string }) {
     const email = data.usernameOrEmail;

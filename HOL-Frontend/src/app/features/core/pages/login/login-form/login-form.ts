@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { SkeletonModule } from 'primeng/skeleton';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
@@ -11,7 +12,7 @@ import { ButtonModule } from 'primeng/button';
 @Component({
   selector: 'app-login-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, DialogModule, InputTextModule, ButtonModule],
+  imports: [CommonModule, FormsModule, DialogModule, InputTextModule, ButtonModule, SkeletonModule],
   templateUrl: './login-form.html',
   styleUrls: ['./login-form.css'],
 })
@@ -19,6 +20,7 @@ export class LoginFormComponent {
   @Input() title = '';
   @Input() logo = '/assets/logo.svg';
   @Input() disabled = false;
+  @Input() initialLoading = false;
   @Output() submitForm = new EventEmitter<{
     usernameOrEmail: string;
     password: string;

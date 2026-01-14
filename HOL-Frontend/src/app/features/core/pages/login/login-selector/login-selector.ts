@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-login-selector',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SkeletonModule],
   template: `
     <div class="login-page" dir="rtl">
       <!-- Background -->
@@ -14,13 +15,31 @@ import { RouterModule } from '@angular/router';
       <div class="login-container">
         <!-- CRM Info Section -->
         <div class="crm-info">
-          <div class="logo-section">
+          <!-- Skeleton Loading for Logo Section -->
+          <div *ngIf="loading" class="logo-section">
+             <div class="flex justify-center mb-4"><p-skeleton shape="circle" size="4rem" styleClass="bg-white/20"></p-skeleton></div>
+             <div class="flex justify-center mb-2"><p-skeleton width="12rem" height="2.5rem" styleClass="bg-white/20"></p-skeleton></div>
+             <div class="flex justify-center"><p-skeleton width="8rem" styleClass="bg-white/20"></p-skeleton></div>
+          </div>
+
+          <div *ngIf="!loading" class="logo-section">
             <div class="logo-icon">⚖️</div>
             <h1>بيت القانون</h1>
             <p class="tagline">نظام إدارة المحاماة المتكامل</p>
           </div>
           
-          <div class="features">
+          <!-- Skeleton Loading for Features -->
+           <div *ngIf="loading" class="features">
+              <div class="feature" *ngFor="let i of [1,2,3]">
+                 <p-skeleton shape="circle" size="2rem" styleClass="bg-white/20"></p-skeleton>
+                 <div class="flex-1">
+                    <p-skeleton width="6rem" styleClass="mb-2 bg-white/20"></p-skeleton>
+                    <p-skeleton width="10rem" height="0.8rem" styleClass="bg-white/20"></p-skeleton>
+                 </div>
+              </div>
+           </div>
+
+          <div *ngIf="!loading" class="features">
             <div class="feature">
               <span class="feature-icon">📋</span>
               <div>
@@ -47,39 +66,62 @@ import { RouterModule } from '@angular/router';
 
         <!-- Login Selector Section -->
         <div class="selector-section">
-          <h2>اختر طريقة الدخول</h2>
-          <p class="subtitle">يرجى اختيار نوع الحساب للمتابعة</p>
-          
-          <div class="login-options">
-            <a routerLink="/login/employee" class="login-option employee">
-              <div class="option-content">
-                <h3>دخول الموظفين</h3>
-                <p>للموظفين والمحامين</p>
-              </div>
-              <span class="arrow">←</span>
-            </a>
-
-            <a routerLink="/login/client" class="login-option client">
-              <div class="option-content">
-                <h3>دخول الموكلين</h3>
-                <p>للعملاء والموكلين</p>
-              </div>
-              <span class="arrow">←</span>
-            </a>
-
-            <a routerLink="/login/public" class="login-option public">
-              <div class="option-content">
-                <h3>دخول عام (هويتي)</h3>
-                <p>التحقق عبر هويتي</p>
-              </div>
-              <span class="arrow">←</span>
-            </a>
+          <!-- Skeleton Loading for Header -->
+          <div *ngIf="loading">
+             <p-skeleton width="15rem" height="2rem" styleClass="mb-2"></p-skeleton>
+             <p-skeleton width="10rem" styleClass="mb-8"></p-skeleton>
+             
+             <div class="flex flex-col gap-4">
+                <div class="p-4 border border-gray-100 rounded-xl flex items-center gap-4" *ngFor="let i of [1,2,3]">
+                   <div class="flex-1">
+                      <p-skeleton width="8rem" height="1.2rem" styleClass="mb-2"></p-skeleton>
+                      <p-skeleton width="6rem" height="0.8rem"></p-skeleton>
+                   </div>
+                   <p-skeleton shape="circle" size="1.5rem"></p-skeleton>
+                </div>
+             </div>
+             
+             <div class="mt-8 pt-6 border-t border-gray-100 flex flex-col items-center gap-2">
+                <p-skeleton width="12rem"></p-skeleton>
+                <p-skeleton width="8rem"></p-skeleton>
+             </div>
           </div>
 
-          <div class="help-text">
-            <p>للمساعدة يرجى التواصل مع الدعم الفني</p>
-            <a href="tel:+96599999999">+965 9999 9999</a>
-          </div>
+          <ng-container *ngIf="!loading">
+            <h2>اختر طريقة الدخول</h2>
+            <p class="subtitle">يرجى اختيار نوع الحساب للمتابعة</p>
+            
+            <div class="login-options">
+              <a routerLink="/login/employee" class="login-option employee">
+                <div class="option-content">
+                  <h3>دخول الموظفين</h3>
+                  <p>للموظفين والمحامين</p>
+                </div>
+                <span class="arrow">←</span>
+              </a>
+
+              <a routerLink="/login/client" class="login-option client">
+                <div class="option-content">
+                  <h3>دخول الموكلين</h3>
+                  <p>للعملاء والموكلين</p>
+                </div>
+                <span class="arrow">←</span>
+              </a>
+
+              <a routerLink="/login/public" class="login-option public">
+                <div class="option-content">
+                  <h3>دخول عام (هويتي)</h3>
+                  <p>التحقق عبر هويتي</p>
+                </div>
+                <span class="arrow">←</span>
+              </a>
+            </div>
+
+            <div class="help-text">
+              <p>للمساعدة يرجى التواصل مع الدعم الفني</p>
+              <a href="tel:+96599999999">+965 9999 9999</a>
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -311,5 +353,13 @@ import { RouterModule } from '@angular/router';
     }
   `]
 })
-export class LoginSelectorComponent {}
+export class LoginSelectorComponent implements OnInit {
+  loading = true;
 
+  ngOnInit() {
+    // Simulate initial loading for effect as requested
+    setTimeout(() => {
+      this.loading = false;
+    }, 500);
+  }
+}

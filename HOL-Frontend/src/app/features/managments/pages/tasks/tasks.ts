@@ -12,6 +12,7 @@ import { AuthService } from '../../../../core/services/auth';
 import { CreateTaskModal } from './components/create-task-modal';
 import { SweetAlertService } from '../../../../shared/services/sweet-alert.service';
 import { FormsModule } from '@angular/forms';
+import { SkeletonModule } from 'primeng/skeleton';
 import { SelectModule } from 'primeng/select';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { Signalr } from '../../../../services/signalr';
@@ -31,7 +32,8 @@ import { Subject, takeUntil, filter, debounceTime } from 'rxjs';
         CreateTaskModal,
         FormsModule,
         SelectModule,
-        RouterModule
+        RouterModule,
+        SkeletonModule
     ],
     providers: [ConfirmationService],
     templateUrl: './tasks.html',

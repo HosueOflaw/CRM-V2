@@ -63,7 +63,52 @@
     </div>
 
     <!-- Data Table -->
-    <p-table [value]="tasks" [loading]="loading" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
+    <div *ngIf="loading" class="border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden">
+        <p-table [value]="[1,2,3,4,5,6]" styleClass="p-datatable-lg">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 5%">#</th>
+                    <th style="width: 25%">المهمة</th>
+                    <th style="width: 15%">المسؤول</th>
+                    <th style="width: 15%">الأولوية</th>
+                    <th style="width: 15%">آخر موعد</th>
+                    <th style="width: 15%">الحالة</th>
+                    <th style="width: 10%">إجراءات</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body">
+                <tr>
+                    <td><p-skeleton width="1rem"></p-skeleton></td>
+                    <td>
+                        <div class="flex flex-col gap-2">
+                            <p-skeleton width="70%" height="1.2rem"></p-skeleton>
+                            <p-skeleton width="40%" height="0.8rem"></p-skeleton>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="flex items-center gap-2">
+                            <p-skeleton shape="circle" size="2rem"></p-skeleton>
+                            <p-skeleton width="5rem"></p-skeleton>
+                        </div>
+                    </td>
+                    <td><p-skeleton width="4rem" height="1.5rem" borderRadius="1rem"></p-skeleton></td>
+                    <td>
+                        <div class="flex flex-col gap-1">
+                            <p-skeleton width="6rem"></p-skeleton>
+                            <p-skeleton width="3rem"></p-skeleton>
+                        </div>
+                    </td>
+                    <td><p-skeleton width="5rem" height="1.5rem"></p-skeleton></td>
+                    <td>
+                        <div class="flex gap-2"><p-skeleton shape="circle" size="2rem"></p-skeleton><p-skeleton
+                                shape="circle" size="2rem"></p-skeleton></div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <p-table *ngIf="!loading" [value]="tasks" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
         responsiveLayout="scroll" styleClass="p-datatable-lg" [rowHover]="true"
         [globalFilterFields]="['title', 'assignedToName', 'description']">
         <ng-template pTemplate="header">
@@ -171,10 +216,13 @@
 
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="7" class="text-center py-8">
-                    <div class="flex flex-col items-center gap-3 text-gray-400">
-                        <i class="pi pi-inbox text-4xl"></i>
-                        <p>لا توجد مهام حالياً</p>
+                <td colspan="7" class="p-0 border-none">
+                    <div
+                        class="flex flex-col items-center justify-center py-20 bg-gray-50/30 dark:bg-gray-800/20 rounded-b-2xl">
+                        <h3 class="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-2">القائمة نظيفة تماماً! ✨
+                        </h3>
+                        <p class="text-gray-500 dark:text-gray-400 text-lg">لا توجد مهام معلقة في الوقت الحالي. استمتع
+                            بوقتك!</p>
                     </div>
                 </td>
             </tr>

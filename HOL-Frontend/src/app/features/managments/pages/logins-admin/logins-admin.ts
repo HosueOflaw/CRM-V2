@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
+import { SkeletonModule } from 'primeng/skeleton';
 import { FormsModule } from '@angular/forms';
 import { LoginHistoryService, LoginHistoryRecord } from '../../../../services/login-history.service';
 
@@ -32,7 +33,8 @@ interface LoginRecord {
     InputTextModule,
     TagModule,
     TooltipModule,
-    FormsModule
+    FormsModule,
+    SkeletonModule
   ],
   templateUrl: './logins-admin.html',
   styleUrls: ['./logins-admin.css'],

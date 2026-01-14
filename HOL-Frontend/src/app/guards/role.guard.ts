@@ -32,7 +32,7 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
     Swal.fire({
         icon: 'warning',
         title: 'غير مصرح',
-        text: 'هذه الصفحة مخصصة للمشرفين أو الإدارة فقط.',
+        text: 'هذه الصفحة مخصصة الإدارة فقط.',
         confirmButtonText: 'فهمت',
         confirmButtonColor: '#f59e0b'
     }).then(() => {
