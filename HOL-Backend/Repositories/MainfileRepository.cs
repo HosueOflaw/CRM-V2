@@ -1,5 +1,6 @@
 using House_of_law_api.Data;
 using House_of_law_api.Domain.Entities;
+using House_of_law_api.DTOs;
 using House_of_law_api.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,13 +25,38 @@ public class MainfileRepository : BaseRepository<Mainfile>, IMainfileRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Mainfile>> SearchByNameAsync(string searchTerm)
-    {
-        if (string.IsNullOrWhiteSpace(searchTerm))
-            return await GetAllAsync();
+  public async Task<IEnumerable<Mainfile>> SearchByNameAsync(string searchTerm)
+  {
+    if (string.IsNullOrWhiteSpace(searchTerm))
+      return await GetAllAsync();
 
-        return await _dbSet
-            .Where(m => m.Name != null && m.Name.Contains(searchTerm))
+    return await _dbSet
+        .Where(m => m.Name != null && m.Name.Contains(searchTerm))
+        .ToListAsync();
+  }
+    public async Task<IEnumerable<ClientDto>> GetAllClientsOptimizedAsync()
+    {
+        return await _context.Mainfiles
+            .AsNoTracking()
+            .GroupJoin(
+                _context.FileDetails.AsNoTracking(),
+                m => m.Id,
+                f => f.FileCode,
+                (m, details) => new { m, detail = details.FirstOrDefault() }
+            )
+            .Select(x => new ClientDto
+            {
+                Id = x.m.Id,
+                Code = x.m.Code,
+                Name = x.m.Name,
+                Cid = x.m.Cid,
+                Address = x.m.Address,
+                DateAdded = x.m.DateAdded,
+                Nationality = x.m.Nationality,
+                ContractNo = x.detail != null ? x.detail.ContractNo : null,
+                LegalPlaintiff = x.detail != null ? x.detail.LegalPlaintiff : null,
+                ContractDetails = x.detail != null ? x.detail.Reason : null
+            })
             .ToListAsync();
     }
 }

@@ -31,6 +31,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
 
+builder.Services.AddMemoryCache();
+
 builder.Services.Configure<CloudflareOptions>(builder.Configuration.GetSection("Cloudflare"));
 
 // تسجيل Repositories
@@ -137,6 +139,9 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddSignalR(options =>
 {
     options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+    options.HandshakeTimeout = TimeSpan.FromSeconds(15);
 });
 builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 builder.Services.AddScoped<IEmailService, EmailService>();

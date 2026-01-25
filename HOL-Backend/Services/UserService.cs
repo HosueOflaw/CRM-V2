@@ -3,6 +3,7 @@ using House_of_law_api.DTOs;
 using House_of_law_api.Interfaces;
 using House_of_law_api.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace House_of_law_api.Services;
 
@@ -17,6 +18,7 @@ public class UserService : IUserService
     private readonly INotificationService _notificationService;
     private readonly IEmailService _emailService;
     private readonly ApplicationDbContext _context;
+    private readonly IMemoryCache _cache;
     private readonly ILogger<UserService> _logger;
 
     public UserService(
@@ -26,6 +28,7 @@ public class UserService : IUserService
         INotificationService notificationService,
         IEmailService emailService,
         ApplicationDbContext context,
+        IMemoryCache cache,
         ILogger<UserService> logger)
     {
         _userRepository = userRepository;
@@ -34,6 +37,7 @@ public class UserService : IUserService
         _notificationService = notificationService;
         _emailService = emailService;
         _context = context;
+        _cache = cache;
         _logger = logger;
     }
 
@@ -154,6 +158,7 @@ public class UserService : IUserService
             
             // تسجيل خروج قسري لضمان أن المستخدم سيدخل بالباسورد الجديد
             await _notificationService.SendForceLogoutAsync(user.Id.ToString(), "password_updated_by_admin");
+            _cache.Remove($"user_stamp_{user.Id}");
         }
 
         await _userRepository.UpdateAsync(user);
@@ -262,7 +267,10 @@ public class UserService : IUserService
         
         await _userRepository.UpdateAsync(user);
 
-        _logger.LogInformation("User logged in: {UserId}, Username: {Username}", user.Id, user.Username);
+        // مسح تفاصيل الجلسة من الـ Cache لضمان أن الفلتر سيقرأ القيمة الجديدة
+        _cache.Remove($"user_stamp_{user.Id}");
+
+        _logger.LogInformation("User logged in and cache cleared: {UserId}, Username: {Username}", user.Id, user.Username);
 
         // Record Login History
         try 
@@ -368,6 +376,7 @@ public class UserService : IUserService
 
         // إرسال إشارة تسجيل خروج قسري للمستخدم لكي يضطر للدخول بكلمة المرور الجديدة
         await _notificationService.SendForceLogoutAsync(user.Id.ToString(), "password_reset_by_admin");
+        _cache.Remove($"user_stamp_{user.Id}");
 
         return true;
     }
@@ -419,6 +428,7 @@ public class UserService : IUserService
         
         // Force logout from all sessions
         await _notificationService.SendForceLogoutAsync(user.Id.ToString(), "password_reset_via_forgot");
+        _cache.Remove($"user_stamp_{user.Id}");
 
         return true;
     }
@@ -430,7 +440,8 @@ public class UserService : IUserService
         {
             user.SecurityStamp = null; // مسح بصمة الجلسة عند تسجيل الخروج
             await _userRepository.UpdateAsync(user);
-            _logger.LogInformation("User logged out and security stamp cleared: {UserId}", userId);
+            _cache.Remove($"user_stamp_{userId}");
+            _logger.LogInformation("User logged out and security stamp cleared from DB and Cache: {UserId}", userId);
         }
     }
 

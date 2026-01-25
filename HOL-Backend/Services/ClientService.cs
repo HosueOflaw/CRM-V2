@@ -224,26 +224,7 @@ public class ClientService : IClientService
 
     public async Task<IEnumerable<ClientDto>> GetAllClientsAsync()
     {
-        var mainfiles = await _mainfileRepository.GetAllAsync();
-        var fileDetails = await _fileDetailRepository.GetAllAsync();
-
-        return mainfiles.Select(m =>
-        {
-            var detail = fileDetails.FirstOrDefault(f => f.FileCode == m.Id);
-            return new ClientDto
-            {
-                Id = m.Id,
-                Code = m.Code,
-                Name = m.Name,
-                Cid = m.Cid,
-                Address = m.Address,
-                DateAdded = m.DateAdded,
-                Nationality = m.Nationality,
-                ContractNo = detail?.ContractNo,
-                LegalPlaintiff = detail?.LegalPlaintiff,
-                ContractDetails = detail?.Reason
-            };
-        });
+        return await _mainfileRepository.GetAllClientsOptimizedAsync();
     }
 
     public async Task<ClientAttachmentDto> AddAttachmentAsync(long fileCode, IFormFile file, CreateClientAttachmentDto dto)
