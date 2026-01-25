@@ -1,6 +1,6 @@
 import { Injectable, Injector } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 import { SweetAlertService } from '../shared/services/sweet-alert.service';
 import { TaskService, TaskStatus } from './task.service';
@@ -14,6 +14,8 @@ export interface SignalRMessage {
     timestamp: string;
 }
 
+export type ConnectionState = 'Connected' | 'Disconnected' | 'Reconnecting' | 'Error';
+
 @Injectable({
     providedIn: 'root'
 })
@@ -21,6 +23,9 @@ export class Signalr {
     private hubConnection?: HubConnection;
     private messageSubject = new Subject<SignalRMessage>();
     public message$ = this.messageSubject.asObservable();
+
+    private connectionStateSubject = new BehaviorSubject<ConnectionState>('Disconnected');
+    public connectionState$ = this.connectionStateSubject.asObservable();
 
     private readonly hubUrl = environment.apiUrl.replace('/api', '') + '/hubs/notifications';
 
@@ -46,12 +51,18 @@ export class Signalr {
                 .withUrl(this.hubUrl, {
                     accessTokenFactory: () => token
                 })
-                .withAutomaticReconnect()
+                .withAutomaticReconnect({
+                    nextRetryDelayInMilliseconds: retryContext => {
+                        if (retryContext.elapsedMilliseconds < 60000) return 2000;
+                        return 10000;
+                    }
+                })
                 .configureLogging(LogLevel.Information)
                 .build();
 
             // بدء الاتصال
             await this.hubConnection.start();
+            this.connectionStateSubject.next('Connected');
             console.log('✅ SignalR Connected!');
 
             // --- Robust Handling for Admin Channel ---
@@ -75,14 +86,50 @@ export class Signalr {
                 this.handleForceLogout();
             });
 
-            // Re-join channels on reconnected
+            // --- Connection Lifecycle Listeners ---
+            this.hubConnection.onreconnecting(() => {
+                console.warn('⚠️ SignalR Reconnecting...');
+                this.connectionStateSubject.next('Reconnecting');
+
+                // عرض تنبيه مستمر للموظف
+                this.swal.fire({
+                    title: 'انقطع الاتصال ⚠️',
+                    text: 'جاري محاولة إعادة الاتصال بالخادم... يرجى الانتظار.',
+                    icon: 'warning',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        this.swal.showLoading();
+                    }
+                });
+            });
+
             this.hubConnection.onreconnected(() => {
                 console.log('🔄 SignalR Reconnected. Re-joining channels...');
+                this.connectionStateSubject.next('Connected');
+
+                // إغلاق التنبيه السابق وإظهار نجاح
+                this.swal.close();
+                this.swal.success({
+                    title: 'تم استعادة الاتصال ✅',
+                    text: 'أنت الآن متصل بالخادم وتستقبل الإشعارات مرة أخرى.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
                 this.messageSubject.next({ type: 'reconnected', data: null, timestamp: new Date().toISOString() });
+            });
+
+            this.hubConnection.onclose(() => {
+                console.error('🔌 SignalR Disconnected and giving up.');
+                this.connectionStateSubject.next('Disconnected');
+                this.swal.close();
             });
 
         } catch (error) {
             console.error('❌ SignalR Connection Error:', error);
+            this.connectionStateSubject.next('Error');
         }
     }
 

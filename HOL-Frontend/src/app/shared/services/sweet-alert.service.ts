@@ -126,5 +126,12 @@ export class SweetAlertService {
   showLoading() {
     return Swal.showLoading();
   }
+
+  /**
+   * Close any open alert
+   */
+  close() {
+    Swal.close();
+  }
 }
 
