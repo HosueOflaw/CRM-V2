@@ -37,4 +37,13 @@ public class AutoNumber
 
     [Column("date_added")]
     public DateTime? DateAdded { get; set; }
+
+    [Column("dept_code")]
+    public int? DeptCode { get; set; }
+
+    [Column("import_job_id")]
+    public int? ImportJobId { get; set; }
+
+    [ForeignKey("ImportJobId")]
+    public virtual ImportJob? ImportJob { get; set; }
 }

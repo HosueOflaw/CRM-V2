@@ -63,6 +63,12 @@ public class Mainfile
     [Column("register_type")]
     public string? RegisterType { get; set; }
 
-    [Column("kafala_added_by")]
-    public int? KafalaAddedBy { get; set; }
+    [Column("added_by")]
+    public int? AddedBy { get; set; }
+
+    [Column("import_job_id")]
+    public int? ImportJobId { get; set; }
+
+    [ForeignKey("ImportJobId")]
+    public virtual ImportJob? ImportJob { get; set; }
 }

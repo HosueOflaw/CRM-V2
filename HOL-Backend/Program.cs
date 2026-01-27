@@ -148,6 +148,9 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IBreakService, BreakService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.MainfileImportWorker>();
+builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.AutoNumberImportWorker>();
+builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.FileDetailImportWorker>();
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<SessionValidationFilter>();

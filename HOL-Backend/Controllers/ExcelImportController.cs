@@ -1,0 +1,388 @@
+using House_of_law_api.Data;
+using House_of_law_api.Domain.Entities;
+using House_of_law_api.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using System.Security.Claims;
+using System.IO;
+using MiniExcelLibs;
+
+namespace House_of_law_api.Controllers;
+
+[Authorize]
+[ApiController]
+[Route("api/[controller]")]
+public class ExcelImportController : ControllerBase
+{
+  private readonly ApplicationDbContext _context;
+  private readonly string _uploadPath;
+  private readonly IMemoryCache _cache;
+
+  public ExcelImportController(ApplicationDbContext context, Microsoft.Extensions.Configuration.IConfiguration configuration, IMemoryCache cache)
+  {
+    _context = context;
+    _cache = cache;
+    _uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads", "excel_imports");
+
+    if (!Directory.Exists(_uploadPath))
+    {
+      Directory.CreateDirectory(_uploadPath);
+    }
+  }
+
+  [HttpPost("upload-mainfiles")]
+  public async Task<IActionResult> UploadMainfiles(IFormFile file, [FromForm] int? addedBy)
+  {
+    return await CreateJob(file, addedBy, "Mainfile");
+  }
+
+  [HttpPost("upload-autonumbers")]
+  public async Task<IActionResult> UploadAutoNumbers(IFormFile file, [FromForm] int? addedBy)
+  {
+    return await CreateJob(file, addedBy, "AutoNumber");
+  }
+
+  [HttpPost("upload-filedetails")]
+  public async Task<IActionResult> UploadFileDetails(IFormFile file, [FromForm] int? addedBy)
+  {
+    return await CreateJob(file, addedBy, "FileDetail");
+  }
+
+  private async Task<IActionResult> CreateJob(IFormFile file, int? addedBy, string jobType)
+  {
+    if (file == null || file.Length == 0)
+      return BadRequest("Please upload a valid Excel file.");
+
+    var extension = Path.GetExtension(file.FileName).ToLower();
+    if (extension != ".xlsx" && extension != ".xls")
+      return BadRequest("Only .xlsx and .xls files are supported.");
+
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+      return Unauthorized();
+
+    var creatorOrAddedById = addedBy ?? userId;
+
+    var fileName = $"{Guid.NewGuid()}{extension}";
+    var filePath = Path.Combine(_uploadPath, fileName);
+
+    using (var stream = new FileStream(filePath, FileMode.Create))
+    {
+      await file.CopyToAsync(stream);
+    }
+
+    var job = new ImportJob
+    {
+      FileName = fileName,
+      JobType = jobType,
+      Status = "Pending",
+      Progress = 0,
+      CreatedAt = DateTime.UtcNow,
+      CreatedById = creatorOrAddedById
+    };
+
+    _context.ImportJobs.Add(job);
+    await _context.SaveChangesAsync();
+
+    return Ok(new { jobId = job.Id, message = "File uploaded successfully. Processing started in background." });
+  }
+
+  [HttpGet("jobs")]
+  public async Task<IActionResult> GetMyJobs([FromQuery] PaginationParams pagination, [FromQuery] string? jobType)
+  {
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+      return Unauthorized();
+
+    var query = _context.ImportJobs
+        .Include(j => j.CreatedBy)
+        .Where(j => j.CreatedById == userId);
+
+    if (!string.IsNullOrEmpty(jobType))
+    {
+      query = query.Where(j => j.JobType == jobType);
+    }
+
+    var totalCount = await query.CountAsync();
+
+    var jobs = await query
+        .OrderByDescending(j => j.CreatedAt)
+        .Skip(pagination.Skip)
+        .Take(pagination.PageSize)
+        .Select(j => new {
+          j.Id,
+          j.FileName,
+          j.JobType,
+          j.Status,
+          j.Progress,
+          j.TotalRows,
+          j.ProcessedRows,
+          j.ErrorMessage,
+          j.CreatedAt,
+          j.CompletedAt,
+          CreatedBy = j.CreatedBy != null ? j.CreatedBy.FullName : "System"
+        })
+        .ToListAsync();
+
+    return Ok(new PagedResponse<object>
+    {
+      Data = jobs,
+      TotalCount = totalCount,
+      PageNumber = pagination.PageNumber,
+      PageSize = pagination.PageSize
+    });
+  }
+
+  [HttpGet("status/{jobId}")]
+  public async Task<IActionResult> GetJobStatus(int jobId)
+  {
+    var job = await _context.ImportJobs.FindAsync(jobId);
+    if (job == null) return NotFound();
+
+    return Ok(new
+    {
+      job.Id,
+      job.Status,
+      job.Progress,
+      job.ProcessedRows,
+      job.TotalRows,
+      job.ErrorMessage,
+      job.CompletedAt
+    });
+  }
+
+  [AllowAnonymous]
+  [HttpGet("download-template")]
+  public IActionResult DownloadTemplate()
+  {
+    try
+    {
+      var columns = new[]
+      {
+                new {
+                    Code = 0,
+                    Name = "",
+                    Cid = "",
+                    Address = "",
+                    Nationality = "",
+                    Note = "",
+                    Work = "",
+                    Membership = "",
+                    CompanyEmail = "",
+                    CompanyFax = "",
+                    CompanyRegister = "",
+                    Partner1 = "",
+                    Partner2 = "",
+                    Partner3 = "",
+                    RegisterType = ""
+                }
+            };
+
+      using var memoryStream = new MemoryStream();
+      memoryStream.SaveAs(columns);
+      var content = memoryStream.ToArray();
+
+      return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Mainfiles_Template.xlsx");
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(new { message = "Error generating template", detail = ex.Message });
+    }
+  }
+
+  [AllowAnonymous]
+  [HttpGet("download-autonumbers-template")]
+  public IActionResult DownloadAutoNumbersTemplate()
+  {
+    try
+    {
+      var columns = new[]
+      {
+                new {
+                    FileCode = 0L,
+                    AutoNumber = "",
+                    Type = "",
+                    CaseRef = "",
+                    Note = "",
+                    Claimant = "",
+                    DeptCode = 0
+                }
+            };
+
+      using var memoryStream = new MemoryStream();
+      memoryStream.SaveAs(columns);
+      var content = memoryStream.ToArray();
+
+      return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AutoNumbers_Template.xlsx");
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(new { message = "Error generating template", detail = ex.Message });
+    }
+  }
+    [AllowAnonymous]
+    [HttpGet("download-filedetails-template")]
+    public IActionResult DownloadFileDetailsTemplate()
+    {
+      try
+      {
+        var columns = new[]
+        {
+                new {
+                    FileCode = 0L,
+                    DeptCode = 0L,
+                    Reason = "",
+                    PatchNo = "",
+                    Client = 0,
+                    ContractNo = "",
+                    DeptAmount = 0.0m,
+                    LegalPlaintiff = "",
+                    LawyerUser = 0,
+                    CourtUser = 0,
+                    MdUser = 0,
+                    LegalAdvisorUser = 0
+                }
+            };
+
+        using var memoryStream = new MemoryStream();
+        memoryStream.SaveAs(columns);
+        var content = memoryStream.ToArray();
+
+        return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "FileDetails_Template.xlsx");
+      }
+      catch (Exception ex)
+      {
+        return BadRequest(new { message = "Error generating template", detail = ex.Message });
+      }
+    }
+
+    [HttpGet("download-original/{jobId}")]
+    public async Task<IActionResult> DownloadOriginal(int jobId)
+    {
+        var job = await _context.ImportJobs.FindAsync(jobId);
+        if (job == null) return NotFound("Job not found");
+
+        var filePath = Path.Combine(_uploadPath, job.FileName);
+        if (!System.IO.File.Exists(filePath)) return NotFound("Original file not found on server");
+
+        var content = await System.IO.File.ReadAllBytesAsync(filePath);
+        return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Original_{job.JobType}_{jobId}.xlsx");
+    }
+
+    [HttpDelete("revert/{jobId}")]
+    public async Task<IActionResult> RevertImport(int jobId)
+    {
+        var job = await _context.ImportJobs.FindAsync(jobId);
+        if (job == null) return NotFound("Job not found");
+
+        if (job.Status == "Processing") return BadRequest("Cannot revert a job that is currently processing.");
+
+        var strategy = _context.Database.CreateExecutionStrategy();
+        
+        try
+        {
+            await strategy.ExecuteAsync(async () =>
+            {
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    // Delete linked data
+                    if (job.JobType == "Mainfile")
+                    {
+                        var records = _context.Mainfiles.Where(m => m.ImportJobId == jobId);
+                        _context.Mainfiles.RemoveRange(records);
+                    }
+                    else if (job.JobType == "AutoNumber")
+                    {
+                        var records = _context.AutoNumbers.Where(a => a.ImportJobId == jobId);
+                        _context.AutoNumbers.RemoveRange(records);
+                    }
+                    else if (job.JobType == "FileDetail")
+                    {
+                        var records = _context.FileDetails.Where(f => f.ImportJobId == jobId);
+                        _context.FileDetails.RemoveRange(records);
+                    }
+
+                    // Remove the job record
+                    _context.ImportJobs.Remove(job);
+                    
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    // Clear cache for this job
+                    _cache.Remove($"job_data_{jobId}");
+
+                    // Try to delete the physical file (outside transaction but inside strategy is okay, 
+                    // though usually safer after commit)
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
+
+            // Delete file after successful commit
+            var filePath = Path.Combine(_uploadPath, job.FileName);
+            if (System.IO.File.Exists(filePath))
+            {
+                try { System.IO.File.Delete(filePath); } catch { }
+            }
+
+            return Ok(new { message = $"Job {jobId} and its associated data have been reverted successfully." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = "Error during revert", detail = ex.Message });
+        }
+    }
+
+    [HttpGet("job-data/{jobId}")]
+    public async Task<IActionResult> GetJobData(int jobId)
+    {
+        string cacheKey = $"job_data_{jobId}";
+        if (_cache.TryGetValue(cacheKey, out object cachedData))
+        {
+            return Ok(cachedData);
+        }
+
+        var job = await _context.ImportJobs.FindAsync(jobId);
+        if (job == null) return NotFound("العملية غير موجودة");
+
+        if (job.Status == "Pending" || job.Status == "Processing") 
+            return BadRequest(new { message = "العملية لا تزال قيد المعالجة، يرجى الانتظار حتى تكتمل." });
+
+        if (job.Status == "Failed")
+            return BadRequest(new { message = "هذه العملية فشلت: " + job.ErrorMessage });
+
+        object data = new List<object>();
+        if (job.JobType == "Mainfile")
+        {
+            data = await _context.Mainfiles.Where(m => m.ImportJobId == jobId).ToListAsync();
+        }
+        else if (job.JobType == "AutoNumber")
+        {
+            data = await _context.AutoNumbers.Where(a => a.ImportJobId == jobId).ToListAsync();
+        }
+        else if (job.JobType == "FileDetail")
+        {
+            data = await _context.FileDetails.Where(f => f.ImportJobId == jobId).ToListAsync();
+        }
+        else
+        {
+            return BadRequest("Unknown job type");
+        }
+
+        // Cache the result for 1 hour
+        var cacheOptions = new MemoryCacheEntryOptions()
+            .SetSlidingExpiration(TimeSpan.FromMinutes(30))
+            .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+
+        _cache.Set(cacheKey, data, cacheOptions);
+
+        return Ok(data);
+    }
+  }
+

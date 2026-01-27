@@ -85,7 +85,6 @@ public class ClientService : IClientService
             LegalPlaintiff = createDto.LegalClaimant,
             Reason = createDto.ContractDetails, // البيان - فقط contractDetails، مش Permissions
             PatchNo = createDto.PatchNo,
-            CourtEmployee = createDto.CourtEmployee,
             DateFinished = createDto.DateFinished,
             DeptAmount = createDto.DeptAmount,
             LawyerUser = createDto.LawyerUser,
@@ -93,18 +92,11 @@ public class ClientService : IClientService
             MdUser = createDto.MdUser,
             LegalAdvisorUser = createDto.LegalAdvisorUser,
             DateAdded = DateTime.UtcNow,
-            Client = createDto.Name,
-            // Permissions - في columns منفصلة
-            CanViewInvoices = createDto.Permissions?.CanViewInvoices,
-            CanViewAttachments = createDto.Permissions?.CanViewAttachments,
-            CanViewFinancialMatrix = createDto.Permissions?.CanViewFinancialMatrix,
-            CanReceiveAutomatedMessages = createDto.Permissions?.CanReceiveAutomatedMessages
+            Client = createDto.Code
         };
 
-        _logger.LogInformation("FileDetail to save: FileCode={FileCode}, Reason={Reason}, Permissions: ViewInvoices={ViewInvoices}, ViewAttachments={ViewAttachments}, ViewFinancial={ViewFinancial}, ReceiveMessages={ReceiveMessages}",
-            fileDetail.FileCode, fileDetail.Reason ?? "NULL",
-            fileDetail.CanViewInvoices, fileDetail.CanViewAttachments, 
-            fileDetail.CanViewFinancialMatrix, fileDetail.CanReceiveAutomatedMessages);
+        _logger.LogInformation("FileDetail to save: FileCode={FileCode}, Reason={Reason}",
+            fileDetail.FileCode, fileDetail.Reason ?? "NULL");
 
         await _fileDetailRepository.AddAsync(fileDetail);
         

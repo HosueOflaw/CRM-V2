@@ -4,6 +4,7 @@ using House_of_law_api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace House_of_law_api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260126080455_AddImportJobsTable")]
+    partial class AddImportJobsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -193,17 +196,9 @@ namespace House_of_law_api.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("date_added");
 
-                    b.Property<int?>("DeptCode")
-                        .HasColumnType("int")
-                        .HasColumnName("dept_code");
-
                     b.Property<long?>("FileCode")
                         .HasColumnType("bigint")
                         .HasColumnName("file_code");
-
-                    b.Property<int?>("ImportJobId")
-                        .HasColumnType("int")
-                        .HasColumnName("import_job_id");
 
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)")
@@ -222,8 +217,6 @@ namespace House_of_law_api.Migrations
                         .HasColumnName("user_added");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ImportJobId");
 
                     b.ToTable("auto_numbers");
                 });
@@ -436,13 +429,33 @@ namespace House_of_law_api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("Client")
-                        .HasColumnType("int")
+                    b.Property<bool?>("CanReceiveAutomatedMessages")
+                        .HasColumnType("bit")
+                        .HasColumnName("can_receive_automated_messages");
+
+                    b.Property<bool?>("CanViewAttachments")
+                        .HasColumnType("bit")
+                        .HasColumnName("can_view_attachments");
+
+                    b.Property<bool?>("CanViewFinancialMatrix")
+                        .HasColumnType("bit")
+                        .HasColumnName("can_view_financial_matrix");
+
+                    b.Property<bool?>("CanViewInvoices")
+                        .HasColumnType("bit")
+                        .HasColumnName("can_view_invoices");
+
+                    b.Property<string>("Client")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("client");
 
                     b.Property<string>("ContractNo")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("contract_no");
+
+                    b.Property<int?>("CourtEmployee")
+                        .HasColumnType("int")
+                        .HasColumnName("court_employee");
 
                     b.Property<int?>("CourtUser")
                         .HasColumnType("int")
@@ -467,10 +480,6 @@ namespace House_of_law_api.Migrations
                     b.Property<long?>("FileCode")
                         .HasColumnType("bigint")
                         .HasColumnName("file_code");
-
-                    b.Property<int?>("ImportJobId")
-                        .HasColumnType("int")
-                        .HasColumnName("import_job_id");
 
                     b.Property<int?>("LawyerUser")
                         .HasColumnType("int")
@@ -497,8 +506,6 @@ namespace House_of_law_api.Migrations
                         .HasColumnName("reason");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ImportJobId");
 
                     b.ToTable("file_details");
                 });
@@ -562,11 +569,6 @@ namespace House_of_law_api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("file_name");
-
-                    b.Property<string>("JobType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("job_type");
 
                     b.Property<int>("ProcessedRows")
                         .HasColumnType("int")
@@ -680,10 +682,6 @@ namespace House_of_law_api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<int?>("AddedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("added_by");
-
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("address");
@@ -716,9 +714,9 @@ namespace House_of_law_api.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("date_added");
 
-                    b.Property<int?>("ImportJobId")
+                    b.Property<int?>("KafalaAddedBy")
                         .HasColumnType("int")
-                        .HasColumnName("import_job_id");
+                        .HasColumnName("kafala_added_by");
 
                     b.Property<string>("Membership")
                         .HasColumnType("nvarchar(max)")
@@ -757,8 +755,6 @@ namespace House_of_law_api.Migrations
                         .HasColumnName("work");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ImportJobId");
 
                     b.ToTable("mainfiles");
                 });
@@ -1072,15 +1068,6 @@ namespace House_of_law_api.Migrations
                     b.ToTable("user_breaks");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.AutoNumber", b =>
-                {
-                    b.HasOne("House_of_law_api.Domain.Entities.ImportJob", "ImportJob")
-                        .WithMany()
-                        .HasForeignKey("ImportJobId");
-
-                    b.Navigation("ImportJob");
-                });
-
             modelBuilder.Entity("House_of_law_api.Domain.Entities.EmployeeTask", b =>
                 {
                     b.HasOne("House_of_law_api.Domain.Entities.User", "AssignedTo")
@@ -1098,15 +1085,6 @@ namespace House_of_law_api.Migrations
                     b.Navigation("AssignedTo");
 
                     b.Navigation("CreatedBy");
-                });
-
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.FileDetail", b =>
-                {
-                    b.HasOne("House_of_law_api.Domain.Entities.ImportJob", "ImportJob")
-                        .WithMany()
-                        .HasForeignKey("ImportJobId");
-
-                    b.Navigation("ImportJob");
                 });
 
             modelBuilder.Entity("House_of_law_api.Domain.Entities.ImportJob", b =>
@@ -1129,15 +1107,6 @@ namespace House_of_law_api.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.Mainfile", b =>
-                {
-                    b.HasOne("House_of_law_api.Domain.Entities.ImportJob", "ImportJob")
-                        .WithMany()
-                        .HasForeignKey("ImportJobId");
-
-                    b.Navigation("ImportJob");
                 });
 
             modelBuilder.Entity("House_of_law_api.Domain.Entities.PermissionRequest", b =>

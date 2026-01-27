@@ -50,7 +50,6 @@ public class CreateClientDto
 
     // FileDetail additional fields
     public string? PatchNo { get; set; }
-    public int? CourtEmployee { get; set; }
     public DateTime? DateFinished { get; set; }
     public decimal? DeptAmount { get; set; }
     public int? LawyerUser { get; set; }
@@ -60,9 +59,6 @@ public class CreateClientDto
 
     // Contacts
     public List<ClientContactDto> Contacts { get; set; } = new();
-
-    // Permissions
-    public ClientPermissionsDto? Permissions { get; set; }
 
     // Financial Entries
     public List<ClientFinancialEntryDto> FinancialEntries { get; set; } = new();
@@ -77,14 +73,6 @@ public class ClientContactDto
     public int Id { get; set; } // Add Id for deletion
     public string Phone { get; set; } = string.Empty;
     public string Relation { get; set; } = string.Empty; // نسبة القرابة
-}
-
-public class ClientPermissionsDto
-{
-    public bool CanViewInvoices { get; set; }
-    public bool CanViewAttachments { get; set; }
-    public bool CanViewFinancialMatrix { get; set; }
-    public bool CanReceiveAutomatedMessages { get; set; }
 }
 
 public class ClientFinancialEntryDto

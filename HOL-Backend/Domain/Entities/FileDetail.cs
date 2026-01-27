@@ -23,11 +23,9 @@ public class FileDetail
     [Column("patch_no")]
     public string? PatchNo { get; set; }
 
-    [Column("court_employee")]
-    public int? CourtEmployee { get; set; }
 
     [Column("client")]
-    public string? Client { get; set; }
+    public int? Client { get; set; }
 
     [Column("date_added")]
     public DateTime? DateAdded { get; set; }
@@ -56,16 +54,9 @@ public class FileDetail
     [Column("legal_advisor_user")]
     public int? LegalAdvisorUser { get; set; }
 
-    // Permissions columns
-    [Column("can_view_invoices")]
-    public bool? CanViewInvoices { get; set; }
+    [Column("import_job_id")]
+    public int? ImportJobId { get; set; }
 
-    [Column("can_view_attachments")]
-    public bool? CanViewAttachments { get; set; }
-
-    [Column("can_view_financial_matrix")]
-    public bool? CanViewFinancialMatrix { get; set; }
-
-    [Column("can_receive_automated_messages")]
-    public bool? CanReceiveAutomatedMessages { get; set; }
+    [ForeignKey("ImportJobId")]
+    public virtual ImportJob? ImportJob { get; set; }
 }

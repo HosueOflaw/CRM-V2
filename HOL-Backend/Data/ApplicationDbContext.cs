@@ -27,6 +27,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<PermissionRequest> PermissionRequests => Set<PermissionRequest>();
     public DbSet<EmployeeTask> EmployeeTasks { get; set; }
     public DbSet<LoginHistory> LoginHistories { get; set; }
+    public DbSet<ImportJob> ImportJobs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
