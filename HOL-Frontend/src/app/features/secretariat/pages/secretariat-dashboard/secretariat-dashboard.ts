@@ -237,7 +237,7 @@ confirmCommonOption() {
     if (this.selectedOption === 'onlyOne') {
       window.open('secretariat/upload-files', '_blank');
     } else if (this.selectedOption === 'excel') {
-      window.open('secretariat/upload-excel', '_blank');
+      window.open('secretariat/import-mainfiles', '_blank');
     }
   }
 
@@ -258,7 +258,7 @@ confirmCommonOption() {
     } else if (this.selectedOption === 'manual') {
       this.showEditForm = true;
     } else if (this.selectedOption === 'excel') {
-      window.open('secretariat/upload-excel', '_blank');
+      window.open('secretariat/import-autonumbers', '_blank');
     }
   }
   if (this.currentFormTitle === 'اغلاق ملف') {

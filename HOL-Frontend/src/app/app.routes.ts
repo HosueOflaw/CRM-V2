@@ -78,10 +78,16 @@ export const routes: Routes = [
               import('./features/secretariat/secretariat-routes').then((m) => m.SECRETARIAT_ROUTES),
           },
           {
-            path: 'upload-excel',
-            data: { title: 'رفع أكسيل | السكرتارية' },
+            path: 'import-mainfiles',
+            data: { title: 'استيراد الموكلين | السكرتارية' },
             loadComponent: () =>
-              import('./features/secretariat/pages/upload-excel/upload-excel').then((m) => m.UploadExcel),
+              import('./features/secretariat/pages/import-mainfiles/import-mainfiles').then((m) => m.ImportMainfilesPage),
+          },
+          {
+            path: 'import-autonumbers',
+            data: { title: 'استيراد Auto Numbers | السكرتارية' },
+            loadComponent: () =>
+              import('./features/secretariat/pages/import-autonumbers/import-autonumbers').then((m) => m.ImportAutoNumbersPage),
           },
           {
             path: 'upload-files',

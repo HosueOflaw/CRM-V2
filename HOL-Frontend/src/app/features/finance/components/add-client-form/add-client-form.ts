@@ -3,7 +3,7 @@ import { Component, inject, Input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ClientService, CreateClientDto } from '../../services/ClientService';
 import { LookupModal } from "../../../../shared/components/lookup-modal/lookup-modal";
-import Swal from 'sweetalert2'; 
+import Swal from 'sweetalert2';
 // import { Subscription } from 'rxjs';
 
 
@@ -15,17 +15,17 @@ import Swal from 'sweetalert2';
   styleUrl: './add-client-form.css'
 })
 export class AddClientForm {
-@Input() showModal!: any;
-// private signalRService = inject(SignalRService);
+  @Input() showModal!: any;
+  // private signalRService = inject(SignalRService);
   // private signalRSubscription?: Subscription;
 
   activeTab = signal<'basic' | 'contacts' | 'financial' | 'attachments'>('basic');
 
-financialEntries = signal<Array<{ type: string; values: Record<string, string> }>>([]);
- 
-isSaving = signal(false);
- 
- clientForm = {
+  financialEntries = signal<Array<{ type: string; values: Record<string, string> }>>([]);
+
+  isSaving = signal(false);
+
+  clientForm = {
     code: 0,
     name: '',
     cid: '',
@@ -47,19 +47,12 @@ isSaving = signal(false);
     legalClaimant: '',
     contractDetails: '',
     patchNo: '',
-    courtEmployee: 0,
     dateFinished: null as Date | null,
     deptAmount: 0,
     lawyerUser: 0,
     courtUser: 0,
     mdUser: 0,
-    legalAdvisorUser: 0,
-    permissions: {
-      canViewInvoices: false,
-      canViewAttachments: false,
-      canViewFinancialMatrix: false,
-      canReceiveAutomatedMessages: false
-    }
+    legalAdvisorUser: 0
   };
 
   financialTypes = [
@@ -68,19 +61,19 @@ isSaving = signal(false);
     'عمولة تحصيل',
   ];
 
- contacts: Array<{ phone: string; relation: string }> = [];
+  contacts: Array<{ phone: string; relation: string }> = [];
   newContact = { phone: '', relation: '' };
-  
+
   attachments: Array<{ file: File; note: string }> = [];
   selectedFile: File | null = null;
   attachmentNote = '';
 
-    newFinancialEntry = { type: '' };
+  newFinancialEntry = { type: '' };
 
- years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
+  years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
   sectors = ['تجاري', 'مدني', 'جنائي'];
 
-    clientsData = [
+  clientsData = [
     { code: 'C001', name: 'محمد أحمد' },
     { code: 'C002', name: 'سارة علي' },
     { code: 'C003', name: 'خالد حسن' },
@@ -96,7 +89,7 @@ isSaving = signal(false);
     { key: 'action', label: 'اجراء' }
   ];
 
-  constructor(private clientService: ClientService) {}
+  constructor(private clientService: ClientService) { }
 
   openModal() {
     this.showModal.set(true);
@@ -130,19 +123,12 @@ isSaving = signal(false);
       legalClaimant: '',
       contractDetails: '',
       patchNo: '',
-      courtEmployee: 0,
       dateFinished: null,
       deptAmount: 0,
       lawyerUser: 0,
       courtUser: 0,
       mdUser: 0,
-      legalAdvisorUser: 0,
-      permissions: {
-        canViewInvoices: false,
-        canViewAttachments: false,
-        canViewFinancialMatrix: false,
-        canReceiveAutomatedMessages: false
-      }
+      legalAdvisorUser: 0
     };
     this.contacts = [];
     this.attachments = [];
@@ -151,14 +137,14 @@ isSaving = signal(false);
     this.financialEntries.set([]);
   }
 
-   addContact() {
+  addContact() {
     if (this.newContact.phone && this.newContact.relation) {
       this.contacts.push({ ...this.newContact });
       this.newContact = { phone: '', relation: '' };
     }
   }
 
-   removeContact(contact: any) {
+  removeContact(contact: any) {
     this.contacts = this.contacts.filter(c => c !== contact);
 
   }
@@ -170,7 +156,7 @@ isSaving = signal(false);
     }
   }
 
- addAttachmentToQueue() {
+  addAttachmentToQueue() {
     if (this.selectedFile) {
       this.attachments.push({
         file: this.selectedFile,
@@ -178,18 +164,18 @@ isSaving = signal(false);
       });
       this.selectedFile = null;
       this.attachmentNote = '';
-      
+
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
     }
   }
 
 
-removeAttachment(att: any) {
+  removeAttachment(att: any) {
     this.attachments = this.attachments.filter(a => a !== att);
   }
 
- addFinancialEntry() {
+  addFinancialEntry() {
     if (!this.newFinancialEntry.type) {
       Swal.fire({
         icon: 'warning',
@@ -213,17 +199,17 @@ removeAttachment(att: any) {
     }
 
     // ✅ إضافة النوع الجديد
-    this.financialEntries.update(entries => [...entries, { 
+    this.financialEntries.update(entries => [...entries, {
       type: this.newFinancialEntry.type,
       values: {} // Initialize empty values
     }]);
     this.newFinancialEntry = { type: '' };
   }
 
-   deleteFinancialEntry(entry: any) {
+  deleteFinancialEntry(entry: any) {
     this.financialEntries.update(entries => entries.filter(e => e !== entry));
   }
-    updateFinancialValue(event: any, entry: any, colKey: string) {
+  updateFinancialValue(event: any, entry: any, colKey: string) {
     const value = event.target.textContent?.trim() || '';
     entry.values = entry.values || {};
     entry.values[colKey] = value;
@@ -235,7 +221,7 @@ removeAttachment(att: any) {
   }
 
 
-async addClient() {
+  async addClient() {
     if (!this.clientForm.code || !this.clientForm.name) {
       await Swal.fire({
         icon: 'warning',
@@ -282,7 +268,6 @@ async addClient() {
         legalClaimant: this.clientForm.legalClaimant || undefined,
         contractDetails: this.clientForm.contractDetails || undefined,
         patchNo: this.clientForm.patchNo || undefined,
-        courtEmployee: this.clientForm.courtEmployee || undefined,
         dateFinished: this.clientForm.dateFinished || undefined,
         deptAmount: this.clientForm.deptAmount || undefined,
         lawyerUser: this.clientForm.lawyerUser || undefined,
@@ -290,7 +275,6 @@ async addClient() {
         mdUser: this.clientForm.mdUser || undefined,
         legalAdvisorUser: this.clientForm.legalAdvisorUser || undefined,
         contacts: this.contacts,
-        permissions: this.clientForm.permissions,
         financialEntries: this.financialEntries().map(e => ({
           type: e.type,
           values: e.values
@@ -347,7 +331,7 @@ async addClient() {
       this.closeModal();
     } catch (error: any) {
       console.error('Error:', error);
-      
+
       let errorMessage = 'حدث خطأ غير متوقع';
       if (error.error?.error) {
         errorMessage = error.error.error;

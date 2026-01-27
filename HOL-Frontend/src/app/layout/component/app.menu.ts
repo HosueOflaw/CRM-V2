@@ -174,8 +174,9 @@ export class AppMenu implements OnInit, OnDestroy {
                 icon: 'pi pi-fw pi-file',
                 items: [
                     { label: 'لوحة التحكم', icon: 'pi pi-fw pi-th-large', routerLink: ['/secretariat'] },
-                    { label: 'رفع أكسيل', icon: 'pi pi-fw pi-upload', routerLink: ['/secretariat/upload-excel'] },
-                    { label: 'رفع الملفات', icon: 'pi pi-fw pi-file-upload', routerLink: ['/secretariat/upload-files'] },
+                    { label: 'رفع الملفات (Excel)', icon: 'pi pi-fw pi-file-excel', routerLink: ['/secretariat/import-mainfiles'] },
+                    { label: 'رفع ملفات (Details Excel)', icon: 'pi pi-fw pi-file-excel', routerLink: ['/secretariat/import-filedetails'] },
+                    { label: 'رفع ملفات (Auto Numbers)', icon: 'pi pi-fw pi-sort-numeric-down', routerLink: ['/secretariat/import-autonumbers'] },
                     { label: 'انتظار العملاء', icon: 'pi pi-fw pi-clock', routerLink: ['/secretariat/waiting-clients'] },
                     { label: 'أرقام الصادر والوارد', icon: 'pi pi-fw pi-sort-numeric-up', routerLink: ['/secretariat/export-and-import-num'] },
                     { label: 'طباعة تكاليف بالوفاء', icon: 'pi pi-fw pi-print', routerLink: ['/secretariat/costs-print'] },

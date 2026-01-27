@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { SubTabs } from '../../shared/sub-tabs/sub-tabs';
-import {  MainTabs } from './clients-table/main-tabs';
+import { MainTabs } from './clients-table/main-tabs';
 import { WorkForm } from './forms/work-form/work-form';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -19,7 +19,7 @@ import { AttachmentsForm } from './forms/attachments-form/attachments-form';
 
 @Component({
   selector: 'app-clients-page',
-  imports: [SubTabs, MainTabs, WorkForm, CommonModule, FormsModule, ReactiveFormsModule, MainForm, LastActionModal, DateModal, NextDateModal, NextActionModal, JusticePortalForm, ClassificationForm, JudgmentForm,AddressForm,SessionForm,AttachmentsForm,ClaimValue],
+  imports: [SubTabs, MainTabs, WorkForm, CommonModule, FormsModule, ReactiveFormsModule, MainForm, LastActionModal, DateModal, NextDateModal, NextActionModal, JusticePortalForm, ClassificationForm, JudgmentForm, AddressForm, SessionForm, AttachmentsForm, ClaimValue],
   templateUrl: './clients-page.html',
   styleUrl: './clients-page.css'
 })
@@ -28,7 +28,7 @@ export class ClientsPage {
   @ViewChild(DateModal) lastActionDateModal!: DateModal;
   @ViewChild(NextActionModal) nextActionModal!: NextActionModal;
   @ViewChild(NextDateModal) nextActionDateModal!: NextDateModal;
-    actionsForm: FormGroup;
+  actionsForm: FormGroup;
 
 
 
@@ -45,20 +45,21 @@ export class ClientsPage {
     });
   }
   selectedTab = 'جهة العمل';
-  subTabs = ['الرئيسية', 'التصنيف','جهة العمل', 'منطوق الحكم', 'العنوان', 'الجلسات', 'الرسوم', 'قيمة المطالبة',  'المرفقات', 'الإجراءات'];
+  subTabs = ['الرئيسية', 'التصنيف', 'جهة العمل', 'منطوق الحكم', 'العنوان', 'الجلسات', 'الرسوم', 'قيمة المطالبة', 'المرفقات', 'الإجراءات'];
 
   client = {
     owner: '',
-    opponent:"",
-    civil:"",
-    condition:"",
-    nationality:"",
-    automaticNo:"",
-    contract:"",
-    indebtedness:"",
-    unified:"",
-    patch:"",
-    address:"",
+    opponent: "",
+    civil: "",
+    condition: "",
+    nationality: "",
+    automaticNo: "",
+    contract: "",
+    indebtedness: "",
+    unified: "",
+    patch: "",
+    address: "",
+    addedBy: "",
   };
 
   form = {
@@ -68,7 +69,7 @@ export class ClientsPage {
     notes: '',
   };
 
-  fees = { claimValue: 0, feesValue: 0,lawValue:0 };
+  fees = { claimValue: 0, feesValue: 0, lawValue: 0 };
   feesTable = [
     { name: 'رسوم تسجيل', value: 150 },
     { name: 'رسوم محكمة', value: 300 },
@@ -83,13 +84,13 @@ export class ClientsPage {
   onSubTabChange(tab: string) {
     this.selectedTab = tab;
   }
-openLastActionForm() {
+  openLastActionForm() {
     this.lastActionModal.open();
   }
-openNextActionForm() {
+  openNextActionForm() {
     this.nextActionModal.open();
   }
-   setLastAction(action: any) {
+  setLastAction(action: any) {
     this.actionsForm.patchValue({ lastAction: action.desc });
   }
 
@@ -107,41 +108,41 @@ openNextActionForm() {
   // عند اختيار آخر إجراء
   onLastActionSelected(action: string) {
     this.actionsForm.patchValue({ lastAction: action });
-  this.lastActionModal.close();
-  setTimeout(() => this.lastActionDateModal.open(), 200);
+    this.lastActionModal.close();
+    setTimeout(() => this.lastActionDateModal.open(), 200);
   }
 
   // عند اختيار تاريخ آخر إجراء
   onLastDateSelected(date: string) {
-     this.actionsForm.patchValue({ lastActionDate: date });
-      this.lastActionDateModal.close();
-      setTimeout(() => this.nextActionModal.open(), 200);
+    this.actionsForm.patchValue({ lastActionDate: date });
+    this.lastActionDateModal.close();
+    setTimeout(() => this.nextActionModal.open(), 200);
   }
 
   // عند اختيار الإجراء القادم
   onNextActionSelected(action: string) {
     this.actionsForm.patchValue({ nextAction: action });
-  this.nextActionModal.close();
-  setTimeout(() => this.nextActionDateModal.open(), 200);
+    this.nextActionModal.close();
+    setTimeout(() => this.nextActionDateModal.open(), 200);
   }
 
   // عند اختيار تاريخ الإجراء القادم
   onNextDateSelected(date: string) {
-this.actionsForm.patchValue({ nextActionDate: date });
+    this.actionsForm.patchValue({ nextActionDate: date });
 
-  const { lastAction, lastActionDate, nextAction, nextActionDate, fileLocation } = this.actionsForm.value;
+    const { lastAction, lastActionDate, nextAction, nextActionDate, fileLocation } = this.actionsForm.value;
 
-  const summaryText = `آخر إجراء: ${lastAction || '-'} بتاريخ ${lastActionDate || '-'}، 
+    const summaryText = `آخر إجراء: ${lastAction || '-'} بتاريخ ${lastActionDate || '-'}، 
 الإجراء القادم: ${nextAction || '-'} بتاريخ ${nextActionDate || '-'}، 
 مكان الملف: ${fileLocation || '-'}`;
 
-  this.actionsForm.patchValue({
-    summary: summaryText,
-    notes: summaryText
-  });
+    this.actionsForm.patchValue({
+      summary: summaryText,
+      notes: summaryText
+    });
   }
 
-  save(){
+  save() {
     console.clear();
   }
 }

@@ -332,6 +332,28 @@ export class Signalr {
                     type: 'success'
                 });
                 break;
+
+            // --- Excel Import ---
+            case 'excel_import_progress':
+                // We typically don't show toast for every 1% increase to avoid spam
+                // But we can update the message subject so the component knows
+                break;
+
+            case 'excel_import_complete':
+                const eicFileName = this.getProp(data, ['fileName']);
+                this.swal.success({
+                    title: 'تم استيراد البيانات بنجاح! ✅',
+                    text: `ملف "${eicFileName || 'البيانات'}" تمت معالجته بالكامل وتم إدخال كافة البيانات في النظام.`,
+                    confirmButtonText: 'ممتاز',
+                    timer: 5000
+                });
+
+                this.notificationService.addNotification({
+                    title: 'استيراد بيانات',
+                    message: `تم الانتهاء من استيراد ملف: ${eicFileName || 'البيانات'}`,
+                    type: 'success'
+                });
+                break;
         }
 
         // Notify subscribers to refresh UI
