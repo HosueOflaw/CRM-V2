@@ -97,6 +97,55 @@ public class FileDetailImportWorker : BackgroundService
             
             job.TotalRows = allRows.Count;
             LogToFile($"DEBUG: Excel read complete. Found {allRows.Count} rows in file.");
+            
+            // --- CRITICAL SIGNATURE CHECK ---
+            if (allRows.Count > 0) {
+                var firstRow = allRows[0] as IDictionary<string, object>;
+                var keys = firstRow.Keys.Select(k => k.Trim().ToLower()).ToList();
+                if (!keys.Contains("كود الملف") || !keys.Contains("كود المديونية") || !keys.Contains("المبلغ المختص")) {
+                    job.Status = "Failed";
+                    job.ErrorMessage = "خطأ فادح: بنية الملف غير متوافقة مع تفاصيل الملفات. يرجى استخدام النموذج الصحيح.";
+                    await context.SaveChangesAsync(stoppingToken);
+                    return;
+                }
+            }
+
+            // --- VALIDATION PASS ---
+            var validationErrors = new List<string>();
+            int rowNum = 1;
+            foreach (IDictionary<string, object> row in allRows)
+            {
+                rowNum++;
+                string GetRowVal(string key) {
+                    var k = row.Keys.FirstOrDefault(x => x.Equals(key, StringComparison.OrdinalIgnoreCase));
+                    return k != null ? row[k]?.ToString() : null;
+                }
+
+                var fileCode = GetRowVal("كود الملف");
+                var amount = GetRowVal("المبلغ المختص");
+                var dateFin = GetRowVal("تاريخ الانتهاء");
+
+                if (!string.IsNullOrEmpty(fileCode) && !long.TryParse(fileCode, out _))
+                    validationErrors.Add($"السطر {rowNum}: كود الملف غير صالح.");
+                
+                if (!string.IsNullOrEmpty(amount) && !decimal.TryParse(amount, out _))
+                    validationErrors.Add($"السطر {rowNum}: المبلغ المختص يجب أن يكون رقماً.");
+
+                if (!string.IsNullOrEmpty(dateFin) && !DateTime.TryParse(dateFin, out _))
+                    validationErrors.Add($"السطر {rowNum}: تاريخ الانتهاء غير صحيح.");
+
+                if (validationErrors.Count > 10) break;
+            }
+
+            if (validationErrors.Any())
+            {
+                job.Status = "Failed";
+                job.ErrorMessage = "فشل التحقق: " + string.Join(" | ", validationErrors);
+                await context.SaveChangesAsync(stoppingToken);
+                return;
+            }
+            // --- END VALIDATION PASS ---
+
             await context.SaveChangesAsync(stoppingToken);
 
             foreach (IDictionary<string, object> row in allRows)

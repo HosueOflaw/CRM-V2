@@ -99,6 +99,45 @@ public class MainfileImportWorker : BackgroundService
             
             job.TotalRows = allRows.Count;
             LogToFile($"DEBUG: Excel read complete. Found {allRows.Count} rows in file.");
+            
+            // --- CRITICAL SIGNATURE CHECK ---
+            if (allRows.Count > 0) {
+                var firstRow = allRows[0] as IDictionary<string, object>;
+                var keys = firstRow.Keys.Select(k => k.Trim().ToLower()).ToList();
+                if (!keys.Contains("الكود") || !keys.Contains("الاسم")) {
+                    job.Status = "Failed";
+                    job.ErrorMessage = "خطأ فادح: بنية الملف غير متوافقة مع البيانات الرئيسية. يرجى استخدام النموذج الصحيح.";
+                    await context.SaveChangesAsync(stoppingToken);
+                    return;
+                }
+            }
+            
+            // --- VALIDATION PASS ---
+            var validationErrors = new List<string>();
+            int rowNum = 1; // Header is 1, data starts at 2
+            foreach (IDictionary<string, object> row in allRows)
+            {
+                rowNum++;
+                var codeStr = row.Keys.FirstOrDefault(x => x.Equals("الكود", StringComparison.OrdinalIgnoreCase)) != null 
+                    ? row[row.Keys.First(x => x.Equals("الكود", StringComparison.OrdinalIgnoreCase))]?.ToString() : null;
+                
+                if (!string.IsNullOrEmpty(codeStr) && !int.TryParse(codeStr, out _))
+                {
+                    validationErrors.Add($"السطر {rowNum}: الكود يجب أن يكون رقماً صحيحاً.");
+                }
+
+                if (validationErrors.Count > 10) break; // Limit errors
+            }
+
+            if (validationErrors.Any())
+            {
+                job.Status = "Failed";
+                job.ErrorMessage = "فشل التحقق من صحة البيانات: " + string.Join(" | ", validationErrors);
+                await context.SaveChangesAsync(stoppingToken);
+                return;
+            }
+            // --- END VALIDATION PASS ---
+
             await context.SaveChangesAsync(stoppingToken);
 
             foreach (IDictionary<string, object> row in allRows)

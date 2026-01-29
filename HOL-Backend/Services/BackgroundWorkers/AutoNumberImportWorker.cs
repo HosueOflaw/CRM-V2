@@ -97,6 +97,48 @@ public class AutoNumberImportWorker : BackgroundService
             
             job.TotalRows = allRows.Count;
             LogToFile($"DEBUG: Excel read complete. Found {allRows.Count} rows in file.");
+            
+            // --- CRITICAL SIGNATURE CHECK ---
+            if (allRows.Count > 0) {
+                var firstRow = allRows[0] as IDictionary<string, object>;
+                var keys = firstRow.Keys.Select(k => k.Trim().ToLower()).ToList();
+                if (!keys.Contains("كود الملف") || !keys.Contains("الرقم الآلي")) {
+                    job.Status = "Failed";
+                    job.ErrorMessage = "خطأ فادح: بنية الملف غير متوافقة مع الأرقام الآلية. يرجى استخدام النموذج الصحيح.";
+                    await context.SaveChangesAsync(stoppingToken);
+                    return;
+                }
+            }
+
+            // --- VALIDATION PASS ---
+            var validationErrors = new List<string>();
+            int rowNum = 1; 
+            foreach (IDictionary<string, object> row in allRows)
+            {
+                rowNum++;
+                var fileCodeStr = row.Keys.FirstOrDefault(x => x.Equals("كود الملف", StringComparison.OrdinalIgnoreCase)) != null 
+                    ? row[row.Keys.First(x => x.Equals("كود الملف", StringComparison.OrdinalIgnoreCase))]?.ToString() : null;
+                var deptCodeStr = row.Keys.FirstOrDefault(x => x.Equals("كود المديونية", StringComparison.OrdinalIgnoreCase)) != null 
+                    ? row[row.Keys.First(x => x.Equals("كود المديونية", StringComparison.OrdinalIgnoreCase))]?.ToString() : null;
+                
+                if (!string.IsNullOrEmpty(fileCodeStr) && !long.TryParse(fileCodeStr, out _))
+                    validationErrors.Add($"السطر {rowNum}: كود الملف يجب أن يكون رقماً.");
+                
+                if (!string.IsNullOrEmpty(deptCodeStr) && !int.TryParse(deptCodeStr, out _))
+                    validationErrors.Add($"السطر {rowNum}: كود المديونية يجب أن يكون رقماً.");
+
+                if (validationErrors.Count > 10) break;
+            }
+
+            if (validationErrors.Any())
+            {
+                job.Status = "Failed";
+                job.ErrorMessage = "فشل التحقق: " + string.Join(" | ", validationErrors);
+                await context.SaveChangesAsync(stoppingToken);
+                return;
+            }
+            // --- END VALIDATION PASS ---
+
             await context.SaveChangesAsync(stoppingToken);
 
             foreach (IDictionary<string, object> row in allRows)

@@ -27,6 +27,72 @@ public class ExcelImportController : ControllerBase
     }
   }
 
+  private (List<string> required, List<string> forbidden) GetValidationRules(string jobType)
+  {
+      return jobType switch
+      {
+          "Mainfile" => (
+              new List<string> { "الكود", "الاسم" },
+              new List<string> { "الرقم الآلي", "رقم القيد", "المبلغ المختص" }
+          ),
+          "AutoNumber" => (
+              new List<string> { "كود الملف", "الرقم الآلي" },
+              new List<string> { "السبب", "رقم القيد", "المبلغ المختص", "الاسم" }
+          ),
+          "FileDetail" => (
+              new List<string> { "كود الملف", "كود المديونية", "المبلغ المختص" },
+              new List<string> { "الرقم الآلي", "الاسم" }
+          ),
+          _ => (new List<string>(), new List<string>())
+      };
+  }
+
+  private async Task<(bool isValid, string errorMessage)> ValidateExcelHeaders(IFormFile file, string jobType)
+  {
+      try
+      {
+          using var stream = file.OpenReadStream();
+          // Read first row without skipping headers
+          var firstRow = MiniExcel.Query(stream).FirstOrDefault() as IDictionary<string, object>;
+          
+          if (firstRow == null) return (false, "الملف فارغ");
+
+          var columns = firstRow.Values
+              .Select(v => v?.ToString()?.Trim())
+              .Where(v => !string.IsNullOrEmpty(v))
+              .ToList();
+
+          var (required, forbidden) = GetValidationRules(jobType);
+
+          // 1. Check Missing Columns
+          var missing = required.Where(h => !columns.Any(c => c.Equals(h, StringComparison.OrdinalIgnoreCase))).ToList();
+          if (missing.Any())
+          {
+              return (false, $"هذا الملف لا يبدو ملف {GetJobTypeAr(jobType)}. يفتقد للأعمدة الأساسية: {string.Join(", ", missing)}");
+          }
+
+          // 2. Check Forbidden Columns (Powerful Isolation)
+          var foundForbidden = forbidden.Where(h => columns.Any(c => c.Equals(h, StringComparison.OrdinalIgnoreCase))).ToList();
+          if (foundForbidden.Any())
+          {
+              return (false, $"خطأ: هذا الملف يحتوي على أعمدة لا تنتمي لعملية {GetJobTypeAr(jobType)} ({string.Join(", ", foundForbidden)}). يرجى التأكد من اختيار الصفحة الصحيحة لنوع الملف.");
+          }
+
+          return (true, null);
+      }
+      catch (Exception ex)
+      {
+          return (false, $"خطأ أثناء فحص بنية الملف: {ex.Message}");
+      }
+  }
+
+  private string GetJobTypeAr(string type) => type switch {
+      "Mainfile" => "بيانات رئيسية",
+      "AutoNumber" => "أرقام آلية",
+      "FileDetail" => "تفاصيل ملفات",
+      _ => type
+  };
+
   [HttpPost("upload-mainfiles")]
   public async Task<IActionResult> UploadMainfiles(IFormFile file, [FromForm] int? addedBy)
   {
@@ -53,6 +119,10 @@ public class ExcelImportController : ControllerBase
     var extension = Path.GetExtension(file.FileName).ToLower();
     if (extension != ".xlsx" && extension != ".xls")
       return BadRequest("Only .xlsx and .xls files are supported.");
+
+    // Validate Headers before saving
+    var (isValid, headerError) = await ValidateExcelHeaders(file, jobType);
+    if (!isValid) return BadRequest(headerError);
 
     var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
     if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
