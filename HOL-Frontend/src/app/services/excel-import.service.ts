@@ -94,7 +94,11 @@ export class ExcelImportService {
     }
 
     getJobData(jobId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${this.apiUrl}/job-data/${jobId}`);
+        return this.http.get<any[]>(`${this.apiUrl}/job-data/${jobId}?_t=${new Date().getTime()}`);
+    }
+
+    updateJobFileName(jobId: number, fileName: string): Observable<any> {
+        return this.http.put(`${this.apiUrl}/job/${jobId}`, { fileName });
     }
 
     private downloadFile(url: string, fileName: string): void {

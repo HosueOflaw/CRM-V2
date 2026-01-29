@@ -82,7 +82,14 @@
             <ng-template pTemplate="body" let-job>
                 <tr>
                     <td>{{ job.createdAt | date:'short' }}</td>
-                    <td><span class="font-medium">{{ job.fileName }}</span></td>
+                    <td>
+                        <div class="flex items-center gap-2">
+                            <span class="font-medium">{{ job.fileName }}</span>
+                            <button pButton icon="pi pi-pencil" (click)="editJobName(job)"
+                                class="p-button-text p-button-xs p-button-rounded p-button-secondary h-6 w-6"
+                                pTooltip="تعديل الاسم"></button>
+                        </div>
+                    </td>
                     <td>
                         <p-tag [severity]="getStatusSeverity(job.status)" [value]="getStatusLabel(job.status)"></p-tag>
                     </td>
@@ -132,28 +139,56 @@
         [breakpoints]="{ '960px': '95vw' }" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
 
         <p-table [value]="jobData" [paginator]="true" [rows]="10" [loading]="loadingJobData" styleClass="p-datatable-sm"
-            [showCurrentPageReport]="true" currentPageReportTemplate="عرض {first} إلى {last} من {totalRecords}">
+            [showCurrentPageReport]="true" currentPageReportTemplate="عرض {first} إلى {last} من {totalRecords}"
+            [scrollable]="true" scrollHeight="500px">
             <ng-template pTemplate="header">
                 <tr>
-                    <th>كود الملف</th>
-                    <th>السبب</th>
-                    <th>رقم القيد</th>
-                    <th>المبلغ المختص</th>
-                    <th>تاريخ الإضافة</th>
+                    <th style="min-width: 80px;">العمليات</th>
+                    <th style="min-width: 80px;">ID</th>
+                    <th style="min-width: 120px;">كود الملف</th>
+                    <th style="min-width: 120px;">كود المديونية</th>
+                    <th style="min-width: 200px;">السبب</th>
+                    <th style="min-width: 150px;">رقم القيد</th>
+                    <th style="min-width: 100px;">العميل</th>
+                    <th style="min-width: 150px;">تاريخ الإضافة</th>
+                    <th style="min-width: 150px;">تاريخ الانتهاء</th>
+                    <th style="min-width: 150px;">رقم العقد</th>
+                    <th style="min-width: 150px;">المبلغ المختص</th>
+                    <th style="min-width: 150px;">المدعي القانوني</th>
+                    <th style="min-width: 100px;">المحامي</th>
+                    <th style="min-width: 100px;">المحكمة</th>
+                    <th style="min-width: 100px;">MD</th>
+                    <th style="min-width: 100px;">المستشار القانوني</th>
+                    <th style="min-width: 100px;">Job ID</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-item>
                 <tr>
+                    <td>
+                        <button pButton icon="pi pi-pencil" (click)="editItem(item)"
+                            class="p-button-text p-button-sm p-button-rounded p-button-warning"></button>
+                    </td>
+                    <td><span class="font-mono text-xs">{{ item.id }}</span></td>
                     <td><span class="font-bold">{{ item.fileCode }}</span></td>
+                    <td>{{ item.deptCode }}</td>
                     <td>{{ item.reason }}</td>
                     <td>{{ item.patchNo }}</td>
-                    <td>{{ item.deptAmount | currency:'AED':'symbol':'1.2-2' }}</td>
+                    <td>{{ item.client }}</td>
                     <td>{{ item.dateAdded | date:'short' }}</td>
+                    <td>{{ item.dateFinished | date:'short' }}</td>
+                    <td>{{ item.contractNo }}</td>
+                    <td>{{ item.deptAmount | currency:'AED':'symbol':'1.2-2' }}</td>
+                    <td>{{ item.legalPlaintiff }}</td>
+                    <td>{{ item.lawyerUser }}</td>
+                    <td>{{ item.courtUser }}</td>
+                    <td>{{ item.mdUser }}</td>
+                    <td>{{ item.legalAdvisorUser }}</td>
+                    <td><span class="font-mono text-xs">{{ item.importJobId }}</span></td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="5" class="text-center py-4">لا توجد بيانات متاحة</td>
+                    <td colspan="16" class="text-center py-4">لا توجد بيانات متاحة</td>
                 </tr>
             </ng-template>
         </p-table>
@@ -161,6 +196,91 @@
         <ng-template pTemplate="footer">
             <button pButton label="إغلاق" icon="pi pi-times" (click)="showDataDialog = false"
                 class="p-button-text"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- Job Edit Dialog -->
+    <p-dialog [(visible)]="showJobEditDialog" header="تعديل اسم الملف" [modal]="true" [style]="{ width: '30vw' }"
+        [draggable]="false" [resizable]="false">
+
+        <div class="flex flex-col gap-3 p-4" *ngIf="editingJob">
+            <label class="font-bold text-sm">اسم الملف الجديد</label>
+            <input pInputText [(ngModel)]="editingJob.fileName" class="w-full" (keyup.enter)="saveJobName()" />
+        </div>
+
+        <ng-template pTemplate="footer">
+            <button pButton label="إلغاء" icon="pi pi-times" (click)="cancelJobName()"
+                class="p-button-text p-button-rounded"></button>
+            <button pButton label="حفظ التعديل" icon="pi pi-check" (click)="saveJobName()" [loading]="savingJobEdit"
+                class="p-button-primary p-button-rounded"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- Edit Dialog (Row Level) -->
+    <p-dialog [(visible)]="showEditDialog" header="تعديل بيانات السطر" [modal]="true"
+        [breakpoints]="{ '960px': '75vw', '640px': '90vw' }" [style]="{ width: '50vw' }" [draggable]="false"
+        [resizable]="false">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4" *ngIf="editingItem">
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">كود الملف</label>
+                <p-inputNumber [(ngModel)]="editingItem.fileCode" [useGrouping]="false"></p-inputNumber>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">كود المديونية</label>
+                <p-inputNumber [(ngModel)]="editingItem.deptCode" [useGrouping]="false"></p-inputNumber>
+            </div>
+            <div class="flex flex-col gap-2 md:col-span-2">
+                <label class="font-bold text-sm">السبب</label>
+                <input pInputText [(ngModel)]="editingItem.reason" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">رقم القيد</label>
+                <input pInputText [(ngModel)]="editingItem.patchNo" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">العميل</label>
+                <p-inputNumber [(ngModel)]="editingItem.client" [useGrouping]="false"></p-inputNumber>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">تاريخ الانتهاء</label>
+                <p-datepicker [(ngModel)]="editingItem.dateFinished" [showIcon]="true" appendTo="body"></p-datepicker>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">رقم العقد</label>
+                <input pInputText [(ngModel)]="editingItem.contractNo" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">المبلغ المختص</label>
+                <p-inputNumber [(ngModel)]="editingItem.deptAmount" mode="currency" currency="AED"></p-inputNumber>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">المدعي القانوني</label>
+                <input pInputText [(ngModel)]="editingItem.legalPlaintiff" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">المحامي</label>
+                <p-inputNumber [(ngModel)]="editingItem.lawyerUser" [useGrouping]="false"></p-inputNumber>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">المحكمة</label>
+                <p-inputNumber [(ngModel)]="editingItem.courtUser" [useGrouping]="false"></p-inputNumber>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">MD</label>
+                <p-inputNumber [(ngModel)]="editingItem.mdUser" [useGrouping]="false"></p-inputNumber>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">المستشار القانوني</label>
+                <p-inputNumber [(ngModel)]="editingItem.legalAdvisorUser" [useGrouping]="false"></p-inputNumber>
+            </div>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <button pButton label="إلغاء" icon="pi pi-times" (click)="cancelEdit()"
+                class="p-button-text p-button-rounded"></button>
+            <button pButton label="حفظ التعديلات" icon="pi pi-check" (click)="saveEdit()" [loading]="savingEdit"
+                class="p-button-primary p-button-rounded"></button>
         </ng-template>
     </p-dialog>
 </div>

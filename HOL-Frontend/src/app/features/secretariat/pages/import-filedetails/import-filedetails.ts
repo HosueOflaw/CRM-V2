@@ -5,11 +5,16 @@ import { ExcelImportService, ImportJob } from '../../../../services/excel-import
 import { Signalr } from '../../../../services/signalr';
 import { SweetAlertService } from '../../../../shared/services/sweet-alert.service';
 import { Table, TableModule } from 'primeng/table';
+import { DataViewService } from '../../../../services/data-view.service';
 import { ButtonModule } from 'primeng/button';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TagModule } from 'primeng/tag';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { CheckboxModule } from 'primeng/checkbox';
+import { DatePickerModule } from 'primeng/datepicker';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -23,7 +28,11 @@ import { Subject, takeUntil } from 'rxjs';
         ProgressBarModule,
         TagModule,
         DialogModule,
-        TooltipModule
+        TooltipModule,
+        InputTextModule,
+        InputNumberModule,
+        CheckboxModule,
+        DatePickerModule
     ],
     templateUrl: './import-filedetails.html'
 })
@@ -49,10 +58,21 @@ export class ImportFileDetailsPage implements OnInit, OnDestroy {
     jobData: any[] = [];
     loadingJobData = false;
 
+    // Row Editing
+    showEditDialog = false;
+    editingItem: any = null;
+    savingEdit = false;
+
+    // Job Editing
+    showJobEditDialog = false;
+    editingJob: any = null;
+    savingJobEdit = false;
+
     private destroy$ = new Subject<void>();
 
     constructor(
         private importService: ExcelImportService,
+        private dataViewService: DataViewService,
         private signalr: Signalr,
         private swal: SweetAlertService
     ) { }
@@ -138,13 +158,12 @@ export class ImportFileDetailsPage implements OnInit, OnDestroy {
 
     listenToProgress() {
         this.signalr.message$.pipe(takeUntil(this.destroy$)).subscribe(msg => {
-            if (msg.type === 'excel_import_progress') {
+            if (msg.type === 'excel_import_progress' && msg.data.jobType === 'FileDetail') {
                 if (msg.data.jobId === this.activeJobId) {
                     this.activeJobProgress = msg.data.progress;
                     this.activeJobStatus = 'Processing';
                 }
 
-                // Update in the list if visible
                 const job = this.jobs.find(j => j.id === msg.data.jobId);
                 if (job) {
                     job.progress = msg.data.progress;
@@ -152,13 +171,11 @@ export class ImportFileDetailsPage implements OnInit, OnDestroy {
                     job.processedRows = msg.data.processed;
                     job.totalRows = msg.data.total;
                 }
-            } else if (msg.type === 'excel_import_complete') {
+            } else if (msg.type === 'excel_import_complete' && msg.data.jobType === 'FileDetail') {
                 if (msg.data.jobId === this.activeJobId) {
                     this.activeJobId = null;
                     this.activeJobProgress = 100;
                 }
-
-                // Refresh list on any completion
                 this.loadJobs();
             }
         });
@@ -230,6 +247,73 @@ export class ImportFileDetailsPage implements OnInit, OnDestroy {
                 this.swal.error({ title: 'خطأ', text: err.error?.message || 'فشل تحميل بيانات العملية' });
             }
         });
+    }
+
+    editItem(item: any) {
+        this.editingItem = {
+            ...item,
+            dateFinished: item.dateFinished ? new Date(item.dateFinished) : null
+        };
+        this.showEditDialog = true;
+    }
+
+    saveEdit() {
+        if (!this.editingItem) return;
+
+        this.savingEdit = true;
+        this.dataViewService.updateFileDetail(this.editingItem.id, this.editingItem).subscribe({
+            next: (updatedItem) => {
+                const index = this.jobData.findIndex(i => i.id === updatedItem.id);
+                if (index !== -1) {
+                    this.jobData[index] = updatedItem;
+                }
+                this.showEditDialog = false;
+                this.editingItem = null;
+                this.savingEdit = false;
+                this.swal.toast({ icon: 'success', title: 'تم التحديث بنجاح' });
+            },
+            error: (err) => {
+                this.savingEdit = false;
+                this.swal.error({ title: 'فشل التحديث', text: err.error?.message || 'حدث خطأ أثناء حفظ التعديلات' });
+            }
+        });
+    }
+
+    cancelEdit() {
+        this.showEditDialog = false;
+        this.editingItem = null;
+    }
+
+    editJobName(job: any) {
+        this.editingJob = { ...job };
+        this.showJobEditDialog = true;
+    }
+
+    saveJobName() {
+        if (!this.editingJob) return;
+
+        this.savingJobEdit = true;
+        this.importService.updateJobFileName(this.editingJob.id, this.editingJob.fileName).subscribe({
+            next: (updatedJob) => {
+                const index = this.jobs.findIndex(j => j.id === updatedJob.id);
+                if (index !== -1) {
+                    this.jobs[index].fileName = updatedJob.fileName;
+                }
+                this.showJobEditDialog = false;
+                this.editingJob = null;
+                this.savingJobEdit = false;
+                this.swal.toast({ icon: 'success', title: 'تم تحديث اسم الملف بنجاح' });
+            },
+            error: (err) => {
+                this.savingJobEdit = false;
+                this.swal.error({ title: 'فشل التحديث', text: err.error || 'حدث خطأ أثناء حفظ الاسم الجديد' });
+            }
+        });
+    }
+
+    cancelJobName() {
+        this.showJobEditDialog = false;
+        this.editingJob = null;
     }
 }
 

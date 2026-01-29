@@ -82,7 +82,14 @@
             <ng-template pTemplate="body" let-job>
                 <tr>
                     <td>{{ job.createdAt | date:'short' }}</td>
-                    <td><span class="font-medium">{{ job.fileName }}</span></td>
+                    <td>
+                        <div class="flex items-center gap-2">
+                            <span class="font-medium">{{ job.fileName }}</span>
+                            <button pButton icon="pi pi-pencil" (click)="editJobName(job)"
+                                class="p-button-text p-button-xs p-button-rounded p-button-secondary h-6 w-6"
+                                pTooltip="تعديل الاسم"></button>
+                        </div>
+                    </td>
                     <td>
                         <p-tag [severity]="getStatusSeverity(job.status)" [value]="getStatusLabel(job.status)"></p-tag>
                     </td>
@@ -132,28 +139,65 @@
         [breakpoints]="{ '960px': '95vw' }" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
 
         <p-table [value]="jobData" [paginator]="true" [rows]="10" [loading]="loadingJobData" styleClass="p-datatable-sm"
-            [showCurrentPageReport]="true" currentPageReportTemplate="عرض {first} إلى {last} من {totalRecords}">
+            [showCurrentPageReport]="true" currentPageReportTemplate="عرض {first} إلى {last} من {totalRecords}"
+            [scrollable]="true" scrollHeight="500px">
             <ng-template pTemplate="header">
                 <tr>
-                    <th style="width: 100px;">الكود</th>
-                    <th>الاسم</th>
-                    <th>رقم الهوية</th>
-                    <th>الجنسية</th>
-                    <th>تاريخ الإضافة</th>
+                    <th style="min-width: 80px;">العمليات</th>
+                    <th style="min-width: 80px;">ID</th>
+                    <th style="min-width: 100px;">الكود</th>
+                    <th style="min-width: 200px;">الاسم</th>
+                    <th style="min-width: 150px;">رقم الهوية</th>
+                    <th style="min-width: 200px;">العنوان</th>
+                    <th style="min-width: 150px;">تاريخ الإضافة</th>
+                    <th style="min-width: 120px;">الجنسية</th>
+                    <th style="min-width: 100px;">أرشيف</th>
+                    <th style="min-width: 200px;">ملاحظة</th>
+                    <th style="min-width: 150px;">العمل</th>
+                    <th style="min-width: 150px;">العضوية</th>
+                    <th style="min-width: 200px;">بريد الشركة</th>
+                    <th style="min-width: 150px;">فاكس الشركة</th>
+                    <th style="min-width: 150px;">سجل الشركة</th>
+                    <th style="min-width: 150px;">شريك 1</th>
+                    <th style="min-width: 150px;">شريك 2</th>
+                    <th style="min-width: 150px;">شريك 3</th>
+                    <th style="min-width: 150px;">نوع السجل</th>
+                    <th style="min-width: 100px;">أضيف بواسطة</th>
+                    <th style="min-width: 100px;">Job ID</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-item>
                 <tr>
+                    <td>
+                        <button pButton icon="pi pi-pencil" (click)="editItem(item)"
+                            class="p-button-text p-button-sm p-button-rounded p-button-warning"></button>
+                    </td>
+                    <td><span class="font-mono text-xs">{{ item.id }}</span></td>
                     <td><span class="font-bold">{{ item.code }}</span></td>
                     <td>{{ item.name }}</td>
                     <td>{{ item.cid }}</td>
-                    <td>{{ item.nationality }}</td>
+                    <td>{{ item.address }}</td>
                     <td>{{ item.dateAdded | date:'short' }}</td>
+                    <td>{{ item.nationality }}</td>
+                    <td><span [class]="item.archive ? 'text-orange-600' : 'text-green-600'">{{ item.archive ? 'نعم' :
+                            'لا' }}</span></td>
+                    <td>{{ item.note }}</td>
+                    <td>{{ item.work }}</td>
+                    <td>{{ item.membership }}</td>
+                    <td>{{ item.companyEmail }}</td>
+                    <td>{{ item.companyFax }}</td>
+                    <td>{{ item.companyRegister }}</td>
+                    <td>{{ item.partner1 }}</td>
+                    <td>{{ item.partner2 }}</td>
+                    <td>{{ item.partner3 }}</td>
+                    <td>{{ item.registerType }}</td>
+                    <td>{{ item.addedBy }}</td>
+                    <td><span class="font-mono text-xs">{{ item.importJobId }}</span></td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="5" class="text-center py-4">لا توجد بيانات متاحة</td>
+                    <td colspan="20" class="text-center py-4">لا توجد بيانات متاحة</td>
                 </tr>
             </ng-template>
         </p-table>
@@ -161,6 +205,103 @@
         <ng-template pTemplate="footer">
             <button pButton label="إغلاق" icon="pi pi-times" (click)="showDataDialog = false"
                 class="p-button-text"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- Job Edit Dialog -->
+    <p-dialog [(visible)]="showJobEditDialog" header="تعديل اسم الملف" [modal]="true" [style]="{ width: '30vw' }"
+        [draggable]="false" [resizable]="false">
+
+        <div class="flex flex-col gap-3 p-4" *ngIf="editingJob">
+            <label class="font-bold text-sm">اسم الملف الجديد</label>
+            <input pInputText [(ngModel)]="editingJob.fileName" class="w-full" (keyup.enter)="saveJobName()" />
+        </div>
+
+        <ng-template pTemplate="footer">
+            <button pButton label="إلغاء" icon="pi pi-times" (click)="cancelJobName()"
+                class="p-button-text p-button-rounded"></button>
+            <button pButton label="حفظ التعديل" icon="pi pi-check" (click)="saveJobName()" [loading]="savingJobEdit"
+                class="p-button-primary p-button-rounded"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- Edit Dialog (Row Level) -->
+    <p-dialog [(visible)]="showEditDialog" header="تعديل بيانات السطر" [modal]="true"
+        [breakpoints]="{ '960px': '75vw', '640px': '90vw' }" [style]="{ width: '50vw' }" [draggable]="false"
+        [resizable]="false">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4" *ngIf="editingItem">
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">الكود</label>
+                <p-inputNumber [(ngModel)]="editingItem.code" [useGrouping]="false"></p-inputNumber>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">الاسم</label>
+                <input pInputText [(ngModel)]="editingItem.name" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">رقم الهوية</label>
+                <input pInputText [(ngModel)]="editingItem.cid" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">الجنسية</label>
+                <input pInputText [(ngModel)]="editingItem.nationality" />
+            </div>
+            <div class="flex flex-col gap-2 md:col-span-2">
+                <label class="font-bold text-sm">العنوان</label>
+                <input pInputText [(ngModel)]="editingItem.address" />
+            </div>
+            <div class="flex items-center gap-2">
+                <p-checkbox [(ngModel)]="editingItem.archive" [binary]="true" inputId="archive"></p-checkbox>
+                <label for="archive" class="font-bold text-sm cursor-pointer">أرشيف</label>
+            </div>
+            <div class="flex flex-col gap-2 md:col-span-2">
+                <label class="font-bold text-sm">ملاحظة</label>
+                <textarea pInputText [(ngModel)]="editingItem.note" rows="3" class="w-full"></textarea>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">العمل</label>
+                <input pInputText [(ngModel)]="editingItem.work" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">العضوية</label>
+                <input pInputText [(ngModel)]="editingItem.membership" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">بريد الشركة</label>
+                <input pInputText [(ngModel)]="editingItem.companyEmail" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">فاكس الشركة</label>
+                <input pInputText [(ngModel)]="editingItem.companyFax" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">سجل الشركة</label>
+                <input pInputText [(ngModel)]="editingItem.companyRegister" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">نوع السجل</label>
+                <input pInputText [(ngModel)]="editingItem.registerType" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">شريك 1</label>
+                <input pInputText [(ngModel)]="editingItem.partner1" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">شريك 2</label>
+                <input pInputText [(ngModel)]="editingItem.partner2" />
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="font-bold text-sm">شريك 3</label>
+                <input pInputText [(ngModel)]="editingItem.partner3" />
+            </div>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <button pButton label="إلغاء" icon="pi pi-times" (click)="cancelEdit()"
+                class="p-button-text p-button-rounded"></button>
+            <button pButton label="حفظ التعديلات" icon="pi pi-check" (click)="saveEdit()" [loading]="savingEdit"
+                class="p-button-primary p-button-rounded"></button>
         </ng-template>
     </p-dialog>
 </div>
