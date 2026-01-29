@@ -1,13 +1,8 @@
-using House_of_law_api.Data;
-using House_of_law_api.Domain.Entities;
-using House_of_law_api.DTOs;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+
 using Microsoft.Extensions.Caching.Memory;
-using System.Security.Claims;
-using System.IO;
+
 using MiniExcelLibs;
+using ClosedXML.Excel;
 
 namespace House_of_law_api.Controllers;
 
@@ -20,7 +15,7 @@ public class ExcelImportController : ControllerBase
   private readonly string _uploadPath;
   private readonly IMemoryCache _cache;
 
-  public ExcelImportController(ApplicationDbContext context, Microsoft.Extensions.Configuration.IConfiguration configuration, IMemoryCache cache)
+  public ExcelImportController(ApplicationDbContext context, IMemoryCache cache)
   {
     _context = context;
     _cache = cache;
@@ -75,7 +70,8 @@ public class ExcelImportController : ControllerBase
 
     var job = new ImportJob
     {
-      FileName = fileName,
+      FileName = file.FileName,
+      StoredFileName = fileName,
       JobType = jobType,
       Status = "Pending",
       Progress = 0,
@@ -90,7 +86,7 @@ public class ExcelImportController : ControllerBase
   }
 
   [HttpGet("jobs")]
-  public async Task<IActionResult> GetMyJobs([FromQuery] PaginationParams pagination, [FromQuery] string? jobType)
+  public async Task<IActionResult> GetMyJobs([FromQuery] PaginationParams pagination, [FromQuery] string jobType)
   {
     var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
     if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
@@ -159,31 +155,13 @@ public class ExcelImportController : ControllerBase
   {
     try
     {
-      var columns = new[]
+      var headers = new List<string>
       {
-                new {
-                    Code = 0,
-                    Name = "",
-                    Cid = "",
-                    Address = "",
-                    Nationality = "",
-                    Note = "",
-                    Work = "",
-                    Membership = "",
-                    CompanyEmail = "",
-                    CompanyFax = "",
-                    CompanyRegister = "",
-                    Partner1 = "",
-                    Partner2 = "",
-                    Partner3 = "",
-                    RegisterType = ""
-                }
-            };
+        "الكود", "الاسم", "رقم الهوية", "العنوان", "الجنسية", "ملاحظة", "العمل",
+        "العضوية", "بريد الشركة", "فاكس الشركة", "سجل الشركة", "شريك 1", "شريك 2", "شريك 3", "نوع السجل", "مؤرشف"
+      };
 
-      using var memoryStream = new MemoryStream();
-      memoryStream.SaveAs(columns);
-      var content = memoryStream.ToArray();
-
+      var content = GenerateExcelTemplate(headers);
       return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Mainfiles_Template.xlsx");
     }
     catch (Exception ex)
@@ -198,23 +176,13 @@ public class ExcelImportController : ControllerBase
   {
     try
     {
-      var columns = new[]
+      // New Order: FileCode, DeptCode (Renamed to كود المديونية), AutoNumber, Type, CaseRef, Note, Claimant
+      var headers = new List<string>
       {
-                new {
-                    FileCode = 0L,
-                    AutoNumber = "",
-                    Type = "",
-                    CaseRef = "",
-                    Note = "",
-                    Claimant = "",
-                    DeptCode = 0
-                }
-            };
+        "كود الملف", "كود المديونية", "الرقم الآلي", "النوع", "مرجع القضية", "ملاحظة", "المدعي", "الرقم الآلي الأب"
+      };
 
-      using var memoryStream = new MemoryStream();
-      memoryStream.SaveAs(columns);
-      var content = memoryStream.ToArray();
-
+      var content = GenerateExcelTemplate(headers);
       return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AutoNumbers_Template.xlsx");
     }
     catch (Exception ex)
@@ -228,28 +196,13 @@ public class ExcelImportController : ControllerBase
     {
       try
       {
-        var columns = new[]
+        var headers = new List<string>
         {
-                new {
-                    FileCode = 0L,
-                    DeptCode = 0L,
-                    Reason = "",
-                    PatchNo = "",
-                    Client = 0,
-                    ContractNo = "",
-                    DeptAmount = 0.0m,
-                    LegalPlaintiff = "",
-                    LawyerUser = 0,
-                    CourtUser = 0,
-                    MdUser = 0,
-                    LegalAdvisorUser = 0
-                }
-            };
-
-        using var memoryStream = new MemoryStream();
-        memoryStream.SaveAs(columns);
-        var content = memoryStream.ToArray();
-
+          "كود الملف", "كود المديونية", "السبب", "رقم القيد", "العميل", "رقم العقد",
+          "المبلغ المختص", "المدعي القانوني", "المحامي", "المحكمة", "MD", "المستشار القانوني", "تاريخ الانتهاء"
+        };
+        
+        var content = GenerateExcelTemplate(headers);
         return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "FileDetails_Template.xlsx");
       }
       catch (Exception ex)
@@ -258,17 +211,43 @@ public class ExcelImportController : ControllerBase
       }
     }
 
+    private byte[] GenerateExcelTemplate(List<string> headers)
+    {
+        using var workbook = new XLWorkbook();
+        var worksheet = workbook.Worksheets.Add("Template");
+        worksheet.RightToLeft = true;
+
+        for (int i = 0; i < headers.Count; i++)
+        {
+            worksheet.Cell(1, i + 1).Value = headers[i];
+            worksheet.Cell(1, i + 1).Style.Font.Bold = true;
+            worksheet.Cell(1, i + 1).Style.Fill.BackgroundColor = XLColor.LightGray;
+        }
+
+        worksheet.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        return stream.ToArray();
+    }
+
     [HttpGet("download-original/{jobId}")]
     public async Task<IActionResult> DownloadOriginal(int jobId)
     {
-        var job = await _context.ImportJobs.FindAsync(jobId);
-        if (job == null) return NotFound("Job not found");
+        var job = await _context.ImportJobs.AsNoTracking().FirstOrDefaultAsync(j => j.Id == jobId);
+        if (job == null) return NotFound("العملية غير موجودة");
 
-        var filePath = Path.Combine(_uploadPath, job.FileName);
-        if (!System.IO.File.Exists(filePath)) return NotFound("Original file not found on server");
+        var filePath = Path.Combine(_uploadPath, job.StoredFileName ?? job.FileName);
+        if (!System.IO.File.Exists(filePath)) return NotFound("الملف الأصلي غير موجود على الخادم");
 
-        var content = await System.IO.File.ReadAllBytesAsync(filePath);
-        return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Original_{job.JobType}_{jobId}.xlsx");
+        var userFileName = job.FileName;
+        if (!userFileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase) && !userFileName.EndsWith(".xls", StringComparison.OrdinalIgnoreCase))
+        {
+            userFileName += Path.GetExtension(job.StoredFileName ?? ".xlsx");
+        }
+
+        var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        return File(fileStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", userFileName);
     }
 
     [HttpDelete("revert/{jobId}")]
@@ -384,5 +363,32 @@ public class ExcelImportController : ControllerBase
 
         return Ok(data);
     }
-  }
+
+    [HttpPut("job/{id}")]
+    public async Task<IActionResult> UpdateJob(int id, [FromBody] UpdateJobDto dto)
+    {
+        var job = await _context.ImportJobs.FindAsync(id);
+        if (job == null) return NotFound("العملية غير موجودة");
+
+        if (!string.IsNullOrEmpty(dto.FileName))
+        {
+            job.FileName = dto.FileName;
+        }
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            return Ok(job);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"خطأ أثناء تحديث العملية: {ex.Message}");
+        }
+    }
+}
+
+public class UpdateJobDto
+{
+    public string FileName { get; set; }
+}
 

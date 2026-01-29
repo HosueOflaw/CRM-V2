@@ -1,7 +1,4 @@
-using House_of_law_api.DTOs;
-using House_of_law_api.Interfaces;
-using House_of_law_api.Services;
-using Microsoft.AspNetCore.Mvc;
+
 
 namespace House_of_law_api.Controllers;
 
@@ -9,82 +6,82 @@ namespace House_of_law_api.Controllers;
 [Route("api/[controller]")]
 public class DepartmentsController : ControllerBase
 {
-    private readonly IDepartmentRepository _repository;
-    private readonly INotificationService _notificationService;
-    private readonly ILogger<DepartmentsController> _logger;
+  private readonly IDepartmentRepository _repository;
+  private readonly INotificationService _notificationService;
+  private readonly ILogger<DepartmentsController> _logger;
 
-    public DepartmentsController(
-        IDepartmentRepository repository,
-        INotificationService notificationService,
-        ILogger<DepartmentsController> logger)
+  public DepartmentsController(
+      IDepartmentRepository repository,
+      INotificationService notificationService,
+      ILogger<DepartmentsController> logger)
+  {
+    _repository = repository;
+    _notificationService = notificationService;
+    _logger = logger;
+  }
+
+  [HttpGet]
+  public async Task<ActionResult<IEnumerable<DepartmentDto>>> GetDepartments()
+  {
+    var departments = await _repository.GetAllAsync();
+    var dtos = departments.Select(d => new DepartmentDto
     {
-        _repository = repository;
-        _notificationService = notificationService;
-        _logger = logger;
-    }
+      Id = d.Id,
+      Code = d.Code,
+      Name = d.Name
+    });
+    return Ok(dtos);
+  }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<DepartmentDto>>> GetDepartments()
+  [HttpGet("{id}")]
+  public async Task<ActionResult<DepartmentDto>> GetDepartment(int id)
+  {
+    var department = await _repository.GetByIdAsync(id);
+    if (department == null) return NotFound();
+
+    return Ok(new DepartmentDto { Id = department.Id, Code = department.Code, Name = department.Name });
+  }
+
+  [HttpPost]
+  public async Task<ActionResult<DepartmentDto>> CreateDepartment(CreateDepartmentDto dto)
+  {
+    var department = new Department
     {
-        var departments = await _repository.GetAllAsync();
-        var dtos = departments.Select(d => new DepartmentDto
-        {
-            Id = d.Id,
-            Code = d.Code,
-            Name = d.Name
-        });
-        return Ok(dtos);
-    }
+      Code = dto.Code,
+      Name = dto.Name
+    };
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<DepartmentDto>> GetDepartment(int id)
-    {
-        var department = await _repository.GetByIdAsync(id);
-        if (department == null) return NotFound();
+    var created = await _repository.AddAsync(department);
+    await _notificationService.BroadcastToAllAsync("department:created", new { id = created.Id, name = created.Name });
 
-        return Ok(new DepartmentDto { Id = department.Id, Code = department.Code, Name = department.Name });
-    }
+    return CreatedAtAction(nameof(GetDepartment), new { id = created.Id },
+        new DepartmentDto { Id = created.Id, Code = created.Code, Name = created.Name });
+  }
 
-    [HttpPost]
-    public async Task<ActionResult<DepartmentDto>> CreateDepartment(CreateDepartmentDto dto)
-    {
-        var department = new Domain.Entities.Department
-        {
-            Code = dto.Code,
-            Name = dto.Name
-        };
+  [HttpPut("{id}")]
+  public async Task<IActionResult> UpdateDepartment(int id, CreateDepartmentDto dto)
+  {
+    var department = await _repository.GetByIdAsync(id);
+    if (department == null) return NotFound();
 
-        var created = await _repository.AddAsync(department);
-        await _notificationService.BroadcastToAllAsync("department:created", new { id = created.Id, name = created.Name });
+    department.Code = dto.Code ?? department.Code;
+    department.Name = dto.Name ?? department.Name;
 
-        return CreatedAtAction(nameof(GetDepartment), new { id = created.Id }, 
-            new DepartmentDto { Id = created.Id, Code = created.Code, Name = created.Name });
-    }
+    await _repository.UpdateAsync(department);
+    await _notificationService.BroadcastToAllAsync("department:updated", new { id = department.Id });
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateDepartment(int id, CreateDepartmentDto dto)
-    {
-        var department = await _repository.GetByIdAsync(id);
-        if (department == null) return NotFound();
+    return NoContent();
+  }
 
-        department.Code = dto.Code ?? department.Code;
-        department.Name = dto.Name ?? department.Name;
+  [HttpDelete("{id}")]
+  public async Task<IActionResult> DeleteDepartment(int id)
+  {
+    var department = await _repository.GetByIdAsync(id);
+    if (department == null) return NotFound();
 
-        await _repository.UpdateAsync(department);
-        await _notificationService.BroadcastToAllAsync("department:updated", new { id = department.Id });
+    await _repository.DeleteAsync(department);
+    await _notificationService.BroadcastToAllAsync("department:deleted", new { id });
 
-        return NoContent();
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteDepartment(int id)
-    {
-        var department = await _repository.GetByIdAsync(id);
-        if (department == null) return NotFound();
-
-        await _repository.DeleteAsync(department);
-        await _notificationService.BroadcastToAllAsync("department:deleted", new { id });
-
-        return NoContent();
-    }
+    return NoContent();
+  }
 }

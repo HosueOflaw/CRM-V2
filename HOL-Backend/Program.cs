@@ -1,34 +1,17 @@
-using House_of_law_api.Data;
-using House_of_law_api.Infrastructure.Cloudflare;
-using House_of_law_api.Infrastructure.Security;
-using House_of_law_api.Infrastructure.SignalR;
-using House_of_law_api.Infrastructure.Swagger;
-using House_of_law_api.Interfaces;
-using House_of_law_api.Repositories;
-using House_of_law_api.Services;
-
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using System.Text;
-
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseSqlServer(connectionString, sqlOptions =>
-    {
-        sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 3,
-            maxRetryDelay: TimeSpan.FromSeconds(30),
-            errorNumbersToAdd: null);
-    });
-    // Don't validate connection on startup for Swagger
-    options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
+  var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+  options.UseSqlServer(connectionString, sqlOptions =>
+  {
+    sqlOptions.EnableRetryOnFailure(
+          maxRetryCount: 3,
+          maxRetryDelay: TimeSpan.FromSeconds(30),
+          errorNumbersToAdd: null);
+  });
+  // Don't validate connection on startup for Swagger
+  options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
 
 builder.Services.AddMemoryCache();
@@ -62,86 +45,86 @@ var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<st
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("Frontend", policy =>
+  options.AddPolicy("Frontend", policy =>
+  {
+    policy.AllowAnyHeader()
+            .AllowAnyMethod()
+            .SetPreflightMaxAge(TimeSpan.FromHours(24)); // Cache preflight for 24 hours
+
+    if (corsOrigins.Length == 0)
     {
-        policy.AllowAnyHeader()
-              .AllowAnyMethod()
-              .SetPreflightMaxAge(TimeSpan.FromHours(24)); // Cache preflight for 24 hours
-        
-        if (corsOrigins.Length == 0)
-        {
-            // Development: Allow all origins (no credentials)
-            policy.AllowAnyOrigin();
-        }
-        else
-        {
-            // Production: Allow specific origins with credentials
-            policy.WithOrigins(corsOrigins)
-                  .AllowCredentials();
-        }
-    });
+      // Development: Allow all origins (no credentials)
+      policy.AllowAnyOrigin();
+    }
+    else
+    {
+      // Production: Allow specific origins with credentials
+      policy.WithOrigins(corsOrigins)
+              .AllowCredentials();
+    }
+  });
 });
 
 // JWT Authentication Configuration
-var jwtSecretKey = builder.Configuration["Jwt:SecretKey"] 
+var jwtSecretKey = builder.Configuration["Jwt:SecretKey"]
     ?? throw new InvalidOperationException("JWT SecretKey not configured");
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+  options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+  options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
-        ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "HouseOfLawAPI",
-        ValidateAudience = true,
-        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "HouseOfLawClient",
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
-    };
+  options.TokenValidationParameters = new TokenValidationParameters
+  {
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
+    ValidateIssuer = true,
+    ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "HouseOfLawAPI",
+    ValidateAudience = true,
+    ValidAudience = builder.Configuration["Jwt:Audience"] ?? "HouseOfLawClient",
+    ValidateLifetime = true,
+    ClockSkew = TimeSpan.Zero
+  };
 
-    options.Events = new JwtBearerEvents
+  options.Events = new JwtBearerEvents
+  {
+    OnMessageReceived = context =>
     {
-        OnMessageReceived = context =>
-        {
-            var accessToken = context.Request.Query["access_token"];
+      var accessToken = context.Request.Query["access_token"];
 
-            // If the request is for our hub...
-            var path = context.HttpContext.Request.Path;
-            if (!string.IsNullOrEmpty(accessToken) &&
-                (path.StartsWithSegments("/hubs/notifications")))
-            {
-                // Read the token out of the query string
-                context.Token = accessToken;
-            }
-            return Task.CompletedTask;
-        }
-    };
+      // If the request is for our hub...
+      var path = context.HttpContext.Request.Path;
+      if (!string.IsNullOrEmpty(accessToken) &&
+              (path.StartsWithSegments("/hubs/notifications")))
+      {
+        // Read the token out of the query string
+        context.Token = accessToken;
+      }
+      return Task.CompletedTask;
+    }
+  };
 });
 
 // Authorization Configuration
 builder.Services.AddAuthorization(options =>
 {
-    // Default policy: require authentication
-    options.FallbackPolicy = null; // Don't require auth by default - use [Authorize] explicitly
-    
-    // Admin policy
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("admin"));
-    
-    // User policy (authenticated users)
-    options.AddPolicy("UserOnly", policy => policy.RequireAuthenticatedUser());
+  // Default policy: require authentication
+  options.FallbackPolicy = null; // Don't require auth by default - use [Authorize] explicitly
+
+  // Admin policy
+  options.AddPolicy("AdminOnly", policy => policy.RequireRole("admin"));
+
+  // User policy (authenticated users)
+  options.AddPolicy("UserOnly", policy => policy.RequireAuthenticatedUser());
 });
 builder.Services.AddSignalR(options =>
 {
-    options.EnableDetailedErrors = builder.Environment.IsDevelopment();
-    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
-    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
-    options.HandshakeTimeout = TimeSpan.FromSeconds(15);
+  options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+  options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+  options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+  options.HandshakeTimeout = TimeSpan.FromSeconds(15);
 });
 builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -153,37 +136,37 @@ builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.Au
 builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.FileDetailImportWorker>();
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<SessionValidationFilter>();
+  options.Filters.Add<SessionValidationFilter>();
 })
     .AddJsonOptions(options =>
     {
-        // Use camelCase to match Angular/JavaScript conventions
-        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
-        options.JsonSerializerOptions.WriteIndented = true; // Pretty print for debugging
+      // Use camelCase to match Angular/JavaScript conventions
+      options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+      options.JsonSerializerOptions.WriteIndented = true; // Pretty print for debugging
     });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "House of Law API",
-        Version = "v1",
-        Description = "API for House of Law Management System"
-    });
+  c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+  {
+    Title = "House of Law API",
+    Version = "v1",
+    Description = "API for House of Law Management System"
+  });
 
-    // إضافة دعم JWT في Swagger
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\""
-    });
+  // إضافة دعم JWT في Swagger
+  c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+  {
+    Name = "Authorization",
+    Type = SecuritySchemeType.ApiKey,
+    Scheme = "Bearer",
+    BearerFormat = "JWT",
+    In = ParameterLocation.Header,
+    Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\""
+  });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+  c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
@@ -197,54 +180,50 @@ builder.Services.AddSwaggerGen(c =>
             new string[] {}
         }
     });
-    
-    // Handle file uploads properly - must be registered before other filters
-    c.OperationFilter<SwaggerFileUploadOperationFilter>();
-    
-    // Ignore IFormFile in Swagger schema
-    c.SchemaFilter<SwaggerIgnoreSchemaFilter>();
-    
-    // Include XML comments if available
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))
-    {
-        c.IncludeXmlComments(xmlPath);
-    }
-    
-    // Ignore schema errors
-    c.IgnoreObsoleteActions();
-    c.IgnoreObsoleteProperties();
+
+  // Handle file uploads properly - must be registered before other filters
+  c.OperationFilter<SwaggerFileUploadOperationFilter>();
+
+  // Ignore IFormFile in Swagger schema
+  c.SchemaFilter<SwaggerIgnoreSchemaFilter>();
+
+  // Include XML comments if available
+  var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+  var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+  if (File.Exists(xmlPath))
+  {
+    c.IncludeXmlComments(xmlPath);
+  }
+
+  // Ignore schema errors
+  c.IgnoreObsoleteActions();
+  c.IgnoreObsoleteProperties();
 });
 
 // Enable static files for file uploads/downloads
-builder.Services.Configure<IISServerOptions>(options =>
-{
-    options.AllowSynchronousIO = true;
-});
 
 var app = builder.Build();
 
 // Always enable Swagger in Development
 if (app.Environment.IsDevelopment())
 {
-    try
+  try
+  {
+    app.UseSwagger(c =>
     {
-        app.UseSwagger(c =>
-        {
-            c.RouteTemplate = "swagger/{documentName}/swagger.json";
-        });
-        app.UseSwaggerUI(c =>
-        {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "House of Law API v1");
-            c.RoutePrefix = "swagger";
-            c.DisplayRequestDuration();
-        });
-    }
-    catch (Exception ex)
+      c.RouteTemplate = "swagger/{documentName}/swagger.json";
+    });
+    app.UseSwaggerUI(c =>
     {
-        app.Logger.LogError(ex, "Error configuring Swagger");
-    }
+      c.SwaggerEndpoint("/swagger/v1/swagger.json", "House of Law API v1");
+      c.RoutePrefix = "swagger";
+      c.DisplayRequestDuration();
+    });
+  }
+  catch (Exception ex)
+  {
+    app.Logger.LogError(ex, "Error configuring Swagger");
+  }
 }
 
 app.UseRouting();
@@ -255,48 +234,48 @@ app.UseCors("Frontend");
 // Handle OPTIONS requests for CORS preflight - must be before HTTPS redirection
 app.Use(async (context, next) =>
 {
-    // Handle CORS preflight (OPTIONS) requests immediately
-    if (context.Request.Method == "OPTIONS")
+  // Handle CORS preflight (OPTIONS) requests immediately
+  if (context.Request.Method == "OPTIONS")
+  {
+    // CORS headers are already set by UseCors middleware
+    // Just return 204 No Content
+    context.Response.StatusCode = 204;
+    context.Response.ContentLength = 0;
+    await context.Response.CompleteAsync();
+    return;
+  }
+
+  // Allow browser refresh WebSocket connections without HTTPS redirect
+  if (context.Request.Path.StartsWithSegments("/HouseOfLawApi"))
+  {
+    if (context.WebSockets.IsWebSocketRequest)
     {
-        // CORS headers are already set by UseCors middleware
-        // Just return 204 No Content
-        context.Response.StatusCode = 204;
-        context.Response.ContentLength = 0;
-        await context.Response.CompleteAsync();
-        return;
+      var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+      // Keep connection alive briefly for browser refresh
+      await Task.Delay(100);
+      await webSocket.CloseAsync(
+          System.Net.WebSockets.WebSocketCloseStatus.NormalClosure,
+          "Connection closed",
+          CancellationToken.None);
+      return;
     }
-    
-    // Allow browser refresh WebSocket connections without HTTPS redirect
-    if (context.Request.Path.StartsWithSegments("/HouseOfLawApi"))
-    {
-        if (context.WebSockets.IsWebSocketRequest)
-        {
-            var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-            // Keep connection alive briefly for browser refresh
-            await Task.Delay(100);
-            await webSocket.CloseAsync(
-                System.Net.WebSockets.WebSocketCloseStatus.NormalClosure,
-                "Connection closed",
-                CancellationToken.None);
-            return;
-        }
-    }
-    await next();
+  }
+  await next();
 });
 
 // Skip HTTPS redirection for OPTIONS, WebSocket, SignalR, and browser refresh requests
-app.UseWhen(context => 
+app.UseWhen(context =>
     context.Request.Method != "OPTIONS" &&
-    !context.WebSockets.IsWebSocketRequest && 
+    !context.WebSockets.IsWebSocketRequest &&
     !context.Request.Path.StartsWithSegments("/hubs") &&
     !context.Request.Path.StartsWithSegments("/HouseOfLawApi"),
     appBuilder =>
 {
-    // Only redirect to HTTPS if not in development or if explicitly configured
-    if (!app.Environment.IsDevelopment())
-    {
-        appBuilder.UseHttpsRedirection();
-    }
+  // Only redirect to HTTPS if not in development or if explicitly configured
+  if (!app.Environment.IsDevelopment())
+  {
+    appBuilder.UseHttpsRedirection();
+  }
 });
 
 app.UseCloudflareForwarding();
@@ -309,27 +288,27 @@ app.UseAuthorization(); // Must come after UseAuthentication
 // Error handling middleware - after routing but before endpoints
 app.UseExceptionHandler(errorApp =>
 {
-    errorApp.Run(async context =>
+  errorApp.Run(async context =>
+  {
+    // Skip error handling for WebSocket and browser refresh connections
+    if (context.WebSockets.IsWebSocketRequest ||
+          context.Request.Path.StartsWithSegments("/HouseOfLawApi"))
     {
-        // Skip error handling for WebSocket and browser refresh connections
-        if (context.WebSockets.IsWebSocketRequest || 
-            context.Request.Path.StartsWithSegments("/HouseOfLawApi"))
-        {
-            return;
-        }
+      return;
+    }
 
-        context.Response.StatusCode = 500;
-        context.Response.ContentType = "application/json";
-        
-        var exceptionHandlerPathFeature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
-        var exception = exceptionHandlerPathFeature?.Error;
-        
-        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-        logger.LogError(exception, "Unhandled exception occurred");
-        
-        var response = new { error = exception?.Message ?? "An error occurred" };
-        await context.Response.WriteAsJsonAsync(response);
-    });
+    context.Response.StatusCode = 500;
+    context.Response.ContentType = "application/json";
+
+    var exceptionHandlerPathFeature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
+    var exception = exceptionHandlerPathFeature?.Error;
+
+    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+    logger.LogError(exception, "Unhandled exception occurred");
+
+    var response = new { error = exception?.Message ?? "An error occurred" };
+    await context.Response.WriteAsJsonAsync(response);
+  });
 });
 
 app.MapControllers();

@@ -1,21 +1,13 @@
-using House_of_law_api.Data;
-using House_of_law_api.Domain.Entities;
-using House_of_law_api.DTOs;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace House_of_law_api.Services;
 
 public interface IBreakService
 {
-    Task<UserBreakDto?> StartBreakAsync(int userId);
-    Task<UserBreakDto?> EndBreakAsync(int userId);
+    Task< UserBreakDto> StartBreakAsync(int userId);
+    Task<UserBreakDto> EndBreakAsync(int userId);
     Task<BreakStatusDto> GetCurrentStatusAsync(int userId);
-    Task<IEnumerable<UserBreakDto>> GetDailyBreaksAsync(DateTime date, string? department = null);
-    Task<IEnumerable<UserBreakDto>> GetActiveBreaksAsync(string? department = null);
+    Task<IEnumerable<UserBreakDto>> GetDailyBreaksAsync(DateTime date, string department = null);
+    Task<IEnumerable<UserBreakDto>> GetActiveBreaksAsync(string department = null);
 }
 
 public class BreakService : IBreakService
@@ -57,7 +49,7 @@ public class BreakService : IBreakService
         }
     }
 
-    public async Task<UserBreakDto?> StartBreakAsync(int userId)
+    public async Task<UserBreakDto> StartBreakAsync(int userId)
     {
         var egyptNow = GetEgyptTime();
         var today = egyptNow.Date;
@@ -104,7 +96,7 @@ public class BreakService : IBreakService
         return MapToDto(newBreak);
     }
 
-    public async Task<UserBreakDto?> EndBreakAsync(int userId)
+    public async Task<UserBreakDto> EndBreakAsync(int userId)
     {
         var activeBreak = await _context.UserBreaks
             .FirstOrDefaultAsync(b => b.UserId == userId && !b.IsCompleted);
@@ -180,7 +172,7 @@ public class BreakService : IBreakService
         };
     }
 
-    public async Task<IEnumerable<UserBreakDto>> GetDailyBreaksAsync(DateTime date, string? department = null)
+    public async Task<IEnumerable<UserBreakDto>> GetDailyBreaksAsync(DateTime date, string department = null)
     {
         var query = _context.UserBreaks
             .Include(b => b.User)
@@ -198,7 +190,7 @@ public class BreakService : IBreakService
         return breaks.Select(MapToDto);
     }
 
-    public async Task<IEnumerable<UserBreakDto>> GetActiveBreaksAsync(string? department = null)
+    public async Task<IEnumerable<UserBreakDto>> GetActiveBreaksAsync(string department = null)
     {
         var query = _context.UserBreaks
             .Include(b => b.User)

@@ -1,12 +1,6 @@
 using EFCore.BulkExtensions;
-using ExcelDataReader;
-using House_of_law_api.Data;
-using House_of_law_api.Domain.Entities;
-using House_of_law_api.Infrastructure.SignalR;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
+
 using System.Data;
-using System.Text;
 
 namespace House_of_law_api.Services.BackgroundWorkers;
 
@@ -79,7 +73,7 @@ public class MainfileImportWorker : BackgroundService
         job.Status = "Processing";
         await context.SaveChangesAsync(stoppingToken);
 
-        var filePath = Path.Combine(_uploadPath, job.FileName);
+        var filePath = Path.Combine(_uploadPath, job.StoredFileName ?? job.FileName);
         
         if (!File.Exists(filePath))
         {
@@ -114,7 +108,7 @@ public class MainfileImportWorker : BackgroundService
                 processedCount++;
                 try
                 {
-                    string? GetStr(string key) {
+                    string GetStr(string key) {
                         var k = row.Keys.FirstOrDefault(x => x.Equals(key, StringComparison.OrdinalIgnoreCase));
                         return k != null ? row[k]?.ToString() : null;
                     }
@@ -124,23 +118,31 @@ public class MainfileImportWorker : BackgroundService
                         return int.TryParse(s, out int val) ? val : 0;
                     }
 
+                    bool? GetBool(string key) {
+                        var s = GetStr(key);
+                        if (string.IsNullOrEmpty(s)) return null;
+                        s = s.Trim().ToLower();
+                        return s == "true" || s == "1" || s == "نعم" || s == "yes";
+                    }
+
                     var mainfile = new Mainfile
                     {
-                        Code = GetInt("Code"),
-                        Name = GetStr("Name"),
-                        Cid = GetStr("Cid"),
-                        Address = GetStr("Address"),
-                        Nationality = GetStr("Nationality"),
-                        Note = GetStr("Note"),
-                        Work = GetStr("Work"),
-                        Membership = GetStr("Membership"),
-                        CompanyEmail = GetStr("CompanyEmail"),
-                        CompanyFax = GetStr("CompanyFax"),
-                        CompanyRegister = GetStr("CompanyRegister"),
-                        Partner1 = GetStr("Partner1"),
-                        Partner2 = GetStr("Partner2"),
-                        Partner3 = GetStr("Partner3"),
-                        RegisterType = GetStr("RegisterType"),
+                        Code = GetInt("الكود"),
+                        Name = GetStr("الاسم"),
+                        Cid = GetStr("رقم الهوية"),
+                        Address = GetStr("العنوان"), // Added to template
+                        Nationality = GetStr("الجنسية"),
+                        Archive = GetBool("مؤرشف"),
+                        Note = GetStr("ملاحظة"),
+                        Work = GetStr("العمل"),
+                        Membership = GetStr("العضوية"),
+                        CompanyEmail = GetStr("بريد الشركة"),
+                        CompanyFax = GetStr("فاكس الشركة"),
+                        CompanyRegister = GetStr("سجل الشركة"),
+                        Partner1 = GetStr("شريك 1"),
+                        Partner2 = GetStr("شريك 2"),
+                        Partner3 = GetStr("شريك 3"),
+                        RegisterType = GetStr("نوع السجل"),
                         AddedBy = job.CreatedById,
                         DateAdded = DateTime.UtcNow,
                         ImportJobId = job.Id
@@ -186,7 +188,7 @@ public class MainfileImportWorker : BackgroundService
             await _hubContext.Clients.User(job.CreatedById.ToString()).SendAsync("broadcast", new 
             {
                 type = "excel_import_complete",
-                data = new { jobId = job.Id, fileName = job.FileName, total = processedCount, added = actualAdded }
+                data = new { jobId = job.Id, fileName = job.FileName, jobType = "Mainfile", total = processedCount, added = actualAdded }
             }, stoppingToken);
         }
         catch (Exception ex)
@@ -221,7 +223,7 @@ public class MainfileImportWorker : BackgroundService
             await _hubContext.Clients.User(job.CreatedById.ToString()).SendAsync("broadcast", new 
             {
                 type = "excel_import_progress",
-                data = new { jobId = job.Id, progress = job.Progress, processed = processedCount, total = job.TotalRows }
+                data = new { jobId = job.Id, jobType = "Mainfile", progress = job.Progress, processed = processedCount, total = job.TotalRows }
             }, stoppingToken);
         }
         catch (Exception ex)

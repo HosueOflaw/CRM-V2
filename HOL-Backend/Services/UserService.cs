@@ -1,8 +1,4 @@
-using House_of_law_api.Domain.Entities;
-using House_of_law_api.DTOs;
-using House_of_law_api.Interfaces;
-using House_of_law_api.Data;
-using Microsoft.EntityFrameworkCore;
+
 using Microsoft.Extensions.Caching.Memory;
 
 namespace House_of_law_api.Services;
@@ -47,7 +43,7 @@ public class UserService : IUserService
         return users.Select(u => MapToDto(u));
     }
 
-    public async Task<UserDto?> GetUserByIdAsync(int id)
+    public async Task<UserDto> GetUserByIdAsync(int id)
     {
         var user = await _userRepository.GetByIdAsync(id);
         return user == null ? null : MapToDto(user);
@@ -107,7 +103,7 @@ public class UserService : IUserService
         return MapToDto(createdUser);
     }
 
-    public async Task<UserDto?> UpdateUserAsync(int id, UpdateUserDto updateDto)
+    public async Task<UserDto> UpdateUserAsync(int id, UpdateUserDto updateDto)
     {
         var user = await _userRepository.GetByIdAsync(id);
         if (user == null)
@@ -181,7 +177,7 @@ public class UserService : IUserService
         return true;
     }
 
-    public async Task<UserDto?> GetUserByUsernameAsync(string username)
+    public async Task<UserDto> GetUserByUsernameAsync(string username)
     {
         var user = await _userRepository.GetByUsernameAsync(username);
         return user == null ? null : MapToDto(user);
@@ -193,7 +189,7 @@ public class UserService : IUserService
         return users.Select(u => MapToDto(u));
     }
 
-    public async Task<LoginResponseDto> LoginAsync(LoginDto loginDto, string? ipAddress, string? userAgent)
+    public async Task<LoginResponseDto> LoginAsync(LoginDto loginDto, string ipAddress, string userAgent)
     {
         var user = await _userRepository.GetByUsernameAsync(loginDto.Username);
 

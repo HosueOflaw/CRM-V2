@@ -1,7 +1,4 @@
-using House_of_law_api.Data;
-using House_of_law_api.Domain.Entities;
-using House_of_law_api.Interfaces;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace House_of_law_api.Repositories;
 
@@ -14,12 +11,12 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     {
     }
 
-    public async Task<User?> GetByUsernameAsync(string username)
+    public async Task<User> GetByUsernameAsync(string username)
     {
         return await _dbSet.FirstOrDefaultAsync(u => u.Username == username);
     }
 
-    public async Task<User?> GetByEmailAsync(string email)
+    public async Task<User> GetByEmailAsync(string email)
     {
         return await _dbSet.FirstOrDefaultAsync(u => u.Email == email);
     }

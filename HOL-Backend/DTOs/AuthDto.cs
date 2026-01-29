@@ -9,17 +9,17 @@ public class LoginDto
 public class LoginResponseDto
 {
     public int UserId { get; set; }
-    public string? Username { get; set; }
-    public string? FullName { get; set; }
-    public string? Email { get; set; }
-    public string? Role { get; set; }
-    public string? Department { get; set; }
-    public string? SupervisedDepartment { get; set; }
-    public string? AccessibleDepartments { get; set; }
-    public string? AccessibleFeatures { get; set; }
+    public string Username { get; set; }
+    public string FullName { get; set; }
+    public string Email { get; set; }
+    public string Role { get; set; }
+    public string Department { get; set; }
+    public string SupervisedDepartment { get; set; }
+    public string AccessibleDepartments { get; set; }
+    public string AccessibleFeatures { get; set; }
     public bool Success { get; set; }
-    public string? Message { get; set; }
-    public string? Token { get; set; }
+    public string Message { get; set; }
+    public string Token { get; set; }
     public int ExpiresIn { get; set; } = 3600;
 }
 

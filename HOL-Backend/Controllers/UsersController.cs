@@ -1,7 +1,3 @@
-using House_of_law_api.DTOs;
-using House_of_law_api.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace House_of_law_api.Controllers;
 
@@ -12,343 +8,338 @@ namespace House_of_law_api.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    private readonly IUserService _userService;
-    private readonly INotificationService _notificationService;
-    private readonly ILogger<UsersController> _logger;
+  private readonly IUserService _userService;
+  private readonly INotificationService _notificationService;
+  private readonly ILogger<UsersController> _logger;
 
-    public UsersController(
-        IUserService userService,
-        INotificationService notificationService,
-        ILogger<UsersController> logger)
+  public UsersController(
+      IUserService userService,
+      INotificationService notificationService,
+      ILogger<UsersController> logger)
+  {
+    _userService = userService;
+    _notificationService = notificationService;
+    _logger = logger;
+  }
+
+  /// <summary>
+  /// جلب كل المستخدمين
+  /// GET: api/users
+  /// </summary>
+  [HttpGet]
+  [Authorize]
+  public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
+  {
+    // استخدام Cloudflare IP في الـ Logging
+    var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+    var cloudflareRayId = HttpContext.Items["Cloudflare-RayId"]?.ToString();
+
+    _logger.LogInformation("GetUsers called from IP: {Ip}, CF-Ray: {RayId}", clientIp, cloudflareRayId);
+
+    var users = await _userService.GetAllUsersAsync();
+    return Ok(users);
+  }
+
+  /// <summary>
+  /// جلب مستخدم واحد
+  /// GET: api/users/5
+  /// </summary>
+  [HttpGet("{id}")]
+  [Authorize]
+  public async Task<ActionResult<UserDto>> GetUser(int id)
+  {
+    var user = await _userService.GetUserByIdAsync(id);
+
+    if (user == null)
     {
-        _userService = userService;
-        _notificationService = notificationService;
-        _logger = logger;
+      return NotFound();
     }
 
-    /// <summary>
-    /// جلب كل المستخدمين
-    /// GET: api/users
-    /// </summary>
-    [HttpGet]
-    [Authorize]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
-    {
-        // استخدام Cloudflare IP في الـ Logging
-        var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
-        var cloudflareRayId = HttpContext.Items["Cloudflare-RayId"]?.ToString();
-        
-        _logger.LogInformation("GetUsers called from IP: {Ip}, CF-Ray: {RayId}", clientIp, cloudflareRayId);
+    return Ok(user);
+  }
 
-        var users = await _userService.GetAllUsersAsync();
-        return Ok(users);
+  /// <summary>
+  /// إنشاء مستخدم جديد
+  /// POST: api/users
+  /// </summary>
+  [HttpPost]
+  [Authorize(Roles = "admin")]
+  public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto createDto)
+  {
+    // استخدام Cloudflare IP للـ Logging
+    var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+    _logger.LogInformation("CreateUser called from IP: {Ip}, Username: {Username}, HasPassword: {HasPassword}",
+        clientIp, createDto.Username, !string.IsNullOrEmpty(createDto.Password));
+
+    // Validation
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
     }
 
-    /// <summary>
-    /// جلب مستخدم واحد
-    /// GET: api/users/5
-    /// </summary>
-    [HttpGet("{id}")]
-    [Authorize]
-    public async Task<ActionResult<UserDto>> GetUser(int id)
+    if (string.IsNullOrWhiteSpace(createDto.Password))
     {
-        var user = await _userService.GetUserByIdAsync(id);
-
-        if (user == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(user);
+      return BadRequest(new { error = "Password is required" });
     }
 
-    /// <summary>
-    /// إنشاء مستخدم جديد
-    /// POST: api/users
-    /// </summary>
-    [HttpPost]
-    [Authorize(Roles = "admin")]
-    public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto createDto)
+    try
     {
-        // استخدام Cloudflare IP للـ Logging
-        var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
-        _logger.LogInformation("CreateUser called from IP: {Ip}, Username: {Username}, HasPassword: {HasPassword}", 
-            clientIp, createDto.Username, !string.IsNullOrEmpty(createDto.Password));
+      var user = await _userService.CreateUserAsync(createDto);
 
-        // Validation
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
+      // إرسال إشعار SignalR لكل المستخدمين
+      await _notificationService.BroadcastToAllAsync("user:created", new
+      {
+        userId = user.Id,
+        username = user.Username,
+        fullName = user.FullName
+      });
 
-        if (string.IsNullOrWhiteSpace(createDto.Password))
-        {
-            return BadRequest(new { error = "Password is required" });
-        }
+      return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+    }
+    catch (InvalidOperationException ex)
+    {
+      return BadRequest(new { error = ex.Message });
+    }
+  }
 
-        try
-        {
-            var user = await _userService.CreateUserAsync(createDto);
+  /// <summary>
+  /// تحديث مستخدم
+  /// PUT: api/users/5
+  /// </summary>
+  [HttpPut("{id}")]
+  [Authorize]
+  public async Task<IActionResult> UpdateUser(int id, UpdateUserDto updateDto)
+  {
+    var user = await _userService.UpdateUserAsync(id, updateDto);
 
-            // إرسال إشعار SignalR لكل المستخدمين
-            await _notificationService.BroadcastToAllAsync("user:created", new
-            {
-                userId = user.Id,
-                username = user.Username,
-                fullName = user.FullName
-            });
-
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+    if (user == null)
+    {
+      return NotFound();
     }
 
-    /// <summary>
-    /// تحديث مستخدم
-    /// PUT: api/users/5
-    /// </summary>
-    [HttpPut("{id}")]
-    [Authorize]
-    public async Task<IActionResult> UpdateUser(int id, UpdateUserDto updateDto)
+    // إشعار SignalR
+    await _notificationService.BroadcastToAllAsync("user:updated", new
     {
-        var user = await _userService.UpdateUserAsync(id, updateDto);
+      userId = user.Id,
+      username = user.Username
+    });
 
-        if (user == null)
-        {
-            return NotFound();
-        }
+    return NoContent();
+  }
 
-        // إشعار SignalR
-        await _notificationService.BroadcastToAllAsync("user:updated", new
-        {
-            userId = user.Id,
-            username = user.Username
-        });
+  /// <summary>
+  /// حذف مستخدم
+  /// DELETE: api/users/5
+  /// </summary>
+  [HttpDelete("{id}")]
+  [Authorize(Roles = "admin")]
+  public async Task<IActionResult> DeleteUser(int id)
+  {
+    var deleted = await _userService.DeleteUserAsync(id);
 
-        return NoContent();
+    if (!deleted)
+    {
+      return NotFound();
     }
 
-    /// <summary>
-    /// حذف مستخدم
-    /// DELETE: api/users/5
-    /// </summary>
-    [HttpDelete("{id}")]
-    [Authorize(Roles = "admin")]
-    public async Task<IActionResult> DeleteUser(int id)
+    // إشعار SignalR
+    await _notificationService.BroadcastToAllAsync("user:deleted", new
     {
-        var deleted = await _userService.DeleteUserAsync(id);
+      userId = id
+    });
 
-        if (!deleted)
-        {
-            return NotFound();
-        }
+    return NoContent();
+  }
 
-        // إشعار SignalR
-        await _notificationService.BroadcastToAllAsync("user:deleted", new
-        {
-            userId = id
-        });
+  /// <summary>
+  /// جلب مستخدم بالـ Username
+  /// GET: api/users/username/{username}
+  /// </summary>
+  [HttpGet("username/{username}")]
+  [Authorize]
+  public async Task<ActionResult<UserDto>> GetUserByUsername(string username)
+  {
+    var user = await _userService.GetUserByUsernameAsync(username);
 
-        return NoContent();
+    if (user == null)
+    {
+      return NotFound();
     }
 
-    /// <summary>
-    /// جلب مستخدم بالـ Username
-    /// GET: api/users/username/{username}
-    /// </summary>
-    [HttpGet("username/{username}")]
-    [Authorize]
-    public async Task<ActionResult<UserDto>> GetUserByUsername(string username)
+    return Ok(user);
+  }
+
+  /// <summary>
+  /// جلب مستخدمين حسب الـ Role
+  /// GET: api/users/role/{role}
+  /// </summary>
+  [HttpGet("role/{role}")]
+  [Authorize(Roles = "admin")]
+  public async Task<ActionResult<IEnumerable<UserDto>>> GetUsersByRole(string role)
+  {
+    var users = await _userService.GetUsersByRoleAsync(role);
+    return Ok(users);
+  }
+
+  /// <summary>
+  /// تسجيل الدخول
+  /// POST: api/users/login
+  /// </summary>
+  [HttpPost("login")]
+  [AllowAnonymous]
+  public async Task<ActionResult<LoginResponseDto>> Login(LoginDto loginDto)
+  {
+    // Get Real IP (considering proxies and Cloudflare)
+    var clientIp = HttpContext.Request.Headers["CF-Connecting-IP"].FirstOrDefault()
+                 ?? HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                 ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+
+    var userAgent = Request.Headers["User-Agent"].ToString();
+
+    _logger.LogInformation("Login attempt from IP: {Ip}, Username: {Username}", clientIp, loginDto.Username);
+
+    var result = await _userService.LoginAsync(loginDto, clientIp, userAgent);
+
+    if (!result.Success)
     {
-        var user = await _userService.GetUserByUsernameAsync(username);
-
-        if (user == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(user);
+      return Unauthorized(result);
     }
 
-    /// <summary>
-    /// جلب مستخدمين حسب الـ Role
-    /// GET: api/users/role/{role}
-    /// </summary>
-    [HttpGet("role/{role}")]
-    [Authorize(Roles = "admin")]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetUsersByRole(string role)
+    // Log token generation for debugging (only in development)
+    if (!string.IsNullOrEmpty(result.Token))
     {
-        var users = await _userService.GetUsersByRoleAsync(role);
-        return Ok(users);
+      _logger.LogInformation("JWT Token generated successfully for user: {Username}, Token length: {TokenLength}",
+          result.Username, result.Token?.Length ?? 0);
     }
 
-    /// <summary>
-    /// تسجيل الدخول
-    /// POST: api/users/login
-    /// </summary>
-    [HttpPost("login")]
-    [AllowAnonymous]
-    public async Task<ActionResult<LoginResponseDto>> Login(LoginDto loginDto)
+    // إشعار SignalR
+    // Removed for performance reasons (High Concurrency 3000+ users)
+    // await _notificationService.BroadcastToAllAsync("user:logged_in", ...);
+
+    return Ok(result);
+  }
+
+  /// <summary>
+  /// تغيير كلمة المرور
+  /// POST: api/users/change-password
+  /// </summary>
+  [HttpPost("change-password")]
+  [Authorize]
+  public async Task<IActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
+  {
+    var success = await _userService.ChangePasswordAsync(changePasswordDto);
+
+    if (!success)
     {
-        // Get Real IP (considering proxies and Cloudflare)
-        var clientIp = HttpContext.Request.Headers["CF-Connecting-IP"].FirstOrDefault()
-                     ?? HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
-                     ?? HttpContext.Connection.RemoteIpAddress?.ToString();
-        
-        var userAgent = Request.Headers["User-Agent"].ToString();
-
-        _logger.LogInformation("Login attempt from IP: {Ip}, Username: {Username}", clientIp, loginDto.Username);
-
-        var result = await _userService.LoginAsync(loginDto, clientIp, userAgent);
-
-        if (!result.Success)
-        {
-            return Unauthorized(result);
-        }
-
-        // Log token generation for debugging (only in development)
-        if (!string.IsNullOrEmpty(result.Token))
-        {
-            _logger.LogInformation("JWT Token generated successfully for user: {Username}, Token length: {TokenLength}", 
-                result.Username, result.Token?.Length ?? 0);
-        }
-
-        // إشعار SignalR
-        await _notificationService.BroadcastToAllAsync("user:logged_in", new
-        {
-            userId = result.UserId,
-            username = result.Username
-        });
-
-        return Ok(result);
+      return BadRequest(new { message = "Invalid old password or user not found" });
     }
 
-    /// <summary>
-    /// تغيير كلمة المرور
-    /// POST: api/users/change-password
-    /// </summary>
-    [HttpPost("change-password")]
-    [Authorize]
-    public async Task<IActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
+    return Ok(new { message = "Password changed successfully" });
+  }
+
+  /// <summary>
+  /// إعادة تعيين كلمة مرور مستخدم (للمسؤول فقط)
+  /// POST: api/users/admin-reset-password
+  /// </summary>
+  [HttpPost("admin-reset-password")]
+  [Authorize(Roles = "admin")]
+  public async Task<IActionResult> AdminResetPassword(AdminResetPasswordDto resetDto)
+  {
+    var success = await _userService.AdminResetPasswordAsync(resetDto);
+
+    if (!success)
     {
-        var success = await _userService.ChangePasswordAsync(changePasswordDto);
-
-        if (!success)
-        {
-            return BadRequest(new { message = "Invalid old password or user not found" });
-        }
-
-        return Ok(new { message = "Password changed successfully" });
+      return NotFound(new { message = "User not found" });
     }
 
-    /// <summary>
-    /// إعادة تعيين كلمة مرور مستخدم (للمسؤول فقط)
-    /// POST: api/users/admin-reset-password
-    /// </summary>
-    [HttpPost("admin-reset-password")]
-    [Authorize(Roles = "admin")]
-    public async Task<IActionResult> AdminResetPassword(AdminResetPasswordDto resetDto)
+    return Ok(new { message = "User password has been reset successfully" });
+  }
+
+  /// <summary>
+  /// طلب إعادة تعيين كلمة المرور (إرسال كود للبريد)
+  /// POST: api/users/forgot-password
+  /// </summary>
+  [HttpPost("forgot-password")]
+  [AllowAnonymous]
+  public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotDto)
+  {
+    var success = await _userService.ForgotPasswordAsync(forgotDto.Email);
+
+    // أمنياً: لا نخبر المستخدم إذا كان البريد موجوداً أم لا
+    return Ok(new { message = "If your email is registered, you will receive a verification code." });
+  }
+
+  /// <summary>
+  /// إعادة تعيين كلمة المرور باستخدام الكود
+  /// POST: api/users/reset-password
+  /// </summary>
+  [HttpPost("reset-password")]
+  [AllowAnonymous]
+  public async Task<IActionResult> ResetPassword(ResetPasswordDto resetDto)
+  {
+    var success = await _userService.ResetPasswordAsync(resetDto);
+
+    if (!success)
     {
-        var success = await _userService.AdminResetPasswordAsync(resetDto);
-
-        if (!success)
-        {
-            return NotFound(new { message = "User not found" });
-        }
-
-        return Ok(new { message = "User password has been reset successfully" });
+      return BadRequest(new { message = "Invalid code, email, or code expired" });
     }
 
-    /// <summary>
-    /// طلب إعادة تعيين كلمة المرور (إرسال كود للبريد)
-    /// POST: api/users/forgot-password
-    /// </summary>
-    [HttpPost("forgot-password")]
-    [AllowAnonymous]
-    public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotDto)
+    return Ok(new { message = "Password has been reset successfully" });
+  }
+
+  /// <summary>
+  /// تسجيل الخروج
+  /// POST: api/users/logout
+  /// Headers: Authorization: Bearer {token}
+  /// </summary>
+  [HttpPost("logout")]
+  [Authorize]
+  public async Task<IActionResult> Logout()
+  {
+    // الحصول على User ID من الـ Claims
+    var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+    var usernameClaim = User.FindFirst(System.Security.Claims.ClaimTypes.Name);
+
+    var userId = userIdClaim != null && int.TryParse(userIdClaim.Value, out var id) ? id : (int?)null;
+    var username = usernameClaim?.Value;
+
+    var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+    _logger.LogInformation("Logout request from IP: {Ip}, UserId: {UserId}, Username: {Username}",
+        clientIp, userId, username);
+
+    // إشعار SignalR للمستخدمين الآخرين ومسح الجلسة من السيرفر
+    if (userId.HasValue)
     {
-        var success = await _userService.ForgotPasswordAsync(forgotDto.Email);
-        
-        // أمنياً: لا نخبر المستخدم إذا كان البريد موجوداً أم لا
-        return Ok(new { message = "If your email is registered, you will receive a verification code." });
+      await _userService.LogoutAsync(userId.Value);
+
+      await _userService.LogoutAsync(userId.Value);
+
+      // Removed Broadcast for performance
+      // await _notificationService.BroadcastToAllAsync("user:logged_out", ...);
     }
 
-    /// <summary>
-    /// إعادة تعيين كلمة المرور باستخدام الكود
-    /// POST: api/users/reset-password
-    /// </summary>
-    [HttpPost("reset-password")]
-    [AllowAnonymous]
-    public async Task<IActionResult> ResetPassword(ResetPasswordDto resetDto)
+    // ملاحظة: JWT tokens هي stateless، لذلك لا يمكن "إلغاء" الـ token من الـ server
+    // الـ client يجب أن يتجاهل الـ token بعد logout
+    return Ok(new
     {
-        var success = await _userService.ResetPasswordAsync(resetDto);
+      message = "Logout successful",
+      timestamp = DateTime.UtcNow
+    });
+  }
+  /// <summary>
+  /// جلب سجل دخول المستخدمين (للأدمن فقط)
+  /// GET: api/users/login-history?date=2026-01-11
+  /// </summary>
+  [HttpGet("login-history")]
+  [Authorize(Roles = "admin")]
+  public async Task<ActionResult<IEnumerable<LoginHistoryDto>>> GetLoginHistory([FromQuery] DateTime? date = null)
+  {
+    // If date is provided, get records for that specific day
+    // If no date, get all recent records (last 1000)
+    DateTime? fromDate = date?.Date;
+    DateTime? toDate = date?.Date.AddDays(1).AddSeconds(-1);
 
-        if (!success)
-        {
-            return BadRequest(new { message = "Invalid code, email, or code expired" });
-        }
-
-        return Ok(new { message = "Password has been reset successfully" });
-    }
-
-    /// <summary>
-    /// تسجيل الخروج
-    /// POST: api/users/logout
-    /// Headers: Authorization: Bearer {token}
-    /// </summary>
-    [HttpPost("logout")]
-    [Authorize]
-    public async Task<IActionResult> Logout()
-    {
-        // الحصول على User ID من الـ Claims
-        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-        var usernameClaim = User.FindFirst(System.Security.Claims.ClaimTypes.Name);
-        
-        var userId = userIdClaim != null && int.TryParse(userIdClaim.Value, out var id) ? id : (int?)null;
-        var username = usernameClaim?.Value;
-
-        var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
-        _logger.LogInformation("Logout request from IP: {Ip}, UserId: {UserId}, Username: {Username}", 
-            clientIp, userId, username);
-
-        // إشعار SignalR للمستخدمين الآخرين ومسح الجلسة من السيرفر
-        if (userId.HasValue)
-        {
-            await _userService.LogoutAsync(userId.Value);
-            
-            await _notificationService.BroadcastToAllAsync("user:logged_out", new
-            {
-                userId = userId.Value,
-                username = username,
-                timestamp = DateTime.UtcNow
-            });
-        }
-
-        // ملاحظة: JWT tokens هي stateless، لذلك لا يمكن "إلغاء" الـ token من الـ server
-        // الـ client يجب أن يتجاهل الـ token بعد logout
-        return Ok(new 
-        { 
-            message = "Logout successful",
-            timestamp = DateTime.UtcNow
-        });
-    }
-    /// <summary>
-    /// جلب سجل دخول المستخدمين (للأدمن فقط)
-    /// GET: api/users/login-history?date=2026-01-11
-    /// </summary>
-    [HttpGet("login-history")]
-    [Authorize(Roles = "admin")]
-    public async Task<ActionResult<IEnumerable<LoginHistoryDto>>> GetLoginHistory([FromQuery] DateTime? date = null)
-    {
-        // If date is provided, get records for that specific day
-        // If no date, get all recent records (last 1000)
-        DateTime? fromDate = date?.Date;
-        DateTime? toDate = date?.Date.AddDays(1).AddSeconds(-1);
-
-        var history = await _userService.GetLoginHistoryAsync(null, fromDate, toDate);
-        return Ok(history);
-    }
+    var history = await _userService.GetLoginHistoryAsync(null, fromDate, toDate);
+    return Ok(history);
+  }
 }

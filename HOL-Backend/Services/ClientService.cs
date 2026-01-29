@@ -1,8 +1,3 @@
-using House_of_law_api.Domain.Entities;
-using House_of_law_api.DTOs;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting;
-using House_of_law_api.Interfaces;
 
 namespace House_of_law_api.Services;
 
@@ -32,7 +27,7 @@ public class ClientService : IClientService
         _additionalAmountRepository = additionalAmountRepository;
         _logger = logger;
         _uploadsPath = Path.Combine(environment.WebRootPath ?? environment.ContentRootPath, "uploads", "attachments");
-        
+
         // Create uploads directory if it doesn't exist
         if (!Directory.Exists(_uploadsPath))
         {
@@ -99,7 +94,7 @@ public class ClientService : IClientService
             fileDetail.FileCode, fileDetail.Reason ?? "NULL");
 
         await _fileDetailRepository.AddAsync(fileDetail);
-        
+
         _logger.LogInformation("FileDetail saved: Id={Id}, FileCode={FileCode}, Reason={Reason}",
             fileDetail.Id, fileDetail.FileCode, fileDetail.Reason ?? "NULL");
 
@@ -138,7 +133,7 @@ public class ClientService : IClientService
                 {
                     foreach (var valuePair in financialEntry.Values)
                     {
-                        if (!string.IsNullOrWhiteSpace(valuePair.Value) && 
+                        if (!string.IsNullOrWhiteSpace(valuePair.Value) &&
                             decimal.TryParse(valuePair.Value, out var amountValue))
                         {
                             var additionalAmount = new AdditionalAmount
@@ -165,7 +160,7 @@ public class ClientService : IClientService
             }
         }
 
-        _logger.LogInformation("Client created successfully: Code={Code}, Name={Name}, Id={Id}, Contacts={Contacts}, FinancialEntries={FinancialEntries}", 
+        _logger.LogInformation("Client created successfully: Code={Code}, Name={Name}, Id={Id}, Contacts={Contacts}, FinancialEntries={FinancialEntries}",
             createdMainfile.Code, createdMainfile.Name, createdMainfile.Id, contactsSaved, financialEntriesSaved);
 
         return new ClientDto
@@ -184,7 +179,7 @@ public class ClientService : IClientService
         };
     }
 
-    public async Task<ClientDto?> GetClientByIdAsync(long id)
+    public async Task<ClientDto> GetClientByIdAsync(long id)
     {
         var mainfile = await _mainfileRepository.GetByIdAsync(id);
         if (mainfile == null) return null;
@@ -206,7 +201,7 @@ public class ClientService : IClientService
         };
     }
 
-    public async Task<ClientDto?> GetClientByCodeAsync(int code)
+    public async Task<ClientDto> GetClientByCodeAsync(int code)
     {
         var mainfile = await _mainfileRepository.GetByCodeAsync(code);
         if (mainfile == null) return null;
@@ -216,7 +211,25 @@ public class ClientService : IClientService
 
     public async Task<IEnumerable<ClientDto>> GetAllClientsAsync()
     {
-        return await _mainfileRepository.GetAllClientsOptimizedAsync();
+        // Fixing performance: Limit to recent 1000 records until full pagination is implemented
+        var clients = await _mainfileRepository.GetAllClientsOptimizedAsync();
+        return clients.Take(1000); 
+    }
+
+    public async Task<ClientAttachmentDto> GetAttachmentByIdAsync(int attachmentId)
+    {
+        var attachment = await _attachmentRepository.GetByIdAsync(attachmentId);
+        if (attachment == null) return null;
+
+        return new ClientAttachmentDto
+        {
+            Id = attachment.Id,
+            Note = attachment.Notes,
+            DateAdded = attachment.DateAdded,
+            UserAdded = attachment.UserAdded,
+            FileName = Path.GetFileName(attachment.Value ?? ""),
+            FilePath = attachment.Value
+        };
     }
 
     public async Task<ClientAttachmentDto> AddAttachmentAsync(long fileCode, IFormFile file, CreateClientAttachmentDto dto)
@@ -290,7 +303,7 @@ public class ClientService : IClientService
     public async Task<IEnumerable<ClientAttachmentDto>> GetClientAttachmentsAsync(long fileCode)
     {
         var attachments = await _attachmentRepository.GetByFileCodeAsync(fileCode);
-        
+
         return attachments.Select(a => new ClientAttachmentDto
         {
             Id = a.Id,
@@ -305,7 +318,7 @@ public class ClientService : IClientService
     public async Task<IEnumerable<ClientContactDto>> GetClientContactsAsync(long fileCode)
     {
         var statements = await _callcenterRepository.GetByFileCodeAsync(fileCode);
-        
+
         return statements.Select(s => new ClientContactDto
         {
             Id = s.Id, // Add Id for deletion

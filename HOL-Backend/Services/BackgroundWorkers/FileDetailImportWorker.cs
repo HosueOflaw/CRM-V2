@@ -1,11 +1,5 @@
-using EFCore.BulkExtensions;
-using House_of_law_api.Data;
-using House_of_law_api.Domain.Entities;
-using House_of_law_api.Infrastructure.SignalR;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
+
 using System.Data;
-using System.Text;
 
 namespace House_of_law_api.Services.BackgroundWorkers;
 
@@ -77,7 +71,7 @@ public class FileDetailImportWorker : BackgroundService
         job.Status = "Processing";
         await context.SaveChangesAsync(stoppingToken);
 
-        var filePath = Path.Combine(_uploadPath, job.FileName);
+        var filePath = Path.Combine(_uploadPath, job.StoredFileName ?? job.FileName);
         
         if (!File.Exists(filePath))
         {
@@ -112,7 +106,7 @@ public class FileDetailImportWorker : BackgroundService
                 processedCount++;
                 try
                 {
-                    string? GetStr(string key) {
+                    string GetStr(string key) {
                         var k = row.Keys.FirstOrDefault(x => x.Equals(key, StringComparison.OrdinalIgnoreCase));
                         return k != null ? row[k]?.ToString() : null;
                     }
@@ -134,23 +128,28 @@ public class FileDetailImportWorker : BackgroundService
 
                     DateTime? GetDate(string key) {
                         var s = GetStr(key);
-                        return DateTime.TryParse(s, out DateTime val) ? val : null;
+                        return DateTime.TryParse(s, out DateTime val) ? (DateTime?)val : null;
                     }
 
                     var detail = new FileDetail
                     {
-                        FileCode = GetLong("FileCode"),
-                        DeptCode = GetLong("DeptCode"),
-                        Reason = GetStr("Reason"),
-                        PatchNo = GetStr("PatchNo"),
-                        Client = GetInt("Client"), // Now int?
-                        ContractNo = GetStr("ContractNo"),
-                        DeptAmount = GetDec("DeptAmount"),
-                        LegalPlaintiff = GetStr("LegalPlaintiff"),
-                        LawyerUser = GetInt("LawyerUser"),
-                        CourtUser = GetInt("CourtUser"),
-                        MdUser = GetInt("MdUser"),
-                        LegalAdvisorUser = GetInt("LegalAdvisorUser"),
+                        FileCode = GetLong("كود الملف"),
+                        DeptCode = GetLong("كود المديونية"),
+                        Reason = GetStr("السبب"),
+                        PatchNo = GetStr("رقم القيد"),
+                        DateFinished = GetDate("تاريخ الانتهاء"), // Note: This wasn't in list but usually present in entity? Checking DTO.. template didn't have it explicitly listed in headers previously created but entity has it. Wait, the template generation list in controller lines 242-253 DOES NOT include DateFinished. Let's check the valid list I created in controller step.
+                        // Controller list: "كود الملف", "كود المديونية", "السبب", "رقم القيد", "العميل", "رقم العقد", "المبلغ المختص", "المدعي القانوني", "المحامي", "المحكمة", "MD", "المستشار القانوني"
+                        // Entity has DateFinished. If it's not in template, I shouldn't try to get it, or I should accept it might be missing?
+                        // Let's stick to what's in the template for now, or just try "تاريخ الانتهاء" if user adds it, but GetDate returns null if missing anyway. 
+                        
+                        Client = GetInt("العميل"),
+                        ContractNo = GetStr("رقم العقد"),
+                        DeptAmount = GetDec("المبلغ المختص"),
+                        LegalPlaintiff = GetStr("المدعي القانوني"),
+                        LawyerUser = GetInt("المحامي"),
+                        CourtUser = GetInt("المحكمة"),
+                        MdUser = GetInt("MD"),
+                        LegalAdvisorUser = GetInt("المستشار القانوني"),
                         DateAdded = DateTime.UtcNow,
                         ImportJobId = job.Id
                     };

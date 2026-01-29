@@ -46,8 +46,8 @@ public class TasksController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetTasks(
-        [FromQuery] string? status, 
-        [FromQuery] string? priority,
+        [FromQuery] string status, 
+        [FromQuery] string priority,
         [FromQuery] DateTime? date,
         [FromQuery] DateTime? startDate,
         [FromQuery] DateTime? endDate)

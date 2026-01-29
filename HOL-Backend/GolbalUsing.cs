@@ -1,0 +1,23 @@
+global using House_of_law_api.DTOs;
+global using House_of_law_api.Interfaces;
+global using House_of_law_api.Data;
+global using House_of_law_api.Infrastructure.Cloudflare;
+global using House_of_law_api.Infrastructure.Security;
+global using House_of_law_api.Infrastructure.SignalR;
+global using House_of_law_api.Infrastructure.Swagger;
+global using House_of_law_api.Repositories;
+global using House_of_law_api.Services;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.AspNetCore.SignalR;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.IdentityModel.Tokens;
+global using Microsoft.OpenApi.Models;
+global using System.Text;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Mvc;
+global using System.Security.Claims;
+global using Microsoft.AspNetCore.Diagnostics;
+global using System.ComponentModel.DataAnnotations;
+global using System.ComponentModel.DataAnnotations.Schema;
+
+namespace House_of_law_api.Modules;

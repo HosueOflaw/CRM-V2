@@ -19,12 +19,12 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         _dbSet = context.Set<T>();
     }
 
-    public virtual async Task<T?> GetByIdAsync(int id)
+    public virtual async Task<T> GetByIdAsync(int id)
     {
         return await _dbSet.FindAsync(id);
     }
 
-    public virtual async Task<T?> GetByIdAsync(long id)
+    public virtual async Task<T> GetByIdAsync(long id)
     {
         return await _dbSet.FindAsync(id);
     }
@@ -39,7 +39,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         return await _dbSet.AsNoTracking().Where(predicate).ToListAsync();
     }
 
-    public virtual async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
+    public virtual async Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
     {
         return await _dbSet.AsNoTracking().FirstOrDefaultAsync(predicate);
     }
@@ -109,7 +109,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
     public virtual async Task<(IEnumerable<T> Items, int TotalCount)> GetPagedAsync(
         int pageNumber, 
         int pageSize,
-        Expression<Func<T, bool>>? filter = null)
+        Expression<Func<T, bool>> filter = null)
     {
         var query = _dbSet.AsQueryable();
 

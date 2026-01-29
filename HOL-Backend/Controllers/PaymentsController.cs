@@ -1,7 +1,4 @@
-using House_of_law_api.DTOs;
-using House_of_law_api.Interfaces;
-using House_of_law_api.Services;
-using Microsoft.AspNetCore.Mvc;
+
 
 namespace House_of_law_api.Controllers;
 
@@ -36,7 +33,7 @@ public class PaymentsController : ControllerBase
         var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
         _logger.LogInformation("GetPayments called from IP: {Ip}", clientIp);
 
-        IEnumerable<Domain.Entities.Payment> payments;
+        IEnumerable<Payment> payments;
 
         if (fileCode.HasValue)
         {
@@ -49,6 +46,8 @@ public class PaymentsController : ControllerBase
         else
         {
             payments = await _repository.GetAllAsync();
+            // Performance Guard: Limit to recent 1000 if fetching all
+            payments = payments.OrderByDescending(p => p.DateAdded).Take(1000);
         }
 
         var dtos = payments.Select(p => new PaymentDto
@@ -108,7 +107,7 @@ public class PaymentsController : ControllerBase
         var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
         _logger.LogInformation("CreatePayment called from IP: {Ip}, Amount: {Amount}", clientIp, createDto.Value);
 
-        var payment = new Domain.Entities.Payment
+        var payment = new Payment
         {
             FileCode = createDto.FileCode,
             DeptCode = createDto.DeptCode,
@@ -123,14 +122,8 @@ public class PaymentsController : ControllerBase
         var created = await _repository.AddAsync(payment);
 
         // إرسال إشعار SignalR لكل المستخدمين
-        await _notificationService.BroadcastToAllAsync("payment:created", new
-        {
-            paymentId = created.Id,
-            fileCode = created.FileCode,
-            deptCode = created.DeptCode,
-            value = created.Value,
-            dateAdded = created.DateAdded
-        });
+        // Removed for performance reasons
+        // await _notificationService.BroadcastToAllAsync("payment:created", ...);
 
         // أو إرسال لمجموعة معينة (مثلاً: finance-1)
         if (created.DeptCode.HasValue)
@@ -186,10 +179,8 @@ public class PaymentsController : ControllerBase
         await _repository.UpdateAsync(payment);
 
         // إشعار SignalR
-        await _notificationService.BroadcastToAllAsync("payment:updated", new
-        {
-            paymentId = payment.Id
-        });
+        // Removed for performance reasons
+        // await _notificationService.BroadcastToAllAsync("payment:updated", ...);
 
         return NoContent();
     }
@@ -211,10 +202,8 @@ public class PaymentsController : ControllerBase
         await _repository.DeleteAsync(payment);
 
         // إشعار SignalR
-        await _notificationService.BroadcastToAllAsync("payment:deleted", new
-        {
-            paymentId = id
-        });
+        // Removed for performance reasons
+        // await _notificationService.BroadcastToAllAsync("payment:deleted", ...);
 
         return NoContent();
     }

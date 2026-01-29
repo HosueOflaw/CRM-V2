@@ -30,7 +30,7 @@ public class SessionValidationFilter : IAsyncActionFilter
             {
                 var cacheKey = $"user_stamp_{userId}";
                 
-                if (!_cache.TryGetValue(cacheKey, out string? dbSecurityStamp))
+                if (!_cache.TryGetValue(cacheKey, out string dbSecurityStamp))
                 {
                     var dbUser = await _userRepository.GetByIdAsync(userId);
                     dbSecurityStamp = dbUser?.SecurityStamp;

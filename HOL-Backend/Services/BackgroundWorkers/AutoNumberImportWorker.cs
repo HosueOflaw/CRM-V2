@@ -1,11 +1,5 @@
-using EFCore.BulkExtensions;
-using House_of_law_api.Data;
-using House_of_law_api.Domain.Entities;
-using House_of_law_api.Infrastructure.SignalR;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
+
 using System.Data;
-using System.Text;
 
 namespace House_of_law_api.Services.BackgroundWorkers;
 
@@ -77,7 +71,7 @@ public class AutoNumberImportWorker : BackgroundService
         job.Status = "Processing";
         await context.SaveChangesAsync(stoppingToken);
 
-        var filePath = Path.Combine(_uploadPath, job.FileName);
+        var filePath = Path.Combine(_uploadPath, job.StoredFileName ?? job.FileName);
         
         if (!File.Exists(filePath))
         {
@@ -112,7 +106,7 @@ public class AutoNumberImportWorker : BackgroundService
                 processedCount++;
                 try
                 {
-                    string? GetStr(string key) {
+                    string GetStr(string key) {
                         var k = row.Keys.FirstOrDefault(x => x.Equals(key, StringComparison.OrdinalIgnoreCase));
                         return k != null ? row[k]?.ToString() : null;
                     }
@@ -129,13 +123,14 @@ public class AutoNumberImportWorker : BackgroundService
 
                     var autoNum = new AutoNumber
                     {
-                        FileCode = GetLong("FileCode"),
-                        AutoNumberValue = GetStr("AutoNumber"),
-                        Type = GetStr("Type"),
-                        CaseRef = GetStr("CaseRef"),
-                        Note = GetStr("Note"),
-                        Claimant = GetStr("Claimant"),
-                        DeptCode = GetInt("DeptCode"),
+                        FileCode = GetLong("كود الملف"),
+                        DeptCode = GetInt("كود المديونية"),
+                        ParentAutoId = GetInt("الرقم الآلي الأب"),
+                        AutoNumberValue = GetStr("الرقم الآلي"),
+                        Type = GetStr("النوع"),
+                        CaseRef = GetStr("مرجع القضية"),
+                        Note = GetStr("ملاحظة"),
+                        Claimant = GetStr("المدعي"),
                         UserAdded = job.CreatedById,
                         DateAdded = DateTime.UtcNow,
                         ImportJobId = job.Id

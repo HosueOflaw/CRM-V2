@@ -16,7 +16,7 @@ public class JwtService : IJwtService
         _logger = logger;
     }
 
-    public string GenerateToken(int userId, string username, string? role, string? securityStamp = null, string? supervisedDept = null, string? accessibleDepts = null, string? accessibleFeatures = null)
+    public string GenerateToken(int userId, string username, string role, string securityStamp = null, string supervisedDept = null, string accessibleDepts = null, string accessibleFeatures = null)
     {
         var secretKey = _configuration["Jwt:SecretKey"] 
             ?? throw new InvalidOperationException("JWT SecretKey not configured");

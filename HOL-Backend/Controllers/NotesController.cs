@@ -1,6 +1,4 @@
-using House_of_law_api.Interfaces;
-using House_of_law_api.Services;
-using Microsoft.AspNetCore.Mvc;
+
 
 namespace House_of_law_api.Controllers;
 
@@ -23,7 +21,7 @@ public class NotesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Domain.Entities.Note>>> GetNotes([FromQuery] long? fileCode = null, [FromQuery] long? deptCode = null)
+    public async Task<ActionResult<IEnumerable<Note>>> GetNotes([FromQuery] long? fileCode = null, [FromQuery] long? deptCode = null)
     {
         if (fileCode.HasValue)
         {
@@ -42,7 +40,7 @@ public class NotesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Domain.Entities.Note>> GetNote(int id)
+    public async Task<ActionResult<Note>> GetNote(int id)
     {
         var note = await _repository.GetByIdAsync(id);
         if (note == null) return NotFound();
@@ -50,7 +48,7 @@ public class NotesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Domain.Entities.Note>> CreateNote(Domain.Entities.Note note)
+    public async Task<ActionResult<Note>> CreateNote(Note note)
     {
         note.DateAdded = DateTime.UtcNow;
         var created = await _repository.AddAsync(note);
@@ -59,7 +57,7 @@ public class NotesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateNote(int id, Domain.Entities.Note note)
+    public async Task<IActionResult> UpdateNote(int id, Note note)
     {
         var existing = await _repository.GetByIdAsync(id);
         if (existing == null) return NotFound();

@@ -22,7 +22,7 @@ namespace House_of_law_api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.AdditionalAmount", b =>
+            modelBuilder.Entity("AdditionalAmount", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -72,7 +72,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("additional_amounts");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.Attachment", b =>
+            modelBuilder.Entity("Attachment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -134,7 +134,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("attachments");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.AuditsFile", b =>
+            modelBuilder.Entity("AuditsFile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -168,7 +168,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("audits_files");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.AutoNumber", b =>
+            modelBuilder.Entity("AutoNumber", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -228,7 +228,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("auto_numbers");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.CallcenterStatement", b =>
+            modelBuilder.Entity("CallcenterStatement", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -290,7 +290,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("callcenter_statements");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.Department", b =>
+            modelBuilder.Entity("Department", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -312,7 +312,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("departments");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.EmployeeTask", b =>
+            modelBuilder.Entity("EmployeeTask", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -354,7 +354,6 @@ namespace House_of_law_api.Migrations
                         .HasColumnName("employee_comment");
 
                     b.Property<string>("Priority")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("priority");
 
@@ -363,7 +362,6 @@ namespace House_of_law_api.Migrations
                         .HasColumnName("start_date");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("status");
 
@@ -385,7 +383,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("employee_tasks");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.FileClassification", b =>
+            modelBuilder.Entity("FileClassification", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -427,7 +425,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("file_classifications");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.FileDetail", b =>
+            modelBuilder.Entity("FileDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -503,7 +501,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("file_details");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.FileStatus", b =>
+            modelBuilder.Entity("FileStatus", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -533,7 +531,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("file_statuses");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.ImportJob", b =>
+            modelBuilder.Entity("ImportJob", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -542,7 +540,7 @@ namespace House_of_law_api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CompletedAt")
+                    b.Property<DateTime>("CompletedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("completed_at");
 
@@ -577,9 +575,12 @@ namespace House_of_law_api.Migrations
                         .HasColumnName("progress");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("status");
+
+                    b.Property<string>("StoredFileName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("stored_file_name");
 
                     b.Property<int>("TotalRows")
                         .HasColumnType("int")
@@ -592,40 +593,49 @@ namespace House_of_law_api.Migrations
                     b.ToTable("import_jobs");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.LoginHistory", b =>
+            modelBuilder.Entity("LoginHistory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("email");
 
                     b.Property<string>("IpAddress")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ip_address");
 
                     b.Property<DateTime>("LoginTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("login_time");
 
                     b.Property<string>("Role")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("role");
 
                     b.Property<string>("UserAgent")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("user_agent");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LoginTime");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("login_histories");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.Mail", b =>
+            modelBuilder.Entity("Mail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -671,7 +681,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("mails");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.Mainfile", b =>
+            modelBuilder.Entity("Mainfile", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -763,7 +773,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("mainfiles");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.Note", b =>
+            modelBuilder.Entity("Note", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -801,7 +811,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("notes");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.Payment", b =>
+            modelBuilder.Entity("Payment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -891,7 +901,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("payments");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.PermissionRequest", b =>
+            modelBuilder.Entity("PermissionRequest", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -917,17 +927,14 @@ namespace House_of_law_api.Migrations
                         .HasColumnName("reason");
 
                     b.Property<string>("RequestType")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("request_type");
 
                     b.Property<string>("RequestedValue")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("requested_value");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("status");
 
@@ -942,7 +949,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("permission_requests");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.User", b =>
+            modelBuilder.Entity("User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1024,7 +1031,7 @@ namespace House_of_law_api.Migrations
                     b.ToTable("users");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.UserBreak", b =>
+            modelBuilder.Entity("UserBreak", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1072,27 +1079,27 @@ namespace House_of_law_api.Migrations
                     b.ToTable("user_breaks");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.AutoNumber", b =>
+            modelBuilder.Entity("AutoNumber", b =>
                 {
-                    b.HasOne("House_of_law_api.Domain.Entities.ImportJob", "ImportJob")
+                    b.HasOne("ImportJob", "ImportJob")
                         .WithMany()
                         .HasForeignKey("ImportJobId");
 
                     b.Navigation("ImportJob");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.EmployeeTask", b =>
+            modelBuilder.Entity("EmployeeTask", b =>
                 {
-                    b.HasOne("House_of_law_api.Domain.Entities.User", "AssignedTo")
+                    b.HasOne("User", "AssignedTo")
                         .WithMany()
                         .HasForeignKey("AssignedToId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("House_of_law_api.Domain.Entities.User", "CreatedBy")
+                    b.HasOne("User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AssignedTo");
@@ -1100,18 +1107,18 @@ namespace House_of_law_api.Migrations
                     b.Navigation("CreatedBy");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.FileDetail", b =>
+            modelBuilder.Entity("FileDetail", b =>
                 {
-                    b.HasOne("House_of_law_api.Domain.Entities.ImportJob", "ImportJob")
+                    b.HasOne("ImportJob", "ImportJob")
                         .WithMany()
                         .HasForeignKey("ImportJobId");
 
                     b.Navigation("ImportJob");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.ImportJob", b =>
+            modelBuilder.Entity("ImportJob", b =>
                 {
-                    b.HasOne("House_of_law_api.Domain.Entities.User", "CreatedBy")
+                    b.HasOne("User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1120,9 +1127,9 @@ namespace House_of_law_api.Migrations
                     b.Navigation("CreatedBy");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.LoginHistory", b =>
+            modelBuilder.Entity("LoginHistory", b =>
                 {
-                    b.HasOne("House_of_law_api.Domain.Entities.User", "User")
+                    b.HasOne("User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1131,18 +1138,18 @@ namespace House_of_law_api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.Mainfile", b =>
+            modelBuilder.Entity("Mainfile", b =>
                 {
-                    b.HasOne("House_of_law_api.Domain.Entities.ImportJob", "ImportJob")
+                    b.HasOne("ImportJob", "ImportJob")
                         .WithMany()
                         .HasForeignKey("ImportJobId");
 
                     b.Navigation("ImportJob");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.PermissionRequest", b =>
+            modelBuilder.Entity("PermissionRequest", b =>
                 {
-                    b.HasOne("House_of_law_api.Domain.Entities.User", "User")
+                    b.HasOne("User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1151,9 +1158,9 @@ namespace House_of_law_api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Domain.Entities.UserBreak", b =>
+            modelBuilder.Entity("UserBreak", b =>
                 {
-                    b.HasOne("House_of_law_api.Domain.Entities.User", "User")
+                    b.HasOne("User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

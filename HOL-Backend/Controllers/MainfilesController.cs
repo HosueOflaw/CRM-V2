@@ -1,6 +1,4 @@
-using House_of_law_api.Interfaces;
-using House_of_law_api.Services;
-using Microsoft.AspNetCore.Mvc;
+
 
 namespace House_of_law_api.Controllers;
 
@@ -23,7 +21,7 @@ public class MainfilesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Domain.Entities.Mainfile>>> GetMainfiles([FromQuery] string? search = null)
+    public async Task<ActionResult<IEnumerable<Mainfile>>> GetMainfiles([FromQuery] string search = null)
     {
         var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
         _logger.LogInformation("GetMainfiles called from IP: {Ip}", clientIp);
@@ -39,7 +37,7 @@ public class MainfilesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Domain.Entities.Mainfile>> GetMainfile(long id)
+    public async Task<ActionResult<Mainfile>> GetMainfile(long id)
     {
         var mainfile = await _repository.GetByIdAsync(id);
         if (mainfile == null) return NotFound();
@@ -47,7 +45,7 @@ public class MainfilesController : ControllerBase
     }
 
     [HttpGet("code/{code}")]
-    public async Task<ActionResult<Domain.Entities.Mainfile>> GetMainfileByCode(int code)
+    public async Task<ActionResult<Mainfile>> GetMainfileByCode(int code)
     {
         var mainfile = await _repository.GetByCodeAsync(code);
         if (mainfile == null) return NotFound();
@@ -55,7 +53,7 @@ public class MainfilesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Domain.Entities.Mainfile>> CreateMainfile(Domain.Entities.Mainfile mainfile)
+    public async Task<ActionResult<Mainfile>> CreateMainfile(Mainfile mainfile)
     {
         mainfile.DateAdded = DateTime.UtcNow;
         var created = await _repository.AddAsync(mainfile);
@@ -64,7 +62,7 @@ public class MainfilesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateMainfile(long id, Domain.Entities.Mainfile mainfile)
+    public async Task<IActionResult> UpdateMainfile(long id, Mainfile mainfile)
     {
         var existing = await _repository.GetByIdAsync(id);
         if (existing == null) return NotFound();

@@ -1,8 +1,4 @@
-using House_of_law_api.Data;
-using House_of_law_api.Domain.Entities;
-using House_of_law_api.DTOs;
-using House_of_law_api.Interfaces;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace House_of_law_api.Repositories;
 
@@ -10,7 +6,7 @@ public class MainfileRepository : BaseRepository<Mainfile>, IMainfileRepository
 {
     public MainfileRepository(ApplicationDbContext context) : base(context) { }
 
-    public async Task<Mainfile?> GetByCodeAsync(int code)
+    public async Task<Mainfile> GetByCodeAsync(int code)
     {
         return await _dbSet.FirstOrDefaultAsync(m => m.Code == code);
     }

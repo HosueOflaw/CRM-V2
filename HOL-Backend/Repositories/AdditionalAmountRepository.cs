@@ -1,7 +1,4 @@
-using House_of_law_api.Data;
-using House_of_law_api.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using House_of_law_api.Interfaces;
+
 
 namespace House_of_law_api.Repositories;
 
