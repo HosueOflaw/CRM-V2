@@ -8,15 +8,18 @@ public class MainfilesController : ControllerBase
 {
     private readonly IMainfileRepository _repository;
     private readonly INotificationService _notificationService;
+    private readonly ApplicationDbContext _context;
     private readonly ILogger<MainfilesController> _logger;
 
     public MainfilesController(
         IMainfileRepository repository,
         INotificationService notificationService,
+        ApplicationDbContext context,
         ILogger<MainfilesController> logger)
     {
         _repository = repository;
         _notificationService = notificationService;
+        _context = context;
         _logger = logger;
     }
 
@@ -57,7 +60,19 @@ public class MainfilesController : ControllerBase
     {
         mainfile.DateAdded = DateTime.UtcNow;
         var created = await _repository.AddAsync(mainfile);
-        await _notificationService.BroadcastToAllAsync("mainfile:created", new { id = created.Id, code = created.Code });
+
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
+        {
+            var currentUser = await _context.Users.FindAsync(userId);
+            if (currentUser != null)
+            {
+                var deptGroupName = $"dept_{currentUser.Department}";
+                await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "Mainfile", id = created.Id, action = "created" });
+                await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "Mainfile", id = created.Id, action = "created" });
+            }
+        }
+
         return CreatedAtAction(nameof(GetMainfile), new { id = created.Id }, created);
     }
 
@@ -67,6 +82,20 @@ public class MainfilesController : ControllerBase
         var existing = await _repository.GetByIdAsync(id);
         if (existing == null) return NotFound();
 
+        // Role Check
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized();
+
+        var currentUser = await _context.Users.FindAsync(userId);
+        if (currentUser == null) return Unauthorized();
+
+        var role = currentUser.Role?.ToLower() ?? "";
+        if (role != "admin" && role != "administrator" && role != "supervisor")
+        {
+            return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
+        }
+
         // Update properties
         existing.Name = mainfile.Name ?? existing.Name;
         existing.Cid = mainfile.Cid ?? existing.Cid;
@@ -74,7 +103,10 @@ public class MainfilesController : ControllerBase
         // Add other properties as needed
 
         await _repository.UpdateAsync(existing);
-        await _notificationService.BroadcastToAllAsync("mainfile:updated", new { id = existing.Id });
+
+        var deptGroupName = $"dept_{currentUser.Department}";
+        await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "Mainfile", id = existing.Id, action = "updated" });
+        await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "Mainfile", id = existing.Id, action = "updated" });
 
         return NoContent();
     }
@@ -85,8 +117,25 @@ public class MainfilesController : ControllerBase
         var mainfile = await _repository.GetByIdAsync(id);
         if (mainfile == null) return NotFound();
 
+        // Role Check
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized();
+
+        var currentUser = await _context.Users.FindAsync(userId);
+        if (currentUser == null) return Unauthorized();
+
+        var role = currentUser.Role?.ToLower() ?? "";
+        if (role != "admin" && role != "administrator" && role != "supervisor")
+        {
+            return Forbid("ليس لديك صلاحية حذف البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
+        }
+
         await _repository.DeleteAsync(mainfile);
-        await _notificationService.BroadcastToAllAsync("mainfile:deleted", new { id });
+
+        var deptGroupName = $"dept_{currentUser.Department}";
+        await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "Mainfile", id = id, action = "deleted" });
+        await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "Mainfile", id = id, action = "deleted" });
 
         return NoContent();
     }

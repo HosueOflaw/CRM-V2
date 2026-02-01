@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Caching.Memory;
+using House_of_law_api.Services;
 namespace House_of_law_api.Controllers;
 
 [Route("api/[controller]")]
@@ -9,12 +10,14 @@ public class DataViewController : ControllerBase
   private readonly ApplicationDbContext _context;
   private readonly ILogger<DataViewController> _logger;
   private readonly IMemoryCache _cache;
+  private readonly INotificationService _notificationService;
 
-  public DataViewController(ApplicationDbContext context, ILogger<DataViewController> logger, IMemoryCache cache)
+  public DataViewController(ApplicationDbContext context, ILogger<DataViewController> logger, IMemoryCache cache, INotificationService notificationService)
   {
     _context = context;
     _logger = logger;
     _cache = cache;
+    _notificationService = notificationService;
   }
 
   // GET: api/DataView/mainfiles
@@ -196,6 +199,20 @@ public class DataViewController : ControllerBase
     var mainfile = await _context.Mainfiles.FindAsync(id);
     if (mainfile == null) return NotFound();
 
+    // Role Check
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+        return Unauthorized();
+
+    var currentUser = await _context.Users.FindAsync(userId);
+    if (currentUser == null) return Unauthorized();
+
+    var role = currentUser.Role?.ToLower() ?? "";
+    if (role != "admin" && role != "administrator" && role != "supervisor")
+    {
+        return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
+    }
+
     // Update fields
     mainfile.Code = dto.Code;
     mainfile.Name = dto.Name;
@@ -225,6 +242,11 @@ public class DataViewController : ControllerBase
       
       if (dto.ImportJobId.HasValue && dto.ImportJobId != mainfile.ImportJobId)
         _cache.Remove($"job_data_{dto.ImportJobId}");
+
+      // Broadcast change to department and admins
+      var deptGroupName = $"dept_{currentUser.Department}";
+      await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "Mainfile", id = id, action = "updated" });
+      await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "Mainfile", id = id, action = "updated" });
 
       return Ok(dto);
     }
@@ -278,6 +300,20 @@ public class DataViewController : ControllerBase
     var detail = await _context.FileDetails.FindAsync(id);
     if (detail == null) return NotFound();
 
+    // Role Check
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+        return Unauthorized();
+
+    var currentUser = await _context.Users.FindAsync(userId);
+    if (currentUser == null) return Unauthorized();
+
+    var role = currentUser.Role?.ToLower() ?? "";
+    if (role != "admin" && role != "administrator" && role != "supervisor")
+    {
+        return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
+    }
+
     // Update fields
     detail.FileCode = dto.FileCode;
     detail.DeptCode = dto.DeptCode;
@@ -303,6 +339,11 @@ public class DataViewController : ControllerBase
         
       if (dto.ImportJobId.HasValue && dto.ImportJobId != detail.ImportJobId)
         _cache.Remove($"job_data_{dto.ImportJobId}");
+
+      // Broadcast change to department and admins
+      var deptGroupName = $"dept_{currentUser.Department}";
+      await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "FileDetail", id = id, action = "updated" });
+      await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "FileDetail", id = id, action = "updated" });
 
       return Ok(dto);
     }
@@ -352,6 +393,20 @@ public class DataViewController : ControllerBase
     var autoNum = await _context.AutoNumbers.FindAsync(id);
     if (autoNum == null) return NotFound();
 
+    // Role Check
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+        return Unauthorized();
+
+    var currentUser = await _context.Users.FindAsync(userId);
+    if (currentUser == null) return Unauthorized();
+
+    var role = currentUser.Role?.ToLower() ?? "";
+    if (role != "admin" && role != "administrator" && role != "supervisor")
+    {
+        return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
+    }
+
     // Update fields
     autoNum.FileCode = dto.FileCode;
     autoNum.ParentAutoId = dto.ParentAutoId;
@@ -372,6 +427,11 @@ public class DataViewController : ControllerBase
         
       if (dto.ImportJobId.HasValue && dto.ImportJobId != autoNum.ImportJobId)
         _cache.Remove($"job_data_{dto.ImportJobId}");
+
+      // Broadcast change to department and admins
+      var deptGroupName = $"dept_{currentUser.Department}";
+      await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "AutoNumber", id = id, action = "updated" });
+      await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "AutoNumber", id = id, action = "updated" });
 
       return Ok(dto);
     }

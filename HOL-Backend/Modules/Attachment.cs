@@ -1,4 +1,6 @@
 
+namespace House_of_law_api.Modules;
+
 [Table("attachments")]
 public class Attachment
 {

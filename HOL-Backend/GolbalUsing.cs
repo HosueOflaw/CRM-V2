@@ -19,5 +19,6 @@ global using System.Security.Claims;
 global using Microsoft.AspNetCore.Diagnostics;
 global using System.ComponentModel.DataAnnotations;
 global using System.ComponentModel.DataAnnotations.Schema;
+global using House_of_law_api.Modules;
+global using Microsoft.AspNetCore.HttpOverrides;
 
-namespace House_of_law_api.Modules;

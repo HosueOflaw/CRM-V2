@@ -1,3 +1,4 @@
+namespace House_of_law_api.Modules;
 
 [Table("additional_amounts")]
 public class AdditionalAmount
