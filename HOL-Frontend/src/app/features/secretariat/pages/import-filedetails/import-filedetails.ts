@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExcelImportService, ImportJob } from '../../../../services/excel-import.service';
 import { Signalr } from '../../../../services/signalr';
+import { AuthService } from '../../../../core/services/auth';
 import { SweetAlertService } from '../../../../shared/services/sweet-alert.service';
 import { Table, TableModule } from 'primeng/table';
 import { DataViewService } from '../../../../services/data-view.service';
@@ -16,6 +17,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
 import { Subject, takeUntil } from 'rxjs';
+import { ImportDashboardComponent } from "../../components/import-dashboard/import-dashboard.component";
 
 @Component({
     selector: 'app-import-filedetails',
@@ -32,7 +34,8 @@ import { Subject, takeUntil } from 'rxjs';
         InputTextModule,
         InputNumberModule,
         CheckboxModule,
-        DatePickerModule
+        DatePickerModule,
+        ImportDashboardComponent
     ],
     templateUrl: './import-filedetails.html'
 })
@@ -51,12 +54,19 @@ export class ImportFileDetailsPage implements OnInit, OnDestroy {
     pageSize = 10;
     totalRecords = 0;
     loadingJobs = false;
+    jobSearch = '';
 
     // View Data
     showDataDialog = false;
     viewingJob: any = null;
     jobData: any[] = [];
     loadingJobData = false;
+
+    // Data View Modal Pagination
+    jobDataPage = 1;
+    jobDataPageSize = 10;
+    jobDataTotalRecords = 0;
+    jobDataSearch = '';
 
     // Row Editing
     showEditDialog = false;
@@ -74,8 +84,17 @@ export class ImportFileDetailsPage implements OnInit, OnDestroy {
         private importService: ExcelImportService,
         private dataViewService: DataViewService,
         private signalr: Signalr,
+        private authService: AuthService,
         private swal: SweetAlertService
     ) { }
+
+    get isAdmin(): boolean {
+        return this.authService.isAdmin();
+    }
+
+    get isSupervisor(): boolean {
+        return this.authService.isSupervisor();
+    }
 
     ngOnInit() {
         // Table with lazy load will trigger its own initial load if we use onLazyLoad
@@ -90,7 +109,7 @@ export class ImportFileDetailsPage implements OnInit, OnDestroy {
 
     loadJobs() {
         this.loadingJobs = true;
-        this.importService.getMyJobs(this.currentPage, this.pageSize, 'FileDetail').subscribe({
+        this.importService.getMyJobs(this.currentPage, this.pageSize, 'FileDetail', this.jobSearch).subscribe({
             next: (result) => {
                 this.jobs = result.data;
                 this.totalRecords = result.totalCount;
@@ -121,8 +140,13 @@ export class ImportFileDetailsPage implements OnInit, OnDestroy {
     }
 
     onPageChange(event: any) {
-        this.currentPage = Math.floor(event.first / event.rows) + 1;
+        this.currentPage = (event.first / event.rows) + 1;
         this.pageSize = event.rows;
+        this.loadJobs();
+    }
+
+    onJobSearch() {
+        this.currentPage = 1;
         this.loadJobs();
     }
 
@@ -234,19 +258,37 @@ export class ImportFileDetailsPage implements OnInit, OnDestroy {
     viewData(job: any) {
         this.viewingJob = job;
         this.showDataDialog = true;
-        this.loadingJobData = true;
-        this.jobData = [];
+        this.jobDataPage = 1;
+        this.jobDataSearch = '';
+        this.loadJobData();
+    }
 
-        this.importService.getJobData(job.id).subscribe({
-            next: (data) => {
-                this.jobData = data;
+    loadJobData() {
+        if (!this.viewingJob) return;
+        this.loadingJobData = true;
+        this.importService.getJobData(this.viewingJob.id, this.jobDataPage, this.jobDataPageSize, this.jobDataSearch).subscribe({
+            next: (result) => {
+                this.jobData = result.data;
+                this.jobDataTotalRecords = result.totalCount;
                 this.loadingJobData = false;
             },
             error: (err) => {
+                console.error('Error fetching job data', err);
                 this.loadingJobData = false;
-                this.swal.error({ title: 'خطأ', text: err.error?.message || 'فشل تحميل بيانات العملية' });
+                this.swal.error({ title: 'خطأ', text: 'فشل تحميل بيانات العملية' });
             }
         });
+    }
+
+    onJobDataPageChange(event: any) {
+        this.jobDataPage = (event.first / event.rows) + 1;
+        this.jobDataPageSize = event.rows;
+        this.loadJobData();
+    }
+
+    onJobDataSearch() {
+        this.jobDataPage = 1;
+        this.loadJobData();
     }
 
     editItem(item: any) {

@@ -1,12 +1,12 @@
 <div class="card bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-6 animate-fadein">
     <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">رفع تفاصيل الملفات (File Details)</h1>
-            <p class="text-gray-500 text-sm">رفع ملفات إكسيل تفاصيل الملفات ومعالجتها في الخلفية</p>
-        </div>
-        <button pButton icon="pi pi-download" label="تحميل النموذج (Template)" (click)="downloadTemplate()"
+        <h2 class="text-2xl font-bold">ملفات تفاصيل القضايا والمصاريف</h2>
+        <button pButton label="تحميل النموذج" icon="pi pi-download" (click)="downloadTemplate()"
             class="p-button-outlined p-button-sm p-button-rounded"></button>
     </div>
+
+    <!-- Stats Dashboard -->
+    <app-import-dashboard jobType="FileDetail"></app-import-dashboard>
 
     <!-- Upload Section -->
     <div
@@ -61,8 +61,15 @@
                 <i class="pi pi-history"></i>
                 آخر عمليات الاستيراد
             </h3>
-            <button pButton icon="pi pi-refresh" (click)="refresh()" [loading]="loadingJobs"
-                class="p-button-text p-button-rounded p-button-sm"></button>
+            <div class="flex items-center gap-3">
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" [(ngModel)]="jobSearch" (input)="onJobSearch()"
+                        placeholder="بحث باسم الملف..." class="p-inputtext-sm p-button-rounded" />
+                </span>
+                <button pButton icon="pi pi-refresh" (click)="refresh()" [loading]="loadingJobs"
+                    class="p-button-text p-button-rounded p-button-sm"></button>
+            </div>
         </div>
 
         <p-table #jobsTable [value]="jobs" [lazy]="true" [paginator]="true" [rows]="pageSize"
@@ -119,7 +126,7 @@
                                 pTooltip="تحميل الملف الأصلي" tooltipPosition="top"
                                 class="p-button-text p-button-sm p-button-rounded p-button-info"></button>
                             <button pButton icon="pi pi-trash" (click)="revertImport(job)"
-                                *ngIf="job.status !== 'Processing'" pTooltip="تراجع (حذف البيانات)"
+                                *ngIf="isAdmin && job.status !== 'Processing'" pTooltip="تراجع (حذف البيانات)"
                                 tooltipPosition="top"
                                 class="p-button-text p-button-sm p-button-rounded p-button-danger"></button>
                         </div>
@@ -138,9 +145,20 @@
     <p-dialog [(visible)]="showDataDialog" [header]="'عرض بيانات العملية: ' + viewingJob?.fileName" [modal]="true"
         [breakpoints]="{ '960px': '95vw' }" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
 
-        <p-table [value]="jobData" [paginator]="true" [rows]="10" [loading]="loadingJobData" styleClass="p-datatable-sm"
-            [showCurrentPageReport]="true" currentPageReportTemplate="عرض {first} إلى {last} من {totalRecords}"
-            [scrollable]="true" scrollHeight="500px">
+        <div class="mb-4">
+            <span class="p-input-icon-left w-full">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" [(ngModel)]="jobDataSearch" (input)="onJobDataSearch()"
+                    placeholder="بحث سريع داخل البيانات (كود الملف، اسم العميل، رقم العقد...)"
+                    class="w-full p-inputtext-sm" />
+            </span>
+        </div>
+
+        <p-table [value]="jobData" [lazy]="true" [paginator]="true" [rows]="jobDataPageSize"
+            [totalRecords]="jobDataTotalRecords" [loading]="loadingJobData" (onLazyLoad)="onJobDataPageChange($event)"
+            styleClass="p-datatable-sm" [showCurrentPageReport]="true"
+            currentPageReportTemplate="عرض {first} إلى {last} من {totalRecords}" [scrollable]="true"
+            scrollHeight="500px">
             <ng-template pTemplate="header">
                 <tr>
                     <th style="min-width: 80px;">العمليات</th>
@@ -165,7 +183,7 @@
             <ng-template pTemplate="body" let-item>
                 <tr>
                     <td>
-                        <button pButton icon="pi pi-pencil" (click)="editItem(item)"
+                        <button pButton icon="pi pi-pencil" (click)="editItem(item)" *ngIf="isAdmin || isSupervisor"
                             class="p-button-text p-button-sm p-button-rounded p-button-warning"></button>
                     </td>
                     <td><span class="font-mono text-xs">{{ item.id }}</span></td>

@@ -59,12 +59,13 @@ export class ExcelImportService {
         return this.http.post<{ jobId: number, message: string }>(`${this.apiUrl}/${endpoint}`, formData);
     }
 
-    getMyJobs(pageNumber: number = 1, pageSize: number = 10, jobType?: string): Observable<PagedResponse<ImportJob>> {
+    getMyJobs(pageNumber: number = 1, pageSize: number = 10, jobType?: string, search?: string): Observable<PagedResponse<ImportJob>> {
         const params: any = {
             pageNumber: pageNumber.toString(),
             pageSize: pageSize.toString()
         };
         if (jobType) params.jobType = jobType;
+        if (search) params.search = search;
 
         return this.http.get<PagedResponse<ImportJob>>(`${this.apiUrl}/jobs`, { params });
     }
@@ -93,12 +94,25 @@ export class ExcelImportService {
         return this.http.delete(`${this.apiUrl}/revert/${jobId}`);
     }
 
-    getJobData(jobId: number): Observable<any[]> {
-        return this.http.get<any[]>(`${this.apiUrl}/job-data/${jobId}?_t=${new Date().getTime()}`);
+    getJobData(jobId: number, pageNumber: number = 1, pageSize: number = 10, search?: string): Observable<PagedResponse<any>> {
+        const params: any = {
+            pageNumber: pageNumber.toString(),
+            pageSize: pageSize.toString(),
+            _t: new Date().getTime().toString()
+        };
+        if (search) params.search = search;
+
+        return this.http.get<PagedResponse<any>>(`${this.apiUrl}/job-data/${jobId}`, { params });
     }
 
     updateJobFileName(jobId: number, fileName: string): Observable<any> {
         return this.http.put(`${this.apiUrl}/job/${jobId}`, { fileName });
+    }
+
+    getImportStats(jobType?: string): Observable<any> {
+        const params: any = {};
+        if (jobType) params.jobType = jobType;
+        return this.http.get<any>(`${this.apiUrl}/stats`, { params });
     }
 
     private downloadFile(url: string, fileName: string): void {
