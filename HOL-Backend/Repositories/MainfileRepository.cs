@@ -55,4 +55,12 @@ public class MainfileRepository : BaseRepository<Mainfile>, IMainfileRepository
             })
             .ToListAsync();
     }
+
+    public async Task<long> GetMaxIdAsync()
+    {
+        if (!await _dbSet.AnyAsync())
+            return 0;
+
+        return await _dbSet.MaxAsync(m => m.Id);
+    }
 }

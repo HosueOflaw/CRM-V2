@@ -57,9 +57,27 @@ public class Payment
   [Column("file_status_after")]
   public string FileStatusAfter { get; set; }
 
+  [Column("payment_method")]
+  public string PaymentMethod { get; set; }
+
+  [Column("sales_agent")]
+  public string SalesAgent { get; set; }
+
+  [Column("sales_company")]
+  public string SalesCompany { get; set; }
+
   [Column("commission")]
   public int? Commission { get; set; }
 
   [Column("commission_closed")]
   public bool? CommissionClosed { get; set; }
+
+  [Column("import_job_id")]
+  public int? ImportJobId { get; set; }
+  
+  [ForeignKey("ImportJobId")]
+  public virtual ImportJob ImportJob { get; set; }
+
+  [ForeignKey("UserAdded")]
+  public virtual User CreatedBy { get; set; }
 }

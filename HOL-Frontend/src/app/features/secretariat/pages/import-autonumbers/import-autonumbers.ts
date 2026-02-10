@@ -44,6 +44,9 @@ export class ImportAutoNumbersPage implements OnInit, OnDestroy {
     activeJobId: number | null = null;
     activeJobProgress = 0;
     activeJobStatus = '';
+    activeJobProcessedRows = 0;
+    activeJobTotalRows = 0;
+    activeJobErrorCount = 0;
 
     // Pagination
     currentPage = 1;
@@ -93,12 +96,51 @@ export class ImportAutoNumbersPage implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        this.loadJobs();
         this.listenToProgress();
+        this.listenToUploadState();
+
+        // Reset state if stuck in Failed to avoid reappearing alert
+        if (this.importService.currentUploadState.status === 'Failed') {
+            this.importService.resetUploadState();
+        }
     }
 
     ngOnDestroy() {
         this.destroy$.next();
         this.destroy$.complete();
+    }
+
+    listenToUploadState() {
+        this.importService.uploadState$.pipe(takeUntil(this.destroy$)).subscribe((state: any) => {
+            if (state.jobType === 'AutoNumber') {
+                if (state.status === 'Uploading') {
+                    this.uploading = true;
+                } else if (state.status === 'Processing') {
+                    this.uploading = false;
+                    this.activeJobId = state.jobId;
+                    this.activeJobStatus = 'Pending';
+                    this.activeJobProgress = state.progress || 0;
+                    this.activeJobProcessedRows = state.processedRows || 0;
+                    this.activeJobTotalRows = state.totalRows || 0;
+                    this.activeJobErrorCount = state.errorCount || 0;
+
+                    if (this.selectedFile) {
+                        this.swal.toast({ icon: 'info', title: 'بدأت المعالجة', text: 'يتم الآن رفع ومعالجة ملف Auto Numbers في الخلفية' });
+                        this.selectedFile = null;
+                        setTimeout(() => this.refresh(), 500);
+                    }
+                } else if (state.status === 'Failed') {
+                    this.uploading = false;
+                    this.swal.error({
+                        title: 'خطأ في الرفع',
+                        text: state.errorMessage || 'فشل رفع الملف'
+                    }).then(() => {
+                        this.importService.resetUploadState();
+                    });
+                }
+            }
+        });
     }
 
     loadJobs() {
@@ -115,6 +157,17 @@ export class ImportAutoNumbersPage implements OnInit, OnDestroy {
                     this.activeJobId = activeJob.id;
                     this.activeJobProgress = activeJob.progress;
                     this.activeJobStatus = activeJob.status;
+                    this.activeJobProcessedRows = activeJob.processedRows;
+                    this.activeJobTotalRows = activeJob.totalRows;
+                    this.activeJobErrorCount = activeJob.errorCount;
+                } else {
+                    // Clear active job if no processing/pending jobs found
+                    this.activeJobId = null;
+                    this.activeJobProgress = 0;
+                    this.activeJobStatus = '';
+                    this.activeJobProcessedRows = 0;
+                    this.activeJobTotalRows = 0;
+                    this.activeJobErrorCount = 0;
                 }
             },
             error: () => {
@@ -148,27 +201,7 @@ export class ImportAutoNumbersPage implements OnInit, OnDestroy {
 
     uploadFile() {
         if (!this.selectedFile) return;
-
-        this.uploading = true;
-        this.importService.uploadAutoNumbers(this.selectedFile).subscribe({
-            next: (res) => {
-                this.activeJobId = res.jobId;
-                this.activeJobStatus = 'Pending';
-                this.activeJobProgress = 0;
-                this.uploading = false;
-                this.selectedFile = null;
-
-                setTimeout(() => {
-                    this.refresh();
-                }, 500);
-
-                this.swal.toast({ icon: 'info', title: 'بدأت المعالجة', text: 'يتم الآن رفع ومعالجة ملف Auto Numbers في الخلفية' });
-            },
-            error: (err) => {
-                this.uploading = false;
-                this.swal.error({ title: 'خطأ في الرفع', text: err.error || 'فشل رفع الملف' });
-            }
-        });
+        this.importService.startUpload(this.selectedFile, 'AutoNumber');
     }
 
     listenToProgress() {
@@ -177,6 +210,18 @@ export class ImportAutoNumbersPage implements OnInit, OnDestroy {
                 if (msg.data.jobId === this.activeJobId) {
                     this.activeJobProgress = msg.data.progress;
                     this.activeJobStatus = 'Processing';
+                    this.activeJobProcessedRows = msg.data.processed;
+                    this.activeJobTotalRows = msg.data.total;
+                    this.activeJobErrorCount = msg.data.errorCount;
+
+                    this.importService.updateProgress(
+                        msg.data.jobId,
+                        msg.data.progress,
+                        'Processing',
+                        msg.data.processed,
+                        msg.data.total,
+                        msg.data.errorCount
+                    );
                 }
 
                 const job = this.jobs.find(j => j.id === msg.data.jobId);
@@ -185,6 +230,7 @@ export class ImportAutoNumbersPage implements OnInit, OnDestroy {
                     job.status = 'Processing';
                     job.processedRows = msg.data.processed;
                     job.totalRows = msg.data.total;
+                    job.errorCount = msg.data.errorCount;
                 }
             } else if (msg.type === 'excel_import_complete' && msg.data.jobType === 'AutoNumber') {
                 if (msg.data.jobId === this.activeJobId) {
@@ -194,6 +240,10 @@ export class ImportAutoNumbersPage implements OnInit, OnDestroy {
                 this.loadJobs();
             }
         });
+    }
+
+    downloadErrorLog(job: any): void {
+        this.importService.downloadErrorLog(job.id, job.fileName);
     }
 
     downloadTemplate() {

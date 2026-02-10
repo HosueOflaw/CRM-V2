@@ -55,9 +55,17 @@ public class MainfilesController : ControllerBase
         return Ok(mainfile);
     }
 
+    [HttpGet("next-id")]
+    public async Task<ActionResult<long>> GetNextId()
+    {
+        var maxId = await _repository.GetMaxIdAsync();
+        return Ok(maxId + 1);
+    }
+
     [HttpPost]
     public async Task<ActionResult<Mainfile>> CreateMainfile(Mainfile mainfile)
     {
+        _logger.LogInformation("Creating new Mainfile: {Code} - {Name}", mainfile.Code, mainfile.Name);
         mainfile.DateAdded = DateTime.UtcNow;
         var created = await _repository.AddAsync(mainfile);
 

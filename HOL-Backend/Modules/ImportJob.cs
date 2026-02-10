@@ -32,6 +32,15 @@ public class ImportJob
   [Column("error_message")]
   public string ErrorMessage { get; set; }
 
+  [Column("error_count")]
+  public int ErrorCount { get; set; } = 0;
+
+  [Column("error_log_file")]
+  public byte[] ErrorLogFile { get; set; }
+
+  [Column("error_log_file_name")]
+  public string ErrorLogFileName { get; set; }
+
   [Column("created_at")]
   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

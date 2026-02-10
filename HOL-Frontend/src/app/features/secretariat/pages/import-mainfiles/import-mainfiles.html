@@ -48,13 +48,21 @@
         <div class="flex justify-between items-center mb-4">
             <div class="flex items-center gap-3">
                 <i class="pi pi-spin pi-spinner text-blue-600"></i>
-                <span class="font-bold text-blue-900 dark:text-blue-100">جاري معالجة الملف الحالي...</span>
+                <span class="font-bold text-blue-900 dark:text-blue-100">جاري معالجة الملف
+                    ({{getStatusLabel(activeJobStatus)}})...</span>
             </div>
             <span class="text-lg font-bold text-blue-700">{{ activeJobProgress }}%</span>
         </div>
         <p-progressBar [value]="activeJobProgress" [showValue]="false" styleClass="h-2 rounded-full"></p-progressBar>
-        <p class="text-xs text-blue-600 mt-2">يتم إدخال البيانات في قاعدة البيانات، يمكنك تصفح باقي أجراء النظام وسنقوم
-            بتنبيهك عند الانتهاء.</p>
+        <div class="flex justify-between mt-2 text-xs">
+            <p class="text-blue-600">
+                تم معالجة {{activeJobProcessedRows}} من أصل {{activeJobTotalRows}} سطر...
+                <span *ngIf="activeJobErrorCount > 0" class="text-red-500 font-bold">
+                    تم اكتشاف {{activeJobErrorCount}} أخطاء حتى الآن
+                </span>
+            </p>
+            <p class="text-blue-500 italic">يمكنك تصفح باقي أجزاء النظام وسنقوم بتنبيهك عند الانتهاء.</p>
+        </div>
     </div>
 
     <!-- History Table -->
@@ -102,6 +110,8 @@
                     </td>
                     <td>
                         <p-tag [severity]="getStatusSeverity(job.status)" [value]="getStatusLabel(job.status)"></p-tag>
+                        <i *ngIf="job.status === 'Failed'" class="pi pi-info-circle text-danger ml-2"
+                            [pTooltip]="job.errorMessage"></i>
                     </td>
                     <td>
                         <div class="flex items-center gap-2 min-w-[150px]">
@@ -116,9 +126,14 @@
                         </span>
                     </td>
                     <td>
-                        <span class="text-sm">
-                            {{ job.processedRows }} / {{ job.totalRows }}
-                        </span>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-sm font-medium">
+                                {{ job.processedRows }} / {{ job.totalRows }}
+                            </span>
+                            <span *ngIf="job.errorCount > 0" class="text-xs text-red-500 font-bold">
+                                ({{ job.errorCount }} خطأ)
+                            </span>
+                        </div>
                     </td>
                     <td class="text-center">
                         <div class="flex justify-center gap-1">
@@ -128,6 +143,9 @@
                             <button pButton icon="pi pi-download" (click)="downloadOriginal(job)"
                                 pTooltip="تحميل الملف الأصلي" tooltipPosition="top"
                                 class="p-button-text p-button-sm p-button-rounded p-button-info"></button>
+                            <button *ngIf="job.errorCount > 0" pButton icon="pi pi-exclamation-triangle"
+                                (click)="downloadErrorLog(job)" pTooltip="تحميل سجل الأخطاء" tooltipPosition="top"
+                                class="p-button-text p-button-sm p-button-rounded p-button-warning"></button>
                             <button pButton icon="pi pi-trash" (click)="revertImport(job)"
                                 *ngIf="isAdmin && job.status !== 'Processing'" pTooltip="تراجع (حذف البيانات)"
                                 tooltipPosition="top"
@@ -146,7 +164,8 @@
 
     <!-- Data View Dialog -->
     <p-dialog [(visible)]="showDataDialog" [header]="'عرض بيانات العملية: ' + viewingJob?.fileName" [modal]="true"
-        [breakpoints]="{ '960px': '95vw' }" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false">
+        [breakpoints]="{ '960px': '95vw' }" [style]="{ width: '80vw' }" [draggable]="false" [resizable]="false"
+        [maximizable]="true">
 
         <div class="mb-4">
             <span class="p-input-icon-left w-full">
@@ -246,9 +265,9 @@
     </p-dialog>
 
     <!-- Edit Dialog (Row Level) -->
-    <p-dialog [(visible)]="showEditDialog" header="تعديل بيانات السطر" [modal]="true"
-        [breakpoints]="{ '960px': '75vw', '640px': '90vw' }" [style]="{ width: '50vw' }" [draggable]="false"
-        [resizable]="false">
+    <p-dialog [(visible)]="showEditDialog" header="تعديل بيانات الملف الرئيسي" [modal]="true"
+        [breakpoints]="{ '960px': '75vw', '640px': '90vw' }" [style]="{ width: '500px' }" [draggable]="false"
+        [resizable]="false" [maximizable]="true">
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4" *ngIf="editingItem">
             <div class="flex flex-col gap-2">

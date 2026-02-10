@@ -15,11 +15,11 @@ import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { CheckboxModule } from 'primeng/checkbox';
+import { TextareaModule } from 'primeng/textarea'; // Correct based on permission modal
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
-    selector: 'app-import-mainfiles',
+    selector: 'app-import-payments',
     standalone: true,
     imports: [
         CommonModule,
@@ -32,12 +32,13 @@ import { Subject, takeUntil } from 'rxjs';
         TooltipModule,
         InputTextModule,
         InputNumberModule,
-        CheckboxModule,
+        TextareaModule,
         ImportDashboardComponent
     ],
-    templateUrl: './import-mainfiles.html'
+    templateUrl: './import-payments.html'
 })
-export class ImportMainfilesPage implements OnInit, OnDestroy {
+
+export class ImportPaymentsPage implements OnInit, OnDestroy {
     @ViewChild('jobsTable') jobsTable!: Table;
 
     selectedFile: File | null = null;
@@ -92,11 +93,10 @@ export class ImportMainfilesPage implements OnInit, OnDestroy {
     }
 
     get isSupervisor(): boolean {
-        return this.authService.isSupervisor();
+        return this.authService.isSupervisor() || this.authService.isAdmin();
     }
 
     ngOnInit() {
-        // Table with lazy load will trigger its own initial load
         this.loadJobs();
         this.listenToProgress();
         this.listenToUploadState();
@@ -114,7 +114,7 @@ export class ImportMainfilesPage implements OnInit, OnDestroy {
 
     listenToUploadState() {
         this.importService.uploadState$.pipe(takeUntil(this.destroy$)).subscribe((state: any) => {
-            if (state.jobType === 'Mainfile') {
+            if (state.jobType === 'Payment') {
                 if (state.status === 'Uploading') {
                     this.uploading = true;
                 } else if (state.status === 'Processing') {
@@ -126,9 +126,8 @@ export class ImportMainfilesPage implements OnInit, OnDestroy {
                     this.activeJobTotalRows = state.totalRows || 0;
                     this.activeJobErrorCount = state.errorCount || 0;
 
-                    // Show toast only once when transitioning from uploading
                     if (this.selectedFile) {
-                        this.swal.toast({ icon: 'info', title: 'بدأت المعالجة', text: 'يتم الآن رفع ومعالجة الملف في الخلفية' });
+                        this.swal.toast({ icon: 'info', title: 'بدأت المعالجة', text: 'يتم الآن رفع ومعالجة ملف المدفوعات في الخلفية' });
                         this.selectedFile = null;
                         setTimeout(() => this.refresh(), 500);
                     }
@@ -143,17 +142,18 @@ export class ImportMainfilesPage implements OnInit, OnDestroy {
                 }
             }
         })
-    };
+    }
+
+
 
     loadJobs() {
         this.loadingJobs = true;
-        this.importService.getMyJobs(this.currentPage, this.pageSize, 'Mainfile', this.jobSearch).subscribe({
+        this.importService.getMyJobs(this.currentPage, this.pageSize, 'Payment', this.jobSearch).subscribe({
             next: (result) => {
                 this.jobs = result.data;
                 this.totalRecords = result.totalCount;
                 this.loadingJobs = false;
 
-                // Check if there's any active job
                 const activeJob = result.data.find(j => j.status === 'Processing' || j.status === 'Pending');
                 if (activeJob) {
                     this.activeJobId = activeJob.id;
@@ -203,12 +203,12 @@ export class ImportMainfilesPage implements OnInit, OnDestroy {
 
     uploadFile() {
         if (!this.selectedFile) return;
-        this.importService.startUpload(this.selectedFile, 'Mainfile');
+        this.importService.startUpload(this.selectedFile, 'Payment');
     }
 
     listenToProgress() {
         this.signalr.message$.pipe(takeUntil(this.destroy$)).subscribe(msg => {
-            if (msg.type === 'excel_import_progress' && msg.data.jobType === 'Mainfile') {
+            if (msg.type === 'excel_import_progress' && msg.data.jobType === 'Payment') {
                 if (msg.data.jobId === this.activeJobId) {
                     this.activeJobProgress = msg.data.progress;
                     this.activeJobStatus = 'Processing';
@@ -232,9 +232,8 @@ export class ImportMainfilesPage implements OnInit, OnDestroy {
                     job.status = 'Processing';
                     job.processedRows = msg.data.processed;
                     job.totalRows = msg.data.total;
-                    job.errorCount = msg.data.errorCount;
                 }
-            } else if (msg.type === 'excel_import_complete' && msg.data.jobType === 'Mainfile') {
+            } else if (msg.type === 'excel_import_complete' && msg.data.jobType === 'Payment') {
                 if (msg.data.jobId === this.activeJobId) {
                     this.activeJobId = null;
                     this.activeJobProgress = 100;
@@ -249,7 +248,7 @@ export class ImportMainfilesPage implements OnInit, OnDestroy {
     }
 
     downloadTemplate() {
-        this.importService.downloadTemplate();
+        this.importService.downloadPaymentsTemplate();
     }
 
     getStatusSeverity(status: string) {
@@ -318,7 +317,8 @@ export class ImportMainfilesPage implements OnInit, OnDestroy {
             error: (err) => {
                 console.error('Error fetching job data', err);
                 this.loadingJobData = false;
-                this.swal.error({ title: 'خطأ', text: 'فشل تحميل بيانات العملية' });
+                const msg = err.error?.message || 'فشل تحميل بيانات العملية';
+                this.swal.error({ title: 'خطأ', text: msg });
             }
         });
     }
@@ -341,9 +341,8 @@ export class ImportMainfilesPage implements OnInit, OnDestroy {
 
     saveEdit() {
         if (!this.editingItem) return;
-
         this.savingEdit = true;
-        this.dataViewService.updateMainfile(this.editingItem.id, this.editingItem).subscribe({
+        this.dataViewService.updatePayment(this.editingItem.id, this.editingItem).subscribe({
             next: (updatedItem) => {
                 const index = this.jobData.findIndex(i => i.id === updatedItem.id);
                 if (index !== -1) {
@@ -390,13 +389,11 @@ export class ImportMainfilesPage implements OnInit, OnDestroy {
                 this.savingJobEdit = false;
                 this.swal.error({ title: 'فشل التحديث', text: err.error || 'حدث خطأ أثناء حفظ الاسم الجديد' });
             }
-        })
-    };
-
+        });
+    }
 
     cancelJobName() {
         this.showJobEditDialog = false;
         this.editingJob = null;
     }
-
 }

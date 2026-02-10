@@ -7,4 +7,5 @@ public interface IMainfileRepository : IBaseRepository<Mainfile>
     Task<IEnumerable<Mainfile>> GetByDeptCodeAsync(long? deptCode);
     Task<IEnumerable<Mainfile>> SearchByNameAsync(string searchTerm);
     Task<IEnumerable<ClientDto>> GetAllClientsOptimizedAsync();
+    Task<long> GetMaxIdAsync();
 }

@@ -1,0 +1,704 @@
+<p-toast></p-toast>
+<div class="p-4" style="background-color: #f8fafc; min-height: 100vh; border-radius: 20px; color: #1e293b;">
+
+    <!-- Clean Professional Header -->
+    <div class="flex flex-column  mb-5 gap-4" style="justify-content: space-between; align-items:center">
+        <div>
+            <div class="flex align-items-center gap-3 mb-1">
+                <i class="pi pi-briefcase text-primary text-3xl"></i>
+                <h1 class="text-4xl font-bold m-0" style="color: #0f172a;">
+                    تعديل بيانات ملف
+                </h1>
+            </div>
+            <p class="text-slate-500 font-medium text-lg ml-2">إدارة وتحديث سجلات الموكلين والبيانات القانونية المرتبطة
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="fade-in">
+
+
+        <!-- Custom Styled Tabs -->
+        <div class="bg-white border-round-xl shadow-2 overflow-hidden border-1 border-slate-200">
+
+            <!-- Tab Navigation -->
+            <div class="flex bg-slate-50 p-1 border-bottom-1 border-slate-200 overflow-x-auto">
+                <button (click)="setActiveTab(0)"
+                    class="tab-link px-4 py-3 border-none bg-transparent cursor-pointer font-bold transition-all flex align-items-center gap-2"
+                    [class.active]="activeTab === 0">
+                    <i class="pi pi-user text-lg"></i>
+                    <span>البيانات الرئيسية</span>
+                </button>
+                <button (click)="setActiveTab(1)"
+                    class="tab-link px-4 py-3 border-none bg-transparent cursor-pointer font-bold transition-all flex align-items-center gap-2"
+                    [class.active]="activeTab === 1">
+                    <i class="pi pi-list text-lg"></i>
+                    <span>تفاصيل الملف</span>
+                    <span
+                        class="bg-blue-100 text-blue-600 px-2 py-1 border-round text-xs font-bold">{{details.length}}</span>
+                </button>
+                <button (click)="setActiveTab(2)"
+                    class="tab-link px-4 py-3 border-none bg-transparent cursor-pointer font-bold transition-all flex align-items-center gap-2"
+                    [class.active]="activeTab === 2">
+                    <i class="pi pi-hashtag text-lg"></i>
+                    <span>الأرقام الآلية</span>
+                    <span
+                        class="bg-amber-100 text-amber-600 px-2 py-1 border-round text-xs font-bold">{{autoNumbers.length}}</span>
+                </button>
+                <button (click)="setActiveTab(3)"
+                    class="tab-link px-4 py-3 border-none bg-transparent cursor-pointer font-bold transition-all flex align-items-center gap-2"
+                    [class.active]="activeTab === 3">
+                    <i class="pi pi-dollar text-lg"></i>
+                    <span>عمليات السداد</span>
+                </button>
+            </div>
+
+            <div class="p-4" style="min-height: 500px; background-color: white;">
+
+                <!-- Tab 0: Mainfile Data (2-ROW LAYOUT) -->
+                <div *ngIf="activeTab === 0" class="fade-in-sub">
+                    <!-- Search Bar for Main Data -->
+                    <div class="mb-4">
+                        <div class="p-inputgroup shadow-1 border-round-xl overflow-hidden w-full lg:w-6">
+                            <span class="p-inputgroup-addon bg-white border-none px-3">
+                                <i class="pi pi-search text-slate-400"></i>
+                            </span>
+                            <input type="text" pInputText [(ngModel)]="searchCode"
+                                placeholder="البحث بالكود أو الـ ID..." (keyup.enter)="onSearch()"
+                                class="border-none py-3 font-semibold text-slate-700" [disabled]="loading" />
+                            <button pButton label="بحث" (click)="onSearch()" [loading]="loading"
+                                class="p-button-primary px-4"></button>
+                            <button *ngIf="record" pButton icon="pi pi-times" (click)="onClear()"
+                                class="p-button-secondary p-button-text text-slate-400"></button>
+                        </div>
+                    </div>
+
+                    <div *ngIf="record" class="grid">
+
+                        <!-- Row 1: Personal (col-4) + Work (col-5) -->
+                        <div class="col-12 xl:col-4">
+                            <div
+                                class="p-3 border-round-lg bg-slate-50 mb-4 border-1 border-slate-100 shadow-sm h-full">
+                                <h3
+                                    class="text-lg font-bold text-slate-700 mb-4 border-bottom-1 border-slate-200 pb-2 flex align-items-center gap-2">
+                                    <i class="pi pi-id-card text-blue-500"></i>
+                                    البيانات الشخصية والأساسية
+                                </h3>
+                                <div class="p-fluid grid">
+                                    <div class="field col-12 lg:col-5">
+                                        <label class="font-bold text-slate-600 mb-2">كود النظام (ثابت)</label>
+                                        <div class="p-inputgroup shadow-sm">
+                                            <span class="p-inputgroup-addon bg-slate-100"><i
+                                                    class="pi pi-lock"></i></span>
+                                            <input type="text" pInputText [ngModel]="record.code" disabled
+                                                class="bg-slate-100 font-bold" />
+                                        </div>
+                                    </div>
+                                    <div class="field col-12 lg:col-6">
+                                        <label class="font-bold text-slate-600 mb-2">اسم الموكل الكامل</label>
+                                        <div class="p-inputgroup shadow-sm">
+                                            <span class="p-inputgroup-addon"><i
+                                                    class="pi pi-user text-blue-500"></i></span>
+                                            <input type="text" pInputText [(ngModel)]="record.name"
+                                                class="p-inputtext-lg" placeholder="أدخل الاسم..." />
+                                        </div>
+                                    </div>
+
+                                    <div class="field col-12 lg:col-6">
+                                        <label class="font-bold text-slate-600 mb-2">رقم الهوية (CID)</label>
+                                        <div class="p-inputgroup shadow-sm">
+                                            <span class="p-inputgroup-addon"><i
+                                                    class="pi pi-id-card text-blue-500"></i></span>
+                                            <input type="text" pInputText [(ngModel)]="record.cid"
+                                                placeholder="الرقم المدني..." />
+                                        </div>
+                                    </div>
+                                    <div class="field col-12 lg:col-5">
+                                        <label class="font-bold text-slate-600 mb-2">الجنسية</label>
+                                        <div class="p-inputgroup shadow-sm">
+                                            <span class="p-inputgroup-addon"><i
+                                                    class="pi pi-globe text-blue-500"></i></span>
+                                            <input type="text" pInputText [(ngModel)]="record.nationality"
+                                                placeholder="الجنسية..." />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 xl:col-5">
+                            <div
+                                class="p-3 border-round-lg bg-slate-50 mb-4 border-1 border-slate-100 shadow-sm h-full">
+                                <h3
+                                    class="text-lg font-bold text-slate-700 mb-4 border-bottom-1 border-slate-200 pb-2 flex align-items-center gap-2">
+                                    <i class="pi pi-map-marker text-green-500"></i>
+                                    بيانات العمل والاتصال
+                                </h3>
+                                <div class="p-fluid grid gap-2 col-12">
+                                    <div class="field col-12 md:col-6">
+                                        <label class="font-bold text-slate-600 mb-2">المهنة / العمل</label>
+                                        <div class="p-inputgroup shadow-sm">
+                                            <span class="p-inputgroup-addon"><i
+                                                    class="pi pi-briefcase text-green-500"></i></span>
+                                            <input type="text" pInputText [(ngModel)]="record.work"
+                                                placeholder="جهة العمل..." />
+                                        </div>
+                                    </div>
+                                    <div class="field col-12 md:col-5">
+                                        <label class="font-bold text-slate-600 mb-2">نوع العضوية</label>
+                                        <div class="p-inputgroup shadow-sm">
+                                            <span class="p-inputgroup-addon"><i
+                                                    class="pi pi-tag text-green-500"></i></span>
+                                            <input type="text" pInputText [(ngModel)]="record.membership"
+                                                placeholder="نوع العضوية..." />
+                                        </div>
+                                    </div>
+                                    <div class="field col-12 md:col-6">
+                                        <label class="font-bold text-slate-600 mb-2">عنوان الموكل</label>
+                                        <div class="p-inputgroup shadow-sm">
+                                            <span class="p-inputgroup-addon"><i
+                                                    class="pi pi-map text-green-500"></i></span>
+                                            <input type="text" pInputText [(ngModel)]="record.address"
+                                                placeholder="العنوان..." />
+                                        </div>
+                                    </div>
+                                    <div class="field col-12 md:col-5">
+                                        <label class="font-bold text-slate-600 mb-2">البريد الإلكتروني للشركة</label>
+                                        <div class="p-inputgroup shadow-sm">
+                                            <span class="p-inputgroup-addon"><i
+                                                    class="pi pi-envelope text-green-500"></i></span>
+                                            <input type="text" pInputText [(ngModel)]="record.companyEmail"
+                                                placeholder="example@company.com" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Corporate (col-4) + Notes (col-5) -->
+                        <div class="col-12 xl:col-4">
+                            <div
+                                class="p-4 border-round-lg bg-slate-50 mb-4 border-1 border-slate-100 shadow-sm h-full">
+                                <h3
+                                    class="text-lg font-bold text-slate-700 mb-4 border-bottom-1 border-slate-200 pb-2 flex align-items-center gap-2">
+                                    <i class="pi pi-users text-purple-500"></i>
+                                    بيانات الشركات والشركاء
+                                </h3>
+                                <div class="grid p-fluid">
+                                    <div class="col-12 md:col-6">
+                                        <div class="field">
+                                            <label class="font-bold text-slate-600 mb-2">السجل التجاري للشركة</label>
+                                            <div class="p-inputgroup shadow-sm">
+                                                <span class="p-inputgroup-addon"><i
+                                                        class="pi pi-building text-purple-500"></i></span>
+                                                <input type="text" pInputText [(ngModel)]="record.companyRegister"
+                                                    placeholder="رقم السجل..." />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 md:col-6">
+                                        <div class="field">
+                                            <label class="font-bold text-slate-600 mb-2">تصنيف السجل</label>
+                                            <div class="p-inputgroup shadow-sm">
+                                                <span class="p-inputgroup-addon"><i
+                                                        class="pi pi-list text-purple-500"></i></span>
+                                                <input type="text" pInputText [(ngModel)]="record.registerType"
+                                                    placeholder="التصنيف..." />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 lg:col-4">
+                                        <div class="field">
+                                            <label class="font-semibold text-slate-500 mb-1">الشريك الأول</label>
+                                            <div class="p-inputgroup shadow-sm">
+                                                <span class="p-inputgroup-addon"><i
+                                                        class="pi pi-user text-purple-400"></i></span>
+                                                <input type="text" pInputText [(ngModel)]="record.partner1"
+                                                    placeholder="الشريك 1..." />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 lg:col-4">
+                                        <div class="field">
+                                            <label class="font-semibold text-slate-500 mb-1">الشريك الثاني</label>
+                                            <div class="p-inputgroup shadow-sm">
+                                                <span class="p-inputgroup-addon"><i
+                                                        class="pi pi-user text-purple-400"></i></span>
+                                                <input type="text" pInputText [(ngModel)]="record.partner2"
+                                                    placeholder="الشريك 2..." />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 lg:col-4">
+                                        <div class="field">
+                                            <label class="font-semibold text-slate-500 mb-1">الشريك الثالث</label>
+                                            <div class="p-inputgroup shadow-sm">
+                                                <span class="p-inputgroup-addon"><i
+                                                        class="pi pi-user text-purple-400"></i></span>
+                                                <input type="text" pInputText [(ngModel)]="record.partner3"
+                                                    placeholder="الشريك 3..." />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 xl:col-5">
+                            <div class="p-3 border-round-lg bg-orange-50 border-1 border-orange-100 shadow-sm h-full">
+                                <h3
+                                    class="text-lg font-bold text-orange-700 mb-4 border-bottom-1 border-orange-200 pb-2 flex align-items-center gap-2">
+                                    <i class="pi pi-pencil text-orange-500"></i>
+                                    ملاحظات وأرشفة الملف
+                                </h3>
+                                <div class="grid  flex flex-column">
+                                    <div class="col-12 flex-grow-1">
+                                        <div class="p-fluid  flex flex-column">
+                                            <label class="font-bold text-orange-600 mb-2 block">ملاحظات المكتب
+                                                العامة</label>
+                                            <textarea pTextarea rows="5" [(ngModel)]="record.note"
+                                                class="w-full  flex-grow-1"
+                                                style="background: white; border: 1px solid #fed7aa; resize: none; min-height: 100px;"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 flex align-items-center justify-content-center mt-3">
+                                        <div
+                                            class="p-3 bg-white border-round-xl border-1 border-orange-200 shadow-sm flex align-items-center gap-3 w-full justify-content-between">
+                                            <div class="flex align-items-center gap-2">
+                                                <p-checkbox [(ngModel)]="record.archive" [binary]="true"
+                                                    inputId="archiveCheck"></p-checkbox>
+                                                <label for="archiveCheck"
+                                                    class="font-bold text-orange-700 text-lg cursor-pointer m-0">أرشفة
+                                                    الملف</label>
+                                            </div>
+                                            <span class="text-xs text-orange-400">لن يظهر في البحث العام</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <!-- Localized Save Button for Main Data -->
+                    <div *ngIf="record" class="col-12 flex justify-content-end mt-4">
+                        <button pButton label="حفظ بيانات الملف الرئيسية" icon="pi pi-save"
+                            class="p-button-success shadow-2 font-bold px-6 py-3 text-lg" (click)="onSave()"
+                            [loading]="saving"></button>
+                    </div>
+                </div>
+
+
+                <!-- Tab 1: File Details Table -->
+                <div *ngIf="activeTab === 1" class="fade-in-sub">
+                    <!-- Search Bar for File Details -->
+                    <!-- Search Bar for File Details -->
+                    <div class="mb-5 flex justify-content-center">
+                        <div class="p-inputgroup shadow-2 border-round-xl overflow-hidden w-full lg:w-8">
+                            <span class="p-inputgroup-addon bg-white border-none px-4">
+                                <i class="pi pi-search text-blue-500 text-xl"></i>
+                            </span>
+                            <input type="text" pInputText [(ngModel)]="searchDetail"
+                                placeholder="البحث برقم الـ ID فقط..." (keyup.enter)="onSearchDetail()"
+                                class="border-none py-3 text-lg font-semibold text-slate-700" />
+                            <button pButton label="بحث في العقود" icon="pi pi-search" (click)="onSearchDetail()"
+                                [loading]="loading" class="p-button-primary px-5 font-bold"></button>
+                        </div>
+                    </div>
+
+                    <!-- Selected Detail Editor Card -->
+                    <div *ngIf="selectedDetail" class="fade-in mb-5">
+                        <div class="p-4 border-round-xl bg-white border-1 border-blue-100 shadow-3">
+                            <div
+                                class="flex align-items-center justify-content-between mb-4 border-bottom-1 border-blue-50 pb-3">
+                                <div class="flex align-items-center gap-3">
+                                    <div
+                                        class="bg-blue-500 text-white border-round-lg p-2 flex align-items-center justify-content-center">
+                                        <i class="pi pi-file-edit text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-slate-800 m-0">تعديل بيانات العقد</h3>
+                                        <span class="text-blue-500 font-medium">عقد رقم:
+                                            {{selectedDetail.contractNo}}</span>
+                                    </div>
+                                </div>
+                                <button pButton icon="pi pi-times"
+                                    class="p-button-rounded p-button-text p-button-secondary"
+                                    (click)="selectedDetail = null"></button>
+                            </div>
+
+                            <div class="p-fluid grid">
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">رقم العقد</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-id-card text-blue-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedDetail.contractNo"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">قيمة المطالبة</label>
+                                    <div class="p-inputgroup">
+                                        <span
+                                            class="p-inputgroup-addon bg-slate-50 border-right-none font-bold text-blue-500">KWD</span>
+                                        <input type="text" pInputText [(ngModel)]="selectedDetail.deptAmount"
+                                            class="border-left-none font-bold" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">المدعي القانوني</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-user-edit text-blue-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedDetail.legalPlaintiff"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">رقم الدفعة / الباتش</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-tags text-blue-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedDetail.patchNo"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">كود المديونية</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-code text-blue-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedDetail.deptCode"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">تاريخ الإضافة</label>
+                                    <div class="p-inputgroup opacity-70">
+                                        <span class="p-inputgroup-addon bg-slate-100 border-right-none"><i
+                                                class="pi pi-calendar"></i></span>
+                                        <input type="text" pInputText
+                                            [ngModel]="selectedDetail.dateAdded | date:'dd/MM/yyyy HH:mm'" disabled
+                                            class="bg-slate-50 border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12">
+                                    <label class="font-bold text-slate-600 mb-2 block">السبب / الملاحظة</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-info-circle text-blue-500"></i></span>
+                                        <textarea pTextarea rows="2" [(ngModel)]="selectedDetail.reason"
+                                            class="border-left-none w-full" style="resize: none;"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-12 flex justify-content-end mt-3 gap-2">
+                                    <button pButton label="إلغاء" icon="pi pi-times"
+                                        class="p-button-secondary p-button-text font-bold"
+                                        (click)="selectedDetail = null"></button>
+                                    <button pButton label="حفظ التغييرات على العقد" icon="pi pi-save"
+                                        class="p-button-primary px-5 font-bold shadow-2" [loading]="savingDetail"
+                                        (click)="onSaveDetail()"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Auto Numbers Table -->
+                <div *ngIf="activeTab === 2" class="fade-in-sub">
+                    <!-- Search Bar for Auto Numbers -->
+                    <div class="mb-5 flex justify-content-center">
+                        <div class="p-inputgroup shadow-2 border-round-xl overflow-hidden w-full lg:w-8">
+                            <span class="p-inputgroup-addon bg-white border-none px-4">
+                                <i class="pi pi-hashtag text-amber-500 text-xl"></i>
+                            </span>
+                            <input type="text" pInputText [(ngModel)]="searchAutoNumber"
+                                placeholder="البحث برقم الـ ID فقط..." (keyup.enter)="onSearchAutoNumber()"
+                                class="border-none py-3 text-lg font-semibold text-slate-700" />
+                            <button pButton label="بحث في الأرقام" icon="pi pi-search" (click)="onSearchAutoNumber()"
+                                [loading]="loading" class="p-button-warning px-5 font-bold text-slate-800"></button>
+                        </div>
+                    </div>
+
+                    <!-- Selected Auto Number Editor Card -->
+                    <div *ngIf="selectedAutoNumber" class="fade-in mb-5">
+                        <div class="p-4 border-round-xl bg-white border-1 border-amber-100 shadow-3">
+                            <div
+                                class="flex align-items-center justify-content-between mb-4 border-bottom-1 border-amber-50 pb-3">
+                                <div class="flex align-items-center gap-3">
+                                    <div
+                                        class="bg-amber-500 text-white border-round-lg p-2 flex align-items-center justify-content-center">
+                                        <i class="pi pi-hashtag text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-slate-800 m-0">تعديل الرقم الآلي</h3>
+                                        <span class="text-amber-600 font-medium">القيمة:
+                                            {{selectedAutoNumber.autoNumberValue}}</span>
+                                    </div>
+                                </div>
+                                <button pButton icon="pi pi-times"
+                                    class="p-button-rounded p-button-text p-button-secondary"
+                                    (click)="selectedAutoNumber = null"></button>
+                            </div>
+
+                            <div class="p-fluid grid">
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">القيمة (الرقم الآلي)</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-hashtag text-amber-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedAutoNumber.autoNumberValue"
+                                            class="border-left-none font-bold" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">النوع</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-tag text-amber-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedAutoNumber.type"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">كود المديونية</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-code text-amber-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedAutoNumber.deptCode"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6">
+                                    <label class="font-bold text-slate-600 mb-2 block">المدعي</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-user text-amber-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedAutoNumber.claimant"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6">
+                                    <label class="font-bold text-slate-600 mb-2 block">مرجع القضية</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-folder text-amber-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedAutoNumber.caseRef"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12">
+                                    <label class="font-bold text-slate-600 mb-2 block">ملاحظات</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-comment text-amber-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedAutoNumber.note"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="col-12 flex justify-content-end mt-3 gap-2">
+                                    <button pButton label="إلغاء" icon="pi pi-times"
+                                        class="p-button-secondary p-button-text font-bold"
+                                        (click)="selectedAutoNumber = null"></button>
+                                    <button pButton label="حفظ الرقم الآلي" icon="pi pi-save"
+                                        class="p-button-warning px-5 font-bold shadow-2 text-slate-800"
+                                        [loading]="savingAutoNumber" (click)="onSaveAutoNumber()"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Tab 3: Payments Table -->
+                <div *ngIf="activeTab === 3" class="fade-in-sub">
+                    <!-- Search Bar for Payments -->
+                    <div class="mb-5 flex justify-content-center">
+                        <div class="p-inputgroup shadow-2 border-round-xl overflow-hidden w-full lg:w-8">
+                            <span class="p-inputgroup-addon bg-white border-none px-4">
+                                <i class="pi pi-dollar text-green-500 text-xl"></i>
+                            </span>
+                            <input type="text" pInputText [(ngModel)]="searchPayment"
+                                placeholder="البحث برقم الـ ID فقط..." (keyup.enter)="onSearchPayment()"
+                                class="border-none py-3 text-lg font-semibold text-slate-700" />
+                            <button pButton label="بحث في السدادات" icon="pi pi-search" (click)="onSearchPayment()"
+                                [loading]="loading" class="p-button-success px-5 font-bold"></button>
+                        </div>
+                    </div>
+
+                    <!-- Selected Payment Editor Card -->
+                    <div *ngIf="selectedPayment" class="fade-in mb-5">
+                        <div class="p-4 border-round-xl bg-white border-1 border-green-100 shadow-3">
+                            <div
+                                class="flex align-items-center justify-content-between mb-4 border-bottom-1 border-green-50 pb-3">
+                                <div class="flex align-items-center gap-3">
+                                    <div
+                                        class="bg-green-500 text-white border-round-lg p-2 flex align-items-center justify-content-center">
+                                        <i class="pi pi-dollar text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-slate-800 m-0">تعديل بيانات السداد</h3>
+                                        <span class="text-green-600 font-medium">قيمة السداد:
+                                            {{selectedPayment.value}}</span>
+                                    </div>
+                                </div>
+                                <button pButton icon="pi pi-times"
+                                    class="p-button-rounded p-button-text p-button-secondary"
+                                    (click)="selectedPayment = null"></button>
+                            </div>
+
+                            <div class="p-fluid grid">
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">القيمة</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-dollar text-green-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedPayment.value"
+                                            class="border-left-none font-bold" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">طريقة الدفع</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-credit-card text-green-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedPayment.paymentMethod"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">مندوب المبيعات</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-user text-green-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedPayment.salesAgent"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">كود الملف</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-file text-green-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedPayment.fileCode"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">كود المديونية</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-hashtag text-green-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedPayment.deptCode"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">تاريخ الإضافة</label>
+                                    <div class="p-inputgroup opacity-70">
+                                        <span class="p-inputgroup-addon bg-slate-100 border-right-none"><i
+                                                class="pi pi-calendar"></i></span>
+                                        <input type="text" pInputText
+                                            [ngModel]="selectedPayment.dateAdded | date:'dd/MM/yyyy HH:mm'" disabled
+                                            class="bg-slate-50 border-left-none" />
+                                    </div>
+                                </div>
+
+                                <div class="col-12 flex justify-content-end mt-3 gap-2">
+                                    <button pButton label="إلغاء" icon="pi pi-times"
+                                        class="p-button-secondary p-button-text font-bold"
+                                        (click)="selectedPayment = null"></button>
+                                    <button pButton label="حفظ السداد" icon="pi pi-save"
+                                        class="p-button-success px-5 font-bold shadow-2" [loading]="savingPayment"
+                                        (click)="onSavePayment()"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Simple Loading State -->
+    <div *ngIf="loading" class="flex flex-column align-items-center justify-content-center py-8">
+        <i class="pi pi-spin pi-spinner text-primary text-6xl mb-3"></i>
+        <div class="text-xl font-bold text-slate-600">جاري استرجاع البيانات...</div>
+    </div>
+
+</div>
+
+<style>
+    .tab-link {
+        color: #64748b;
+        border-radius: 8px 8px 0 0;
+        margin-right: 2px;
+        position: relative;
+    }
+
+    .tab-link:hover {
+        background: rgba(37, 99, 235, 0.05);
+        color: #2563eb;
+    }
+
+    .tab-link.active {
+        background: white;
+        color: #2563eb;
+        border-bottom: 3px solid #2563eb !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .fade-in {
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-sub {
+        animation: fadeInSub 0.3s ease-in;
+    }
+
+    @keyframes fadeInSub {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    :host ::ng-deep {
+        .p-inputtext {
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .p-inputtext:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .p-datatable .p-datatable-thead>tr>th {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+
+        .p-toast-message {
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    }
+</style>

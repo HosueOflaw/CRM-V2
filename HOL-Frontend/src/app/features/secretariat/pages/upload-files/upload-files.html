@@ -1,34 +1,62 @@
-<div class="p-6 max-w-full mx-auto shadow rounded"
-     style="background-color: var(--surface-card); color: var(--text-color);">
+<div class="p-6 max-w-full mx-auto shadow rounded" (keydown.enter)="$event.preventDefault()"
+  style="background-color: var(--surface-card); color: var(--text-color);">
 
-  <h1 class="text-xl font-bold mb-6 text-center" style="color: var(--text-color);">إدخال ملف جديد</h1>
+  <h1 class="text-xl font-bold mb-6 text-center" style="color: var(--text-color);">
+    إدخال ملف جديد
+  </h1>
 
-  <form class="grid grid-cols-1 md:grid-cols-3 gap-6" style="direction: rtl;">
+  <!-- Action Buttons at Top for visibility -->
+  <div
+    class="flex gap-4 mb-8 justify-center bg-gray-50/50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+    <button type="button" class="btn btn-secondary px-10 gap-2 shadow-lg " (click)="save()" style="color: var(--text-color);">
+      <i class="pi pi-save text-xl"></i>
+      حفظ البيانات (Save)
+    </button>
+    <button type="button" class="btn btn-secondary px-10 gap-2 shadow-lg" (click)="clear()">
+      <i class="pi pi-file-plus text-xl"></i>
+      تفريغ / جديد (Reset)
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6" style="direction: rtl;">
 
     <!-- العمود 1 -->
     <div class="space-y-4">
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">الرقم الآلي</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+        <label class="label"><span class="label-text" style="color: var(--text-color);">الرقم (ID)</span></label>
+        <input type="number" [(ngModel)]="mainfile.id" name="id" class="input input-bordered w-full" readonly
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">تصنيف الجنسية</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+        <label class="label"><span class="label-text" style="color: var(--text-color);">الكود *</span></label>
+        <input type="number" [(ngModel)]="mainfile.code" name="code" class="input input-bordered w-full" required
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">تصنيف باتش زين</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+        <label class="label"><span class="label-text" style="color: var(--text-color);">الاسم *</span></label>
+        <input type="text" [(ngModel)]="mainfile.name" name="name" class="input input-bordered w-full" required
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
-      <div class="flex gap-3 pt-5 flex-col">
-        <button type="button" class="btn btn-success w-full">حفظ</button>
-        <button type="button" class="btn btn-primary w-full">جديد</button>
+      <div class="form-control">
+        <label class="label"><span class="label-text" style="color: var(--text-color);">الرقم المدني</span></label>
+        <input type="text" [(ngModel)]="mainfile.cid" name="cid" class="input input-bordered w-full"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text" style="color: var(--text-color);">العنوان</span></label>
+        <input type="text" [(ngModel)]="mainfile.address" name="address" class="input input-bordered w-full"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text" style="color: var(--text-color);">الجنسية</span></label>
+        <input type="text" [(ngModel)]="mainfile.nationality" name="nationality" class="input input-bordered w-full"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
     </div>
@@ -37,95 +65,40 @@
     <div class="space-y-4">
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">الموكل</span></label>
-        <div class="flex gap-2">
-          <input type="text" [(ngModel)]="selectedClient" name="selectedClient" class="input input-bordered w-full"
-                 style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-          <button type="button" class="btn btn-sm" (click)="openLookup('client')">...</button>
-        </div>
+        <label class="label"><span class="label-text" style="color: var(--text-color);">أرشيف</span></label>
+        <input type="checkbox" [(ngModel)]="mainfile.archive" name="archive" class="checkbox"
+          style="border-color: var(--surface-border);" />
       </div>
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">المدعي القانوني</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+        <label class="label"><span class="label-text" style="color: var(--text-color);">ملاحظات</span></label>
+        <textarea [(ngModel)]="mainfile.note" name="note" class="textarea textarea-bordered w-full" rows="3"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"></textarea>
       </div>
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">القطاع</span></label>
-        <div class="flex gap-2">
-          <input type="text" [(ngModel)]="selectedSector" name="selectedSector" class="input input-bordered w-full"
-                 style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-          <button type="button" class="btn btn-sm" (click)="openLookup('sector')">...</button>
-        </div>
+        <label class="label"><span class="label-text" style="color: var(--text-color);">العمل</span></label>
+        <input type="text" [(ngModel)]="mainfile.work" name="work" class="input input-bordered w-full"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">ترقيم الشركة 1</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+        <label class="label"><span class="label-text" style="color: var(--text-color);">العضوية</span></label>
+        <input type="text" [(ngModel)]="mainfile.membership" name="membership" class="input input-bordered w-full"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">ترقيم الشركة 2</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+        <label class="label"><span class="label-text" style="color: var(--text-color);">البريد الإلكتروني
+            للشركة</span></label>
+        <input type="email" [(ngModel)]="mainfile.companyEmail" name="companyEmail" class="input input-bordered w-full"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">ملاحظات الخط</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-      </div>
-
-      <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">ملاحظات 1</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-      </div>
-
-      <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">ملاحظات 2</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-      </div>
-
-      <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">ملاحظات 3</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-      </div>
-
-      <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">المحكمة</span></label>
-        <div class="flex gap-2">
-          <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-          <button type="button" class="btn btn-sm">...</button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3">
-        <div class="form-control">
-          <label class="label"><span class="label-text" style="color: var(--text-color);">عمولة ودية</span></label>
-          <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-        </div>
-        <div class="form-control">
-          <label class="label"><span class="label-text" style="color: var(--text-color);">عمولة قضائية</span></label>
-          <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-        </div>
-        <div class="form-control">
-          <label class="label"><span class="label-text" style="color: var(--text-color);">مقدم ودي</span></label>
-          <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-        </div>
-        <div class="form-control">
-          <label class="label"><span class="label-text" style="color: var(--text-color);">مقدم قضائي</span></label>
-          <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-        </div>
+        <label class="label"><span class="label-text" style="color: var(--text-color);">فاكس الشركة</span></label>
+        <input type="text" [(ngModel)]="mainfile.companyFax" name="companyFax" class="input input-bordered w-full"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
     </div>
@@ -134,111 +107,42 @@
     <div class="space-y-4">
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">الكود</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+        <label class="label"><span class="label-text" style="color: var(--text-color);">سجل الشركة</span></label>
+        <input type="text" [(ngModel)]="mainfile.companyRegister" name="companyRegister"
+          class="input input-bordered w-full"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">الاسم</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+        <label class="label"><span class="label-text" style="color: var(--text-color);">الشريك 1</span></label>
+        <input type="text" [(ngModel)]="mainfile.partner1" name="partner1" class="input input-bordered w-full"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">سبب الديون</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+        <label class="label"><span class="label-text" style="color: var(--text-color);">الشريك 2</span></label>
+        <input type="text" [(ngModel)]="mainfile.partner2" name="partner2" class="input input-bordered w-full"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">الباتش</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+        <label class="label"><span class="label-text" style="color: var(--text-color);">الشريك 3</span></label>
+        <input type="text" [(ngModel)]="mainfile.partner3" name="partner3" class="input input-bordered w-full"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
       <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">الموظف</span></label>
-        <div class="flex gap-2">
-          <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-          <button type="button" class="btn btn-sm" (click)="openLookup('employee')">...</button>
-        </div>
+        <label class="label"><span class="label-text" style="color: var(--text-color);">نوع السجل</span></label>
+        <input type="text" [(ngModel)]="mainfile.registerType" name="registerType" class="input input-bordered w-full"
+          style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
       </div>
 
-      <div class="grid grid-cols-2 gap-3">
-        <div class="form-control">
-          <label class="label"><span class="label-text" style="color: var(--text-color);">تاريخ الورود</span></label>
-          <input type="date" class="input input-bordered w-full"
-                 style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-        </div>
-        <div class="form-control">
-          <label class="label"><span class="label-text" style="color: var(--text-color);">تاريخ التسليم</span></label>
-          <input type="date" class="input input-bordered w-full"
-                 style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-        </div>
-      </div>
-
-      <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">تاريخ السحب</span></label>
-        <input type="date" class="input input-bordered w-full" />
-      </div>
-
-      <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">رقم العقد</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-      </div>
-
-      <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">الحالة</span></label>
-        <div class="flex gap-2">
-          <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-          <button class="btn btn-sm">...</button>
-        </div>
-      </div>
-
-      <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">الرقم المدني</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-      </div>
-
-      <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">المطالبة</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-      </div>
-
-      <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">ملاحظات</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-      </div>
-
-      <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">الموحد</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-      </div>
-
-      <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">العنوان</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
-      </div>
-
-      <div class="form-control">
-        <label class="label"><span class="label-text" style="color: var(--text-color);">الجنسية</span></label>
-        <input type="text" class="input input-bordered w-full"
-               style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
+      <div class="p-4 bg-blue-50/20 dark:bg-blue-900/10 rounded-lg border border-blue-500/20 text-center">
+        <p class="text-xs opacity-70 mb-2">تأكد من إدخال الكود والاسم بشكل صحيح</p>
       </div>
 
     </div>
 
-  </form>
+  </div>
 
 </div>
-
-<app-lookup-modal (itemSelected)="onItemSelected($event)"></app-lookup-modal>

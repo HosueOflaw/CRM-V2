@@ -17,7 +17,7 @@ import { Subscription } from 'rxjs';
             <!-- Home is always visible -->
             <li app-menuitem [item]="homeItem" [index]="0"></li>
 
-          
+
 
             <!-- Performance Dashboard for Admin/Supervisor -->
             <li *ngIf="isAdminOrSupervisor" app-menuitem [item]="performanceItem" [index]="1"></li>
@@ -177,6 +177,7 @@ export class AppMenu implements OnInit, OnDestroy {
                     { label: 'رفع الملفات (Excel)', icon: 'pi pi-fw pi-file-excel', routerLink: ['/secretariat/import-mainfiles'] },
                     { label: 'رفع ملفات (Details Excel)', icon: 'pi pi-fw pi-file-excel', routerLink: ['/secretariat/import-filedetails'] },
                     { label: 'رفع ملفات (Auto Numbers)', icon: 'pi pi-fw pi-sort-numeric-down', routerLink: ['/secretariat/import-autonumbers'] },
+                    { label: 'رفع المدفوعات (Payments)', icon: 'pi pi-fw pi-money-bill', routerLink: ['/secretariat/import-payments'] },
                     { label: 'انتظار العملاء', icon: 'pi pi-fw pi-clock', routerLink: ['/secretariat/waiting-clients'] },
                     { label: 'أرقام الصادر والوارد', icon: 'pi pi-fw pi-sort-numeric-up', routerLink: ['/secretariat/export-and-import-num'] },
                     { label: 'طباعة تكاليف بالوفاء', icon: 'pi pi-fw pi-print', routerLink: ['/secretariat/costs-print'] },
@@ -190,7 +191,8 @@ export class AppMenu implements OnInit, OnDestroy {
                     { label: 'تنظيم دخول العملاء', icon: 'pi pi-fw pi-calendar', routerLink: ['/secretariat/organizing-clients'] },
                     { label: 'تجميع ملفات الأقساط', icon: 'pi pi-fw pi-folder', routerLink: ['/secretariat/installment-collection'] },
                     { label: 'الأستمارات', icon: 'pi pi-fw pi-file-edit', routerLink: ['/secretariat/formslist'] },
-                    { label: 'طباعة ملفات من أكسيل', icon: 'pi pi-fw pi-file-excel', routerLink: ['/secretariat/print-page'] }
+                    { label: 'طباعة ملفات من أكسيل', icon: 'pi pi-fw pi-file-excel', routerLink: ['/secretariat/print-page'] },
+                    { label: 'تعديل بيانات ملف', icon: 'pi pi-fw pi-user-edit', routerLink: ['/secretariat/edit-record'] }
                 ]
             },
             {

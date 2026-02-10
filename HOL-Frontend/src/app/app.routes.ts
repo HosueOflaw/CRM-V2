@@ -90,6 +90,12 @@ export const routes: Routes = [
               import('./features/secretariat/pages/import-autonumbers/import-autonumbers').then((m) => m.ImportAutoNumbersPage),
           },
           {
+            path: 'import-payments',
+            data: { title: 'استيراد المدفوعات Payments | السكرتارية' },
+            loadComponent: () =>
+              import('./features/secretariat/pages/import-payments/import-payments').then((m) => m.ImportPaymentsPage),
+          },
+          {
             path: 'upload-files',
             data: { title: 'رفع الملفات | السكرتارية' },
             loadComponent: () =>
@@ -178,6 +184,12 @@ export const routes: Routes = [
             data: { title: 'طباعة ملفات من أكسيل | السكرتارية' },
             loadComponent: () =>
               import('./features/secretariat/pages/direct-print/direct-print').then((m) => m.DirectPrint),
+          },
+          {
+            path: 'edit-record',
+            data: { title: 'تعديل بيانات ملف | السكرتارية' },
+            loadComponent: () =>
+              import('./features/secretariat/pages/edit-record/edit-record').then((m) => m.EditRecordPage),
           },
         ],
       },

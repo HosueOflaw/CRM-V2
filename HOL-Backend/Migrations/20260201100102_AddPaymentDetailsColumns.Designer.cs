@@ -4,6 +4,7 @@ using House_of_law_api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace House_of_law_api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260201100102_AddPaymentDetailsColumns")]
+    partial class AddPaymentDetailsColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -551,18 +554,6 @@ namespace House_of_law_api.Migrations
                     b.Property<int>("CreatedById")
                         .HasColumnType("int")
                         .HasColumnName("created_by_id");
-
-                    b.Property<int>("ErrorCount")
-                        .HasColumnType("int")
-                        .HasColumnName("error_count");
-
-                    b.Property<byte[]>("ErrorLogFile")
-                        .HasColumnType("varbinary(max)")
-                        .HasColumnName("error_log_file");
-
-                    b.Property<string>("ErrorLogFileName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("error_log_file_name");
 
                     b.Property<string>("ErrorMessage")
                         .HasColumnType("nvarchar(max)")

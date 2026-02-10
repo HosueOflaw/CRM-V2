@@ -1,5 +1,6 @@
-
+using EFCore.BulkExtensions;
 using System.Data;
+using ClosedXML.Excel;
 
 namespace House_of_law_api.Services.BackgroundWorkers;
 
@@ -19,7 +20,7 @@ public class FileDetailImportWorker : BackgroundService
         _serviceProvider = serviceProvider;
         _logger = logger;
         _hubContext = hubContext;
-        _uploadPath = Path.Combine(environment.WebRootPath ?? environment.ContentRootPath, "uploads", "excel_imports");
+        _uploadPath = Path.Combine(environment.ContentRootPath, "uploads", "excel_imports");
         
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
@@ -81,15 +82,10 @@ public class FileDetailImportWorker : BackgroundService
             return;
         }
 
-        int processedCount = 0;
-        int queuedCount = 0;
-
         try
         {
-            var batchSize = 2000;
-            var buffer = new List<FileDetail>();
-
             var initialDbCount = await context.FileDetails.CountAsync(stoppingToken);
+
             LogToFile($"DEBUG: Processing Job {job.Id}. Initial DB count: {initialDbCount}");
             
             using var stream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -110,49 +106,19 @@ public class FileDetailImportWorker : BackgroundService
                 }
             }
 
-            // --- VALIDATION PASS ---
-            var validationErrors = new List<string>();
-            int rowNum = 1;
-            foreach (IDictionary<string, object> row in allRows)
-            {
-                rowNum++;
-                string GetRowVal(string key) {
-                    var k = row.Keys.FirstOrDefault(x => x.Equals(key, StringComparison.OrdinalIgnoreCase));
-                    return k != null ? row[k]?.ToString() : null;
-                }
-
-                var fileCode = GetRowVal("كود الملف");
-                var amount = GetRowVal("المبلغ المختص");
-                var dateFin = GetRowVal("تاريخ الانتهاء");
-
-                if (!string.IsNullOrEmpty(fileCode) && !long.TryParse(fileCode, out _))
-                    validationErrors.Add($"السطر {rowNum}: كود الملف غير صالح.");
-                
-                if (!string.IsNullOrEmpty(amount) && !decimal.TryParse(amount, out _))
-                    validationErrors.Add($"السطر {rowNum}: المبلغ المختص يجب أن يكون رقماً.");
-
-                if (!string.IsNullOrEmpty(dateFin) && !DateTime.TryParse(dateFin, out _))
-                    validationErrors.Add($"السطر {rowNum}: تاريخ الانتهاء غير صحيح.");
-
-                if (validationErrors.Count > 10) break;
-            }
-
-            if (validationErrors.Any())
-            {
-                job.Status = "Failed";
-                job.ErrorMessage = "فشل التحقق: " + string.Join(" | ", validationErrors);
-                await context.SaveChangesAsync(stoppingToken);
-                return;
-            }
-            // --- END VALIDATION PASS ---
-
-            await context.SaveChangesAsync(stoppingToken);
+            // --- SINGLE PASS PROCESSING ---
+            int jobProcessedCount = 0;
+            int jobErrorCount = 0;
+            int jobQueuedCount = 0;
+            var rowBuffer = new List<FileDetail>();
+            var errorRows = new List<IDictionary<string, object>>();
+            var jobBatchSize = 1000;
 
             foreach (IDictionary<string, object> row in allRows)
             {
                 if (stoppingToken.IsCancellationRequested) break;
+                jobProcessedCount++;
 
-                processedCount++;
                 try
                 {
                     string GetStr(string key) {
@@ -180,62 +146,85 @@ public class FileDetailImportWorker : BackgroundService
                         return DateTime.TryParse(s, out DateTime val) ? (DateTime?)val : null;
                     }
 
-                    var detail = new FileDetail
-                    {
-                        FileCode = GetLong("كود الملف"),
-                        DeptCode = GetLong("كود المديونية"),
-                        Reason = GetStr("السبب"),
-                        PatchNo = GetStr("رقم القيد"),
-                        DateFinished = GetDate("تاريخ الانتهاء"), // Note: This wasn't in list but usually present in entity? Checking DTO.. template didn't have it explicitly listed in headers previously created but entity has it. Wait, the template generation list in controller lines 242-253 DOES NOT include DateFinished. Let's check the valid list I created in controller step.
-                        // Controller list: "كود الملف", "كود المديونية", "السبب", "رقم القيد", "العميل", "رقم العقد", "المبلغ المختص", "المدعي القانوني", "المحامي", "المحكمة", "MD", "المستشار القانوني"
-                        // Entity has DateFinished. If it's not in template, I shouldn't try to get it, or I should accept it might be missing?
-                        // Let's stick to what's in the template for now, or just try "تاريخ الانتهاء" if user adds it, but GetDate returns null if missing anyway. 
-                        
-                        Client = GetInt("العميل"),
-                        ContractNo = GetStr("رقم العقد"),
-                        DeptAmount = GetDec("المبلغ المختص"),
-                        LegalPlaintiff = GetStr("المدعي القانوني"),
-                        LawyerUser = GetInt("المحامي"),
-                        CourtUser = GetInt("المحكمة"),
-                        MdUser = GetInt("MD"),
-                        LegalAdvisorUser = GetInt("المستشار القانوني"),
-                        DateAdded = DateTime.UtcNow,
-                        ImportJobId = job.Id
-                    };
+                    // Validation
+                    var fileCode = GetStr("كود الملف");
+                    var amount = GetStr("المبلغ المختص");
+                    var dateFin = GetStr("تاريخ الانتهاء");
+                    string rowError = null;
 
-                    // Requirement check
-                    if (detail.FileCode > 0)
+                    if (string.IsNullOrEmpty(fileCode)) rowError = "كود الملف مطلوب.";
+                    else if (!long.TryParse(fileCode, out _)) rowError = $"كود الملف '{fileCode}' غير صالح.";
+                    else if (string.IsNullOrEmpty(amount)) rowError = "المبلغ المختص مطلوب.";
+                    else if (!decimal.TryParse(amount, out _)) rowError = $"المبلغ المختص '{amount}' يجب أن يكون رقماً.";
+                    else if (!string.IsNullOrEmpty(dateFin) && !DateTime.TryParse(dateFin, out _)) rowError = $"تاريخ الانتهاء '{dateFin}' غير صحيح.";
+
+                    if (rowError != null)
                     {
-                        buffer.Add(detail);
-                        queuedCount++;
+                        jobErrorCount++;
+                        var errorRow = new Dictionary<string, object>(row);
+                        errorRow["خطأ التحقق (Error Message)"] = rowError;
+                        errorRows.Add(errorRow);
+                    }
+                    else
+                    {
+                        var detail = new FileDetail
+                        {
+                            FileCode = GetLong("كود الملف"),
+                            DeptCode = GetLong("كود المديونية"),
+                            Reason = GetStr("السبب"),
+                            PatchNo = GetStr("رقم القيد"),
+                            DateFinished = GetDate("تاريخ الانتهاء"),
+                            Client = GetInt("العميل"),
+                            ContractNo = GetStr("رقم العقد"),
+                            DeptAmount = GetDec("المبلغ المختص"),
+                            LegalPlaintiff = GetStr("المدعي القانوني"),
+                            LawyerUser = GetInt("المحامي"),
+                            CourtUser = GetInt("المحكمة"),
+                            MdUser = GetInt("MD"),
+                            LegalAdvisorUser = GetInt("المستشار القانوني"),
+                            DateAdded = DateTime.UtcNow,
+                            ImportJobId = job.Id
+                        };
+                        rowBuffer.Add(detail);
+                        jobQueuedCount++;
                     }
 
-                    if (buffer.Count >= batchSize)
+                    if (rowBuffer.Count >= jobBatchSize)
                     {
-                        LogToFile($"DEBUG: Saving batch ending at Excel row {processedCount}. (Buffer: {buffer.Count}, Total Queued: {queuedCount})");
-                        await SaveBatchAsync(buffer, context, job, processedCount, stoppingToken);
-                        buffer.Clear();
+                        await SaveBatchAsync(rowBuffer, context, job, jobProcessedCount, jobErrorCount, stoppingToken);
+                        rowBuffer.Clear();
                     }
                 }
                 catch (Exception rowEx)
                 {
-                    LogToFile($"DEBUG: Row {processedCount} mapping error: {rowEx.Message}");
+                    LogToFile($"DEBUG: Row {jobProcessedCount} error: {rowEx.Message}");
+                    jobErrorCount++;
+                    var errorRow = new Dictionary<string, object>(row);
+                    errorRow["Error"] = rowEx.Message;
+                    errorRows.Add(errorRow);
                 }
             }
 
-            if (buffer.Count > 0)
+            if (rowBuffer.Count > 0)
             {
-                LogToFile($"DEBUG: Saving final batch. size: {buffer.Count}");
-                await SaveBatchAsync(buffer, context, job, processedCount, stoppingToken);
+                await SaveBatchAsync(rowBuffer, context, job, jobProcessedCount, jobErrorCount, stoppingToken);
             }
 
             var finalDbCount = await context.FileDetails.CountAsync(stoppingToken);
             var actualAdded = finalDbCount - initialDbCount;
 
+            // Generate Error Log if needed
+            if (errorRows.Any())
+            {
+                job.ErrorLogFile = GenerateErrorLog(errorRows);
+                job.ErrorLogFileName = $"Errors_{job.FileName}";
+            }
+
             job.Status = "Completed";
             job.Progress = 100;
-            job.ProcessedRows = processedCount;
-            job.ErrorMessage = $"Summary: ExcelRows={job.TotalRows}, ValidRows={queuedCount}, DB_Added={actualAdded}, DB_Total={finalDbCount}";
+            job.ProcessedRows = jobProcessedCount;
+            job.ErrorCount = jobErrorCount;
+            job.ErrorMessage = $"Summary: Total={job.TotalRows}, Added={actualAdded}, Errors={jobErrorCount}";
             job.CompletedAt = DateTime.UtcNow;
             await context.SaveChangesAsync(stoppingToken);
             
@@ -244,7 +233,7 @@ public class FileDetailImportWorker : BackgroundService
             await _hubContext.Clients.User(job.CreatedById.ToString()).SendAsync("broadcast", new 
             {
                 type = "excel_import_complete",
-                data = new { jobId = job.Id, fileName = job.FileName, jobType = "FileDetail", total = processedCount, added = actualAdded }
+                data = new { jobId = job.Id, fileName = job.FileName, jobType = "FileDetail", total = jobProcessedCount, added = actualAdded, errorCount = jobErrorCount }
             }, stoppingToken);
         }
         catch (Exception ex)
@@ -258,33 +247,87 @@ public class FileDetailImportWorker : BackgroundService
         }
     }
 
-    private async Task SaveBatchAsync(List<FileDetail> items, ApplicationDbContext context, ImportJob job, int processedCount, CancellationToken stoppingToken)
+    private async Task SaveBatchAsync(List<FileDetail> items, ApplicationDbContext context, ImportJob job, int processedCount, int errorCount, CancellationToken stoppingToken)
     {
         try 
         {
-            LogToFile($"Saving batch of {items.Count} items to database...");
-            
-            // Using AddRange + SaveChanges for better reliability with Foreign Keys
-            context.FileDetails.AddRange(items);
-            await context.SaveChangesAsync(stoppingToken);
-            
+            LogToFile($"Saving batch of {items.Count} items to database using BulkInsert...");
+            await context.BulkInsertAsync(items, cancellationToken: stoppingToken);
             LogToFile("Batch saved successfully.");
-            
-            job.ProcessedRows = processedCount;
-            job.Progress = (int)((double)processedCount / job.TotalRows * 100);
-            await context.SaveChangesAsync(stoppingToken);
-
-            await _hubContext.Clients.User(job.CreatedById.ToString()).SendAsync("broadcast", new 
-            {
-                type = "excel_import_progress",
-                data = new { jobId = job.Id, jobType = "FileDetail", progress = job.Progress, processed = processedCount, total = job.TotalRows }
-            }, stoppingToken);
         }
         catch (Exception ex)
         {
-            LogToFile($"ERROR in SaveBatchAsync: {ex.Message}");
-            if (ex.InnerException != null) LogToFile($"Inner Exception: {ex.InnerException.Message}");
-            throw;
+            LogToFile($"ERROR in SaveBatchAsync (Bulk): {ex.Message}. Falling back to AddRange...");
+            context.FileDetails.AddRange(items);
+            await context.SaveChangesAsync(stoppingToken);
+            LogToFile("Fallback saved successfully.");
         }
+        
+        job.ProcessedRows = processedCount;
+        job.ErrorCount = errorCount;
+        job.Progress = (int)((double)processedCount / job.TotalRows * 100);
+        await context.SaveChangesAsync(stoppingToken);
+
+        await BroadcastProgress(job, processedCount, errorCount);
+    }
+
+    private byte[] GenerateErrorLog(List<IDictionary<string, object>> errorRows)
+    {
+        try
+        {
+            using var workbook = new ClosedXML.Excel.XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Errors");
+            worksheet.RightToLeft = true;
+
+            if (errorRows.Count == 0) return null;
+
+            // Headers
+            var headers = errorRows[0].Keys.ToList();
+            for (int i = 0; i < headers.Count; i++)
+            {
+                var cell = worksheet.Cell(1, i + 1);
+                cell.Value = headers[i];
+                cell.Style.Font.Bold = true;
+                cell.Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.LightGray;
+            }
+
+            // Data
+            for (int r = 0; r < errorRows.Count; r++)
+            {
+                var rowData = errorRows[r];
+                for (int c = 0; c < headers.Count; c++)
+                {
+                    var val = rowData.ContainsKey(headers[c]) ? rowData[headers[c]]?.ToString() : "";
+                    worksheet.Cell(r + 2, c + 1).Value = val;
+                }
+            }
+
+            worksheet.Columns().AdjustToContents();
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+        catch (Exception ex)
+        {
+            LogToFile($"ERROR generating error log: {ex.Message}");
+            return null;
+        }
+    }
+
+    private async Task BroadcastProgress(ImportJob job, int processed, int errors)
+    {
+        await _hubContext.Clients.User(job.CreatedById.ToString()).SendAsync("broadcast", new 
+        {
+            type = "excel_import_progress",
+            data = new 
+            { 
+                jobId = job.Id, 
+                jobType = "FileDetail", 
+                progress = job.Progress, 
+                processed = processed, 
+                total = job.TotalRows,
+                errorCount = errors
+            }
+        });
     }
 }

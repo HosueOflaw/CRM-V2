@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface ImportJob {
@@ -10,6 +10,7 @@ export interface ImportJob {
     progress: number;
     totalRows: number;
     processedRows: number;
+    errorCount: number;
     errorMessage?: string;
     createdAt: string;
     completedAt?: string;
@@ -26,24 +27,85 @@ export interface PagedResponse<T> {
     hasPrevious: boolean;
 }
 
+export interface UploadState {
+    jobId: number | null;
+    status: string;
+    progress: number;
+    jobType: string | null;
+    totalRows?: number;
+    processedRows?: number;
+    errorCount?: number;
+    errorMessage?: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
 export class ExcelImportService {
     private apiUrl = `${environment.apiUrl}/ExcelImport`;
 
+    private uploadStateSubject = new BehaviorSubject<UploadState>({
+        jobId: null,
+        status: 'Idle',
+        progress: 0,
+        jobType: null
+    });
+    uploadState$ = this.uploadStateSubject.asObservable();
+
+    get currentUploadState(): UploadState {
+        return this.uploadStateSubject.value;
+    }
+
     constructor(private http: HttpClient) { }
 
-    uploadMainfiles(file: File): Observable<{ jobId: number, message: string }> {
-        return this.uploadFile(file, 'upload-mainfiles');
+    startUpload(file: File, type: 'Mainfile' | 'AutoNumber' | 'FileDetail' | 'Payment') {
+        if (this.uploadStateSubject.value.status === 'Uploading') return;
+
+        let endpoint = '';
+        switch (type) {
+            case 'Mainfile': endpoint = 'upload-mainfiles'; break;
+            case 'AutoNumber': endpoint = 'upload-autonumbers'; break;
+            case 'FileDetail': endpoint = 'upload-filedetails'; break;
+            case 'Payment': endpoint = 'upload-payments'; break;
+        }
+
+        this.uploadStateSubject.next({ jobId: null, status: 'Uploading', progress: 0, jobType: type });
+
+        this.uploadFile(file, endpoint).subscribe({
+            next: (res) => {
+                this.uploadStateSubject.next({ jobId: res.jobId, status: 'Processing', progress: 0, jobType: type });
+            },
+            error: (err) => {
+                console.error('Upload failed', err);
+                const errorMsg = err.error?.message || err.error || err.message || 'فشل رفع الملف';
+                this.uploadStateSubject.next({
+                    jobId: null,
+                    status: 'Failed',
+                    progress: 0,
+                    jobType: type,
+                    errorMessage: errorMsg
+                });
+            }
+        });
     }
 
-    uploadAutoNumbers(file: File): Observable<{ jobId: number, message: string }> {
-        return this.uploadFile(file, 'upload-autonumbers');
+    // Signals from SignalR will update this state
+    updateProgress(jobId: number, progress: number, status: string, processed?: number, total?: number, errorCount?: number) {
+        const current = this.uploadStateSubject.value;
+        if (current.jobId === jobId) {
+            this.uploadStateSubject.next({
+                ...current,
+                progress,
+                status,
+                processedRows: processed ?? current.processedRows,
+                totalRows: total ?? current.totalRows,
+                errorCount: errorCount ?? current.errorCount
+            });
+        }
     }
 
-    uploadFileDetails(file: File): Observable<{ jobId: number, message: string }> {
-        return this.uploadFile(file, 'upload-filedetails');
+    resetUploadState() {
+        this.uploadStateSubject.next({ jobId: null, status: 'Idle', progress: 0, jobType: null });
     }
 
     private uploadFile(file: File, endpoint: string): Observable<{ jobId: number, message: string }> {
@@ -82,6 +144,10 @@ export class ExcelImportService {
         this.downloadFile(`${this.apiUrl}/download-autonumbers-template`, 'AutoNumbers_Template.xlsx');
     }
 
+    downloadPaymentsTemplate(): void {
+        this.downloadFile(`${this.apiUrl}/download-payments-template`, 'Payments_Template.xlsx');
+    }
+
     downloadFileDetailsTemplate(): void {
         this.downloadFile(`${this.apiUrl}/download-filedetails-template`, 'FileDetails_Template.xlsx');
     }
@@ -92,6 +158,10 @@ export class ExcelImportService {
 
     revertImport(jobId: number): Observable<any> {
         return this.http.delete(`${this.apiUrl}/revert/${jobId}`);
+    }
+
+    downloadErrorLog(jobId: number, fileName: string): void {
+        this.downloadFile(`${this.apiUrl}/download-error-log/${jobId}`, `Errors_${fileName}`);
     }
 
     getJobData(jobId: number, pageNumber: number = 1, pageSize: number = 10, search?: string): Observable<PagedResponse<any>> {

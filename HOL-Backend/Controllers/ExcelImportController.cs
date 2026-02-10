@@ -1,4 +1,5 @@
 
+
 using Microsoft.Extensions.Caching.Memory;
 using House_of_law_api.Services;
 
@@ -13,16 +14,18 @@ namespace House_of_law_api.Controllers;
 public class ExcelImportController : ControllerBase
 {
   private readonly ApplicationDbContext _context;
+  private readonly IWebHostEnvironment _env;
   private readonly string _uploadPath;
   private readonly IMemoryCache _cache;
   private readonly INotificationService _notificationService;
 
-  public ExcelImportController(ApplicationDbContext context, IMemoryCache cache, INotificationService notificationService)
+  public ExcelImportController(ApplicationDbContext context, IMemoryCache cache, INotificationService notificationService, IWebHostEnvironment env)
   {
     _context = context;
     _cache = cache;
     _notificationService = notificationService;
-    _uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads", "excel_imports");
+    _env = env;
+    _uploadPath = Path.Combine(_env.ContentRootPath, "uploads", "excel_imports");
 
     if (!Directory.Exists(_uploadPath))
     {
@@ -46,6 +49,10 @@ public class ExcelImportController : ControllerBase
               new List<string> { "كود الملف", "كود المديونية", "المبلغ المختص" },
               new List<string> { "الرقم الآلي", "الاسم" }
           ),
+          "Payment" => (
+              new List<string> { "اسم العميل", "المبلغ" }, // Required columns based on Worker
+              new List<string> { "الرقم الآلي" } // Forbidden columns to avoid mixup (Removed FileCode)
+          ),
           _ => (new List<string>(), new List<string>())
       };
   }
@@ -55,7 +62,6 @@ public class ExcelImportController : ControllerBase
     try
     {
       using var stream = file.OpenReadStream();
-      // Read first row without skipping headers
       var firstRow = MiniExcel.Query(stream).FirstOrDefault() as IDictionary<string, object>;
 
       if (firstRow == null) return (false, "الملف فارغ");
@@ -67,14 +73,12 @@ public class ExcelImportController : ControllerBase
 
       var (required, forbidden) = GetValidationRules(jobType);
 
-      // 1. Check Missing Columns
       var missing = required.Where(h => !columns.Any(c => c.Equals(h, StringComparison.OrdinalIgnoreCase))).ToList();
       if (missing.Any())
       {
         return (false, $"هذا الملف لا يبدو ملف {GetJobTypeAr(jobType)}. يفتقد للأعمدة الأساسية: {string.Join(", ", missing)}");
       }
 
-      // 2. Check Forbidden Columns (Powerful Isolation)
       var foundForbidden = forbidden.Where(h => columns.Any(c => c.Equals(h, StringComparison.OrdinalIgnoreCase))).ToList();
       if (foundForbidden.Any())
       {
@@ -93,6 +97,7 @@ public class ExcelImportController : ControllerBase
       "Mainfile" => "بيانات رئيسية",
       "AutoNumber" => "أرقام آلية",
       "FileDetail" => "تفاصيل ملفات",
+      "Payment" => "مدفوعات",
       _ => type
   };
 
@@ -114,6 +119,12 @@ public class ExcelImportController : ControllerBase
     return await CreateJob(file, addedBy, "FileDetail");
   }
 
+  [HttpPost("upload-payments")]
+  public async Task<IActionResult> UploadPayments(IFormFile file, [FromForm] int? addedBy)
+  {
+    return await CreateJob(file, addedBy, "Payment");
+  }
+
   private async Task<IActionResult> CreateJob(IFormFile file, int? addedBy, string jobType)
   {
     if (file == null || file.Length == 0)
@@ -123,7 +134,6 @@ public class ExcelImportController : ControllerBase
     if (extension != ".xlsx" && extension != ".xls")
       return BadRequest("Only .xlsx and .xls files are supported.");
 
-    // Validate Headers before saving
     var (isValid, headerError) = ValidateExcelHeaders(file, jobType);
     if (!isValid) return BadRequest(headerError);
 
@@ -155,7 +165,6 @@ public class ExcelImportController : ControllerBase
     _context.ImportJobs.Add(job);
     await _context.SaveChangesAsync();
 
-    // Broadcast change
     var currentUser = await _context.Users.FindAsync(userId);
     if (currentUser != null)
     {
@@ -186,7 +195,6 @@ public class ExcelImportController : ControllerBase
 
     if (!isAdmin)
     {
-      // Non-admins see jobs from their department + any job uploaded by an Admin (General System Imports)
       query = query.Where(j => j.CreatedBy.Department == userDept || j.CreatedBy.Role.ToLower() == "admin" || j.CreatedBy.Role.ToLower() == "administrator");
     }
 
@@ -214,6 +222,7 @@ public class ExcelImportController : ControllerBase
           j.Progress,
           j.TotalRows,
           j.ProcessedRows,
+          j.ErrorCount,
           j.ErrorMessage,
           j.CreatedAt,
           j.CompletedAt,
@@ -275,7 +284,6 @@ public class ExcelImportController : ControllerBase
   {
     try
     {
-      // New Order: FileCode, DeptCode (Renamed to كود المديونية), AutoNumber, Type, CaseRef, Note, Claimant
       var headers = new List<string>
       {
         "كود الملف", "كود المديونية", "الرقم الآلي", "النوع", "مرجع القضية", "ملاحظة", "المدعي", "الرقم الآلي الأب"
@@ -289,20 +297,41 @@ public class ExcelImportController : ControllerBase
       return BadRequest(new { message = "Error generating template", detail = ex.Message });
     }
   }
+
+  [AllowAnonymous]
+  [HttpGet("download-filedetails-template")]
+  public IActionResult DownloadFileDetailsTemplate()
+  {
+    try
+    {
+      var headers = new List<string>
+      {
+        "كود الملف", "كود المديونية", "السبب", "رقم القيد", "العميل", "رقم العقد",
+        "المبلغ المختص", "المدعي القانوني", "المحامي", "المحكمة", "MD", "المستشار القانوني", "تاريخ الانتهاء"
+      };
+      
+      var content = GenerateExcelTemplate(headers);
+      return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "FileDetails_Template.xlsx");
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(new { message = "Error generating template", detail = ex.Message });
+    }
+  }
+
     [AllowAnonymous]
-    [HttpGet("download-filedetails-template")]
-    public IActionResult DownloadFileDetailsTemplate()
+    [HttpGet("download-payments-template")]
+    public IActionResult DownloadPaymentsTemplate()
     {
       try
       {
         var headers = new List<string>
         {
-          "كود الملف", "كود المديونية", "السبب", "رقم القيد", "العميل", "رقم العقد",
-          "المبلغ المختص", "المدعي القانوني", "المحامي", "المحكمة", "MD", "المستشار القانوني", "تاريخ الانتهاء"
+          "اسم العميل", "المبلغ", "العملة", "تاريخ الدفع", "طريقة الدفع", "موظف المبيعات", "شركة المبيعات", "ملاحظات", "كود الملف", "كود القسم", "العمولة"
         };
         
         var content = GenerateExcelTemplate(headers);
-        return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "FileDetails_Template.xlsx");
+        return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Payments_Template.xlsx");
       }
       catch (Exception ex)
       {
@@ -383,6 +412,11 @@ public class ExcelImportController : ControllerBase
                         var records = _context.FileDetails.Where(f => f.ImportJobId == jobId);
                         _context.FileDetails.RemoveRange(records);
                     }
+                    else if (job.JobType == "Payment")
+                    {
+                        var records = _context.Payments.Where(p => p.ImportJobId == jobId);
+                        _context.Payments.RemoveRange(records);
+                    }
 
                     // Remove the job record
                     _context.ImportJobs.Remove(job);
@@ -404,10 +438,11 @@ public class ExcelImportController : ControllerBase
             });
 
             // Delete file after successful commit
-            var filePath = Path.Combine(_uploadPath, job.FileName);
-            if (System.IO.File.Exists(filePath))
+            var fileNameToDelete = job.StoredFileName ?? job.FileName;
+            var filePathToDelete = Path.Combine(_uploadPath, fileNameToDelete);
+            if (System.IO.File.Exists(filePathToDelete))
             {
-                try { System.IO.File.Delete(filePath); } catch { }
+                try { System.IO.File.Delete(filePathToDelete); } catch { }
             }
 
             // Broadcast change
@@ -476,6 +511,16 @@ public class ExcelImportController : ControllerBase
             totalCount = await q.CountAsync();
             query = q.OrderByDescending(f => f.Id).Skip(pagination.Skip).Take(pagination.PageSize);
         }
+        else if (job.JobType == "Payment")
+        {
+            var q = _context.Payments.Where(p => p.ImportJobId == jobId);
+            if (!string.IsNullOrEmpty(search))
+            {
+                q = q.Where(p => p.JouralEntry.Contains(search) || p.AlEntry.Contains(search));
+            }
+            totalCount = await q.CountAsync();
+            query = q.OrderByDescending(p => p.Id).Skip(pagination.Skip).Take(pagination.PageSize);
+        }
         else
         {
             return BadRequest("Unknown job type");
@@ -493,7 +538,7 @@ public class ExcelImportController : ControllerBase
     }
 
     [HttpGet("stats")]
-    public async Task<IActionResult> GetImportStats([FromQuery] string? jobType)
+    public async Task<IActionResult> GetImportStats([FromQuery] string jobType)
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
@@ -525,22 +570,27 @@ public class ExcelImportController : ControllerBase
         var failedJobs = await query.CountAsync(j => j.Status == "Failed");
         var processingJobs = await query.CountAsync(j => j.Status == "Processing" || j.Status == "Pending");
 
-        var totalRowsProcessed = await query.SumAsync(j => j.ProcessedRows);
+        var processedJobsQuery = query.Where(j => j.Status == "Completed");
+        var totalRowsProcessed = await processedJobsQuery.SumAsync(j => (int?)(j.ProcessedRows - j.ErrorCount)) ?? 0;
 
         // Monthly growth (Last 6 months)
         var sixMonthsAgo = DateTime.UtcNow.AddMonths(-6);
-        var monthlyGrowth = await query
-            .Where(j => j.CreatedAt >= sixMonthsAgo && j.Status == "Completed")
+        var monthlyGrowth = await processedJobsQuery
+            .Where(j => j.CreatedAt >= sixMonthsAgo)
             .GroupBy(j => new { j.CreatedAt.Year, j.CreatedAt.Month })
             .Select(g => new
             {
                 Year = g.Key.Year,
                 Month = g.Key.Month,
-                TotalRows = g.Sum(j => j.ProcessedRows),
+                TotalRows = g.Sum(j => j.ProcessedRows - j.ErrorCount),
                 JobCount = g.Count()
             })
             .OrderBy(x => x.Year).ThenBy(x => x.Month)
             .ToListAsync();
+
+        var totalRowsAttempted = await query.SumAsync(j => (int?)j.TotalRows) ?? 0;
+        var totalErrorCount = await query.SumAsync(j => (int?)j.ErrorCount) ?? 0;
+        var totalSuccessfulRows = await query.Where(j => j.Status == "Completed").SumAsync(j => (int?)(j.ProcessedRows - j.ErrorCount)) ?? 0;
 
         return Ok(new
         {
@@ -550,7 +600,9 @@ public class ExcelImportController : ControllerBase
                 SuccessfulJobs = successfulJobs,
                 FailedJobs = failedJobs,
                 ProcessingJobs = processingJobs,
-                TotalRowsProcessed = totalRowsProcessed,
+                TotalRowsAttempted = totalRowsAttempted,
+                TotalSuccessfulRows = totalSuccessfulRows,
+                TotalErrorCount = totalErrorCount,
                 SuccessRate = totalJobs > 0 ? (double)successfulJobs / totalJobs * 100 : 0
             },
             MonthlyGrowth = monthlyGrowth
@@ -591,6 +643,18 @@ public class ExcelImportController : ControllerBase
         {
             return StatusCode(500, $"خطأ أثناء تحديث العملية: {ex.Message}");
         }
+    }
+
+    [HttpGet("download-error-log/{jobId}")]
+    public async Task<IActionResult> DownloadErrorLog(int jobId)
+    {
+        var job = await _context.ImportJobs.AsNoTracking().FirstOrDefaultAsync(j => j.Id == jobId);
+        if (job == null || job.ErrorLogFile == null) return NotFound("سجل الأخطاء غير موجود لهذه العملية");
+
+        var fileName = job.ErrorLogFileName ?? $"Errors_{job.FileName}";
+        if (!fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase)) fileName += ".xlsx";
+
+        return File(job.ErrorLogFile, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 }
 

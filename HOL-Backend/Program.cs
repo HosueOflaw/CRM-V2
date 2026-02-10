@@ -439,6 +439,7 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.MainfileImportWorker>();
 builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.AutoNumberImportWorker>();
 builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.FileDetailImportWorker>();
+builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.PaymentImportWorker>();
 
 builder.Services.AddControllers(options =>
 {
