@@ -10,15 +10,18 @@ public class ClientsController : ControllerBase
   private readonly IClientService _clientService;
   private readonly INotificationService _notificationService;
   private readonly ILogger<ClientsController> _logger;
+  private readonly IAuditService _auditService;
 
   public ClientsController(
       IClientService clientService,
       INotificationService notificationService,
-      ILogger<ClientsController> logger)
+      ILogger<ClientsController> logger,
+      IAuditService auditService)
   {
     _clientService = clientService;
     _notificationService = notificationService;
     _logger = logger;
+    _auditService = auditService;
   }
 
   /// <summary>
@@ -93,6 +96,9 @@ public class ClientsController : ControllerBase
         );
       }
 
+      // Audit Log
+      await _auditService.LogActionAsync(client.Code, (long?)createDto.DeptCode, "ADD", $"إضافة موكل جديد: {client.Name}", null, "Client", client.Id.ToString());
+
       // Return the client with 201 Created status
       return StatusCode(201, client);
     }
@@ -145,6 +151,9 @@ public class ClientsController : ControllerBase
         fileName = attachment.FileName
       });
 
+      // Audit Log
+      await _auditService.LogActionAsync(fileCode, deptCode, "ADD", $"رفع مرفق جديد: {attachment.FileName}", null, "Attachment", attachment.Id.ToString());
+
       return Ok(attachment);
     }
     catch (Exception ex)
@@ -195,6 +204,9 @@ public class ClientsController : ControllerBase
       contactId = contactId
     });
 
+    // Audit Log
+    await _auditService.LogActionAsync(null, null, "DELETE", $"حذف رقم تواصل للموكل (ID: {contactId})", null, "Contact", contactId.ToString());
+
     return NoContent();
   }
 
@@ -214,6 +226,9 @@ public class ClientsController : ControllerBase
     {
       attachmentId = attachmentId
     });
+
+    // Audit Log
+    await _auditService.LogActionAsync(null, null, "DELETE", $"حذف مرفق للموكل (ID: {attachmentId})", null, "Attachment", attachmentId.ToString());
 
     return NoContent();
   }

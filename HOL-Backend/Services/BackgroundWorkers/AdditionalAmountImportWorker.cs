@@ -2,19 +2,26 @@ using EFCore.BulkExtensions;
 using System.Data;
 using ClosedXML.Excel;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.SignalR;
+using House_of_law_api.Data;
+using House_of_law_api.Modules;
+using House_of_law_api.Interfaces;
+using House_of_law_api.Infrastructure.SignalR;
+using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace House_of_law_api.Services.BackgroundWorkers;
 
-public class MainfileImportWorker : BackgroundService
+public class AdditionalAmountImportWorker : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<MainfileImportWorker> _logger;
+    private readonly ILogger<AdditionalAmountImportWorker> _logger;
     private readonly IHubContext<NotificationsHub> _hubContext;
     private readonly string _uploadPath;
 
-    public MainfileImportWorker(
+    public AdditionalAmountImportWorker(
         IServiceProvider serviceProvider, 
-        ILogger<MainfileImportWorker> logger,
+        ILogger<AdditionalAmountImportWorker> logger,
         IHubContext<NotificationsHub> hubContext,
         IWebHostEnvironment environment)
     {
@@ -23,12 +30,13 @@ public class MainfileImportWorker : BackgroundService
         _hubContext = hubContext;
         _uploadPath = Path.Combine(environment.ContentRootPath, "uploads", "excel_imports");
         
-        // Register encoding for ExcelDataReader
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        _logger.LogInformation("AdditionalAmountImportWorker starting...");
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -38,7 +46,7 @@ public class MainfileImportWorker : BackgroundService
                     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     
                     var pendingJob = await context.ImportJobs
-                        .Where(j => j.Status == "Pending" && j.JobType == "Mainfile")
+                        .Where(j => j.Status == "Pending" && j.JobType == "AdditionalAmount")
                         .OrderBy(j => j.CreatedAt)
                         .FirstOrDefaultAsync(stoppingToken);
 
@@ -50,26 +58,16 @@ public class MainfileImportWorker : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking for pending import jobs");
+                _logger.LogError(ex, "Error checking for pending AdditionalAmount import jobs");
             }
 
-            await Task.Delay(5000, stoppingToken); // Check every 5 seconds
+            await Task.Delay(5000, stoppingToken);
         }
-    }
-
-    private void LogToFile(string message)
-    {
-        try
-        {
-            var logPath = Path.Combine(_uploadPath, "import_debug.log");
-            File.AppendAllText(logPath, $"[{DateTime.Now}] {message}{Environment.NewLine}");
-        }
-        catch { /* Best effort */ }
     }
 
     private async Task ProcessJobAsync(ImportJob job, ApplicationDbContext context, IServiceScope scope, CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Starting processing job {JobId} for file {FileName}", job.Id, job.FileName);
+        _logger.LogInformation("Starting AdditionalAmount processing job {JobId} for file {FileName}", job.Id, job.FileName);
         
         job.Status = "Processing";
         await context.SaveChangesAsync(stoppingToken);
@@ -86,35 +84,48 @@ public class MainfileImportWorker : BackgroundService
 
         try
         {
-            var initialDbCount = await context.Mainfiles.CountAsync(stoppingToken);
-
-            LogToFile($"DEBUG: Processing Job {job.Id}. Initial DB count: {initialDbCount}");
+            var initialDbCount = await context.AdditionalAmounts.CountAsync(stoppingToken);
             
             using var stream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             var allRows = MiniExcelLibs.MiniExcel.Query(stream, useHeaderRow: true).ToList();
             
             job.TotalRows = allRows.Count;
-            LogToFile($"DEBUG: Excel read complete. Found {allRows.Count} rows in file.");
+            // Save TotalRows immediately so UI shows correct count even if processing hangs
+            await context.SaveChangesAsync(stoppingToken); 
             
+            _logger.LogInformation("AdditionalAmountImportWorker detected {Count} rows in file {FileName}", allRows.Count, job.FileName);
+
             // --- CRITICAL SIGNATURE CHECK ---
-            if (allRows.Count > 0) {
-                var firstRow = allRows[0] as IDictionary<string, object>;
-                var keys = firstRow.Keys.Select(k => k.Trim().ToLower()).ToList();
-                if (!keys.Contains("الكود") || !keys.Contains("الاسم")) {
+            // Check headers using MiniExcel's GetColumns if possible, or fallback to first row check safely
+            var columns = MiniExcelLibs.MiniExcel.GetColumns(filePath, useHeaderRow: true);
+            var columnNames = columns.Select(c => c.Trim().ToLower()).ToList();
+
+            if (!columnNames.Contains("كود الملف") || !columnNames.Contains("المبلغ")) {
+                 // Fallback to checking first row if GetColumns fails or behaves unexpectedly
+                 if (allRows.Count > 0) {
+                    var firstRow = allRows[0] as IDictionary<string, object>;
+                    var keys = firstRow.Keys.Select(k => k.Trim().ToLower()).ToList();
+                     if (!keys.Contains("كود الملف") || !keys.Contains("المبلغ")) {
+                        job.Status = "Failed";
+                        job.ErrorMessage = "خطأ فادح: بنية الملف غير متوافقة. الأعمدة المطلوبة: 'كود الملف' و 'المبلغ'.";
+                        await context.SaveChangesAsync(stoppingToken);
+                        return;
+                    }
+                 } else {
+                    // If no rows and GetColumns also didn't find required headers
                     job.Status = "Failed";
-                    job.ErrorMessage = "خطأ فادح: بنية الملف غير متوافقة مع البيانات الرئيسية. يرجى استخدام النموذج الصحيح.";
+                    job.ErrorMessage = "خطأ فادح: الملف فارغ أو بنية الملف غير متوافقة. الأعمدة المطلوبة: 'كود الملف' و 'المبلغ'.";
                     await context.SaveChangesAsync(stoppingToken);
                     return;
-                }
+                 }
             }
-            
+
             // --- SINGLE PASS PROCESSING ---
             int jobProcessedCount = 0;
             int jobErrorCount = 0;
-            int jobQueuedCount = 0;
-            var rowBuffer = new List<Mainfile>();
-            int jobBatchSize = 100;
+            var rowBuffer = new List<AdditionalAmount>();
             var errorRows = new List<IDictionary<string, object>>();
+            var jobBatchSize = 1000;
 
             foreach (IDictionary<string, object> row in allRows)
             {
@@ -128,26 +139,36 @@ public class MainfileImportWorker : BackgroundService
                         return k != null ? row[k]?.ToString() : null;
                     }
 
-                    int GetInt(string key) {
+                    long GetLong(string key) {
                         var s = GetStr(key);
-                        return int.TryParse(s, out int val) ? val : 0;
+                        if (string.IsNullOrWhiteSpace(s)) return 0;
+                        s = s.Trim();
+                        return long.TryParse(s, out long val) ? val : 0;
                     }
 
-                    bool? GetBool(string key) {
+                    long? GetLongNullable(string key) {
                         var s = GetStr(key);
-                        if (string.IsNullOrEmpty(s)) return null;
-                        s = s.Trim().ToLower();
-                        return s == "true" || s == "1" || s == "نعم" || s == "yes";
+                        if (string.IsNullOrWhiteSpace(s)) return null;
+                        s = s.Trim();
+                        return long.TryParse(s, out long val) ? val : (long?)null;
+                    }
+
+                    decimal? GetDecimalNullable(string key) {
+                        var s = GetStr(key);
+                        if (string.IsNullOrWhiteSpace(s)) return null;
+                        s = s.Trim();
+                        return decimal.TryParse(s, out decimal val) ? val : (decimal?)null;
                     }
 
                     // Validation
-                    var codeStr = GetStr("الكود");
-                    var name = GetStr("الاسم");
+                    var fileCodeStr = GetStr("كود الملف");
+                    var valueStr = GetStr("المبلغ");
                     string rowError = null;
 
-                    if (string.IsNullOrEmpty(codeStr)) rowError = "الكود مطلوب.";
-                    else if (!int.TryParse(codeStr, out _)) rowError = $"الكود '{codeStr}' يجب أن يكون رقماً صحيحاً.";
-                    else if (string.IsNullOrEmpty(name)) rowError = "الاسم مطلوب.";
+                    if (string.IsNullOrWhiteSpace(fileCodeStr)) rowError = "كود الملف مطلوب.";
+                    else if (!long.TryParse(fileCodeStr, out _)) rowError = $"كود الملف '{fileCodeStr}' غير صالح.";
+                    else if (string.IsNullOrWhiteSpace(valueStr)) rowError = "المبلغ مطلوب.";
+                    else if (!decimal.TryParse(valueStr, out _)) rowError = $"المبلغ '{valueStr}' غير صالح.";
 
                     if (rowError != null)
                     {
@@ -158,30 +179,18 @@ public class MainfileImportWorker : BackgroundService
                     }
                     else
                     {
-                        var mainfile = new Mainfile
+                        var amount = new AdditionalAmount
                         {
-                            Code = GetInt("الكود"),
-                            Name = GetStr("الاسم"),
-                            Cid = GetStr("رقم الهوية"),
-                            Address = GetStr("العنوان"),
-                            Nationality = GetStr("الجنسية"),
-                            Archive = GetBool("مؤرشف"),
-                            Note = GetStr("ملاحظة"),
-                            Work = GetStr("العمل"),
-                            Membership = GetStr("العضوية"),
-                            CompanyEmail = GetStr("بريد الشركة"),
-                            CompanyFax = GetStr("فاكس الشركة"),
-                            CompanyRegister = GetStr("سجل الشركة"),
-                            Partner1 = GetStr("شريك 1"),
-                            Partner2 = GetStr("شريك 2"),
-                            Partner3 = GetStr("شريك 3"),
-                            RegisterType = GetStr("نوع السجل"),
-                            AddedBy = job.CreatedById,
+                            FileCode = GetLong("كود الملف"),
+                            DeptCode = GetLongNullable("كود المديونية"),
+                            Value = GetDecimalNullable("المبلغ"),
+                            AmountType = GetStr("النوع") ?? "Other",
+                            UserAdded = (int)job.CreatedById,
                             DateAdded = DateTime.UtcNow,
+                            Enabled = true,
                             ImportJobId = job.Id
                         };
-                        rowBuffer.Add(mainfile);
-                        jobQueuedCount++;
+                        rowBuffer.Add(amount);
                     }
 
                     if (rowBuffer.Count >= jobBatchSize)
@@ -192,7 +201,6 @@ public class MainfileImportWorker : BackgroundService
                 }
                 catch (Exception rowEx)
                 {
-                    LogToFile($"DEBUG: Row {jobProcessedCount} error: {rowEx.Message}");
                     jobErrorCount++;
                     var errorRow = new Dictionary<string, object>(row);
                     errorRow["Error"] = rowEx.Message;
@@ -205,33 +213,32 @@ public class MainfileImportWorker : BackgroundService
                 await SaveBatchAsync(rowBuffer, context, job, jobProcessedCount, jobErrorCount, stoppingToken);
             }
 
-            var finalDbCount = await context.Mainfiles.CountAsync(stoppingToken);
+            var finalDbCount = await context.AdditionalAmounts.CountAsync(stoppingToken);
             var actualAdded = finalDbCount - initialDbCount;
 
             // Generate Error Log if needed
             if (errorRows.Any())
             {
                 job.ErrorLogFile = GenerateErrorLog(errorRows);
-                job.ErrorLogFileName = $"Errors_{job.FileName}";
+                job.ErrorLogFileName = $"Errors_Amounts_{job.FileName}";
             }
 
             job.Status = "Completed";
             job.Progress = 100;
             job.ProcessedRows = jobProcessedCount;
             job.ErrorCount = jobErrorCount;
+            // job.TotalRows is already saved
             job.ErrorMessage = $"Summary: Total={job.TotalRows}, Added={actualAdded}, Errors={jobErrorCount}";
             job.CompletedAt = DateTime.UtcNow;
             await context.SaveChangesAsync(stoppingToken);
             
-            LogToFile($"DEBUG: Job {job.Id} finished. {job.ErrorMessage}");
-
-            // Audit Log - Resolve from scope
+            // Audit Log
             var auditService = scope.ServiceProvider.GetRequiredService<IAuditService>();
             await auditService.LogActionAsync(
                 null, 
                 null, 
                 "IMPORT_COMPLETED", 
-                $"تم إكمال رفع ملف اكسيل (Mainfile): {job.FileName}. الإجمالي: {job.TotalRows}، أضيف: {actualAdded}، أخطاء: {jobErrorCount}", 
+                $"تم إكمال رفع ملف اكسيل (AdditionalAmounts): {job.FileName}. الإجمالي: {job.TotalRows}، أضيف: {actualAdded}، أخطاء: {jobErrorCount}", 
                 null, 
                 "ImportJob", 
                 job.Id.ToString());
@@ -239,44 +246,40 @@ public class MainfileImportWorker : BackgroundService
             await _hubContext.Clients.User(job.CreatedById.ToString()).SendAsync("broadcast", new 
             {
                 type = "excel_import_complete",
-                data = new { jobId = job.Id, fileName = job.FileName, jobType = "Mainfile", total = jobProcessedCount, added = actualAdded, errorCount = jobErrorCount }
+                data = new { jobId = job.Id, fileName = job.FileName, jobType = "AdditionalAmount", total = jobProcessedCount, added = actualAdded, errorCount = jobErrorCount }
             }, stoppingToken);
         }
         catch (Exception ex)
         {
-            LogToFile($"CRITICAL ERROR in Job {job.Id}: {ex.Message}");
-            if (ex.InnerException != null) LogToFile($"Inner Exception: {ex.InnerException.Message}");
-            
-            _logger.LogError(ex, "Critical error in ImportWorker for job {JobId}", job.Id);
+            _logger.LogError(ex, "Fatal error in AdditionalAmountImportWorker for job {JobId}", job.Id);
             job.Status = "Failed";
-            job.ErrorMessage = ex.Message;
-            await context.SaveChangesAsync(stoppingToken);
+            job.ErrorMessage = $"خطأ داخلي: {ex.Message}";
+            try {
+                await context.SaveChangesAsync(stoppingToken);
+            } catch (Exception saveEx) {
+                 _logger.LogError(saveEx, "Failed to save error status for job {JobId}", job.Id);
+            }
         }
     }
 
-    private async Task SaveBatchAsync(List<Mainfile> items, ApplicationDbContext context, ImportJob job, int processedCount, int errorCount, CancellationToken stoppingToken)
+    private async Task SaveBatchAsync(List<AdditionalAmount> items, ApplicationDbContext context, ImportJob job, int processedCount, int errorCount, CancellationToken stoppingToken)
     {
         try 
         {
-            LogToFile($"Saving batch of {items.Count} items to database...");
             await context.BulkInsertAsync(items, cancellationToken: stoppingToken);
-            LogToFile("Batch saved successfully.");
-            
-            job.ProcessedRows = processedCount;
-            job.ErrorCount = errorCount;
-            job.Progress = (int)((double)processedCount / job.TotalRows * 100);
-            await context.SaveChangesAsync(stoppingToken);
-
-            await BroadcastProgress(job, processedCount, errorCount);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            LogToFile($"ERROR in SaveBatchAsync: {ex.Message}");
-            LogToFile("Attempting fallback with AddRange...");
-            context.Mainfiles.AddRange(items);
+            context.AdditionalAmounts.AddRange(items);
             await context.SaveChangesAsync(stoppingToken);
-            LogToFile("Fallback saved successfully.");
         }
+        
+        job.ProcessedRows = processedCount;
+        job.ErrorCount = errorCount;
+        job.Progress = (int)((double)processedCount / job.TotalRows * 100);
+        await context.SaveChangesAsync(stoppingToken);
+
+        await BroadcastProgress(job, processedCount, errorCount);
     }
 
     private byte[] GenerateErrorLog(List<IDictionary<string, object>> errorRows)
@@ -289,7 +292,7 @@ public class MainfileImportWorker : BackgroundService
 
             if (errorRows.Count == 0) return null;
 
-            // Headers (use columns from first error row)
+            // Headers
             var headers = errorRows[0].Keys.ToList();
             for (int i = 0; i < headers.Count; i++)
             {
@@ -315,9 +318,8 @@ public class MainfileImportWorker : BackgroundService
             workbook.SaveAs(stream);
             return stream.ToArray();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            LogToFile($"ERROR generating error log: {ex.Message}");
             return null;
         }
     }
@@ -330,7 +332,7 @@ public class MainfileImportWorker : BackgroundService
             data = new 
             { 
                 jobId = job.Id, 
-                jobType = "Mainfile", 
+                jobType = "AdditionalAmount", 
                 progress = job.Progress, 
                 processed = processed, 
                 total = job.TotalRows,

@@ -10,17 +10,20 @@ public class MainfilesController : ControllerBase
     private readonly INotificationService _notificationService;
     private readonly ApplicationDbContext _context;
     private readonly ILogger<MainfilesController> _logger;
+    private readonly IAuditService _auditService;
 
     public MainfilesController(
         IMainfileRepository repository,
         INotificationService notificationService,
         ApplicationDbContext context,
-        ILogger<MainfilesController> logger)
+        ILogger<MainfilesController> logger,
+        IAuditService auditService)
     {
         _repository = repository;
         _notificationService = notificationService;
         _context = context;
         _logger = logger;
+        _auditService = auditService;
     }
 
     [HttpGet]
@@ -69,6 +72,9 @@ public class MainfilesController : ControllerBase
         mainfile.DateAdded = DateTime.UtcNow;
         var created = await _repository.AddAsync(mainfile);
 
+        // Audit Log
+        await _auditService.LogActionAsync(created.Code, null, "ADD", $"إضافة ملف جديد: {created.Name}", null, "Mainfile", created.Id.ToString(), created.DateAdded);
+
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
         {
@@ -104,6 +110,9 @@ public class MainfilesController : ControllerBase
             return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
         }
 
+        // Capture Previous State
+        var previousState = new { existing.Name, existing.Cid, existing.Address };
+        
         // Update properties
         existing.Name = mainfile.Name ?? existing.Name;
         existing.Cid = mainfile.Cid ?? existing.Cid;
@@ -111,6 +120,9 @@ public class MainfilesController : ControllerBase
         // Add other properties as needed
 
         await _repository.UpdateAsync(existing);
+
+        // Audit Log
+        await _auditService.LogActionAsync(existing.Code, null, "UPDATE", $"تعديل بيانات الملف: {existing.Name} بواسطة User Update", previousState, "Mainfile", existing.Id.ToString(), existing.DateAdded, DateTime.UtcNow);
 
         var deptGroupName = $"dept_{currentUser.Department}";
         await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "Mainfile", id = existing.Id, action = "updated" });
@@ -140,6 +152,9 @@ public class MainfilesController : ControllerBase
         }
 
         await _repository.DeleteAsync(mainfile);
+
+        // Audit Log
+        await _auditService.LogActionAsync(mainfile.Code, null, "DELETE", $"حذف الملف: {mainfile.Name}", mainfile, "Mainfile", id.ToString());
 
         var deptGroupName = $"dept_{currentUser.Department}";
         await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "Mainfile", id = id, action = "deleted" });

@@ -4,6 +4,7 @@ using House_of_law_api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace House_of_law_api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260210130424_UpdateAuditsFileSchema")]
+    partial class UpdateAuditsFileSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,10 +54,6 @@ namespace House_of_law_api.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
 
-                    b.Property<DateTime?>("EntityAddedDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("entity_added_date");
-
                     b.Property<string>("EntityId")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("entity_id");
@@ -63,10 +62,6 @@ namespace House_of_law_api.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("entity_type");
 
-                    b.Property<DateTime?>("EntityUpdateDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("entity_update_date");
-
                     b.Property<long?>("FileCode")
                         .HasColumnType("bigint")
                         .HasColumnName("file_code");
@@ -74,10 +69,6 @@ namespace House_of_law_api.Migrations
                     b.Property<string>("PreviousState")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("previous_state");
-
-                    b.Property<string>("UserCode")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("user_code");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int")
@@ -336,10 +327,6 @@ namespace House_of_law_api.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("file_code");
 
-                    b.Property<int?>("ImportJobId")
-                        .HasColumnType("int")
-                        .HasColumnName("import_job_id");
-
                     b.Property<int?>("UserAdded")
                         .HasColumnType("int")
                         .HasColumnName("user_added");
@@ -487,10 +474,6 @@ namespace House_of_law_api.Migrations
                     b.Property<long?>("FileCode")
                         .HasColumnType("bigint")
                         .HasColumnName("file_code");
-
-                    b.Property<int?>("ImportJobId")
-                        .HasColumnType("int")
-                        .HasColumnName("import_job_id");
 
                     b.Property<int?>("UserAdded")
                         .HasColumnType("int")
@@ -845,10 +828,6 @@ namespace House_of_law_api.Migrations
                     b.Property<long?>("FileCode")
                         .HasColumnType("bigint")
                         .HasColumnName("file_code");
-
-                    b.Property<int?>("ImportJobId")
-                        .HasColumnType("int")
-                        .HasColumnName("import_job_id");
 
                     b.Property<string>("NoteText")
                         .HasColumnType("nvarchar(max)")

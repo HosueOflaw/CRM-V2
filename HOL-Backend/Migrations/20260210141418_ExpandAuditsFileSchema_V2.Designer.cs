@@ -4,6 +4,7 @@ using House_of_law_api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace House_of_law_api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260210141418_ExpandAuditsFileSchema_V2")]
+    partial class ExpandAuditsFileSchema_V2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -336,10 +339,6 @@ namespace House_of_law_api.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("file_code");
 
-                    b.Property<int?>("ImportJobId")
-                        .HasColumnType("int")
-                        .HasColumnName("import_job_id");
-
                     b.Property<int?>("UserAdded")
                         .HasColumnType("int")
                         .HasColumnName("user_added");
@@ -487,10 +486,6 @@ namespace House_of_law_api.Migrations
                     b.Property<long?>("FileCode")
                         .HasColumnType("bigint")
                         .HasColumnName("file_code");
-
-                    b.Property<int?>("ImportJobId")
-                        .HasColumnType("int")
-                        .HasColumnName("import_job_id");
 
                     b.Property<int?>("UserAdded")
                         .HasColumnType("int")
@@ -845,10 +840,6 @@ namespace House_of_law_api.Migrations
                     b.Property<long?>("FileCode")
                         .HasColumnType("bigint")
                         .HasColumnName("file_code");
-
-                    b.Property<int?>("ImportJobId")
-                        .HasColumnType("int")
-                        .HasColumnName("import_job_id");
 
                     b.Property<string>("NoteText")
                         .HasColumnType("nvarchar(max)")

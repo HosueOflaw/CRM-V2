@@ -29,4 +29,7 @@ public class Mail
 
   [Column("user_updated")]
   public int? UserUpdated { get; set; }
+
+  [Column("import_job_id")]
+  public int? ImportJobId { get; set; }
 }

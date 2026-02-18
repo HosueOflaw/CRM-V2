@@ -26,4 +26,7 @@ public class FileClassification
 
   [Column("date_added")]
   public DateTime? DateAdded { get; set; }
+
+  [Column("import_job_id")]
+  public int? ImportJobId { get; set; }
 }

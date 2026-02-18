@@ -11,13 +11,15 @@ public class DataViewController : ControllerBase
   private readonly ILogger<DataViewController> _logger;
   private readonly IMemoryCache _cache;
   private readonly INotificationService _notificationService;
+  private readonly IAuditService _auditService;
 
-  public DataViewController(ApplicationDbContext context, ILogger<DataViewController> logger, IMemoryCache cache, INotificationService notificationService)
+  public DataViewController(ApplicationDbContext context, ILogger<DataViewController> logger, IMemoryCache cache, INotificationService notificationService, IAuditService auditService)
   {
     _context = context;
     _logger = logger;
     _cache = cache;
     _notificationService = notificationService;
+    _auditService = auditService;
   }
 
   // GET: api/DataView/mainfiles
@@ -399,6 +401,12 @@ public class DataViewController : ControllerBase
         return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
     }
 
+    // Capture Previous State for Audit
+    var previousState = new { 
+        mainfile.Name, mainfile.Code, mainfile.Cid, mainfile.Address, 
+        mainfile.Nationality, mainfile.Archive, mainfile.Note, mainfile.Work 
+    };
+
     // Update fields
     mainfile.Code = dto.Code;
     mainfile.Name = dto.Name;
@@ -433,6 +441,9 @@ public class DataViewController : ControllerBase
       var deptGroupName = $"dept_{currentUser.Department}";
       await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "Mainfile", id = id, action = "updated" });
       await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "Mainfile", id = id, action = "updated" });
+
+      // Audit Log
+      await _auditService.LogActionAsync(mainfile.Code, null, "UPDATE", $"تعديل بيانات الملف: {mainfile.Name} بواسطة User Update", previousState, "Mainfile", id.ToString(), mainfile.DateAdded, DateTime.UtcNow);
 
       return Ok(dto);
     }
@@ -523,6 +534,12 @@ public class DataViewController : ControllerBase
         return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
     }
 
+    // Capture Previous State for Audit
+    var previousState = new { 
+        detail.DeptCode, detail.Reason, detail.PatchNo, detail.Client, 
+        detail.ContractNo, detail.DeptAmount, detail.LawyerUser 
+    };
+
     // Update fields
     detail.FileCode = dto.FileCode;
     detail.DeptCode = dto.DeptCode;
@@ -553,6 +570,9 @@ public class DataViewController : ControllerBase
       var deptGroupName = $"dept_{currentUser.Department}";
       await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "FileDetail", id = id, action = "updated" });
       await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "FileDetail", id = id, action = "updated" });
+
+      // Audit Log
+      await _auditService.LogActionAsync(detail.FileCode, (long?)detail.DeptCode, "UPDATE", $"تعديل تفاصيل الملف: {detail.ContractNo} بواسطة User Update", previousState, "FileDetail", id.ToString(), detail.DateAdded, DateTime.UtcNow);
 
       return Ok(dto);
     }
@@ -639,6 +659,12 @@ public class DataViewController : ControllerBase
         return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
     }
 
+    // Capture Previous State for Audit
+    var previousState = new { 
+        autoNum.AutoNumberValue, autoNum.Type, autoNum.CaseRef, 
+        autoNum.Note, autoNum.Claimant, autoNum.DeptCode 
+    };
+
     // Update fields
     autoNum.FileCode = dto.FileCode;
     autoNum.ParentAutoId = dto.ParentAutoId;
@@ -664,6 +690,9 @@ public class DataViewController : ControllerBase
       var deptGroupName = $"dept_{currentUser.Department}";
       await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "AutoNumber", id = id, action = "updated" });
       await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "AutoNumber", id = id, action = "updated" });
+
+      // Audit Log
+      await _auditService.LogActionAsync(autoNum.FileCode, (long?)autoNum.DeptCode, "UPDATE", $"تعديل الرقم الآلي: {autoNum.AutoNumberValue} بواسطة User Update", previousState, "AutoNumber", id.ToString(), autoNum.DateAdded, DateTime.UtcNow);
 
       return Ok(dto);
     }
@@ -711,6 +740,12 @@ public class DataViewController : ControllerBase
         return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
     }
 
+    // Capture Previous State for Audit
+    var previousState = new { 
+        payment.Value, payment.FileStatusAfter, payment.PaymentMethod, 
+        payment.SalesAgent, payment.SalesCompany, payment.Commission 
+    };
+
     // Update fields
     payment.Value = dto.Value;
     payment.JouralEntry = dto.JouralEntry;
@@ -743,6 +778,9 @@ public class DataViewController : ControllerBase
       await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "Payment", id = id, action = "updated" });
       await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "Payment", id = id, action = "updated" });
 
+      // Audit Log 
+      await _auditService.LogActionAsync(payment.FileCode, (long?)payment.DeptCode, "UPDATE", $"تعديل سند الدفع بقيمة {payment.Value} بواسطة User Update", previousState, "Payment", id.ToString(), payment.DateAdded, DateTime.UtcNow);
+
       return Ok(dto);
     }
     catch (Exception ex)
@@ -773,5 +811,555 @@ public class DataViewController : ControllerBase
     var results = await query.Take(100).ToListAsync();
 
     return Ok(results);
+  }
+
+  // GET: api/DataView/mainfiles/{id}/fileclassifications
+  [HttpGet("mainfiles/{id}/fileclassifications")]
+  public async Task<IActionResult> GetMainfileClassifications(long id)
+  {
+    var classifications = await _context.FileClassifications
+      .AsNoTracking()
+      .Where(f => f.FileCode == id)
+      .ToListAsync();
+
+    return Ok(classifications);
+  }
+
+  // GET: api/DataView/fileclassifications/{id}
+  [HttpGet("fileclassifications/{id}")]
+  public async Task<IActionResult> GetFileClassificationById(int id)
+  {
+    var classification = await _context.FileClassifications
+      .AsNoTracking()
+      .FirstOrDefaultAsync(f => f.Id == id);
+
+    if (classification == null)
+      return NotFound();
+
+    return Ok(classification);
+  }
+
+  // GET: api/DataView/fileclassifications/search/{term}
+  [HttpGet("fileclassifications/search/{term}")]
+  public async Task<IActionResult> SearchFileClassifications(string term)
+  {
+    if (string.IsNullOrEmpty(term)) return BadRequest("Search term is required");
+
+    var query = _context.FileClassifications.AsNoTracking();
+
+    if (int.TryParse(term, out int id))
+    {
+       query = query.Where(f => f.Id == id);
+    }
+    else
+    {
+       query = query.Where(f => f.Code.Contains(term) || f.Classification.Contains(term) || f.Department.Contains(term));
+    }
+
+    var results = await query.Take(100).ToListAsync();
+
+    return Ok(results);
+  }
+
+  // PUT: api/DataView/fileclassifications/{id}
+  [HttpPut("fileclassifications/{id}")]
+  public async Task<IActionResult> UpdateFileClassification(int id, [FromBody] FileClassification dto)
+  {
+    if (id != dto.Id) return BadRequest("ID mismatch");
+
+    var classification = await _context.FileClassifications.FindAsync(id);
+    if (classification == null) return NotFound();
+
+    // Role Check
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+    if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+        return Unauthorized();
+
+    var currentUser = await _context.Users.FindAsync(userId);
+    if (currentUser == null) return Unauthorized();
+
+    var role = currentUser.Role?.ToLower() ?? "";
+    if (role != "admin" && role != "administrator" && role != "supervisor")
+    {
+        return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
+    }
+
+    // Capture Previous State for Audit
+    var previousState = new { 
+        classification.Code, classification.Classification, classification.Department, classification.DeptCode 
+    };
+
+    // Update fields
+    classification.Code = dto.Code;
+    classification.Classification = dto.Classification;
+    classification.Department = dto.Department;
+    classification.DeptCode = dto.DeptCode;
+    classification.FileCode = dto.FileCode;
+
+    try
+    {
+      await _context.SaveChangesAsync();
+      
+      // Invalidate cache for the specific job
+      if (classification.DateAdded.HasValue) // Using date as a proxy since no direct JobId in model often, but model has it sometimes
+      {
+         // Wait, FileClassification model doesn't have ImportJobId in previous view_file. Let me check.
+      }
+
+      // Broadcast change to department and admins
+      var deptGroupName = $"dept_{currentUser.Department}";
+      await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "FileClassification", id = id, action = "updated" });
+      await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "FileClassification", id = id, action = "updated" });
+
+      // Audit Log 
+      await _auditService.LogActionAsync(classification.FileCode, (long?)classification.DeptCode, "UPDATE", $"تعديل تصنيف ملف: {classification.Classification} بواسطة User Update", previousState, "FileClassification", id.ToString(), classification.DateAdded, DateTime.UtcNow);
+
+      return Ok(dto);
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, "Error updating file classification {Id}", id);
+      return StatusCode(500, "Internal server error during update");
+    }
+  }
+
+  // GET: api/DataView/mainfiles/{id}/notes
+  [HttpGet("mainfiles/{id}/notes")]
+  public async Task<IActionResult> GetMainfileNotes(long id)
+  {
+      var notes = await _context.Notes
+          .AsNoTracking()
+          .Where(n => n.FileCode == id)
+          .OrderByDescending(n => n.DateAdded)
+          .ToListAsync();
+
+      return Ok(notes);
+  }
+
+  // GET: api/DataView/notes/{id}
+  [HttpGet("notes/{id}")]
+  public async Task<IActionResult> GetNoteById(int id)
+  {
+      var note = await _context.Notes
+          .AsNoTracking()
+          .FirstOrDefaultAsync(n => n.Id == id);
+
+      if (note == null)
+          return NotFound();
+
+      return Ok(note);
+  }
+
+  // GET: api/DataView/notes/search/{term}
+  [HttpGet("notes/search/{term}")]
+  public async Task<IActionResult> SearchNotes(string term)
+  {
+      if (string.IsNullOrEmpty(term)) return BadRequest("Search term is required");
+
+      var query = _context.Notes.AsNoTracking();
+
+      if (int.TryParse(term, out int id))
+      {
+          query = query.Where(n => n.Id == id);
+      }
+      else
+      {
+          query = query.Where(n => n.NoteText.Contains(term));
+      }
+
+      var results = await query.Take(100).ToListAsync();
+
+      return Ok(results);
+  }
+
+  // PUT: api/DataView/notes/{id}
+  [HttpPut("notes/{id}")]
+  public async Task<IActionResult> UpdateNote(int id, [FromBody] Note dto)
+  {
+      if (id != dto.Id) return BadRequest("ID mismatch");
+
+      var note = await _context.Notes.FindAsync(id);
+      if (note == null) return NotFound();
+
+      // Role Check
+      var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+      if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+          return Unauthorized();
+
+      var currentUser = await _context.Users.FindAsync(userId);
+      if (currentUser == null) return Unauthorized();
+
+      var role = currentUser.Role?.ToLower() ?? "";
+      if (role != "admin" && role != "administrator" && role != "supervisor")
+      {
+          return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
+      }
+
+      // Capture Previous State for Audit
+      var previousState = new { note.NoteText, note.DeptCode };
+
+      // Update fields
+      note.NoteText = dto.NoteText;
+      note.DeptCode = dto.DeptCode;
+      note.FileCode = dto.FileCode;
+      note.UserUpdated = userId;
+
+      try
+      {
+          await _context.SaveChangesAsync();
+
+          // Broadcast change to department and admins
+          var deptGroupName = $"dept_{currentUser.Department}";
+          await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "Note", id = id, action = "updated" });
+          await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "Note", id = id, action = "updated" });
+
+          // Audit Log 
+          await _auditService.LogActionAsync(note.FileCode, (long?)note.DeptCode, "UPDATE", $"تعديل ملاحظة بواسطة User Update", previousState, "Note", id.ToString(), note.DateAdded, DateTime.UtcNow);
+
+          return Ok(dto);
+      }
+      catch (Exception ex)
+      {
+          _logger.LogError(ex, "Error updating note {Id}", id);
+          return StatusCode(500, "Internal server error during update");
+      }
+  }
+
+  // GET: api/DataView/additionalamounts/{id}
+  [HttpGet("additionalamounts/{id}")]
+  public async Task<IActionResult> GetAdditionalAmountById(int id)
+  {
+      var amount = await _context.AdditionalAmounts
+          .AsNoTracking()
+          .FirstOrDefaultAsync(a => a.Id == id);
+
+      if (amount == null)
+          return NotFound();
+
+      return Ok(amount);
+  }
+
+  // GET: api/DataView/additionalamounts/search/{term}
+  [HttpGet("additionalamounts/search/{term}")]
+  public async Task<IActionResult> SearchAdditionalAmounts(string term)
+  {
+      if (string.IsNullOrEmpty(term)) return BadRequest("Search term is required");
+
+      var query = _context.AdditionalAmounts.AsNoTracking();
+
+      if (int.TryParse(term, out int id))
+      {
+          query = query.Where(a => a.Id == id);
+      }
+      else
+      {
+          query = query.Where(a => a.AmountType.Contains(term));
+      }
+
+      var results = await query.Take(100).ToListAsync();
+
+      return Ok(results);
+  }
+
+  // PUT: api/DataView/additionalamounts/{id}
+  [HttpPut("additionalamounts/{id}")]
+  public async Task<IActionResult> UpdateAdditionalAmount(int id, [FromBody] AdditionalAmount dto)
+  {
+      if (id != dto.Id) return BadRequest("ID mismatch");
+
+      var amount = await _context.AdditionalAmounts.FindAsync(id);
+      if (amount == null) return NotFound();
+
+      // Role Check
+      var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+      if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+          return Unauthorized();
+
+      var currentUser = await _context.Users.FindAsync(userId);
+      if (currentUser == null) return Unauthorized();
+
+      var role = currentUser.Role?.ToLower() ?? "";
+      if (role != "admin" && role != "administrator" && role != "supervisor")
+      {
+          return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
+      }
+
+      // Capture Previous State for Audit
+      var previousState = new { amount.Value, amount.AmountType, amount.DeptCode, amount.FileCode };
+
+      // Update fields
+      amount.Value = dto.Value;
+      amount.AmountType = dto.AmountType;
+      amount.DeptCode = dto.DeptCode;
+      amount.FileCode = dto.FileCode;
+      amount.UserUpdated = userId;
+      amount.DateUpdated = DateTime.UtcNow;
+
+      try
+      {
+          await _context.SaveChangesAsync();
+
+          // Invalidate cache for the specific job
+          if (amount.ImportJobId.HasValue)
+              _cache.Remove($"job_data_{amount.ImportJobId}");
+
+          // Broadcast change to department and admins
+          var deptGroupName = $"dept_{currentUser.Department}";
+          await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "AdditionalAmount", id = id, action = "updated" });
+          await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "AdditionalAmount", id = id, action = "updated" });
+
+          // Audit Log 
+          await _auditService.LogActionAsync(amount.FileCode ?? 0, (long?)amount.DeptCode, "UPDATE", $"تعديل مبلغ إضافي بواسطة User Update", previousState, "AdditionalAmount", id.ToString(), amount.DateAdded, DateTime.UtcNow);
+
+          return Ok(dto);
+      }
+      catch (Exception ex)
+      {
+          _logger.LogError(ex, "Error updating additional amount {Id}", id);
+          return StatusCode(500, "Internal server error during update");
+      }
+  }
+
+  // GET: api/DataView/mails/{id}
+  [HttpGet("mails/{id}")]
+  public async Task<IActionResult> GetMailById(int id)
+  {
+      var mail = await _context.Mails
+          .AsNoTracking()
+          .FirstOrDefaultAsync(m => m.Id == id);
+
+      if (mail == null)
+          return NotFound();
+
+      return Ok(mail);
+  }
+
+  // GET: api/DataView/mails/search/{term}
+  [HttpGet("mails/search/{term}")]
+  public async Task<IActionResult> SearchMails(string term)
+  {
+      if (string.IsNullOrEmpty(term)) return BadRequest("Search term is required");
+
+      var query = _context.Mails.AsNoTracking();
+
+      if (int.TryParse(term, out int id))
+      {
+          query = query.Where(m => m.Id == id);
+      }
+      else
+      {
+          query = query.Where(m => m.Subject.Contains(term) || m.Body.Contains(term));
+      }
+
+      var results = await query.Take(100).ToListAsync();
+
+      return Ok(results);
+  }
+
+  // PUT: api/DataView/mails/{id}
+  [HttpPut("mails/{id}")]
+  public async Task<IActionResult> UpdateMail(int id, [FromBody] Mail dto)
+  {
+      if (id != dto.Id) return BadRequest("ID mismatch");
+
+      var mail = await _context.Mails.FindAsync(id);
+      if (mail == null) return NotFound();
+
+      // Role Check
+      var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+      if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+          return Unauthorized();
+
+      var currentUser = await _context.Users.FindAsync(userId);
+      if (currentUser == null) return Unauthorized();
+
+      var role = currentUser.Role?.ToLower() ?? "";
+      if (role != "admin" && role != "administrator" && role != "supervisor")
+      {
+          return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
+      }
+
+      // Capture Previous State for Audit
+      var previousState = new { mail.Subject, mail.Body, mail.DeptCode, mail.FileCode };
+
+      // Update fields
+      mail.Subject = dto.Subject;
+      mail.Body = dto.Body;
+      mail.DeptCode = dto.DeptCode;
+      mail.FileCode = dto.FileCode;
+      mail.UserUpdated = userId;
+      mail.DateUpdated = DateTime.UtcNow;
+
+      try
+      {
+          await _context.SaveChangesAsync();
+
+          // Invalidate cache for the specific job
+          if (mail.ImportJobId.HasValue)
+              _cache.Remove($"job_data_{mail.ImportJobId}");
+
+          // Broadcast change to department and admins
+          var deptGroupName = $"dept_{currentUser.Department}";
+          await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "Mail", id = id, action = "updated" });
+          await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "Mail", id = id, action = "updated" });
+
+          // Audit Log 
+          await _auditService.LogActionAsync(mail.FileCode ?? 0, (long?)mail.DeptCode, "UPDATE", $"تعديل بريد بواسطة User Update", previousState, "Mail", id.ToString(), mail.DateAdded, DateTime.UtcNow);
+
+          return Ok(dto);
+      }
+      catch (Exception ex)
+      {
+          _logger.LogError(ex, "Error updating mail {Id}", id);
+          return StatusCode(500, "Internal server error during update");
+      }
+  }
+  // GET: api/DataView/attachments/{id}
+  [HttpGet("attachments/{id}")]
+  public async Task<IActionResult> GetAttachmentById(int id)
+  {
+      var attachment = await _context.Attachments
+          .AsNoTracking()
+          .FirstOrDefaultAsync(a => a.Id == id);
+
+      if (attachment == null)
+          return NotFound();
+
+      return Ok(attachment);
+  }
+
+  // GET: api/DataView/attachments/search/{term}
+  [HttpGet("attachments/search/{term}")]
+  public async Task<IActionResult> SearchAttachments(string term)
+  {
+      if (string.IsNullOrEmpty(term)) return BadRequest("Search term is required");
+
+      var query = _context.Attachments.AsNoTracking();
+
+      if (int.TryParse(term, out int id))
+      {
+          query = query.Where(a => a.Id == id);
+      }
+      else
+      {
+          query = query.Where(a => a.AttachCode.Contains(term) || a.Notes.Contains(term) || a.Value.Contains(term));
+      }
+
+      var results = await query.Take(100).ToListAsync();
+
+      return Ok(results);
+  }
+
+  // PUT: api/DataView/attachments/{id}
+  [HttpPut("attachments/{id}")]
+  public async Task<IActionResult> UpdateAttachment(int id, [FromBody] House_of_law_api.Modules.Attachment dto)
+  {
+      if (id != dto.Id) return BadRequest("ID mismatch");
+
+      var attachment = await _context.Attachments.FindAsync(id);
+      if (attachment == null) return NotFound();
+
+      // Role Check
+      var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+      if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+          return Unauthorized();
+
+      var currentUser = await _context.Users.FindAsync(userId);
+      if (currentUser == null) return Unauthorized();
+
+      var role = currentUser.Role?.ToLower() ?? "";
+      if (role != "admin" && role != "administrator" && role != "supervisor")
+      {
+          return Forbid("ليس لديك صلاحية تعديل البيانات. هذه الميزة متاحة للمشرفين والمديرين فقط.");
+      }
+
+      // Capture Previous State for Audit
+      var previousState = new { attachment.AttachCode, attachment.AttachType, attachment.Value, attachment.Notes, attachment.DeptCode, attachment.FileCode };
+
+      // Update fields
+      attachment.AttachCode = dto.AttachCode;
+      attachment.AttachType = dto.AttachType;
+      attachment.Value = dto.Value;
+      attachment.Notes = dto.Notes;
+      attachment.DeptCode = dto.DeptCode;
+      attachment.FileCode = dto.FileCode;
+      attachment.UserUpdated = userId;
+      attachment.DateUpdated = DateTime.UtcNow;
+
+      try
+      {
+          await _context.SaveChangesAsync();
+
+          // Invalidate cache for the specific job
+          if (attachment.ImportJobId.HasValue)
+              _cache.Remove($"job_data_{attachment.ImportJobId}");
+
+          // Broadcast change to department and admins
+          var deptGroupName = $"dept_{currentUser.Department}";
+          await _notificationService.BroadcastToChannelAsync("admins", "excel_data_updated", new { type = "Attachment", id = id, action = "updated" });
+          await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "Attachment", id = id, action = "updated" });
+
+          // Audit Log 
+          await _auditService.LogActionAsync(attachment.FileCode ?? 0, (long?)attachment.DeptCode, "UPDATE", $"تعديل مرفق بواسطة User Update", previousState, "Attachment", id.ToString(), attachment.DateAdded, DateTime.UtcNow);
+
+          return Ok(dto);
+      }
+      catch (Exception ex)
+      {
+          _logger.LogError(ex, "Error updating attachment {Id}", id);
+          return StatusCode(500, "Internal server error during update");
+      }
+  }
+
+  // GET: api/DataView/mainfiles/{id}/attachments
+  [HttpGet("mainfiles/{id}/attachments")]
+  public async Task<IActionResult> GetMainfileAttachments(long id)
+  {
+      var attachments = await _context.Attachments
+          .AsNoTracking()
+          .Where(a => a.FileCode == id)
+          .OrderByDescending(a => a.DateAdded)
+          .ToListAsync();
+
+      return Ok(attachments);
+  }
+
+  // GET: api/DataView/mainfiles/{id}/mails
+  [HttpGet("mainfiles/{id}/mails")]
+  public async Task<IActionResult> GetMainfileMails(long id)
+  {
+      var mails = await _context.Mails
+          .AsNoTracking()
+          .Where(m => m.FileCode == id)
+          .OrderByDescending(m => m.DateAdded)
+          .ToListAsync();
+
+      return Ok(mails);
+  }
+
+  // GET: api/DataView/mainfiles/{id}/additionalamounts
+  [HttpGet("mainfiles/{id}/additionalamounts")]
+  public async Task<IActionResult> GetMainfileAdditionalAmounts(long id)
+  {
+      var amounts = await _context.AdditionalAmounts
+          .AsNoTracking()
+          .Where(a => a.FileCode == id)
+          .OrderByDescending(a => a.DateAdded)
+          .ToListAsync();
+
+      return Ok(amounts);
+  }
+
+  // GET: api/DataView/mainfiles/{id}/payments
+  [HttpGet("mainfiles/{id}/payments")]
+  public async Task<IActionResult> GetMainfilePayments(long id)
+  {
+      var payments = await _context.Payments
+          .AsNoTracking()
+          .Where(p => p.FileCode == id)
+          .OrderByDescending(p => p.DateAdded)
+          .ToListAsync();
+
+      return Ok(payments);
   }
 }

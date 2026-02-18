@@ -9,15 +9,18 @@ public class PaymentsController : ControllerBase
     private readonly IPaymentRepository _repository;
     private readonly INotificationService _notificationService;
     private readonly ILogger<PaymentsController> _logger;
+    private readonly IAuditService _auditService;
 
     public PaymentsController(
         IPaymentRepository repository,
         INotificationService notificationService,
-        ILogger<PaymentsController> logger)
+        ILogger<PaymentsController> logger,
+        IAuditService auditService)
     {
         _repository = repository;
         _notificationService = notificationService;
         _logger = logger;
+        _auditService = auditService;
     }
 
     /// <summary>
@@ -121,6 +124,21 @@ public class PaymentsController : ControllerBase
 
         var created = await _repository.AddAsync(payment);
 
+        // Audit Log (Movement tracking)
+        string movementMsg = string.IsNullOrEmpty(created.FileStatusAfter) 
+            ? $"إضافة سند دفع بقيمة {created.Value}" 
+            : $"إضافة سند دفع بقيمة {created.Value} وتغيير الحالة إلى {created.FileStatusAfter}";
+            
+        await _auditService.LogActionAsync(
+            created.FileCode, 
+            created.DeptCode, 
+            "STATUS_CHANGE", 
+            movementMsg, 
+            null, 
+            "Payment", 
+            created.Id.ToString(),
+            created.DateAdded);
+
         // إرسال إشعار SignalR لكل المستخدمين
         // Removed for performance reasons
         // await _notificationService.BroadcastToAllAsync("payment:created", ...);
@@ -169,6 +187,9 @@ public class PaymentsController : ControllerBase
             return NotFound();
         }
 
+        // Capture Previous State
+        var previousState = new { payment.Value, payment.FileCode, payment.DeptCode, payment.FileStatusAfter };
+
         payment.FileCode = updateDto.FileCode ?? payment.FileCode;
         payment.DeptCode = updateDto.DeptCode ?? payment.DeptCode;
         payment.Value = updateDto.Value;
@@ -177,6 +198,18 @@ public class PaymentsController : ControllerBase
         payment.FileStatusAfter = updateDto.FileStatusAfter ?? payment.FileStatusAfter;
 
         await _repository.UpdateAsync(payment);
+
+        // Audit Log
+        await _auditService.LogActionAsync(
+            payment.FileCode, 
+            payment.DeptCode, 
+            "STATUS_CHANGE", 
+            $"تحديث سند دفع / حركة ملف (ID: {id}) بواسطة User Update", 
+            previousState, 
+            "Payment", 
+            id.ToString(),
+            payment.DateAdded,
+            DateTime.UtcNow);
 
         // إشعار SignalR
         // Removed for performance reasons
@@ -200,6 +233,16 @@ public class PaymentsController : ControllerBase
         }
 
         await _repository.DeleteAsync(payment);
+
+        // Audit Log
+        await _auditService.LogActionAsync(
+            payment.FileCode, 
+            payment.DeptCode, 
+            "DELETE", 
+            $"حذف سند دفع بقيمة {payment.Value}", 
+            payment, 
+            "Payment", 
+            id.ToString());
 
         // إشعار SignalR
         // Removed for performance reasons

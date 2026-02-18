@@ -33,4 +33,7 @@ public class AdditionalAmount
 
   [Column("enabled")]
   public bool? Enabled { get; set; }
+
+  [Column("import_job_id")]
+  public int? ImportJobId { get; set; }
 }

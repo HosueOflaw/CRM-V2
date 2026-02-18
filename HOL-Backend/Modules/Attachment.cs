@@ -1,7 +1,7 @@
 
 namespace House_of_law_api.Modules;
 
-[Table("attachments")]
+[Table("attachments", Schema = "dbo")]
 public class Attachment
 {
   [Key]
@@ -43,4 +43,7 @@ public class Attachment
 
   [Column("enabled")]
   public bool? Enabled { get; set; }
+
+  [Column("import_job_id")]
+  public int? ImportJobId { get; set; }
 }

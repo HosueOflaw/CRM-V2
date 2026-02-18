@@ -53,6 +53,26 @@ public class ExcelImportController : ControllerBase
               new List<string> { "اسم العميل", "المبلغ" }, // Required columns based on Worker
               new List<string> { "الرقم الآلي" } // Forbidden columns to avoid mixup (Removed FileCode)
           ),
+          "FileClassification" => (
+              new List<string> { "كود الملف", "التصنيف", "القسم" },
+              new List<string> { "رقم القيد", "الرقم الآلي", "المبلغ" }
+          ),
+          "Note" => (
+              new List<string> { "كود الملف", "الملاحظة" },
+              new List<string> { "رقم القيد", "الرقم الآلي", "المبلغ المختص" }
+          ),
+          "AdditionalAmount" => (
+              new List<string> { "كود الملف", "المبلغ" },
+              new List<string> { "رقم القيد", "الرقم الآلي" }
+          ),
+          "Mail" => (
+              new List<string> { "كود الملف", "الموضوع", "المحتوى" },
+              new List<string> { "رقم القيد", "الرقم الآلي", "المبلغ" }
+          ),
+          "Attachment" => (
+              new List<string> { "كود الملف", "كود المرفق" },
+              new List<string> { "رقم القيد", "الرقم الآلي" }
+          ),
           _ => (new List<string>(), new List<string>())
       };
   }
@@ -98,6 +118,11 @@ public class ExcelImportController : ControllerBase
       "AutoNumber" => "أرقام آلية",
       "FileDetail" => "تفاصيل ملفات",
       "Payment" => "مدفوعات",
+      "FileClassification" => "تصنيفات الملفات",
+      "Note" => "ملاحظات الجداول",
+      "AdditionalAmount" => "مبالغ إضافية",
+      "Mail" => "البريد",
+      "Attachment" => "المرفقات",
       _ => type
   };
 
@@ -123,6 +148,30 @@ public class ExcelImportController : ControllerBase
   public async Task<IActionResult> UploadPayments(IFormFile file, [FromForm] int? addedBy)
   {
     return await CreateJob(file, addedBy, "Payment");
+  }
+
+  [HttpPost("upload-fileclassifications")]
+  public async Task<IActionResult> UploadFileClassifications(IFormFile file, [FromForm] int? addedBy)
+  {
+    return await CreateJob(file, addedBy, "FileClassification");
+  }
+
+  [HttpPost("upload-notes")]
+  public async Task<IActionResult> UploadNotes(IFormFile file, [FromForm] int? addedBy)
+  {
+    return await CreateJob(file, addedBy, "Note");
+  }
+
+  [HttpPost("upload-additionalamounts")]
+  public async Task<IActionResult> UploadAdditionalAmounts(IFormFile file, [FromForm] int? addedBy)
+  {
+    return await CreateJob(file, addedBy, "AdditionalAmount");
+  }
+
+  [HttpPost("upload-mails")]
+  public async Task<IActionResult> UploadMails(IFormFile file, [FromForm] int? addedBy)
+  {
+    return await CreateJob(file, addedBy, "Mail");
   }
 
   private async Task<IActionResult> CreateJob(IFormFile file, int? addedBy, string jobType)
@@ -339,6 +388,86 @@ public class ExcelImportController : ControllerBase
       }
     }
 
+    [AllowAnonymous]
+    [HttpGet("download-fileclassifications-template")]
+    public IActionResult DownloadFileClassificationsTemplate()
+    {
+      try
+      {
+        var headers = new List<string>
+        {
+          "كود الملف", "كود المديونية", "التصنيف", "القسم", "الكود"
+        };
+        
+        var content = GenerateExcelTemplate(headers);
+        return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "FileClassifications_Template.xlsx");
+      }
+      catch (Exception ex)
+      {
+        return BadRequest(new { message = "Error generating template", detail = ex.Message });
+      }
+    }
+
+  [AllowAnonymous]
+  [HttpGet("download-notes-template")]
+  public IActionResult DownloadNotesTemplate()
+  {
+    try
+    {
+      var headers = new List<string>
+      {
+        "كود الملف", "كود المديونية", "الملاحظة"
+      };
+      
+      var content = GenerateExcelTemplate(headers);
+      return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Notes_Template.xlsx");
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(new { message = "Error generating template", detail = ex.Message });
+    }
+  }
+
+  [AllowAnonymous]
+  [HttpGet("download-additionalamounts-template")]
+  public IActionResult DownloadAdditionalAmountsTemplate()
+  {
+    try
+    {
+      var headers = new List<string>
+      {
+        "كود الملف", "كود المديونية", "المبلغ", "النوع"
+      };
+      
+      var content = GenerateExcelTemplate(headers);
+      return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AdditionalAmounts_Template.xlsx");
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(new { message = "Error generating template", detail = ex.Message });
+    }
+  }
+
+    [AllowAnonymous]
+    [HttpGet("download-mails-template")]
+    public IActionResult DownloadMailsTemplate()
+    {
+      try
+      {
+        var headers = new List<string>
+        {
+          "كود الملف", "كود المديونية", "الموضوع", "المحتوى"
+        };
+        
+        var content = GenerateExcelTemplate(headers);
+        return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Mails_Template.xlsx");
+      }
+      catch (Exception ex)
+      {
+        return BadRequest(new { message = "Error generating template", detail = ex.Message });
+      }
+    }
+
     private byte[] GenerateExcelTemplate(List<string> headers)
     {
         using var workbook = new XLWorkbook();
@@ -412,10 +541,35 @@ public class ExcelImportController : ControllerBase
                         var records = _context.FileDetails.Where(f => f.ImportJobId == jobId);
                         _context.FileDetails.RemoveRange(records);
                     }
+                else if (job.JobType == "Attachment")
+                {
+                    var records = _context.Attachments.Where(a => a.ImportJobId == jobId);
+                    _context.Attachments.RemoveRange(records);
+                }
                     else if (job.JobType == "Payment")
                     {
                         var records = _context.Payments.Where(p => p.ImportJobId == jobId);
                         _context.Payments.RemoveRange(records);
+                    }
+                    else if (job.JobType == "FileClassification")
+                    {
+                        var records = _context.FileClassifications.Where(f => f.ImportJobId == jobId);
+                        _context.FileClassifications.RemoveRange(records);
+                    }
+                    else if (job.JobType == "Note")
+                    {
+                        var records = _context.Notes.Where(n => n.ImportJobId == jobId);
+                        _context.Notes.RemoveRange(records);
+                    }
+                    else if (job.JobType == "AdditionalAmount")
+                    {
+                        var records = _context.AdditionalAmounts.Where(a => a.ImportJobId == jobId);
+                        _context.AdditionalAmounts.RemoveRange(records);
+                    }
+                    else if (job.JobType == "Mail")
+                    {
+                        var records = _context.Mails.Where(m => m.ImportJobId == jobId);
+                        _context.Mails.RemoveRange(records);
                     }
 
                     // Remove the job record
@@ -520,6 +674,56 @@ public class ExcelImportController : ControllerBase
             }
             totalCount = await q.CountAsync();
             query = q.OrderByDescending(p => p.Id).Skip(pagination.Skip).Take(pagination.PageSize);
+        }
+        else if (job.JobType == "FileClassification")
+        {
+            var q = _context.FileClassifications.Where(f => f.ImportJobId == jobId);
+            if (!string.IsNullOrEmpty(search))
+            {
+                q = q.Where(f => f.Classification.Contains(search) || f.Department.Contains(search) || f.Code.Contains(search));
+            }
+            totalCount = await q.CountAsync();
+            query = q.OrderByDescending(f => f.Id).Skip(pagination.Skip).Take(pagination.PageSize);
+        }
+        else if (job.JobType == "Note")
+        {
+            var q = _context.Notes.Where(n => n.ImportJobId == jobId);
+            if (!string.IsNullOrEmpty(search))
+            {
+                q = q.Where(n => n.FileCode.ToString().Contains(search) || n.NoteText.Contains(search));
+            }
+            totalCount = await q.CountAsync();
+            query = q.OrderByDescending(n => n.Id).Skip(pagination.Skip).Take(pagination.PageSize);
+        }
+        else if (job.JobType == "AdditionalAmount")
+        {
+            var q = _context.AdditionalAmounts.Where(a => a.ImportJobId == jobId);
+            if (!string.IsNullOrEmpty(search))
+            {
+                q = q.Where(a => a.FileCode.ToString().Contains(search) || a.AmountType.Contains(search));
+            }
+            totalCount = await q.CountAsync();
+            query = q.OrderByDescending(a => a.Id).Skip(pagination.Skip).Take(pagination.PageSize);
+        }
+        else if (job.JobType == "Mail")
+        {
+            var q = _context.Mails.Where(m => m.ImportJobId == jobId);
+            if (!string.IsNullOrEmpty(search))
+            {
+                q = q.Where(m => m.FileCode.ToString().Contains(search) || m.Subject.Contains(search) || m.Body.Contains(search));
+            }
+            totalCount = await q.CountAsync();
+            query = q.OrderByDescending(m => m.Id).Skip(pagination.Skip).Take(pagination.PageSize);
+        }
+        else if (job.JobType == "Attachment")
+        {
+            var q = _context.Attachments.Where(a => a.ImportJobId == jobId);
+            if (!string.IsNullOrEmpty(search))
+            {
+                q = q.Where(a => a.FileCode.ToString().Contains(search) || a.AttachCode.Contains(search) || a.Notes.Contains(search) || a.Value.Contains(search));
+            }
+            totalCount = await q.CountAsync();
+            query = q.OrderByDescending(a => a.Id).Skip(pagination.Skip).Take(pagination.PageSize);
         }
         else
         {
@@ -655,6 +859,111 @@ public class ExcelImportController : ControllerBase
         if (!fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase)) fileName += ".xlsx";
 
         return File(job.ErrorLogFile, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+    }
+
+    [HttpPost("upload-attachments")]
+    public async Task<IActionResult> UploadAttachments(IFormFile file, [FromForm] int? addedBy)
+    {
+        return await CreateJob(file, addedBy, "Attachment");
+    }
+
+    [HttpGet("download-attachments-template")]
+    [Authorize(Policy = "UserOnly")]
+    public IActionResult DownloadAttachmentsTemplate()
+    {
+        var templatePath = Path.Combine(_env.ContentRootPath, "Templates", "AttachmentsTemplate.xlsx");
+        if (!System.IO.File.Exists(templatePath))
+        {
+            var wb = new XLWorkbook();
+            var ws = wb.Worksheets.Add("Attachments");
+            ws.RightToLeft = true;
+            ws.Cell(1, 1).Value = "كود الملف";
+            ws.Cell(1, 2).Value = "كود المديونية";
+            ws.Cell(1, 3).Value = "كود المرفق";
+            ws.Cell(1, 4).Value = "نوع المرفق";
+            ws.Cell(1, 5).Value = "القيمة";
+            ws.Cell(1, 6).Value = "ملاحظات";
+            
+            // Styling
+            var rng = ws.Range(1, 1, 1, 6);
+            rng.Style.Font.Bold = true;
+            rng.Style.Fill.BackgroundColor = XLColor.LightGray;
+            ws.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            wb.SaveAs(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AttachmentsTemplate.xlsx");
+        }
+        return PhysicalFile(templatePath, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AttachmentsTemplate.xlsx");
+    }
+
+    [HttpGet("export-job-data/{jobId}")]
+    public async Task<IActionResult> ExportJobData(int jobId)
+    {
+        var job = await _context.ImportJobs.AsNoTracking().FirstOrDefaultAsync(j => j.Id == jobId);
+        if (job == null) return NotFound("العملية غير موجودة");
+
+        var jobType = job.JobType;
+        byte[] content;
+        var fileName = $"Current_{job.FileName}";
+        if (!fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase)) fileName += ".xlsx";
+
+        try
+        {
+            using var workbook = new ClosedXML.Excel.XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Data");
+            worksheet.RightToLeft = true;
+
+            List<object> list = jobType switch
+            {
+                "Mainfile" => (await _context.Mainfiles.AsNoTracking().Where(m => m.ImportJobId == jobId).ToListAsync()).Cast<object>().ToList(),
+                "AutoNumber" => (await _context.AutoNumbers.AsNoTracking().Where(a => a.ImportJobId == jobId).ToListAsync()).Cast<object>().ToList(),
+                "FileDetail" => (await _context.FileDetails.AsNoTracking().Where(f => f.ImportJobId == jobId).ToListAsync()).Cast<object>().ToList(),
+                "Payment" => (await _context.Payments.AsNoTracking().Where(p => p.ImportJobId == jobId).ToListAsync()).Cast<object>().ToList(),
+                "FileClassification" => (await _context.FileClassifications.AsNoTracking().Where(f => f.ImportJobId == jobId).ToListAsync()).Cast<object>().ToList(),
+                "Note" => (await _context.Notes.AsNoTracking().Where(n => n.ImportJobId == jobId).ToListAsync()).Cast<object>().ToList(),
+                "AdditionalAmount" => (await _context.AdditionalAmounts.AsNoTracking().Where(a => a.ImportJobId == jobId).ToListAsync()).Cast<object>().ToList(),
+                "Mail" => (await _context.Mails.AsNoTracking().Where(m => m.ImportJobId == jobId).ToListAsync()).Cast<object>().ToList(),
+                "Attachment" => (await _context.Attachments.AsNoTracking().Where(a => a.ImportJobId == jobId).ToListAsync()).Cast<object>().ToList(),
+                _ => throw new Exception("Unknown job type")
+            };
+
+            if (list.Count == 0) return BadRequest("لا توجد بيانات حالية لهذه العملية في قاعدة البيانات.");
+
+            var properties = list[0].GetType().GetProperties()
+                .Where(p => p.Name != "Id" && p.Name != "ImportJobId" && p.Name != "CreatedBy" && p.Name != "ImportJob")
+                .ToList();
+
+            // Headers
+            for (int i = 0; i < properties.Count; i++)
+            {
+                var cell = worksheet.Cell(1, i + 1);
+                cell.Value = properties[i].Name;
+                cell.Style.Font.Bold = true;
+                cell.Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.LightGray;
+            }
+
+            // Data
+            for (int r = 0; r < list.Count; r++)
+            {
+                for (int c = 0; c < properties.Count; c++)
+                {
+                    var val = properties[c].GetValue(list[r]);
+                    worksheet.Cell(r + 2, c + 1).Value = val?.ToString() ?? "";
+                }
+            }
+
+            worksheet.Columns().AdjustToContents();
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            content = stream.ToArray();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"خطأ أثناء توليد الملف: {ex.Message}");
+        }
+
+        return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 }
 

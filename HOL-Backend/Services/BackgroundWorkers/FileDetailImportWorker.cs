@@ -1,6 +1,7 @@
 using EFCore.BulkExtensions;
 using System.Data;
 using ClosedXML.Excel;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace House_of_law_api.Services.BackgroundWorkers;
 
@@ -42,7 +43,7 @@ public class FileDetailImportWorker : BackgroundService
 
                     if (pendingJob != null)
                     {
-                        await ProcessJobAsync(pendingJob, context, stoppingToken);
+                        await ProcessJobAsync(pendingJob, context, scope, stoppingToken);
                     }
                 }
             }
@@ -65,7 +66,7 @@ public class FileDetailImportWorker : BackgroundService
         catch { }
     }
 
-    private async Task ProcessJobAsync(ImportJob job, ApplicationDbContext context, CancellationToken stoppingToken)
+    private async Task ProcessJobAsync(ImportJob job, ApplicationDbContext context, IServiceScope scope, CancellationToken stoppingToken)
     {
         _logger.LogInformation("Starting FileDetail processing job {JobId} for file {FileName}", job.Id, job.FileName);
         
@@ -229,6 +230,17 @@ public class FileDetailImportWorker : BackgroundService
             await context.SaveChangesAsync(stoppingToken);
             
             LogToFile($"DEBUG: Job {job.Id} finished. {job.ErrorMessage}");
+
+            // Audit Log - Resolve from scope
+            var auditService = scope.ServiceProvider.GetRequiredService<IAuditService>();
+            await auditService.LogActionAsync(
+                null, 
+                null, 
+                "IMPORT_COMPLETED", 
+                $"تم إكمال رفع ملف اكسيل (FileDetail): {job.FileName}. الإجمالي: {job.TotalRows}، أضيف: {actualAdded}، أخطاء: {jobErrorCount}", 
+                null, 
+                "ImportJob", 
+                job.Id.ToString());
             
             await _hubContext.Clients.User(job.CreatedById.ToString()).SendAsync("broadcast", new 
             {

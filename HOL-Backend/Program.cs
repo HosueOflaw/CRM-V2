@@ -319,6 +319,7 @@
 
 // app.Run();
 
+if (!Directory.Exists("wwwroot")) Directory.CreateDirectory("wwwroot");
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
@@ -329,7 +330,7 @@ builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
     sqlOptions.EnableRetryOnFailure(3, TimeSpan.FromSeconds(30), null);
   });
   options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
-});
+}); 
 
 builder.Services.AddMemoryCache();
 
@@ -355,6 +356,8 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAuditService, AuditService>();
 
 var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 
@@ -440,6 +443,12 @@ builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.Ma
 builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.AutoNumberImportWorker>();
 builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.FileDetailImportWorker>();
 builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.PaymentImportWorker>();
+builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.FileClassificationImportWorker>();
+builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.NoteImportWorker>();
+builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.AdditionalAmountImportWorker>();
+builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.MailImportWorker>();
+builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.AttachmentImportWorker>();
+builder.Services.AddHostedService<House_of_law_api.Services.BackgroundWorkers.StartupJobCleanupService>();
 
 builder.Services.AddControllers(options =>
 {
@@ -518,7 +527,6 @@ if (app.Environment.IsDevelopment())
   });
 }
 
-app.UseStaticFiles();
 
 app.UseRouting();
 app.Use(async (context, next) =>
@@ -539,6 +547,25 @@ app.UseCloudflareForwarding();
 app.UseAuthentication();
 app.UseAuthorization();
 
+
+//app.UseDefaultFiles();
+//app.UseStaticFiles();
+//app.MapControllerRoute("Default", "{contorller=Fallback}/{action=index}/{id?}");
+//app.MapFallbackToController("index", "Fallback");
+
+//var webRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+//if (Directory.Exists(webRoot))
+//{
+//    app.UseDefaultFiles();
+//    app.UseStaticFiles();
+//    app.MapControllerRoute("Default", "{contorller=Fallback}/{action=index}/{id?}");
+//    app.MapFallbackToController("index", "Fallback");
+//}
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseExceptionHandler(errorApp =>
 {
   errorApp.Run(async context =>
@@ -553,8 +580,8 @@ app.UseExceptionHandler(errorApp =>
     await context.Response.WriteAsJsonAsync(response);
   });
 });
-
-app.MapControllers();
 app.MapHub<NotificationsHub>(NotificationsHub.Route);
+app.MapControllers();
+
 
 app.Run();
