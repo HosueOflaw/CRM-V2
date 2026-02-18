@@ -19,14 +19,8 @@
           <td>{{ attachment.action }}</td>
           <td>{{ attachment.date | date: 'dd/MM/yyyy' }}</td>
           <td>
-            <a
-              *ngIf="attachment.file"
-              [href]="attachment.file"
-              target="_blank"
-              style="color: var(--primary-color, #3b82f6);"
-              class="hover:underline"
-              >📂 عرض</a
-            >
+            <a *ngIf="attachment.file" [href]="attachment.file" target="_blank"
+              style="color: var(--primary-color, #3b82f6);" class="hover:underline">📂 عرض</a>
           </td>
           <td>
             <button class="btn btn-sm btn-error" (click)="deleteAttachment(i)">

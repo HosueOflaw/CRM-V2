@@ -1,0 +1,281 @@
+<div class="card bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-6 animate-fadein">
+    <!-- Header Section -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+            <i class="pi pi-dollar text-primary text-2xl"></i>
+            استيراد مبالغ إضافية (Additional Amounts)
+        </h2>
+        <button pButton label="تحميل النموذج" icon="pi pi-download" (click)="downloadTemplate()"
+            class="p-button-outlined p-button-sm p-button-rounded transition-all duration-300 hover:bg-primary-50"></button>
+    </div>
+
+    <!-- Stats Dashboard Component -->
+    <app-import-dashboard jobType="AdditionalAmount"></app-import-dashboard>
+
+    <!-- Upload Section -->
+    <div
+        class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-8 border-2 border-dashed border-gray-200 dark:border-gray-700 mb-8 transition-all hover:border-primary">
+        <div class="flex flex-col items-center justify-center gap-4">
+            <div class="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                <i class="pi pi-cloud-upload text-3xl text-primary"></i>
+            </div>
+            <div class="text-center">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-1">اختر ملف الإكسيل للرفع</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">يدعم تنسيقات .xlsx أو .xls فقط</p>
+            </div>
+
+            <input type="file" #fileInput (change)="onFileSelected($event)" accept=".xlsx, .xls" class="hidden">
+
+            <div class="flex items-center gap-3">
+                <button pButton [label]="selectedFile ? selectedFile.name : 'اختيار ملف'"
+                    [icon]="selectedFile ? 'pi pi-file-excel' : 'pi pi-search'" (click)="fileInput.click()"
+                    class="p-button-secondary p-button-rounded px-6"></button>
+
+                <button pButton label="بدأ الاستيراد" icon="pi pi-play" [disabled]="!selectedFile || uploading"
+                    [loading]="uploading" (click)="uploadFile()"
+                    class="p-button-primary p-button-rounded px-8 transition-transform hover:scale-105"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Job Progress -->
+    <div *ngIf="activeJobId"
+        class="mb-8 p-6 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20 rounded-2xl animate-fadein">
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center gap-3">
+                <i class="pi pi-spin pi-spinner text-blue-600 dark:text-blue-400 text-xl"></i>
+                <div>
+                    <h4 class="font-bold text-gray-800 dark:text-white m-0">جاري معالجة العملية الحالية</h4>
+                    <p class="text-sm text-gray-500 m-0">يتم الآن فحص وإضافة البيانات في الخلفية...</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <span class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ activeJobProgress }}%</span>
+            </div>
+        </div>
+
+        <p-progressBar [value]="activeJobProgress" [showValue]="false"
+            styleClass="h-2 rounded-full mb-4"></p-progressBar>
+
+        <div class="grid grid-cols-3 gap-4">
+            <div class="p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+                <div class="text-xs text-gray-400 mb-1">الإجمالي في الملف</div>
+                <div class="font-bold text-gray-800 dark:text-white">{{ activeJobTotalRows }}</div>
+            </div>
+            <div class="p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+                <div class="text-xs text-gray-400 mb-1">تمت معالجة</div>
+                <div class="font-bold text-primary">{{ activeJobProcessedRows }}</div>
+            </div>
+            <div class="p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+                <div class="text-xs text-gray-400 mb-1">أخطاء</div>
+                <div class="font-bold text-red-500">{{ activeJobErrorCount }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Table -->
+    <div class="history-section">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white m-0">سجل عمليات الرفع</h3>
+            <span class="p-input-icon-left w-full md:w-auto">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" [(ngModel)]="jobSearch" (input)="onJobSearch()"
+                    placeholder="بحث في اسم الملف..." class="p-inputtext-sm p-rounded-lg w-full">
+            </span>
+        </div>
+
+        <p-table #jobsTable [value]="jobs" [lazy]="true" (onLazyLoad)="onPageChange($event)" [paginator]="true"
+            [rows]="pageSize" [totalRecords]="totalRecords" [loading]="loadingJobs" [rowsPerPageOptions]="[10, 20, 50]"
+            styleClass="p-datatable-sm p-datatable-gridlines rounded-xl overflow-hidden shadow-sm"
+            [responsiveLayout]="'scroll'">
+            <ng-template pTemplate="header">
+                <tr class="bg-gray-50 dark:bg-gray-800">
+                    <th class="w-12 text-center text-xs font-bold uppercase tracking-wider">#ID</th>
+                    <th class="text-xs font-bold uppercase tracking-wider">اسم الملف</th>
+                    <th class="text-xs font-bold uppercase tracking-wider">الحالة</th>
+                    <th class="text-xs font-bold uppercase tracking-wider">التقدم</th>
+                    <th class="text-xs font-bold uppercase tracking-wider">التفاصيل (إجمالي/رُفع/خطأ)</th>
+                    <th class="text-xs font-bold uppercase tracking-wider">بواسطة</th>
+                    <th class="text-xs font-bold uppercase tracking-wider">التاريخ</th>
+                    <th class="w-48 text-center text-xs font-bold uppercase tracking-wider">الإجراءات</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-job>
+                <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                    <td class="text-center font-mono text-gray-400">{{ job.id }}</td>
+                    <td>
+                        <div class="flex items-center gap-2">
+                            <span class="font-semibold text-gray-700 dark:text-gray-200">{{ job.fileName }}</span>
+                            <button pButton icon="pi pi-pencil" class="p-button-text p-button-xs p-button-rounded"
+                                (click)="editJobName(job)" pTooltip="تعديل اسم الملف"></button>
+                        </div>
+                    </td>
+                    <td>
+                        <p-tag [value]="getStatusLabel(job.status)" [severity]="getStatusSeverity(job.status)"
+                            styleClass="px-3 rounded-full font-medium"></p-tag>
+                    </td>
+                    <td>
+                        <div class="flex items-center gap-2 w-32">
+                            <p-progressBar [value]="job.progress" [showValue]="false"
+                                styleClass="h-1.5 flex-1"></p-progressBar>
+                            <span class="text-xs font-bold">{{ job.progress }}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="flex flex-col gap-1 text-xs">
+                            <div class="flex justify-between"><span>الإجمالي:</span> <span class="font-bold">{{
+                                    job.totalRows }}</span></div>
+                            <div class="flex justify-between text-primary"><span>تم الرفع:</span> <span
+                                    class="font-bold">{{ job.processedRows - job.errorCount }}</span></div>
+                            <div class="flex justify-between text-red-500"><span>الأخطاء:</span> <span
+                                    class="font-bold">{{ job.errorCount }}</span></div>
+                        </div>
+                    </td>
+                    <td class="text-sm">{{ job.createdBy }}</td>
+                    <td class="text-sm text-gray-500">{{ job.createdAt | date:'short' }}</td>
+                    <td>
+                        <div class="flex justify-center gap-1">
+                            <button pButton icon="pi pi-eye" class="p-button-text p-button-sm p-button-rounded"
+                                (click)="viewData(job)" pTooltip="عرض البيانات المرفوعة"
+                                [disabled]="job.status !== 'Completed'"></button>
+
+                            <button pButton icon="pi pi-download"
+                                class="p-button-text p-button-secondary p-button-sm p-button-rounded"
+                                (click)="downloadOriginal(job)" pTooltip="تحميل الملف الأصلي"></button>
+
+                            <button pButton icon="pi pi-file-excel"
+                                class="p-button-text p-button-success p-button-sm p-button-rounded"
+                                (click)="exportJobData(job)" pTooltip="تصدير البيانات الحالية"></button>
+
+                            <button pButton icon="pi pi-exclamation-triangle"
+                                class="p-button-text p-button-warning p-button-sm p-button-rounded"
+                                *ngIf="job.errorCount > 0" (click)="downloadErrorLog(job)"
+                                pTooltip="تحميل سجل الأخطاء"></button>
+
+                            <button pButton icon="pi pi-trash"
+                                class="p-button-text p-button-danger p-button-sm p-button-rounded" *ngIf="isAdmin"
+                                (click)="revertImport(job)" pTooltip="التراجع عن العملية"></button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="8" class="text-center p-8 bg-gray-50/30">
+                        <i class="pi pi-inbox text-4xl text-gray-300 mb-3 block"></i>
+                        <span class="text-gray-400">لا توجد عمليات رفع سابقة لمبالغ إضافية</span>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <!-- Data View Dialog -->
+    <p-dialog [(visible)]="showDataDialog" [header]="'بيانات العملية رقم ' + viewingJob?.id" [modal]="true"
+        [style]="{width: '90vw', maxWidth: '1200px'}" [maximizable]="true"
+        styleClass="p-fluid rounded-2xl overflow-hidden shadow-2xl">
+        <div
+            class="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl flex flex-wrap gap-4 items-center justify-between border border-gray-100 dark:border-gray-700">
+            <div class="flex items-center gap-4">
+                <div><span class="text-xs text-gray-400 block mb-1">اسم الملف:</span> <span class="font-bold">{{
+                        viewingJob?.fileName }}</span></div>
+                <div class="w-px h-8 bg-gray-200 dark:bg-gray-700"></div>
+                <div><span class="text-xs text-gray-400 block mb-1">إجمالي السجلات:</span> <span class="font-bold">{{
+                        jobDataTotalRecords }}</span></div>
+            </div>
+            <span class="p-input-icon-left w-full md:w-auto">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" [(ngModel)]="jobDataSearch" (input)="onJobDataSearch()"
+                    placeholder="بحث في البيانات..." class="p-inputtext-sm p-rounded-lg w-full">
+            </span>
+        </div>
+
+        <p-table [value]="jobData" [lazy]="true" (onLazyLoad)="onJobDataPageChange($event)" [paginator]="true"
+            [rows]="jobDataPageSize" [totalRecords]="jobDataTotalRecords" [loading]="loadingJobData"
+            [rowsPerPageOptions]="[10, 20, 50, 100]"
+            styleClass="p-datatable-sm p-datatable-striped rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800"
+            [responsiveLayout]="'scroll'">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th class="w-32">كود الملف</th>
+                    <th class="w-32">كود المديونية</th>
+                    <th>المبلغ</th>
+                    <th>النوع</th>
+                    <th class="w-32">بواسطة</th>
+                    <th class="w-40">تاريخ الإضافة</th>
+                    <th class="w-24 text-center">إجراءات</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item>
+                <tr class="transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
+                    <td class="font-mono">{{ item.fileCode }}</td>
+                    <td class="font-mono text-gray-500">{{ item.deptCode }}</td>
+                    <td class="font-bold text-primary">{{ item.value | number:'1.3-3' }}</td>
+                    <td>
+                        <p-tag [value]="item.amountType || 'Other'" severity="info" styleClass="px-2 text-xs"></p-tag>
+                    </td>
+                    <td>{{ item.userAdded }}</td>
+                    <td class="text-xs text-gray-500">{{ item.dateAdded | date:'short' }}</td>
+                    <td class="text-center">
+                        <button pButton icon="pi pi-pencil" class="p-button-text p-button-sm p-button-rounded"
+                            (click)="editItem(item)" pTooltip="تعديل هذا السجل"></button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+        <ng-template pTemplate="footer">
+            <button pButton label="إغلاق" icon="pi pi-times" (click)="showDataDialog = false"
+                class="p-button-text"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- Row Edit Dialog -->
+    <p-dialog [(visible)]="showEditDialog" header="تعديل بيانات السجل" [modal]="true" [style]="{width: '450px'}"
+        styleClass="p-fluid rounded-2xl shadow-2xl">
+        <div class="grid gap-4 mt-2" *ngIf="editingItem">
+            <div class="field">
+                <label class="font-bold mb-2 block">كود الملف</label>
+                <p-inputNumber [(ngModel)]="editingItem.fileCode" [useGrouping]="false" class="w-full" [disabled]="true"
+                    pTooltip="لا يمكن تغيير كود الملف المرتبط بالسجل" tooltipPosition="top"></p-inputNumber>
+            </div>
+            <div class="field">
+                <label class="font-bold mb-2 block">كود المديونية</label>
+                <p-inputNumber [(ngModel)]="editingItem.deptCode" [useGrouping]="false" class="w-full"
+                    pTooltip="كود المديونية (اختياري)"></p-inputNumber>
+            </div>
+            <div class="field">
+                <label class="font-bold mb-2 block">المبلغ</label>
+                <p-inputNumber [(ngModel)]="editingItem.value" mode="decimal" [minFractionDigits]="3"
+                    [maxFractionDigits]="3" class="w-full" pTooltip="قيمة المبلغ الإضافي"></p-inputNumber>
+            </div>
+            <div class="field">
+                <label class="font-bold mb-2 block">النوع</label>
+                <input pInputText type="text" [(ngModel)]="editingItem.amountType" class="w-full"
+                    placeholder="مثال: رسوم قضائية، أتعاب..." pTooltip="نوع المبلغ الإضافي">
+            </div>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton label="إلغاء" icon="pi pi-times" (click)="cancelEdit()"
+                class="p-button-text p-button-secondary"></button>
+            <button pButton label="حفظ التغييرات" icon="pi pi-check" (click)="saveEdit()" [loading]="savingEdit"
+                class="p-button-primary"></button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- Job Edit Dialog -->
+    <p-dialog [(visible)]="showJobEditDialog" header="تعديل اسم الملف" [modal]="true" [style]="{width: '450px'}"
+        styleClass="p-fluid rounded-2xl shadow-2xl">
+        <div class="field mt-4" *ngIf="editingJob">
+            <label class="font-bold mb-2 block">اسم الملف الجديد</label>
+            <input pInputText type="text" [(ngModel)]="editingJob.fileName" class="w-full"
+                (keyup.enter)="saveJobName()">
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton label="إلغاء" icon="pi pi-times" (click)="cancelJobName()"
+                class="p-button-text p-button-secondary"></button>
+            <button pButton label="تحديث الاسم" icon="pi pi-check" (click)="saveJobName()" [loading]="savingJobEdit"
+                class="p-button-primary"></button>
+        </ng-template>
+    </p-dialog>
+</div>

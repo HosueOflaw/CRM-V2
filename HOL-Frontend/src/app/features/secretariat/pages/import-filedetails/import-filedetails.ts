@@ -280,6 +280,11 @@ export class ImportFileDetailsPage implements OnInit, OnDestroy {
         this.importService.downloadOriginal(job.id, job.jobType);
     }
 
+    exportJobData(job: any) {
+        console.log('Exporting job data for:', job);
+        this.importService.exportJobData(job.id, job.fileName);
+    }
+
     revertImport(job: any) {
         this.swal.question({
             title: 'هل أنت متأكد؟',

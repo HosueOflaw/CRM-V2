@@ -5,7 +5,6 @@ import { ExcelImportService, ImportJob } from '../../../../services/excel-import
 import { Signalr } from '../../../../services/signalr';
 import { AuthService } from '../../../../core/services/auth';
 import { SweetAlertService } from '../../../../shared/services/sweet-alert.service';
-import { ImportDashboardComponent } from '../../components/import-dashboard/import-dashboard.component';
 import { Table, TableModule } from 'primeng/table';
 import { DataViewService } from '../../../../services/data-view.service';
 import { ButtonModule } from 'primeng/button';
@@ -15,11 +14,12 @@ import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { TextareaModule } from 'primeng/textarea'; // Correct based on permission modal
+import { TextareaModule } from 'primeng/textarea';
 import { Subject, takeUntil } from 'rxjs';
+import { ImportDashboardComponent } from "../../components/import-dashboard/import-dashboard.component";
 
 @Component({
-    selector: 'app-import-payments',
+    selector: 'app-import-mails',
     standalone: true,
     imports: [
         CommonModule,
@@ -35,10 +35,9 @@ import { Subject, takeUntil } from 'rxjs';
         TextareaModule,
         ImportDashboardComponent
     ],
-    templateUrl: './import-payments.html'
+    templateUrl: './import-mails.html'
 })
-
-export class ImportPaymentsPage implements OnInit, OnDestroy {
+export class ImportMailsPage implements OnInit, OnDestroy {
     @ViewChild('jobsTable') jobsTable!: Table;
 
     selectedFile: File | null = null;
@@ -62,11 +61,13 @@ export class ImportPaymentsPage implements OnInit, OnDestroy {
     showDataDialog = false;
     viewingJob: any = null;
     jobData: any[] = [];
+    loadingJobData = false;
+
+    // Data View Modal Pagination
     jobDataPage = 1;
     jobDataPageSize = 10;
     jobDataTotalRecords = 0;
     jobDataSearch = '';
-    loadingJobData = false;
 
     // Row Editing
     showEditDialog = false;
@@ -93,7 +94,7 @@ export class ImportPaymentsPage implements OnInit, OnDestroy {
     }
 
     get isSupervisor(): boolean {
-        return this.authService.isSupervisor() || this.authService.isAdmin();
+        return this.authService.isSupervisor();
     }
 
     ngOnInit() {
@@ -101,7 +102,6 @@ export class ImportPaymentsPage implements OnInit, OnDestroy {
         this.listenToProgress();
         this.listenToUploadState();
 
-        // Reset state if stuck in Failed to avoid reappearing alert
         if (this.importService.currentUploadState.status === 'Failed') {
             this.importService.resetUploadState();
         }
@@ -114,7 +114,7 @@ export class ImportPaymentsPage implements OnInit, OnDestroy {
 
     listenToUploadState() {
         this.importService.uploadState$.pipe(takeUntil(this.destroy$)).subscribe((state: any) => {
-            if (state.jobType === 'Payment') {
+            if (state.jobType === 'Mail') {
                 if (state.status === 'Uploading') {
                     this.uploading = true;
                 } else if (state.status === 'Processing') {
@@ -127,7 +127,7 @@ export class ImportPaymentsPage implements OnInit, OnDestroy {
                     this.activeJobErrorCount = state.errorCount || 0;
 
                     if (this.selectedFile) {
-                        this.swal.toast({ icon: 'info', title: 'بدأت المعالجة', text: 'يتم الآن رفع ومعالجة ملف المدفوعات في الخلفية' });
+                        this.swal.toast({ icon: 'info', title: 'بدأت المعالجة', text: 'يتم الآن رفع ومعالجة ملف البريد في الخلفية' });
                         this.selectedFile = null;
                         setTimeout(() => this.refresh(), 500);
                     }
@@ -141,14 +141,12 @@ export class ImportPaymentsPage implements OnInit, OnDestroy {
                     });
                 }
             }
-        })
+        });
     }
-
-
 
     loadJobs() {
         this.loadingJobs = true;
-        this.importService.getMyJobs(this.currentPage, this.pageSize, 'Payment', this.jobSearch).subscribe({
+        this.importService.getMyJobs(this.currentPage, this.pageSize, 'Mail', this.jobSearch).subscribe({
             next: (result) => {
                 this.jobs = result.data;
                 this.totalRecords = result.totalCount;
@@ -163,13 +161,7 @@ export class ImportPaymentsPage implements OnInit, OnDestroy {
                     this.activeJobTotalRows = activeJob.totalRows;
                     this.activeJobErrorCount = activeJob.errorCount;
                 } else {
-                    // Clear active job if no processing/pending jobs found
                     this.activeJobId = null;
-                    this.activeJobProgress = 0;
-                    this.activeJobStatus = '';
-                    this.activeJobProcessedRows = 0;
-                    this.activeJobTotalRows = 0;
-                    this.activeJobErrorCount = 0;
                 }
             },
             error: () => {
@@ -180,9 +172,7 @@ export class ImportPaymentsPage implements OnInit, OnDestroy {
 
     refresh() {
         this.currentPage = 1;
-        if (this.jobsTable) {
-            this.jobsTable.first = 0;
-        }
+        if (this.jobsTable) this.jobsTable.first = 0;
         this.loadJobs();
     }
 
@@ -203,12 +193,12 @@ export class ImportPaymentsPage implements OnInit, OnDestroy {
 
     uploadFile() {
         if (!this.selectedFile) return;
-        this.importService.startUpload(this.selectedFile, 'Payment');
+        this.importService.startUpload(this.selectedFile, 'Mail');
     }
 
     listenToProgress() {
         this.signalr.message$.pipe(takeUntil(this.destroy$)).subscribe(msg => {
-            if (msg.type === 'excel_import_progress' && msg.data.jobType === 'Payment') {
+            if (msg.type === 'excel_import_progress' && msg.data.jobType === 'Mail') {
                 if (msg.data.jobId === this.activeJobId) {
                     this.activeJobProgress = msg.data.progress;
                     this.activeJobStatus = 'Processing';
@@ -232,8 +222,9 @@ export class ImportPaymentsPage implements OnInit, OnDestroy {
                     job.status = 'Processing';
                     job.processedRows = msg.data.processed;
                     job.totalRows = msg.data.total;
+                    job.errorCount = msg.data.errorCount;
                 }
-            } else if (msg.type === 'excel_import_complete' && msg.data.jobType === 'Payment') {
+            } else if (msg.type === 'excel_import_complete' && msg.data.jobType === 'Mail') {
                 if (msg.data.jobId === this.activeJobId) {
                     this.activeJobId = null;
                     this.activeJobProgress = 100;
@@ -248,7 +239,7 @@ export class ImportPaymentsPage implements OnInit, OnDestroy {
     }
 
     downloadTemplate() {
-        this.importService.downloadPaymentsTemplate();
+        this.importService.downloadMailsTemplate();
     }
 
     getStatusSeverity(status: string) {
@@ -321,8 +312,7 @@ export class ImportPaymentsPage implements OnInit, OnDestroy {
             error: (err) => {
                 console.error('Error fetching job data', err);
                 this.loadingJobData = false;
-                const msg = err.error?.message || 'فشل تحميل بيانات العملية';
-                this.swal.error({ title: 'خطأ', text: msg });
+                this.swal.error({ title: 'خطأ', text: 'فشل تحميل بيانات العملية' });
             }
         });
     }
@@ -345,8 +335,9 @@ export class ImportPaymentsPage implements OnInit, OnDestroy {
 
     saveEdit() {
         if (!this.editingItem) return;
+
         this.savingEdit = true;
-        this.dataViewService.updatePayment(this.editingItem.id, this.editingItem).subscribe({
+        this.dataViewService.updateMail(this.editingItem.id, this.editingItem).subscribe({
             next: (updatedItem) => {
                 const index = this.jobData.findIndex(i => i.id === updatedItem.id);
                 if (index !== -1) {

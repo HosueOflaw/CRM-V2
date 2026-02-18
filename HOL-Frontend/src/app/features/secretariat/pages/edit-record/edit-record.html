@@ -52,6 +52,22 @@
                     <i class="pi pi-dollar text-lg"></i>
                     <span>عمليات السداد</span>
                 </button>
+                <button (click)="setActiveTab(4)"
+                    class="tab-link px-4 py-3 border-none bg-transparent cursor-pointer font-bold transition-all flex align-items-center gap-2"
+                    [class.active]="activeTab === 4">
+                    <i class="pi pi-tags text-lg"></i>
+                    <span>تصنيفات الملف</span>
+                    <span
+                        class="bg-purple-100 text-purple-600 px-2 py-1 border-round text-xs font-bold">{{classifications.length}}</span>
+                </button>
+                <button (click)="setActiveTab(5)"
+                    class="tab-link px-4 py-3 border-none bg-transparent cursor-pointer font-bold transition-all flex align-items-center gap-2"
+                    [class.active]="activeTab === 5">
+                    <i class="pi pi-comment text-lg"></i>
+                    <span>ملاحظات الجدول</span>
+                    <span
+                        class="bg-orange-100 text-orange-600 px-2 py-1 border-round text-xs font-bold">{{notes.length}}</span>
+                </button>
             </div>
 
             <div class="p-4" style="min-height: 500px; background-color: white;">
@@ -619,86 +635,352 @@
                     </div>
                 </div>
 
+                <!-- Tab 4: File Classifications Table -->
+                <div *ngIf="activeTab === 4" class="fade-in-sub">
+                    <!-- Search Bar for Classifications -->
+                    <div class="mb-5 flex justify-content-center">
+                        <div class="p-inputgroup shadow-2 border-round-xl overflow-hidden w-full lg:w-8">
+                            <span class="p-inputgroup-addon bg-white border-none px-4">
+                                <i class="pi pi-tags text-purple-500 text-xl"></i>
+                            </span>
+                            <input type="text" pInputText [(ngModel)]="searchClassification"
+                                placeholder="البحث برقم الـ ID أو كود الملف..." (keyup.enter)="onSearchClassification()"
+                                class="border-none py-3 text-lg font-semibold text-slate-700" />
+                            <button pButton label="بحث في التصنيفات" icon="pi pi-search"
+                                (click)="onSearchClassification()" [loading]="loading"
+                                class="p-button-help px-5 font-bold"></button>
+                        </div>
+                    </div>
+
+                    <!-- Selected Classification Editor Card -->
+                    <div *ngIf="selectedClassification" class="fade-in mb-5">
+                        <div class="p-4 border-round-xl bg-white border-1 border-purple-100 shadow-3">
+                            <div
+                                class="flex align-items-center justify-content-between mb-4 border-bottom-1 border-purple-50 pb-3">
+                                <div class="flex align-items-center gap-3">
+                                    <div
+                                        class="bg-purple-500 text-white border-round-lg p-2 flex align-items-center justify-content-center">
+                                        <i class="pi pi-tags text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-slate-800 m-0">تعديل تصنيف الملف</h3>
+                                        <span class="text-purple-600 font-medium">كود الملف:
+                                            {{selectedClassification.fileCode ||
+                                            selectedClassification.MainfileId}}</span>
+                                    </div>
+                                </div>
+                                <button pButton icon="pi pi-times"
+                                    class="p-button-rounded p-button-text p-button-secondary"
+                                    (click)="selectedClassification = null"></button>
+                            </div>
+
+                            <div class="p-fluid grid">
+                                <div class="field col-12 md:col-6 lg:col-3">
+                                    <label class="font-bold text-slate-600 mb-2 block">كود الملف (File Code)</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-file text-purple-500"></i></span>
+                                        <input type="number" pInputText [(ngModel)]="selectedClassification.fileCode"
+                                            class="border-left-none font-bold" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-3">
+                                    <label class="font-bold text-slate-600 mb-2 block">كود المديونية (Dept Code)</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-id-card text-purple-500"></i></span>
+                                        <input type="number" pInputText [(ngModel)]="selectedClassification.deptCode"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-3">
+                                    <label class="font-bold text-slate-600 mb-2 block">التصنيف (Classification)</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-tag text-purple-500"></i></span>
+                                        <input type="text" pInputText
+                                            [(ngModel)]="selectedClassification.classification"
+                                            class="border-left-none font-bold" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-3">
+                                    <label class="font-bold text-slate-600 mb-2 block">القسم (Department)</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-briefcase text-purple-500"></i></span>
+                                        <input type="text" pInputText [(ngModel)]="selectedClassification.department"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+
+                                <div class="col-12 flex justify-content-end mt-3 gap-2">
+                                    <button pButton label="إلغاء" icon="pi pi-times"
+                                        class="p-button-secondary p-button-text font-bold"
+                                        (click)="selectedClassification = null"></button>
+                                    <button pButton label="حفظ التصنيف" icon="pi pi-check" pTooltip="حفظ التعديلات"
+                                        class="p-button-help px-8 font-bold shadow-2 mr-2"
+                                        [loading]="savingClassification" (click)="onSaveClassification()"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Classifications Table -->
+                    <div class="fade-in">
+                        <p-table [value]="classifications" [rows]="10" [paginator]="true"
+                            styleClass="p-datatable-gridlines p-datatable-sm shadow-1 border-round-xl overflow-hidden"
+                            [responsiveLayout]="'scroll'">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th class="bg-slate-50 text-slate-700 font-bold py-3" style="width: 80px">ID</th>
+                                    <th class="bg-slate-50 text-slate-700 font-bold py-3">كود الملف</th>
+                                    <th class="bg-slate-50 text-slate-700 font-bold py-3">كود المديونية</th>
+                                    <th class="bg-slate-50 text-slate-700 font-bold py-3">التصنيف</th>
+                                    <th class="bg-slate-50 text-slate-700 font-bold py-3">القسم</th>
+                                    <th class="bg-slate-50 text-slate-700 font-bold py-3" style="width: 100px">إجراءات
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-item>
+                                <tr [class.bg-purple-50]="selectedClassification?.id === item.id"
+                                    class="transition-all hover:bg-slate-50">
+                                    <td class="font-mono text-slate-400 text-center">{{item.id}}</td>
+                                    <td class="font-bold text-slate-700 text-center">{{item.fileCode}}</td>
+                                    <td class="text-center">{{item.deptCode || '---'}}</td>
+                                    <td>
+                                        <span class="font-bold text-purple-700">{{item.classification}}</span>
+                                    </td>
+                                    <td>
+                                        <p-tag [value]="item.department" severity="info"
+                                            styleClass="px-2 font-bold"></p-tag>
+                                    </td>
+                                    <td class="text-center">
+                                        <button pButton icon="pi pi-pencil"
+                                            class="p-button-rounded p-button-text p-button-warning"
+                                            (click)="selectClassification(item)" pTooltip="تعديل هذا التصنيف"></button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 text-slate-400 font-medium">
+                                        <i class="pi pi-info-circle mr-2"></i> لا توجد تصنيفات مرتبطة بهذا البحث
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+
+                </div>
+
+                <!-- Tab 5: Notes Table -->
+                <div *ngIf="activeTab === 5" class="fade-in-sub">
+                    <!-- Search Bar for Notes -->
+                    <div class="mb-5 flex justify-content-center">
+                        <div class="p-inputgroup shadow-2 border-round-xl overflow-hidden w-full lg:w-8">
+                            <span class="p-inputgroup-addon bg-white border-none px-4">
+                                <i class="pi pi-search text-orange-500 text-xl"></i>
+                            </span>
+                            <input type="text" pInputText [(ngModel)]="searchNote"
+                                placeholder="البحث برقم الـ ID أو نص الملاحظة..." (keyup.enter)="onSearchNote()"
+                                class="border-none py-3 text-lg font-semibold text-slate-700" />
+                            <button pButton label="بحث في الملاحظات" icon="pi pi-search" (click)="onSearchNote()"
+                                [loading]="loading" class="p-button-warning px-5 font-bold text-slate-800"></button>
+                        </div>
+                    </div>
+
+                    <!-- Selected Note Editor Card -->
+                    <div *ngIf="selectedNote" class="fade-in mb-5">
+                        <div class="p-4 border-round-xl bg-white border-1 border-orange-100 shadow-3">
+                            <div
+                                class="flex align-items-center justify-content-between mb-4 border-bottom-1 border-orange-50 pb-3">
+                                <div class="flex align-items-center gap-3">
+                                    <div
+                                        class="bg-orange-500 text-white border-round-lg p-2 flex align-items-center justify-content-center">
+                                        <i class="pi pi-comment text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-slate-800 m-0">تعديل الملاحظة</h3>
+                                        <span class="text-orange-600 font-medium">كود الملف:
+                                            {{selectedNote.fileCode}}</span>
+                                    </div>
+                                </div>
+                                <button pButton icon="pi pi-times"
+                                    class="p-button-rounded p-button-text p-button-secondary"
+                                    (click)="selectedNote = null"></button>
+                            </div>
+
+                            <div class="p-fluid grid">
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">كود الملف</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-file text-orange-500"></i></span>
+                                        <input type="number" pInputText [(ngModel)]="selectedNote.fileCode"
+                                            class="border-left-none font-bold" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">كود المديونية</label>
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon bg-slate-50 border-right-none"><i
+                                                class="pi pi-id-card text-orange-500"></i></span>
+                                        <input type="number" pInputText [(ngModel)]="selectedNote.deptCode"
+                                            class="border-left-none" />
+                                    </div>
+                                </div>
+                                <div class="field col-12 md:col-6 lg:col-4">
+                                    <label class="font-bold text-slate-600 mb-2 block">تاريخ الإضافة</label>
+                                    <div class="p-inputgroup opacity-70">
+                                        <span class="p-inputgroup-addon bg-slate-100 border-right-none"><i
+                                                class="pi pi-calendar"></i></span>
+                                        <input type="text" pInputText
+                                            [ngModel]="selectedNote.dateAdded | date:'dd/MM/yyyy HH:mm'" disabled
+                                            class="bg-slate-100 border-left-none font-bold" />
+                                    </div>
+                                </div>
+                                <div class="field col-12">
+                                    <label class="font-bold text-slate-600 mb-2 block">نص الملاحظة</label>
+                                    <textarea pTextarea rows="4" [(ngModel)]="selectedNote.noteText"
+                                        class="w-full border-1 border-orange-200" style="resize: none;"></textarea>
+                                </div>
+
+                                <div class="col-12 flex justify-content-end mt-3 gap-2">
+                                    <button pButton label="إلغاء" icon="pi pi-times"
+                                        class="p-button-secondary p-button-text font-bold"
+                                        (click)="selectedNote = null"></button>
+                                    <button pButton label="حفظ الملاحظة" icon="pi pi-check"
+                                        class="p-button-warning px-8 font-bold shadow-2 mr-2 text-slate-800"
+                                        [loading]="savingNote" (click)="onSaveNote()"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes Table -->
+                    <div class="fade-in">
+                        <p-table [value]="notes" [rows]="10" [paginator]="true"
+                            styleClass="p-datatable-gridlines p-datatable-sm shadow-1 border-round-xl overflow-hidden"
+                            [responsiveLayout]="'scroll'">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th class="bg-slate-50 text-slate-700 font-bold py-3" style="width: 80px">ID</th>
+                                    <th class="bg-slate-50 text-slate-700 font-bold py-3">كود الملف</th>
+                                    <th class="bg-slate-50 text-slate-700 font-bold py-3">كود المديونية</th>
+                                    <th class="bg-slate-50 text-slate-700 font-bold py-3">الملاحظة</th>
+                                    <th class="bg-slate-50 text-slate-700 font-bold py-3">التاريخ</th>
+                                    <th class="bg-slate-50 text-slate-700 font-bold py-3" style="width: 100px">إجراءات
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-item>
+                                <tr [class.bg-orange-50]="selectedNote?.id === item.id"
+                                    class="transition-all hover:bg-slate-50">
+                                    <td class="font-mono text-slate-400 text-center">{{item.id}}</td>
+                                    <td class="font-bold text-slate-700 text-center">{{item.fileCode}}</td>
+                                    <td class="text-center">{{item.deptCode || '---'}}</td>
+                                    <td>
+                                        <div class="white-space-normal line-height-3 text-slate-700">{{item.noteText}}
+                                        </div>
+                                    </td>
+                                    <td class="text-center">{{item.dateAdded | date:'dd/MM/yyyy'}}</td>
+                                    <td class="text-center">
+                                        <button pButton icon="pi pi-pencil"
+                                            class="p-button-rounded p-button-text p-button-warning"
+                                            (click)="selectNote(item)" pTooltip="تعديل هذه الملاحظة"></button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 text-slate-400 font-medium">
+                                        <i class="pi pi-info-circle mr-2"></i> لا توجد ملاحظات مرتبطة بهذا البحث
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+
+                </div>
             </div>
         </div>
+        <!-- Simple Loading State -->
+        <div *ngIf="loading" class="flex flex-column align-items-center justify-content-center py-8">
+            <i class="pi pi-spin pi-spinner text-primary text-6xl mb-3"></i>
+            <div class="text-xl font-bold text-slate-600">جاري استرجاع البيانات...</div>
+        </div>
+
     </div>
-    <!-- Simple Loading State -->
-    <div *ngIf="loading" class="flex flex-column align-items-center justify-content-center py-8">
-        <i class="pi pi-spin pi-spinner text-primary text-6xl mb-3"></i>
-        <div class="text-xl font-bold text-slate-600">جاري استرجاع البيانات...</div>
-    </div>
 
-</div>
-
-<style>
-    .tab-link {
-        color: #64748b;
-        border-radius: 8px 8px 0 0;
-        margin-right: 2px;
-        position: relative;
-    }
-
-    .tab-link:hover {
-        background: rgba(37, 99, 235, 0.05);
-        color: #2563eb;
-    }
-
-    .tab-link.active {
-        background: white;
-        color: #2563eb;
-        border-bottom: 3px solid #2563eb !important;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-
-    .fade-in {
-        animation: fadeIn 0.4s ease-out;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
+    <style>
+        .tab-link {
+            color: #64748b;
+            border-radius: 8px 8px 0 0;
+            margin-right: 2px;
+            position: relative;
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .fade-in-sub {
-        animation: fadeInSub 0.3s ease-in;
-    }
-
-    @keyframes fadeInSub {
-        from {
-            opacity: 0;
+        .tab-link:hover {
+            background: rgba(37, 99, 235, 0.05);
+            color: #2563eb;
         }
 
-        to {
-            opacity: 1;
-        }
-    }
-
-    :host ::ng-deep {
-        .p-inputtext {
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
+        .tab-link.active {
+            background: white;
+            color: #2563eb;
+            border-bottom: 3px solid #2563eb !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        .p-inputtext:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
         }
 
-        .p-datatable .p-datatable-thead>tr>th {
-            background-color: #f1f5f9;
-            color: #475569;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .p-toast-message {
-            border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        .fade-in-sub {
+            animation: fadeInSub 0.3s ease-in;
         }
-    }
-</style>
+
+        @keyframes fadeInSub {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        :host ::ng-deep {
+            .p-inputtext {
+                border-radius: 8px;
+                border: 1px solid #cbd5e1;
+            }
+
+            .p-inputtext:focus {
+                border-color: #2563eb;
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            }
+
+            .p-datatable .p-datatable-thead>tr>th {
+                background-color: #f1f5f9;
+                color: #475569;
+            }
+
+            .p-toast-message {
+                border-radius: 12px;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            }
+        }
+    </style>

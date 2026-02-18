@@ -274,6 +274,10 @@ export class ImportAutoNumbersPage implements OnInit, OnDestroy {
         this.importService.downloadOriginal(job.id, job.jobType);
     }
 
+    exportJobData(job: any) {
+        this.importService.exportJobData(job.id, job.fileName);
+    }
+
     revertImport(job: any) {
         this.swal.question({
             title: 'هل أنت متأكد؟',

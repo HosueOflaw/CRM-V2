@@ -58,7 +58,7 @@ export class ExcelImportService {
 
     constructor(private http: HttpClient) { }
 
-    startUpload(file: File, type: 'Mainfile' | 'AutoNumber' | 'FileDetail' | 'Payment') {
+    startUpload(file: File, type: 'Mainfile' | 'AutoNumber' | 'FileDetail' | 'Payment' | 'FileClassification' | 'Note' | 'AdditionalAmount' | 'Mail' | 'Attachment') {
         if (this.uploadStateSubject.value.status === 'Uploading') return;
 
         let endpoint = '';
@@ -67,6 +67,11 @@ export class ExcelImportService {
             case 'AutoNumber': endpoint = 'upload-autonumbers'; break;
             case 'FileDetail': endpoint = 'upload-filedetails'; break;
             case 'Payment': endpoint = 'upload-payments'; break;
+            case 'FileClassification': endpoint = 'upload-fileclassifications'; break;
+            case 'Note': endpoint = 'upload-notes'; break;
+            case 'AdditionalAmount': endpoint = 'upload-additionalamounts'; break;
+            case 'Mail': endpoint = 'upload-mails'; break;
+            case 'Attachment': endpoint = 'upload-attachments'; break;
         }
 
         this.uploadStateSubject.next({ jobId: null, status: 'Uploading', progress: 0, jobType: type });
@@ -152,6 +157,26 @@ export class ExcelImportService {
         this.downloadFile(`${this.apiUrl}/download-filedetails-template`, 'FileDetails_Template.xlsx');
     }
 
+    downloadFileClassificationsTemplate(): void {
+        this.downloadFile(`${this.apiUrl}/download-fileclassifications-template`, 'FileClassifications_Template.xlsx');
+    }
+
+    downloadNotesTemplate(): void {
+        this.downloadFile(`${this.apiUrl}/download-notes-template`, 'Notes_Template.xlsx');
+    }
+
+    downloadAdditionalAmountsTemplate(): void {
+        this.downloadFile(`${this.apiUrl}/download-additionalamounts-template`, 'AdditionalAmounts_Template.xlsx');
+    }
+
+    downloadMailsTemplate(): void {
+        this.downloadFile(`${this.apiUrl}/download-mails-template`, 'Mails_Template.xlsx');
+    }
+
+    downloadAttachmentsTemplate(): void {
+        this.downloadFile(`${this.apiUrl}/download-attachments-template`, 'Attachments_Template.xlsx');
+    }
+
     downloadOriginal(jobId: number, jobType: string): void {
         this.downloadFile(`${this.apiUrl}/download-original/${jobId}`, `Original_${jobType}_${jobId}.xlsx`);
     }
@@ -183,6 +208,12 @@ export class ExcelImportService {
         const params: any = {};
         if (jobType) params.jobType = jobType;
         return this.http.get<any>(`${this.apiUrl}/stats`, { params });
+    }
+
+    exportJobData(jobId: number, fileName: string): void {
+        const timestamp = new Date().toISOString().slice(0, 10);
+        const finalName = `Current_Data_${fileName}_${timestamp}.xlsx`;
+        this.downloadFile(`${this.apiUrl}/export-job-data/${jobId}`, finalName);
     }
 
     private downloadFile(url: string, fileName: string): void {

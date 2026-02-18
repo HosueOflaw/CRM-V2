@@ -168,7 +168,7 @@ export class SecretariatDashboard {
     { title: 'Bulk SMS' },
     { title: 'الرقم الموحد', type: 'navigate', value: "/secretariat/upload-excel" },
     { title: 'اغلاق ملف', type: 'form', onClick: () => this.openCommonForm('اغلاق ملف') },
-    { title: 'ملاحظات الملفات', type: 'navigate', value: "/secretariat/upload-excel" },
+    { title: 'ملاحظات الملفات', type: 'navigate', value: "/secretariat/import-notes" },
     { title: 'رفع الإجراءات', type: 'navigate', value: "/secretariat/procedures" },
     { title: 'رفع افادات AutoDailer', type: 'navigate', value: "/secretariat/upload-page" },
     { title: 'رفع الارقام البة 2', type: 'form', onClick: () => this.openCommonForm('2 رفع ارقام البة') },
@@ -249,8 +249,8 @@ export class SecretariatDashboard {
     if (this.currentAction === 'رفع ملفات') {
       if (this.selectedOption === 'onlyOne') {
         window.open('secretariat/upload-files', '_blank');
-        }
-        else if (this.selectedOption === 'manual') {
+      }
+      else if (this.selectedOption === 'manual') {
         window.open('secretariat/edit-record#main', '_blank');
       } else if (this.selectedOption === 'excel') {
         window.open('secretariat/import-mainfiles', '_blank');

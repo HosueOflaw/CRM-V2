@@ -35,6 +35,26 @@ export class DataViewService {
         return this.http.put(`${this.apiUrl}/payments/${id}`, data);
     }
 
+    updateFileClassification(id: number, data: any): Observable<any> {
+        return this.http.put(`${this.apiUrl}/fileclassifications/${id}`, data);
+    }
+
+    updateMail(id: number, data: any): Observable<any> {
+        return this.http.put(`${environment.apiUrl}/DataView/mails/${id}`, data);
+    }
+
+    updateNote(id: number, data: any): Observable<any> {
+        return this.http.put(`${this.apiUrl}/notes/${id}`, data);
+    }
+
+    updateAdditionalAmount(id: number, data: any): Observable<any> {
+        return this.http.put(`${this.apiUrl}/additionalamounts/${id}`, data);
+    }
+
+    updateAttachment(id: number, data: any): Observable<any> {
+        return this.http.put(`${this.apiUrl}/attachments/${id}`, data);
+    }
+
     getMainfileById(id: number | string): Observable<any> {
         return this.http.get(`${this.apiUrl}/mainfiles/${id}`);
     }
@@ -49,6 +69,14 @@ export class DataViewService {
 
     getMainfileAutoNumbers(id: number | string): Observable<any[]> {
         return this.http.get<any[]>(`${this.apiUrl}/mainfiles/${id}/autonumbers`);
+    }
+
+    getMainfileClassifications(id: number | string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/mainfiles/${id}/fileclassifications`);
+    }
+
+    getMainfileNotes(id: number | string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/mainfiles/${id}/notes`);
     }
 
     getMainfileByAutoNumber(autoNumber: string): Observable<any> {
@@ -67,6 +95,22 @@ export class DataViewService {
         return this.http.get<any>(`${this.apiUrl}/autonumbers/${id}`);
     }
 
+    getFileClassificationById(id: number | string): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/fileclassifications/${id}`);
+    }
+
+    getNoteById(id: number | string): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/notes/${id}`);
+    }
+
+    getAdditionalAmountById(id: number | string): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/additionalamounts/${id}`);
+    }
+
+    getAttachmentById(id: number | string): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/attachments/${id}`);
+    }
+
     searchFileDetails(term: string): Observable<any[]> {
         return this.http.get<any[]>(`${this.apiUrl}/filedetails/search/${term}`);
     }
@@ -77,5 +121,37 @@ export class DataViewService {
 
     searchPayments(term: string): Observable<any[]> {
         return this.http.get<any[]>(`${this.apiUrl}/payments/search/${term}`);
+    }
+
+    searchFileClassifications(term: string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/fileclassifications/search/${term}`);
+    }
+
+    searchNotes(term: string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/notes/search/${term}`);
+    }
+
+    searchAdditionalAmounts(term: string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/additionalamounts/search/${term}`);
+    }
+
+    searchAttachments(term: string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/attachments/search/${term}`);
+    }
+
+    getMainfileAttachments(id: number | string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/mainfiles/${id}/attachments`);
+    }
+
+    getMainfileMails(id: number | string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/mainfiles/${id}/mails`);
+    }
+
+    getMainfileAdditionalAmounts(id: number | string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/mainfiles/${id}/additionalamounts`);
+    }
+
+    getMainfilePaymentsByFileCode(id: number | string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/mainfiles/${id}/payments`);
     }
 }

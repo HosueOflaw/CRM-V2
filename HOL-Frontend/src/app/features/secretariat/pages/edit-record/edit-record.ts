@@ -46,6 +46,8 @@ export class EditRecordPage implements OnInit {
     searchDetail: string = '';
     searchAutoNumber: string = '';
     searchPayment: string = '';
+    searchClassification: string = '';
+    searchNote: string = '';
     loading = false;
     saving = false;
     record: any = null;
@@ -53,6 +55,8 @@ export class EditRecordPage implements OnInit {
     details: any[] = [];
     autoNumbers: any[] = [];
     payments: any[] = [];
+    classifications: any[] = [];
+    notes: any[] = [];
     selectedDetail: any = null;
     selectedAutoNumber: any = null;
     loadingDetails = false;
@@ -61,6 +65,10 @@ export class EditRecordPage implements OnInit {
     savingAutoNumber = false;
     selectedPayment: any = null;
     savingPayment = false;
+    selectedClassification: any = null;
+    savingClassification = false;
+    selectedNote: any = null;
+    savingNote = false;
     activeTab: number = 0;
 
     constructor(
@@ -76,6 +84,8 @@ export class EditRecordPage implements OnInit {
             if (frag === 'details') this.activeTab = 1;
             else if (frag === 'numbers') this.activeTab = 2;
             else if (frag === 'payments') this.activeTab = 3;
+            else if (frag === 'classifications') this.activeTab = 4;
+            else if (frag === 'notes') this.activeTab = 5;
             else this.activeTab = 0;
         });
     }
@@ -99,6 +109,20 @@ export class EditRecordPage implements OnInit {
         }
         else if (tabIndex === 3) {
             fragment = 'payments';
+        }
+        else if (tabIndex === 4) {
+            fragment = 'classifications';
+            // Lazy load classifications if a record is loaded and classifications are empty
+            if (this.record && this.classifications.length === 0) {
+                this.fetchRelatedData(this.record.id);
+            }
+        }
+        else if (tabIndex === 5) {
+            fragment = 'notes';
+            // Lazy load notes if a record is loaded and notes are empty
+            if (this.record && this.notes.length === 0) {
+                this.fetchRelatedData(this.record.id);
+            }
         }
 
         this.router.navigate([], { fragment: fragment, relativeTo: this.route });
@@ -148,6 +172,17 @@ export class EditRecordPage implements OnInit {
             error: () => this.loadingDetails = false
         });
 
+        this.dataViewService.getMainfileClassifications(mainfileId).subscribe({
+            next: (classifications) => {
+                this.classifications = classifications;
+                if (findType === 'classification' && findValue) {
+                    let match = classifications.find(c => c.id.toString() === findValue);
+                    this.selectedClassification = match ? { ...match } : null;
+                }
+            },
+            error: () => { }
+        });
+
         this.dataViewService.getMainfileAutoNumbers(mainfileId).subscribe({
             next: (nums) => {
                 this.autoNumbers = nums;
@@ -162,6 +197,17 @@ export class EditRecordPage implements OnInit {
                 }
             },
             error: () => this.loadingAutoNumbers = false
+        });
+
+        this.dataViewService.getMainfileNotes(mainfileId).subscribe({
+            next: (notes) => {
+                this.notes = notes;
+                if (findType === 'note' && findValue) {
+                    let match = notes.find(n => n.id.toString() === findValue);
+                    this.selectedNote = match ? { ...match } : null;
+                }
+            },
+            error: () => { }
         });
     }
 
@@ -330,7 +376,107 @@ export class EditRecordPage implements OnInit {
         });
     }
 
-    selectPayment(payment: any) { // Added selectPayment method
+    onSearchClassification() {
+        if (!this.searchClassification?.trim()) {
+            this.messageService.add({ severity: 'warn', summary: 'تنبيه', detail: 'يرجى إدخال بيانات البحث' });
+            return;
+        }
+        this.loading = true;
+        this.selectedClassification = null;
+
+        const val = this.searchClassification.trim();
+
+        this.dataViewService.searchFileClassifications(val).subscribe({
+            next: (results: any[]) => {
+                this.classifications = results;
+                this.activeTab = 4;
+                this.loading = false;
+                if (results.length > 0) {
+                    this.messageService.add({ severity: 'success', summary: 'تم العثور', detail: `تم العثور على ${results.length} سجل` });
+                    if (results.length === 1) {
+                        this.selectedClassification = { ...results[0] };
+                    }
+                } else {
+                    this.messageService.add({ severity: 'info', summary: 'تنبيه', detail: 'لم يتم العثور على نتائج' });
+                }
+            },
+            error: () => {
+                this.loading = false;
+                this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'حدث خطأ أثناء البحث' });
+            }
+        });
+    }
+
+    onSaveClassification() {
+        if (!this.selectedClassification) return;
+        this.savingClassification = true;
+        this.dataViewService.updateFileClassification(this.selectedClassification.id, this.selectedClassification).subscribe({
+            next: () => {
+                this.savingClassification = false;
+                this.swal.success({ title: 'تم الحفظ', text: 'تم تحديث التصنيف بنجاح' });
+            },
+            error: (err) => {
+                this.savingClassification = false;
+                this.swal.error({ title: 'فشل الحفظ', text: err.error?.message || 'حدث خطأ أثناء التحديث' });
+            }
+        });
+    }
+
+    selectClassification(item: any) {
+        this.selectedClassification = { ...item };
+    }
+
+    onSearchNote() {
+        if (!this.searchNote?.trim()) {
+            this.messageService.add({ severity: 'warn', summary: 'تنبيه', detail: 'يرجى إدخال بيانات البحث' });
+            return;
+        }
+        this.loading = true;
+        this.selectedNote = null;
+
+        const val = this.searchNote.trim();
+
+        this.dataViewService.searchNotes(val).subscribe({
+            next: (results: any[]) => {
+                this.notes = results;
+                this.activeTab = 5;
+                this.loading = false;
+                if (results.length > 0) {
+                    this.messageService.add({ severity: 'success', summary: 'تم العثور', detail: `تم العثور على ${results.length} سجل` });
+                    if (results.length === 1) {
+                        this.selectedNote = { ...results[0] };
+                    }
+                } else {
+                    this.messageService.add({ severity: 'info', summary: 'تنبيه', detail: 'لم يتم العثور على نتائج' });
+                }
+            },
+            error: () => {
+                this.loading = false;
+                this.messageService.add({ severity: 'error', summary: 'خطأ', detail: 'حدث خطأ أثناء البحث' });
+            }
+        });
+    }
+
+    onSaveNote() {
+        if (!this.selectedNote) return;
+        this.savingNote = true;
+        this.dataViewService.updateNote(this.selectedNote.id, this.selectedNote).subscribe({
+            next: () => {
+                this.savingNote = false;
+                this.swal.success({ title: 'تم الحفظ', text: 'تم تحديث الملاحظة بنجاح' });
+            },
+            error: (err) => {
+                this.savingNote = false;
+                this.swal.error({ title: 'فشل الحفظ', text: err.error?.message || 'حدث خطأ أثناء التحديث' });
+            }
+        });
+    }
+
+    selectNote(note: any) {
+        this.selectedNote = { ...note };
+    }
+
+    selectPayment(payment: any) {
         this.selectedPayment = { ...payment };
     }
 
@@ -339,13 +485,19 @@ export class EditRecordPage implements OnInit {
         this.selectedDetail = null;
         this.selectedAutoNumber = null;
         this.selectedPayment = null;
+        this.selectedClassification = null;
+        this.selectedNote = null;
         this.searchCode = '';
         this.searchDetail = '';
         this.searchAutoNumber = '';
         this.searchPayment = '';
+        this.searchClassification = '';
+        this.searchNote = '';
         this.details = [];
         this.autoNumbers = [];
-        this.payments = []; // Added for payments
+        this.payments = [];
+        this.classifications = [];
+        this.notes = [];
         this.setActiveTab(0);
     }
 }
