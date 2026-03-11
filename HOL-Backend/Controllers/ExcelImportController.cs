@@ -18,12 +18,14 @@ public class ExcelImportController : ControllerBase
   private readonly string _uploadPath;
   private readonly IMemoryCache _cache;
   private readonly INotificationService _notificationService;
+  private readonly IAuditService _auditService;
 
-  public ExcelImportController(ApplicationDbContext context, IMemoryCache cache, INotificationService notificationService, IWebHostEnvironment env)
+  public ExcelImportController(ApplicationDbContext context, IMemoryCache cache, INotificationService notificationService, IAuditService auditService, IWebHostEnvironment env)
   {
     _context = context;
     _cache = cache;
     _notificationService = notificationService;
+    _auditService = auditService;
     _env = env;
     _uploadPath = Path.Combine(_env.ContentRootPath, "uploads", "excel_imports");
 
@@ -221,6 +223,16 @@ public class ExcelImportController : ControllerBase
         await _notificationService.BroadcastToChannelAsync("admins", "excel_import_changed", new { jobId = job.Id, fileName = job.FileName, action = "created" });
         await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_import_changed", new { jobId = job.Id, fileName = job.FileName, action = "created" });
     }
+
+    // Audit Log for upload initiation
+    await _auditService.LogActionAsync(
+        null, 
+        null, 
+        "IMPORT_STARTED", 
+        $"بدء رفع ومعالجة ملف اكسيل ({GetJobTypeAr(jobType)}): {file.FileName}", 
+        null, 
+        "ImportJob", 
+        job.Id.ToString());
 
     return Ok(new { jobId = job.Id, message = "File uploaded successfully. Processing started in background." });
   }

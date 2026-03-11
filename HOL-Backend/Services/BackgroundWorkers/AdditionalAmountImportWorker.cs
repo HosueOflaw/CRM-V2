@@ -241,7 +241,10 @@ public class AdditionalAmountImportWorker : BackgroundService
                 $"تم إكمال رفع ملف اكسيل (AdditionalAmounts): {job.FileName}. الإجمالي: {job.TotalRows}، أضيف: {actualAdded}، أخطاء: {jobErrorCount}", 
                 null, 
                 "ImportJob", 
-                job.Id.ToString());
+                job.Id.ToString(),
+                null,
+                null,
+                job.CreatedById);
             
             await _hubContext.Clients.User(job.CreatedById.ToString()).SendAsync("broadcast", new 
             {

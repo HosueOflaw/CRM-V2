@@ -80,32 +80,56 @@ public class ClientsController : ControllerBase
 
     try
     {
-      var client = await _clientService.CreateClientAsync(createDto);
+        var client = await _clientService.CreateClientAsync(createDto);
 
-      // إشعار SignalR لكل المستخدمين
-      // Removed for performance reasons (High Concurrency)
-      // await _notificationService.BroadcastToAllAsync("client:created", ...);
+        // Notify via SignalR for the specific department
+        if (createDto.DeptCode.HasValue)
+        {
+            await _notificationService.BroadcastToChannelAsync(
+                $"clients-{createDto.DeptCode}",
+                "client:created",
+                new { clientId = client.Id, name = client.Name }
+            );
+        }
 
-      // إشعار لمجموعة معينة (لو عندك deptCode)
-      if (createDto.DeptCode.HasValue)
-      {
-        await _notificationService.BroadcastToChannelAsync(
-            $"clients-{createDto.DeptCode}",
-            "client:created",
-            new { clientId = client.Id, name = client.Name }
-        );
-      }
+        // Audit Log
+        await _auditService.LogActionAsync(client.Code, (long?)createDto.DeptCode, "ADD", $"إضافة موكل جديد: {client.Name}", null, "Client", client.Id.ToString());
 
-      // Audit Log
-      await _auditService.LogActionAsync(client.Code, (long?)createDto.DeptCode, "ADD", $"إضافة موكل جديد: {client.Name}", null, "Client", client.Id.ToString());
-
-      // Return the client with 201 Created status
-      return StatusCode(201, client);
+        return StatusCode(201, client);
     }
     catch (InvalidOperationException ex)
     {
-      return BadRequest(new { error = ex.Message });
+        return BadRequest(new { error = ex.Message });
     }
+  }
+
+  /// <summary>
+  /// تحديث بيانات موكل
+  /// PUT: api/clients/5
+  /// </summary>
+  [HttpPut("{id}")]
+  [Authorize]
+  public async Task<ActionResult<ClientDto>> UpdateClient(long id, [FromBody] CreateClientDto updateDto)
+  {
+      if (!ModelState.IsValid)
+      {
+          return BadRequest(ModelState);
+      }
+
+      try
+      {
+          var client = await _clientService.UpdateClientAsync(id, updateDto);
+          if (client == null) return NotFound();
+
+          // Audit Log
+          await _auditService.LogActionAsync(client.Code, (long?)updateDto.DeptCode, "UPDATE", $"تحديث بيانات موكل: {client.Name}", null, "Client", id.ToString());
+
+          return Ok(client);
+      }
+      catch (Exception ex)
+      {
+          return BadRequest(new { error = ex.Message });
+      }
   }
 
   /// <summary>

@@ -9,12 +9,44 @@ public class ClientDto
   public string Name { get; set; }
   public string Cid { get; set; }
   public string Address { get; set; }
-  public DateTime? DateAdded { get; set; }
   public string Nationality { get; set; }
+  public string Work { get; set; }
+  public string Membership { get; set; }
+  public string CompanyEmail { get; set; }
+  public string CompanyFax { get; set; }
+  public string CompanyRegister { get; set; }
+  public string Partner1 { get; set; }
+  public string Partner2 { get; set; }
+  public string Partner3 { get; set; }
+  public string RegisterType { get; set; }
+  public string Note { get; set; }
   public string ContractNo { get; set; }
+  public string Department { get; set; }
+  public long? DeptCode { get; set; }
   public string LegalPlaintiff { get; set; }
-  public string Sector { get; set; }
   public string ContractDetails { get; set; }
+  public string PatchNo { get; set; }
+  public DateTime? DateFinished { get; set; }
+  public decimal? DeptAmount { get; set; }
+  public int? LawyerUser { get; set; }
+  public int? CourtUser { get; set; }
+  public int? MdUser { get; set; }
+  public int? LegalAdvisorUser { get; set; }
+  public string Phone1 { get; set; }
+  public string Phone1Owner { get; set; }
+  public string Phone2 { get; set; }
+  public string Phone2Owner { get; set; }
+  public decimal? FinancialAmount { get; set; }
+  public string FinancialType { get; set; }
+  public decimal? DownPaymentPercent { get; set; }
+  public decimal? FinalPaymentPercent { get; set; }
+  public decimal? CollectionCommission { get; set; }
+  public DateTime? DateAdded { get; set; }
+  public int? UserAdded { get; set; }
+  public DateTime? DateUpdated { get; set; }
+  public int? UserUpdated { get; set; }
+  public List<ClientContactDto> Contacts { get; set; } = new();
+  public List<ClientFinancialDetailDto> FinancialDetails { get; set; } = new();
 }
 
 public class CreateClientDto
@@ -60,8 +92,13 @@ public class CreateClientDto
   // Contacts
   public List<ClientContactDto> Contacts { get; set; } = new();
 
-  // Financial Entries
   public List<ClientFinancialEntryDto> FinancialEntries { get; set; } = new();
+
+  public decimal? FinancialAmount { get; set; }
+  public string FinancialType { get; set; }
+
+  // New Detailed Financials
+  public List<ClientFinancialDetailDto> FinancialDetails { get; set; } = new();
 
   // Department
   public long? DeptCode { get; set; }
@@ -73,6 +110,14 @@ public class ClientContactDto
   public int Id { get; set; } // Add Id for deletion
   public string Phone { get; set; } = string.Empty;
   public string Relation { get; set; } = string.Empty; // نسبة القرابة
+}
+
+public class ClientFinancialDetailDto
+{
+    public string Category { get; set; }
+    public decimal? DownPayment { get; set; }
+    public decimal? FinalPayment { get; set; }
+    public decimal? CollectionCommission { get; set; }
 }
 
 public class ClientFinancialEntryDto

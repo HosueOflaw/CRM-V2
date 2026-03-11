@@ -245,7 +245,10 @@ public class AttachmentImportWorker : BackgroundService
                 $"تم إكمال رفع ملف مرفقات: {job.FileName}. الإجمالي: {job.TotalRows}، أضيف: {actualAdded}، أخطاء: {jobErrorCount}", 
                 null, 
                 "ImportJob", 
-                job.Id.ToString());
+                job.Id.ToString(),
+                null,
+                null,
+                job.CreatedById);
             
             await _hubContext.Clients.User(job.CreatedById.ToString()).SendAsync("broadcast", new 
             {

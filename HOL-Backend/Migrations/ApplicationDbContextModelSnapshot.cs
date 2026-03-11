@@ -550,6 +550,14 @@ namespace House_of_law_api.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("file_code");
 
+                    b.Property<byte[]>("FileContent")
+                        .HasColumnType("varbinary(max)")
+                        .HasColumnName("file_content");
+
+                    b.Property<int?>("ImportJobId")
+                        .HasColumnType("int")
+                        .HasColumnName("import_job_id");
+
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("notes");
@@ -568,7 +576,443 @@ namespace House_of_law_api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("attachments");
+                    b.ToTable("attachments", "dbo");
+                });
+
+            modelBuilder.Entity("House_of_law_api.Modules.Client", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("address");
+
+                    b.Property<string>("Cid")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("cid");
+
+                    b.Property<int>("Code")
+                        .HasColumnType("int")
+                        .HasColumnName("code");
+
+                    b.Property<decimal?>("CollectionCommission")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("collection_commission");
+
+                    b.Property<string>("CompanyEmail")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("company_email");
+
+                    b.Property<string>("CompanyFax")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("company_fax");
+
+                    b.Property<string>("CompanyRegister")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("company_register");
+
+                    b.Property<string>("ContractDetails")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("contract_details");
+
+                    b.Property<string>("ContractNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("contract_no");
+
+                    b.Property<int?>("CourtUser")
+                        .HasColumnType("int")
+                        .HasColumnName("court_user");
+
+                    b.Property<DateTime?>("DateAdded")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("date_added");
+
+                    b.Property<DateTime?>("DateFinished")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("date_finished");
+
+                    b.Property<DateTime?>("DateUpdated")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("date_updated");
+
+                    b.Property<string>("Department")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("department");
+
+                    b.Property<decimal?>("DeptAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("dept_amount");
+
+                    b.Property<long?>("DeptCode")
+                        .HasColumnType("bigint")
+                        .HasColumnName("dept_code");
+
+                    b.Property<decimal?>("DownPaymentPercent")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("down_payment_percent");
+
+                    b.Property<decimal?>("FinalPaymentPercent")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("final_payment_percent");
+
+                    b.Property<decimal?>("FinancialAmount")
+                        .HasColumnType("decimal(18,3)")
+                        .HasColumnName("financial_amount");
+
+                    b.Property<string>("FinancialType")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("financial_type");
+
+                    b.Property<int?>("ImportJobId")
+                        .HasColumnType("int")
+                        .HasColumnName("import_job_id");
+
+                    b.Property<int?>("LawyerUser")
+                        .HasColumnType("int")
+                        .HasColumnName("lawyer_user");
+
+                    b.Property<int?>("LegalAdvisorUser")
+                        .HasColumnType("int")
+                        .HasColumnName("legal_advisor_user");
+
+                    b.Property<string>("LegalPlaintiff")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("legal_plaintiff");
+
+                    b.Property<int?>("MdUser")
+                        .HasColumnType("int")
+                        .HasColumnName("md_user");
+
+                    b.Property<string>("Membership")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("membership");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Nationality")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("nationality");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("note");
+
+                    b.Property<string>("Partner1")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("partner1");
+
+                    b.Property<string>("Partner2")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("partner2");
+
+                    b.Property<string>("Partner3")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("partner3");
+
+                    b.Property<string>("PatchNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("patch_no");
+
+                    b.Property<string>("Phone1")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("phone1");
+
+                    b.Property<string>("Phone1Owner")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("phone1_owner");
+
+                    b.Property<string>("Phone2")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("phone2");
+
+                    b.Property<string>("Phone2Owner")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("phone2_owner");
+
+                    b.Property<string>("RegisterType")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("register_type");
+
+                    b.Property<int?>("UserAdded")
+                        .HasColumnType("int")
+                        .HasColumnName("user_added");
+
+                    b.Property<int?>("UserUpdated")
+                        .HasColumnType("int")
+                        .HasColumnName("user_updated");
+
+                    b.Property<string>("Work")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("work");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImportJobId");
+
+                    b.ToTable("clients");
+                });
+
+            modelBuilder.Entity("House_of_law_api.Modules.ClientContact", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<long>("ClientId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("client_id");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("phone");
+
+                    b.Property<string>("Relation")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("relation");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("client_contacts");
+                });
+
+            modelBuilder.Entity("House_of_law_api.Modules.ClientFinancialDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("category");
+
+                    b.Property<long>("ClientId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("client_id");
+
+                    b.Property<decimal?>("CollectionCommission")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("collection_commission");
+
+                    b.Property<decimal?>("DownPaymentPercent")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("down_payment_percent");
+
+                    b.Property<decimal?>("FinalPaymentPercent")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("final_payment_percent");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("client_financial_details");
+                });
+
+            modelBuilder.Entity("House_of_law_api.Modules.CustodyStatement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("Amount")
+                        .HasColumnType("decimal(18,3)")
+                        .HasColumnName("amount");
+
+                    b.Property<string>("ClientName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("client_name");
+
+                    b.Property<string>("CodeAttach")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("code_attach");
+
+                    b.Property<long?>("CodeAutoNo")
+                        .HasColumnType("bigint")
+                        .HasColumnName("code_auto_no");
+
+                    b.Property<int?>("CodeExpense")
+                        .HasColumnType("int")
+                        .HasColumnName("code_expense");
+
+                    b.Property<string>("CodeStatus")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("code_status");
+
+                    b.Property<long?>("CompanyCode")
+                        .HasColumnType("bigint")
+                        .HasColumnName("company_code");
+
+                    b.Property<bool>("CompanyOrOffice")
+                        .HasColumnType("bit")
+                        .HasColumnName("company_or_office");
+
+                    b.Property<DateTime?>("DateAdded")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("date_added");
+
+                    b.Property<long?>("DeptCode")
+                        .HasColumnType("bigint")
+                        .HasColumnName("dept_code");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("bit")
+                        .HasColumnName("enabled");
+
+                    b.Property<long?>("FileCode")
+                        .HasColumnType("bigint")
+                        .HasColumnName("file_code");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("notes");
+
+                    b.Property<bool>("ReceiveAcc")
+                        .HasColumnType("bit")
+                        .HasColumnName("receive_acc");
+
+                    b.Property<bool>("ReceiveSec")
+                        .HasColumnType("bit")
+                        .HasColumnName("receive_sec");
+
+                    b.Property<bool>("SendToACC")
+                        .HasColumnType("bit")
+                        .HasColumnName("send_to_acc");
+
+                    b.Property<bool>("SendToCompany")
+                        .HasColumnType("bit")
+                        .HasColumnName("send_to_company");
+
+                    b.Property<string>("StatementNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("statement_no");
+
+                    b.Property<int?>("UserAcc")
+                        .HasColumnType("int")
+                        .HasColumnName("user_acc");
+
+                    b.Property<int?>("UserAdded")
+                        .HasColumnType("int")
+                        .HasColumnName("user_added");
+
+                    b.Property<int?>("UserSec")
+                        .HasColumnType("int")
+                        .HasColumnName("user_sec");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("custody_statements");
+                });
+
+            modelBuilder.Entity("House_of_law_api.Modules.Mail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("body");
+
+                    b.Property<DateTime?>("DateAdded")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("date_added");
+
+                    b.Property<DateTime?>("DateUpdated")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("date_updated");
+
+                    b.Property<long?>("DeptCode")
+                        .HasColumnType("bigint")
+                        .HasColumnName("dept_code");
+
+                    b.Property<long?>("FileCode")
+                        .HasColumnType("bigint")
+                        .HasColumnName("file_code");
+
+                    b.Property<int?>("ImportJobId")
+                        .HasColumnType("int")
+                        .HasColumnName("import_job_id");
+
+                    b.Property<string>("Subject")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("subject");
+
+                    b.Property<int?>("UserAdded")
+                        .HasColumnType("int")
+                        .HasColumnName("user_added");
+
+                    b.Property<int?>("UserUpdated")
+                        .HasColumnType("int")
+                        .HasColumnName("user_updated");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("mails");
+                });
+
+            modelBuilder.Entity("House_of_law_api.Modules.Note", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DateAdded")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("date_added");
+
+                    b.Property<long?>("DeptCode")
+                        .HasColumnType("bigint")
+                        .HasColumnName("dept_code");
+
+                    b.Property<long?>("FileCode")
+                        .HasColumnType("bigint")
+                        .HasColumnName("file_code");
+
+                    b.Property<int?>("ImportJobId")
+                        .HasColumnType("int")
+                        .HasColumnName("import_job_id");
+
+                    b.Property<string>("NoteText")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("note_text");
+
+                    b.Property<int?>("UserAdded")
+                        .HasColumnType("int")
+                        .HasColumnName("user_added");
+
+                    b.Property<int?>("UserUpdated")
+                        .HasColumnType("int")
+                        .HasColumnName("user_updated");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("notes");
                 });
 
             modelBuilder.Entity("ImportJob", b =>
@@ -687,52 +1131,6 @@ namespace House_of_law_api.Migrations
                     b.ToTable("login_histories");
                 });
 
-            modelBuilder.Entity("Mail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Body")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("body");
-
-                    b.Property<DateTime?>("DateAdded")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("date_added");
-
-                    b.Property<DateTime?>("DateUpdated")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("date_updated");
-
-                    b.Property<long?>("DeptCode")
-                        .HasColumnType("bigint")
-                        .HasColumnName("dept_code");
-
-                    b.Property<long?>("FileCode")
-                        .HasColumnType("bigint")
-                        .HasColumnName("file_code");
-
-                    b.Property<string>("Subject")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("subject");
-
-                    b.Property<int?>("UserAdded")
-                        .HasColumnType("int")
-                        .HasColumnName("user_added");
-
-                    b.Property<int?>("UserUpdated")
-                        .HasColumnType("int")
-                        .HasColumnName("user_updated");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("mails");
-                });
-
             modelBuilder.Entity("Mainfile", b =>
                 {
                     b.Property<long>("Id")
@@ -823,48 +1221,6 @@ namespace House_of_law_api.Migrations
                     b.HasIndex("ImportJobId");
 
                     b.ToTable("mainfiles");
-                });
-
-            modelBuilder.Entity("Note", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("DateAdded")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("date_added");
-
-                    b.Property<long?>("DeptCode")
-                        .HasColumnType("bigint")
-                        .HasColumnName("dept_code");
-
-                    b.Property<long?>("FileCode")
-                        .HasColumnType("bigint")
-                        .HasColumnName("file_code");
-
-                    b.Property<int?>("ImportJobId")
-                        .HasColumnType("int")
-                        .HasColumnName("import_job_id");
-
-                    b.Property<string>("NoteText")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("note_text");
-
-                    b.Property<int?>("UserAdded")
-                        .HasColumnType("int")
-                        .HasColumnName("user_added");
-
-                    b.Property<int?>("UserUpdated")
-                        .HasColumnType("int")
-                        .HasColumnName("user_updated");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("notes");
                 });
 
             modelBuilder.Entity("Payment", b =>
@@ -1192,6 +1548,37 @@ namespace House_of_law_api.Migrations
                     b.Navigation("ImportJob");
                 });
 
+            modelBuilder.Entity("House_of_law_api.Modules.Client", b =>
+                {
+                    b.HasOne("ImportJob", "ImportJob")
+                        .WithMany()
+                        .HasForeignKey("ImportJobId");
+
+                    b.Navigation("ImportJob");
+                });
+
+            modelBuilder.Entity("House_of_law_api.Modules.ClientContact", b =>
+                {
+                    b.HasOne("House_of_law_api.Modules.Client", "Client")
+                        .WithMany("ClientContacts")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("House_of_law_api.Modules.ClientFinancialDetail", b =>
+                {
+                    b.HasOne("House_of_law_api.Modules.Client", "Client")
+                        .WithMany("FinancialDetails")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+
             modelBuilder.Entity("ImportJob", b =>
                 {
                     b.HasOne("User", "CreatedBy")
@@ -1258,6 +1645,13 @@ namespace House_of_law_api.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("House_of_law_api.Modules.Client", b =>
+                {
+                    b.Navigation("ClientContacts");
+
+                    b.Navigation("FinancialDetails");
                 });
 #pragma warning restore 612, 618
         }

@@ -10,6 +10,7 @@ public class ApplicationDbContext : DbContext
 
   public DbSet<User> Users => Set<User>();
   public DbSet<Department> Departments => Set<Department>();
+  public DbSet<Client> Clients => Set<Client>();
   public DbSet<Mainfile> Mainfiles => Set<Mainfile>();
   public DbSet<FileDetail> FileDetails => Set<FileDetail>();
   public DbSet<AutoNumber> AutoNumbers => Set<AutoNumber>();
@@ -27,10 +28,16 @@ public class ApplicationDbContext : DbContext
   public DbSet<EmployeeTask> EmployeeTasks { get; set; }
   public DbSet<LoginHistory> LoginHistories { get; set; }
   public DbSet<ImportJob> ImportJobs { get; set; }
+  public DbSet<ClientContact> ClientContacts { get; set; }
+  public DbSet<ClientFinancialDetail> ClientFinancialDetails { get; set; }
+  public DbSet<CustodyStatement> CustodyStatements => Set<CustodyStatement>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     base.OnModelCreating(modelBuilder);
+
+    modelBuilder.Entity<CustodyStatement>().Property(x => x.Amount)
+        .HasColumnType("decimal(18,3)");
 
     modelBuilder.Entity<FileDetail>().Property(x => x.DeptAmount)
         .HasColumnType("decimal(18,3)");
@@ -42,6 +49,9 @@ public class ApplicationDbContext : DbContext
         .HasColumnType("decimal(18,3)");
 
     modelBuilder.Entity<Payment>().Property(x => x.Value)
+        .HasColumnType("decimal(18,3)");
+
+    modelBuilder.Entity<Client>().Property(x => x.FinancialAmount)
         .HasColumnType("decimal(18,3)");
 
     // Performance Indexes

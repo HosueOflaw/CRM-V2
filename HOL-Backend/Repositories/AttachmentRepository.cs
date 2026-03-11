@@ -28,4 +28,12 @@ public class AttachmentRepository : BaseRepository<Attachment>, IAttachmentRepos
             .Where(a => a.Enabled == true)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<Attachment>> GetByAutoNumberAsync(string autoNumber)
+    {
+        return await _dbSet
+            .Where(a => a.AutoNumberCode == autoNumber && a.Enabled == true)
+            .OrderByDescending(a => a.DateAdded)
+            .ToListAsync();
+    }
 }

@@ -1,3 +1,4 @@
+namespace House_of_law_api.Modules;
 
 [Table("mails")]
 public class Mail

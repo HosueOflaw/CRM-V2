@@ -46,4 +46,7 @@ public class Attachment
 
   [Column("import_job_id")]
   public int? ImportJobId { get; set; }
+
+  [Column("file_content")]
+  public byte[]? FileContent { get; set; }
 }

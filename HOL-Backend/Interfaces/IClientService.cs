@@ -15,4 +15,5 @@ public interface IClientService
     Task<IEnumerable<ClientAttachmentDto>> GetClientAttachmentsAsync(long fileCode);
     Task<IEnumerable<ClientContactDto>> GetClientContactsAsync(long fileCode);
     Task<bool> DeleteContactAsync(int contactId);
+    Task<ClientDto> UpdateClientAsync(long id, CreateClientDto updateDto);
 }

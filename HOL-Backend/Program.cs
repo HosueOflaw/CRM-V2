@@ -1,3 +1,4 @@
+using MongoDB.Driver;
 // var builder = WebApplication.CreateBuilder(args);
 
 // builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
@@ -322,6 +323,14 @@
 if (!Directory.Exists("wwwroot")) Directory.CreateDirectory("wwwroot");
 var builder = WebApplication.CreateBuilder(args);
 
+// Register MongoDB Client
+builder.Services.AddSingleton<IMongoClient>(sp => 
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    var connectionString = config["MongoDbSettings:ConnectionString"];
+    return new MongoClient(connectionString);
+});
+
 builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
 {
   var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -337,6 +346,7 @@ builder.Services.AddMemoryCache();
 builder.Services.Configure<CloudflareOptions>(builder.Configuration.GetSection("Cloudflare"));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IMainfileRepository, MainfileRepository>();
@@ -350,12 +360,15 @@ builder.Services.AddScoped<IFileClassificationRepository, FileClassificationRepo
 builder.Services.AddScoped<ICallcenterStatementRepository, CallcenterStatementRepository>();
 builder.Services.AddScoped<IAdditionalAmountRepository, AdditionalAmountRepository>();
 builder.Services.AddScoped<IAuditsFileRepository, AuditsFileRepository>();
+builder.Services.AddScoped<ICustodyStatementRepository, MongoCustodyStatementRepository>();
+builder.Services.AddScoped<IMongoCustodyAttachmentRepository, MongoCustodyAttachmentRepository>();
 
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<ICustodyStatementService, CustodyStatementService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuditService, AuditService>();
 
