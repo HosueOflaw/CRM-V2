@@ -16,7 +16,7 @@ import { ReceiptVoucher } from "../receipt-voucher/receipt-voucher";
 export class DailyRestrictions {
 
   constructor(private router: Router, public ref: DynamicDialogRef) {}
-  
+
  // الحالة
   showMainForm = true;
   showVoucherForm = false;
@@ -96,7 +96,7 @@ export class DailyRestrictions {
         this.closeMainForm();
         this.router.navigate(['finance/accounts-balances']);
         break;
-        
+
       case 'الميزانية العمومية':
         alert('فتح شاشة الميزانية العمومية');
         break;

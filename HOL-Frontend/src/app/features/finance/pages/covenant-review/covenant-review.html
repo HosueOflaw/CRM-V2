@@ -2,15 +2,23 @@
   <!-- Search Section -->
   <div class="search-section">
     <div class="search-filters">
-      <div class="form-field">
+      <div class="form-field cursor-pointer" (click)="openModal()">
         <label class="form-label">الموظف</label>
-        <input type="text" class="form-input" placeholder="الموظف" [(ngModel)]="employeeSearch" name="employeeSearch" />
+        <div class="relative">
+          <input type="text" class="form-input pointer-events-none" placeholder="اختر الموظف..."
+            [(ngModel)]="employeeSearch" name="employeeSearch" readonly />
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+            <i class="fas fa-search"></i>
+          </span>
+        </div>
       </div>
     </div>
-    
-    <div class="search-actions">
-      <button class="form-button form-button-outline" (click)="openModal()">...</button>
-      <button class="form-button form-button-primary">بحث</button>
+
+    <div class="search-actions flex items-end pb-1">
+      <button class="form-button form-button-primary shadow-lg shadow-primary/20 active:scale-95 transition-all"
+        (click)="fetchData()" [disabled]="!selectedUser">
+        <i class="fas fa-search ml-2"></i> بحث
+      </button>
       <button class="form-button form-button-success">تم الاستلام</button>
       <button class="form-button form-button-outline">نتيجة المصروف</button>
     </div>
@@ -20,52 +28,68 @@
   <div class="page-content">
     <div class="table-container">
 
-    <table class="table table-sm table-zebra text-right">
-      <thead class="bg-gray-100">
-        <tr>
-          <th>م</th>
-          <th>اسم الشركة</th>
-          <th>رقم الكشف</th>
-          <th>المبلغ</th>
-          <th>التاريخ</th>
-          <th>الشركة</th>
-          <th>المكتب</th>
-        </tr>
-      </thead>
+      <table class="table table-sm table-zebra text-right">
+        <thead class="bg-gray-100">
+          <tr>
+            <th>م</th>
+            <th>رقم الكشف</th>
+            <th>الشركة</th>
+            <th>الاسم</th>
+            <th>المدني</th>
+            <th>رقم العقد</th>
+            <th>المحكمة</th>
+            <th>رقم الخط</th>
+            <th>التاريخ</th>
+            <th>المبلغ</th>
+            <th>المرفقات</th>
+          </tr>
+        </thead>
 
-      <tbody>
-        <tr *ngFor="let row of rows; let i = index">
-          <td>{{ i + 1 }}</td>
-          <td>{{ row.company }}</td>
-          <td>{{ row.sheetNumber }}</td>
-          <td>{{ row.amount }}</td>
-          <td>{{ row.date }}</td>
-          <td>{{ row.companyPay }}</td>
-          <td>{{ row.officePay }}</td>
-        </tr>
+        <tbody>
+          <tr *ngFor="let row of rows; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ row.statementNo }}</td>
+            <td>{{ row.clientName }}</td>
+            <td>{{ row.personName || '---' }}</td>
+            <td>{{ row.civilId || '---' }}</td>
+            <td>{{ row.contractNo || '---' }}</td>
+            <td>{{ row.court || '---' }}</td>
+            <td>{{ row.phoneNumber || '---' }}</td>
+            <td>{{ row.dateAdded | date:'yyyy-MM-dd' }}</td>
+            <td>{{ row.amount | number:'1.2-2' }}</td>
+            <td>
+              <div class="flex gap-2 justify-center">
+                <button *ngFor="let attach of row.attachments; let j = index" (click)="viewAttachment(attach)"
+                  class="btn btn-xs btn-primary btn-outline" title="عرض المرفق">
+                  <i class="fas fa-file-pdf"></i>
+                  {{ j + 1 }}
+                </button>
+                <span *ngIf="!row.attachments || row.attachments.length === 0" class="text-xs text-gray-400">لا
+                  يوجد</span>
+              </div>
+            </td>
+          </tr>
 
-        <tr *ngIf="rows.length === 0">
-          <td colspan="7" class="text-center text-gray-400 py-10">
-            لا توجد بيانات
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          <tr *ngIf="rows.length === 0">
+            <td colspan="11" class="text-center text-gray-400 py-10">
+              لا توجد بيانات لهذا الموظف
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-4 p-4 bg-slate-50 rounded-lg flex justify-between items-center border border-slate-100 shadow-sm">
+      <div class="text-slate-500 text-sm font-medium">إجمالي عدد الكشوف: <span class="text-slate-900 font-bold">{{
+          rows.length }}</span></div>
+      <div class="text-slate-900 text-lg font-black tracking-tight">إجمالي العهدة : <span class="text-primary">{{
+          totalAmount | number:'1.2-2' }}</span></div>
+    </div>
 
   </div>
-
-  <!-- Footer -->
-  <div class="mt-2 text-center text-sm font-bold">
-    إجمالي العهدة : {{ totalAmount }}
-  </div>
-
-</div>
 
   <!-- 🔹 Lookup Modal -->
-  <app-lookup-modal
-    #lookup
-    [title]="lookupConfig.title"
-    [columns]="lookupConfig.columns"
-    [data]="lookupConfig.data"
-    (itemSelected)="handleSelect($event)"
-  ></app-lookup-modal>
+  <app-lookup-modal #lookup [title]="lookupConfig.title" [columns]="lookupConfig.columns" [data]="lookupConfig.data"
+    (itemSelected)="handleSelect($event)"></app-lookup-modal>

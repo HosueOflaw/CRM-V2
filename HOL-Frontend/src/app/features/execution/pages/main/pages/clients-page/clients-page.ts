@@ -16,6 +16,8 @@ import { AddressForm } from './forms/address-form/address-form';
 import { SessionForm } from './forms/session-form/session-form';
 import { ClaimValue } from './forms/claim-value/claim-value';
 import { AttachmentsForm } from './forms/attachments-form/attachments-form';
+import { ClientService, CreateClientDto } from '../../../../../finance/services/ClientService';
+import { SweetAlertService } from '../../../../../../shared/services/sweet-alert.service';
 
 @Component({
   selector: 'app-clients-page',
@@ -28,11 +30,17 @@ export class ClientsPage {
   @ViewChild(DateModal) lastActionDateModal!: DateModal;
   @ViewChild(NextActionModal) nextActionModal!: NextActionModal;
   @ViewChild(NextDateModal) nextActionDateModal!: NextDateModal;
+  @ViewChild(JusticePortalForm) justicePortal!: JusticePortalForm;
+
   actionsForm: FormGroup;
+  searchCode: string = '';
+  loading: boolean = false;
 
-
-
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private clientService: ClientService,
+    private swal: SweetAlertService
+  ) {
     this.actionsForm = this.fb.group({
       lastAction: [''],
       lastActionDate: [''],
@@ -44,23 +52,66 @@ export class ClientsPage {
       notes: ['']
     });
   }
-  selectedTab = 'جهة العمل';
+
+  selectedTab = 'الرئيسية';
   subTabs = ['الرئيسية', 'التصنيف', 'جهة العمل', 'منطوق الحكم', 'العنوان', 'الجلسات', 'الرسوم', 'قيمة المطالبة', 'المرفقات', 'الإجراءات'];
 
-  client = {
-    owner: '',
-    opponent: "",
-    civil: "",
-    condition: "",
-    nationality: "",
-    automaticNo: "",
-    contract: "",
-    indebtedness: "",
-    unified: "",
-    patch: "",
-    address: "",
-    addedBy: "",
+  client: CreateClientDto = {
+    code: 0,
+    name: '',
+    cid: '',
+    address: '',
+    nationality: '',
+    work: '',
+    membership: '',
+    companyEmail: '',
+    companyFax: '',
+    companyRegister: '',
+    partner1: '',
+    partner2: '',
+    partner3: '',
+    registerType: '',
+    note: '',
+    contractNo: '',
+    department: '',
+    deptCode: undefined,
+    legalPlaintiff: '',
+    contractDetails: '',
+    patchNo: '',
+    dateFinished: undefined,
+    deptAmount: undefined,
+    lawyerUser: undefined,
+    courtUser: undefined,
+    mdUser: undefined,
+    legalAdvisorUser: undefined,
+    phone1: '',
+    phone1Owner: '',
+    phone2: '',
+    phone2Owner: '',
+    financialAmount: undefined,
+    financialType: '',
+    contacts: [],
+    financialDetails: [
+      { category: 'اتعاب' },
+      { category: 'ودي' },
+      { category: 'تنفيذ' },
+      { category: 'قضائي مدنى' },
+      { category: 'قضائي مدعى عليه' },
+      { category: 'خبراء' },
+      { category: 'اجراء' }
+    ]
   };
+
+  addContact() {
+    if (!this.client.contacts) this.client.contacts = [];
+    this.client.contacts.push({ phone: '', relation: '' });
+  }
+
+  removeContact(index: number) {
+    if (this.client.contacts) {
+      this.client.contacts.splice(index, 1);
+    }
+  }
 
   form = {
     caseNumber: '',
@@ -84,12 +135,50 @@ export class ClientsPage {
   onSubTabChange(tab: string) {
     this.selectedTab = tab;
   }
+
+  onSearch() {
+    if (!this.searchCode) return;
+    this.loading = true;
+    this.clientService.getClientByCode(Number(this.searchCode)).subscribe({
+      next: (data) => {
+        this.client = data;
+        this.loading = false;
+        this.swal.success({ title: 'تم العثور', text: `تم تحميل بيانات الموكل: ${data.name}` });
+      },
+      error: (err) => {
+        this.loading = false;
+        this.swal.error({ title: 'خطأ', text: 'الموكل غير موجود أو حدث خطأ في النظام' });
+      }
+    });
+  }
+
+  save() {
+    if (!this.client.id) {
+      this.swal.error({ title: 'خطأ', text: 'لا يمكن حفظ بيانات موكل غير موجود' });
+      return;
+    }
+
+    this.loading = true;
+    this.clientService.updateClient(this.client.id!, this.client).subscribe({
+      next: () => {
+        this.loading = false;
+        this.swal.success({ title: 'تم الحفظ', text: 'تم تحديث بيانات الموكل بنجاح' });
+      },
+      error: (err) => {
+        this.loading = false;
+        this.swal.error({ title: 'فشل الحفظ', text: err.error?.message || 'حدث خطأ أثناء الحفظ' });
+      }
+    });
+  }
+
   openLastActionForm() {
     this.lastActionModal.open();
   }
+
   openNextActionForm() {
     this.nextActionModal.open();
   }
+
   setLastAction(action: any) {
     this.actionsForm.patchValue({ lastAction: action.desc });
   }
@@ -105,33 +194,28 @@ export class ClientsPage {
   setNextActionDate(date: string) {
     this.actionsForm.patchValue({ nextActionDate: date });
   }
-  // عند اختيار آخر إجراء
+
   onLastActionSelected(action: string) {
     this.actionsForm.patchValue({ lastAction: action });
     this.lastActionModal.close();
     setTimeout(() => this.lastActionDateModal.open(), 200);
   }
 
-  // عند اختيار تاريخ آخر إجراء
   onLastDateSelected(date: string) {
     this.actionsForm.patchValue({ lastActionDate: date });
     this.lastActionDateModal.close();
     setTimeout(() => this.nextActionModal.open(), 200);
   }
 
-  // عند اختيار الإجراء القادم
   onNextActionSelected(action: string) {
     this.actionsForm.patchValue({ nextAction: action });
     this.nextActionModal.close();
     setTimeout(() => this.nextActionDateModal.open(), 200);
   }
 
-  // عند اختيار تاريخ الإجراء القادم
   onNextDateSelected(date: string) {
     this.actionsForm.patchValue({ nextActionDate: date });
-
     const { lastAction, lastActionDate, nextAction, nextActionDate, fileLocation } = this.actionsForm.value;
-
     const summaryText = `آخر إجراء: ${lastAction || '-'} بتاريخ ${lastActionDate || '-'}، 
 الإجراء القادم: ${nextAction || '-'} بتاريخ ${nextActionDate || '-'}، 
 مكان الملف: ${fileLocation || '-'}`;
@@ -140,9 +224,5 @@ export class ClientsPage {
       summary: summaryText,
       notes: summaryText
     });
-  }
-
-  save() {
-    console.clear();
   }
 }

@@ -1,15 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CreateClientDto } from '../../../../../../../finance/services/ClientService';
 
 @Component({
   selector: 'app-claim-value',
-  imports: [CommonModule,FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './claim-value.html',
   styleUrl: './claim-value.css'
 })
 export class ClaimValue {
-claims = [
+  @Input() client!: CreateClientDto;
+  claims = [
     { statement: 'مطالبة بأتعاب محاماة', amount: 250.0 },
     { statement: 'مطالبة بتعويض مادي', amount: 1200.5 },
     { statement: 'مطالبة بمصاريف قضائية', amount: 480.75 },

@@ -1,15 +1,18 @@
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CreateClientDto } from '../../../../../../../finance/services/ClientService';
 
 @Component({
   selector: 'app-session-form',
-  imports: [CommonModule,FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './session-form.html',
   styleUrl: './session-form.css'
 })
 export class SessionForm {
-sessions = [
+  @Input() client!: CreateClientDto;
+  sessions = [
     {
       name: 'جلسة أولى',
       date: new Date('2025-10-20'),

@@ -4,53 +4,32 @@
   </h3>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- الإجراء المطلوب -->
+    <!-- الإجراء المطلوب (Note) -->
     <div class="form-control">
       <label class="label font-semibold" style="color: var(--text-color-secondary);">الإجراء المطلوب</label>
-      <input
-        type="text"
-        readonly
-        [value]="selectedAction"
-        (click)="openActionModal()"
-        placeholder="اضغط للاختيار"
+      <input type="text" readonly [value]="client.note" (click)="openActionModal()" placeholder="اضغط للاختيار"
         class="input input-bordered cursor-pointer focus:ring-2 focus:ring-primary/50"
-        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-      />
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
     </div>
 
-    <!-- حالة العميل -->
+    <!-- حالة العميل (RegisterType) -->
     <div class="form-control">
       <label class="label font-semibold" style="color: var(--text-color-secondary);">حالة العميل</label>
-      <input
-        type="text"
-        [(ngModel)]="selectedClientStatus"
-        placeholder="اكتب حالة العميل"
+      <input type="text" [(ngModel)]="client.registerType" placeholder="اكتب حالة العميل"
         class="input input-bordered focus:ring-2 focus:ring-primary/50"
-        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-      />
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
     </div>
 
-    <!-- القسم -->
+    <!-- القسم (Sector) -->
     <div class="form-control md:col-span-2">
       <label class="label font-semibold" style="color: var(--text-color-secondary);">القسم</label>
-      <input
-        type="text"
-        readonly
-        [value]="selectedSection"
-        (click)="openSectionModal()"
-        placeholder="اضغط للاختيار"
+      <input type="text" readonly [value]="client.sector" (click)="openSectionModal()" placeholder="اضغط للاختيار"
         class="input input-bordered cursor-pointer focus:ring-2 focus:ring-primary/50"
-        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-      />
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
     </div>
   </div>
 
-  <!-- زر الحفظ -->
-  <div class="flex justify-center mt-8">
-    <button class="btn btn-primary px-10 py-2 text-base rounded-xl">
-      💾 حفظ
-    </button>
-  </div>
+  <p class="text-xs opacity-50 text-center mt-6">يتم حفظ البيانات تلقائياً عند الضغط على زر حفظ في الأعلى</p>
 </div>
 
 <!-- مودال الإجراءات -->
@@ -59,14 +38,10 @@
     <h3 class="text-lg font-bold mb-4" style="color: var(--text-color);">
       ⚙️ اختر الإجراء المطلوب
     </h3>
-    <ul class="menu rounded-box border max-h-60 overflow-y-auto" 
-        style="width: 100% !important; font-weight: bold; line-height: 1.6; background-color: var(--surface-card); border-color: var(--surface-border);">
-      <li
-        *ngFor="let action of actions"
-        (click)="selectAction(action)"
-        class="transition-all cursor-pointer border-b"
-        style="border-color: var(--surface-border);"
-      >
+    <ul class="menu rounded-box border max-h-60 overflow-y-auto"
+      style="width: 100% !important; font-weight: bold; line-height: 1.6; background-color: var(--surface-card); border-color: var(--surface-border);">
+      <li *ngFor="let action of actions" (click)="selectAction(action)" class="transition-all cursor-pointer border-b"
+        style="border-color: var(--surface-border);">
         <a style="color: var(--text-color);">{{ action }}</a>
       </li>
     </ul>
@@ -82,14 +57,10 @@
     <h3 class="text-lg font-bold mb-4" style="color: var(--text-color);">
       🏷️ اختر القسم
     </h3>
-    <ul class="menu rounded-box border max-h-60 overflow-y-auto w-full text-lg" 
-        style="width: 100% !important; font-weight: bold; line-height: 1.6; background-color: var(--surface-card); border-color: var(--surface-border);">
-      <li
-        *ngFor="let section of sections"
-        (click)="selectSection(section)"
-        class="transition-all cursor-pointer border-b"
-        style="border-color: var(--surface-border);"
-      >
+    <ul class="menu rounded-box border max-h-60 overflow-y-auto w-full text-lg"
+      style="width: 100% !important; font-weight: bold; line-height: 1.6; background-color: var(--surface-card); border-color: var(--surface-border);">
+      <li *ngFor="let section of sections" (click)="selectSection(section)"
+        class="transition-all cursor-pointer border-b" style="border-color: var(--surface-border);">
         <a style="color: var(--text-color);">{{ section }}</a>
       </li>
     </ul>

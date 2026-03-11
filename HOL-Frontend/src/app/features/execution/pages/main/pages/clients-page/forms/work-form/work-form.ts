@@ -1,27 +1,23 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { CreateClientDto } from '../../../../../../../finance/services/ClientService';
 
 @Component({
   selector: 'app-work-form',
-  imports: [CommonModule,FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './work-form.html',
   styleUrl: './work-form.css'
 })
 export class WorkForm {
-workForm = {
-    name: '',
-    address: '',
-    militaryNumber: '',
-  };
+  @Input() client!: CreateClientDto;
 
   save() {
-    console.log('تم حفظ بيانات جهة العمل:', this.workForm);
-    alert('✅ تم حفظ جهة العمل بنجاح');
+    console.log('تم حفظ بيانات جهة العمل:', this.client.work);
   }
 
   cancel() {
-    this.workForm = { name: '', address: '', militaryNumber: '' };
     console.log('تم إلغاء / إخلاء البيانات');
   }
 }

@@ -1,3 +1,111 @@
+:host {
+    --premium-primary: #1e293b;
+    --premium-accent: #3b82f6;
+    --premium-bg: rgba(255, 255, 255, 0.7);
+    --premium-border: rgba(203, 213, 225, 0.4);
+    --glass-blur: 12px;
+}
+
 .rightSide {
     direction: rtl !important;
+    font-family: 'Inter', 'Outfit', sans-serif;
+    color: var(--premium-primary);
+}
+
+.premium-card {
+    background: var(--premium-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--premium-border) !important;
+    border-radius: 1.5rem !important;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05) !important;
+}
+
+.premium-input {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid var(--premium-border) !important;
+    border-radius: 0.75rem !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.premium-input:focus {
+    background: #fff !important;
+    border-color: var(--premium-accent) !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+    outline: none !important;
+}
+
+.premium-btn {
+    border-radius: 0.75rem !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.premium-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.premium-table {
+    border-collapse: separate !important;
+    border-spacing: 0 4px !important;
+}
+
+.premium-table td {
+    padding: 0.75rem 1rem !important;
+    background: #fff;
+    border-top: 1px solid var(--premium-border) !important;
+    border-bottom: 1px solid var(--premium-border) !important;
+}
+
+.premium-table td:first-child {
+    border-right: 1px solid var(--premium-border) !important;
+    border-top-right-radius: 0.75rem !important;
+    border-bottom-right-radius: 0.75rem !important;
+}
+
+.premium-table td:last-child {
+    border-left: 1px solid var(--premium-border) !important;
+    border-top-left-radius: 0.75rem !important;
+    border-bottom-left-radius: 0.75rem !important;
+}
+
+.premium-table thead th {
+    background: transparent !important;
+    color: #64748b !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    font-size: 0.7rem !important;
+    letter-spacing: 0.05em;
+    padding-bottom: 0.5rem !important;
+}
+
+.label-text-premium {
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+    display: inline-block;
+}
+
+.glass-badge {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    font-weight: 600;
+    border-radius: 0.5rem;
+    padding: 2px 8px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
 }

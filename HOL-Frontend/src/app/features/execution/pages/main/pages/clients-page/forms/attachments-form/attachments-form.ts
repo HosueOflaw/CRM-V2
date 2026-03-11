@@ -1,32 +1,89 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { ClientService, CreateClientDto } from '../../../../../../../finance/services/ClientService';
+import { SweetAlertService } from '../../../../../../../../shared/services/sweet-alert.service';
 
 @Component({
   selector: 'app-attachments-form',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './attachments-form.html',
   styleUrl: './attachments-form.css'
 })
-export class AttachmentsForm {
-  attachments = [
-    {
-      action: 'تقديم لائحة اعتراضية',
-      date: new Date('2024-10-12'),
-      file: 'https://example.com/files/objection.pdf'
-    },
-    {
-      action: 'استلام الحكم الابتدائي',
-      date: new Date('2024-11-05'),
-      file: 'https://example.com/files/verdict.pdf'
-    },
-    {
-      action: 'تقديم استئناف',
-      date: new Date('2024-12-01'),
-      file: 'https://example.com/files/appeal.pdf'
-    }
-  ];
+export class AttachmentsForm implements OnInit {
+  @Input() client!: CreateClientDto;
+  attachments: any[] = [];
+  loadingVisible: boolean = false;
 
-  deleteAttachment(index: number) {
-    this.attachments.splice(index, 1);
+  constructor(
+    private clientService: ClientService,
+    private swal: SweetAlertService
+  ) { }
+
+  ngOnInit() {
+    if (this.client?.code) {
+      this.loadAttachments();
+    }
+  }
+
+  loadAttachments() {
+    this.clientService.getClientAttachments(this.client.code).subscribe({
+      next: (data) => this.attachments = data,
+      error: () => console.error('Failed to load attachments')
+    });
+  }
+
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    if (file && this.client?.code) {
+      this.loadingVisible = true;
+      this.clientService.uploadAttachment(this.client.code, file, 'مرفق موكل').subscribe({
+        next: () => {
+          this.loadingVisible = false;
+          this.swal.success({ title: 'تم الرفع', text: 'تم رفع الملف بنجاح' });
+          this.loadAttachments();
+        },
+        error: () => {
+          this.loadingVisible = false;
+          this.swal.error({ title: 'خطأ', text: 'فشل رفع الملف' });
+        }
+      });
+    }
+  }
+
+  deleteAttachment(id: number) {
+    this.swal.fire({
+      title: 'هل أنت متأكد؟',
+      text: 'هل أنت متأكد من حذف هذا المرفق؟',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، احذف',
+      cancelButtonText: 'إلغاء'
+    }).then((result: any) => {
+      if (result.isConfirmed) {
+        this.clientService.deleteAttachment(id).subscribe({
+          next: () => {
+            this.swal.success({ title: 'تم الحذف', text: 'تم حذف المرفق بنجاح' });
+            this.loadAttachments();
+          },
+          error: () => this.swal.error({ title: 'خطأ', text: 'فشل حذف المرفق' })
+        });
+      }
+    });
+  }
+
+  downloadAttachment(id: number, fileName: string) {
+    this.clientService.downloadAttachment(id).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    });
   }
 }

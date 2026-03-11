@@ -1,158 +1,220 @@
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-4 p-4">
+  <!-- 🔍 قسم البحث (Premium Glassmorphism Design) -->
+  <div class="card shadow-lg p-6 mb-4 flex items-center justify-between gap-4"
+    style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.5rem;">
+    <div class="flex items-center gap-4 w-full">
+      <div class="relative w-1/3">
+        <span class="absolute inset-y-0 right-0 flex items-center pr-3">
+          <i class="pi pi-search text-gray-400"></i>
+        </span>
+        <input type="text" [(ngModel)]="searchCode" (keyup.enter)="onSearch()" placeholder="ابحث بكود الموكل..."
+          class="input input-bordered w-full pr-10 focus:ring-2 focus:ring-primary transition-all rounded-xl"
+          style="background: var(--surface-card); color: var(--text-color); border-color: var(--surface-border);" />
+      </div>
+      <button (click)="onSearch()" [disabled]="loading" class="btn btn-primary px-8 rounded-xl flex items-center gap-2">
+        <span *ngIf="loading" class="loading loading-spinner"></span>
+        <i *ngIf="!loading" class="pi pi-search"></i>
+        بحث
+      </button>
+    </div>
+  </div>
+
   <!-- 🟣 التبويبات الفرعية -->
   <app-sub-tabs [tabs]="subTabs" (tabChange)="onSubTabChange($event)"></app-sub-tabs>
 
   <!-- 🟩 محتوى الصفحة (فورمات + جداول) -->
   <div class="flex gap-6">
     <!-- العمود الأيمن: الفورمات -->
-    <div class="w-2/3 flex  gap-4">
+    <div class="w-2/3 flex flex-col gap-4">
       <!-- بطاقة البيانات الأساسية -->
-      <div class="card shadow p-4" style="align-self: flex-start; background-color: var(--surface-card);">
-        <h2 class="text-lg font-semibold mb-3" style="color: var(--text-color);">بيانات العميل</h2>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">الموكل</label>
-            <input type="text" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [value]="client.owner" readonly />
+      <div class="card shadow p-4" style="background-color: var(--surface-card); border-radius: 1rem;">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold" style="color: var(--text-color);">
+            <i class="pi pi-user-edit ml-2"></i> بيانات الموكل: {{ client.name || '---' }}
+          </h2>
+          <span class="badge badge-primary py-3 px-4 rounded-lg">كود: {{ client.code || '---' }}</span>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">اسم الموكل</label>
+            <input type="text" [(ngModel)]="client.name" class="input input-bordered w-full bg-opacity-50" />
           </div>
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">الخصم</label>
-            <input type="text" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [value]="client.opponent" readonly />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">الرقم المدني (CID)</label>
+            <input type="text" [(ngModel)]="client.cid" class="input input-bordered w-full bg-opacity-50" />
           </div>
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">المدني</label>
-            <input type="text" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [value]="client.civil" readonly />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">الجنسية</label>
+            <input type="text" [(ngModel)]="client.nationality" class="input input-bordered w-full bg-opacity-50" />
           </div>
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">الحالة</label>
-            <input type="text" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [value]="client.condition" readonly />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">جهة العمل</label>
+            <input type="text" [(ngModel)]="client.work" class="input input-bordered w-full bg-opacity-50" />
           </div>
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">الجنسية</label>
-            <input type="text" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [value]="client.nationality" readonly />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">رقم الهاتف 1</label>
+            <input type="text" [(ngModel)]="client.phone1" class="input input-bordered w-full bg-opacity-50" />
           </div>
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">الرقم الالي</label>
-            <input type="text" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [value]="client.automaticNo" readonly />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">رقم الهاتف 2</label>
+            <input type="text" [(ngModel)]="client.phone2" class="input input-bordered w-full bg-opacity-50" />
           </div>
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">العقد</label>
-            <input type="text" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [value]="client.contract" readonly />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">رقم العقد</label>
+            <input type="text" [(ngModel)]="client.contractNumber" class="input input-bordered w-full bg-opacity-50" />
           </div>
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">المديونية</label>
-            <input type="text" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [value]="client.indebtedness" readonly />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">سنة العقد</label>
+            <input type="number" [(ngModel)]="client.contractYear" class="input input-bordered w-full bg-opacity-50" />
           </div>
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">الموحد</label>
-            <input type="text" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [value]="client.unified" readonly />
+          <div class="flex flex-col gap-1 col-span-2">
+            <label class="text-sm font-semibold opacity-70">العنوان</label>
+            <input type="text" [(ngModel)]="client.address" class="input input-bordered w-full bg-opacity-50" />
           </div>
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">رقم الباتش</label>
-            <input type="text" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [value]="client.patch" readonly />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">البريد الإلكتروني للشركة</label>
+            <input type="email" [(ngModel)]="client.companyEmail" class="input input-bordered w-full bg-opacity-50" />
           </div>
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">العنوان</label>
-            <input type="text" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [value]="client.address" readonly />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">فاكس الشركة</label>
+            <input type="text" [(ngModel)]="client.companyFax" class="input input-bordered w-full bg-opacity-50" />
           </div>
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">الموظف المضيف</label>
-            <input type="text" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [value]="client.addedBy" readonly />
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">السجل التجاري</label>
+            <input type="text" [(ngModel)]="client.companyRegister" class="input input-bordered w-full bg-opacity-50" />
           </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">الشريك 1</label>
+            <input type="text" [(ngModel)]="client.partner1" class="input input-bordered w-full bg-opacity-50" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">الشريك 2</label>
+            <input type="text" [(ngModel)]="client.partner2" class="input input-bordered w-full bg-opacity-50" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-semibold opacity-70">الشريك 3</label>
+            <input type="text" [(ngModel)]="client.partner3" class="input input-bordered w-full bg-opacity-50" />
+          </div>
+        </div>
+        <div class="flex justify-end mt-4">
+          <button (click)="save()" [disabled]="loading || !client.id"
+            class="btn btn-primary btn-sm rounded-lg flex items-center gap-2">
+            <span *ngIf="loading" class="loading loading-spinner loading-xs"></span>
+            <i class="pi pi-save"></i>
+            حفظ التعديلات
+          </button>
         </div>
       </div>
 
       <!-- الفورم المتغير حسب التبويب -->
-      <div class="card shadow p-3 w-[700px]" style="background-color: var(--surface-card);">
+      <div class="card shadow p-6 w-full"
+        style="background-color: var(--surface-card); border-radius: 1rem; min-height: 400px;">
         <ng-container [ngSwitch]="selectedTab">
-          <app-main-form *ngSwitchCase="'الرئيسية'"></app-main-form>
-          <app-work-form *ngSwitchCase="'جهة العمل'"></app-work-form>
-          <app-classification-form *ngSwitchCase="'التصنيف'"></app-classification-form>
-          <app-judgment-form *ngSwitchCase="'منطوق الحكم'"></app-judgment-form>
-          <app-address-form *ngSwitchCase="'العنوان'"></app-address-form>
-          <app-session-form *ngSwitchCase="'الجلسات'"></app-session-form>
-          <app-claim-value *ngSwitchCase="'قيمة المطالبة'"></app-claim-value>
-          <app-attachments-form *ngSwitchCase="'المرفقات'"></app-attachments-form>
-          <!--  <app-fees-form *ngSwitchCase="'الرسوم'"></app-fees-form>
-          <app-actions-form *ngSwitchCase="'الإجراءات'"></app-actions-form> -->
+          <app-main-form *ngSwitchCase="'الرئيسية'" [client]="client"></app-main-form>
+          <app-work-form *ngSwitchCase="'جهة العمل'" [client]="client"></app-work-form>
+          <app-classification-form *ngSwitchCase="'التصنيف'" [client]="client"></app-classification-form>
+          <app-judgment-form *ngSwitchCase="'منطوق الحكم'" [client]="client"></app-judgment-form>
+          <app-address-form *ngSwitchCase="'العنوان'" [client]="client"></app-address-form>
+          <app-session-form *ngSwitchCase="'الجلسات'" [client]="client"></app-session-form>
+          <app-claim-value *ngSwitchCase="'قيمة المطالبة'" [client]="client"></app-claim-value>
+          <app-attachments-form *ngSwitchCase="'المرفقات'" [client]="client"></app-attachments-form>
         </ng-container>
       </div>
     </div>
 
     <!-- العمود الأيسر: الجداول الجانبية -->
     <div class="w-1/3 flex flex-col gap-4">
+      <!-- 💳 تفاصيل الرسوم (7 الفئات) -->
       <div class="card shadow p-4" style="background-color: var(--surface-card);">
-        <h3 class="font-semibold mb-3" style="color: var(--text-color);">تفاصيل الرسوم</h3>
-        <div class="grid grid-cols-2 gap-3  flex flex-col">
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">قيمة المطالبة</label>
-            <input type="number" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [(ngModel)]="fees.claimValue" />
-          </div>
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">الرسوم</label>
-            <input type="number" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [(ngModel)]="fees.feesValue" />
-          </div>
-          <div>
-            <label class="text-sm" style="color: var(--text-color-secondary);">اتعاب المحاماة</label>
-            <input type="number" class="input input-bordered w-full"
-              style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-              [(ngModel)]="fees.lawValue" />
-          </div>
-        </div>
-        <div class="p-4 rounded-xl shadow mt-6" style="background-color: var(--surface-section);">
-          <h3 class="text-lg font-semibold mb-2" style="color: var(--text-color);">💰 الرسوم</h3>
-          <table class="table table-zebra w-full" style="border-color: var(--surface-border);">
+        <h3 class="font-semibold mb-3 flex justify-between items-center" style="color: var(--text-color);">
+          <span>📊 تفاصيل النسب المالية</span>
+          <span class="text-xs opacity-60">قيمة المطالبة: {{ client.financialAmount | number:'1.2-2' }}</span>
+        </h3>
+
+        <div class="overflow-x-auto">
+          <table class="table table-compact w-full text-xs" style="color: var(--text-color);">
             <thead>
-              <tr style="background-color: var(--surface-section);">
-                <th style="color: var(--text-color);">البند</th>
-                <th style="color: var(--text-color);">القيمة</th>
+              <tr class="text-center opacity-70">
+                <th class="p-1">الفئة</th>
+                <th class="p-1">مقدم %</th>
+                <th class="p-1">مؤخر %</th>
+                <th class="p-1">عمولة %</th>
               </tr>
             </thead>
             <tbody>
-              <tr style="background-color: var(--surface-card); color: var(--text-color);">
-                <td>رسوم تسجيل</td>
-                <td>150</td>
-              </tr>
-              <tr style="background-color: var(--surface-ground); color: var(--text-color);">
-                <td>رسوم محكمة</td>
-                <td>300</td>
+              <tr *ngFor="let fd of client.financialDetails">
+                <td class="p-1 font-bold">{{ fd.category }}</td>
+                <td class="p-1">
+                  <input type="number" class="input input-ghost input-xs w-12 p-0 text-center border-b rounded-none"
+                    [(ngModel)]="fd.downPayment" style="border-color: var(--surface-border);" />
+                </td>
+                <td class="p-1">
+                  <input type="number" class="input input-ghost input-xs w-12 p-0 text-center border-b rounded-none"
+                    [(ngModel)]="fd.finalPayment" style="border-color: var(--surface-border);" />
+                </td>
+                <td class="p-1">
+                  <input type="number" class="input input-ghost input-xs w-12 p-0 text-center border-b rounded-none"
+                    [(ngModel)]="fd.collectionCommission" style="border-color: var(--surface-border);" />
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="mt-4 border-t pt-3 text-sm" style="border-color: var(--surface-border); color: var(--text-color);">
-          <p>إجمالي المسدد: <span class="font-semibold">{{ totals.paid | number }}</span></p>
-          <p>إجمالي التخفيض: <span class="font-semibold">{{ totals.discount | number }}</span></p>
-          <p>المتبقي: <span class="font-semibold" style="color: var(--red-500);">{{ totals.remaining | number }}</span>
-          </p>
+      </div>
+
+      <!-- 📞 جهات الاتصال المتعددة -->
+      <div class="card shadow p-4" style="background-color: var(--surface-card);">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="font-semibold" style="color: var(--text-color);">📞 أرقام التواصل</h3>
+          <button (click)="addContact()" class="btn btn-ghost btn-xs text-primary">
+            <i class="pi pi-plus-circle"></i> إضافة
+          </button>
         </div>
+
+        <div class="space-y-2 max-h-60 overflow-y-auto pr-2">
+          <div *ngFor="let contact of client.contacts; let i = index"
+            class="flex items-center gap-2 p-2 rounded-lg border"
+            style="border-color: var(--surface-border); background-color: var(--surface-ground);">
+            <input type="text" placeholder="الرقم" class="input input-ghost input-xs w-full" [(ngModel)]="contact.phone"
+              style="color: var(--text-color);" />
+            <input type="text" placeholder="الصلة" class="input input-ghost input-xs w-20"
+              [(ngModel)]="contact.relation" style="color: var(--text-color);" />
+            <button (click)="removeContact(i)" class="btn btn-ghost btn-xs text-error p-0">
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+          <div *ngIf="!client.contacts?.length" class="text-center py-4 text-xs opacity-50">
+            لا توجد أرقام مضافة
+          </div>
+        </div>
+      </div>
+      <div class="p-4 rounded-xl shadow mt-6" style="background-color: var(--surface-section);">
+        <h3 class="text-lg font-semibold mb-2" style="color: var(--text-color);">💰 الرسوم</h3>
+        <table class="table table-zebra w-full" style="border-color: var(--surface-border);">
+          <thead>
+            <tr style="background-color: var(--surface-section);">
+              <th style="color: var(--text-color);">البند</th>
+              <th style="color: var(--text-color);">القيمة</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background-color: var(--surface-card); color: var(--text-color);">
+              <td>رسوم تسجيل</td>
+              <td>150</td>
+            </tr>
+            <tr style="background-color: var(--surface-ground); color: var(--text-color);">
+              <td>رسوم محكمة</td>
+              <td>300</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-4 border-t pt-3 text-sm" style="border-color: var(--surface-border); color: var(--text-color);">
+        <p>إجمالي المسدد: <span class="font-semibold">{{ totals.paid | number }}</span></p>
+        <p>إجمالي التخفيض: <span class="font-semibold">{{ totals.discount | number }}</span></p>
+        <p>المتبقي: <span class="font-semibold" style="color: var(--red-500);">{{ totals.remaining | number }}</span>
+        </p>
       </div>
     </div>
   </div>

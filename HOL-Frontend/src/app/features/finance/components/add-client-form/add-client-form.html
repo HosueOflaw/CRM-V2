@@ -31,7 +31,7 @@
             <!-- Client Code -->
             <div class="form-field">
               <label class="form-label form-label-required">كود الموكل</label>
-              <input type="text" [(ngModel)]="clientForm.code" name="code" class="form-input" required />
+              <input type="number" [(ngModel)]="clientForm.code" name="code" class="form-input" required />
             </div>
 
             <!-- Client Name -->
@@ -40,9 +40,6 @@
               <div class="form-row">
                 <input type="text" [(ngModel)]="clientForm.name" name="name" class="form-input" style="flex: 1;"
                   required />
-                <button class="form-button form-button-outline" type="button" (click)="clientLookup.open()">
-                  اختر...
-                </button>
               </div>
             </div>
           </div>
@@ -78,6 +75,49 @@
             </div>
           </div>
 
+          <!-- Missing Fields Grid -->
+          <div class="form-grid form-grid-3">
+            <div class="form-field">
+              <label class="form-label">الوظيفة</label>
+              <input type="text" [(ngModel)]="clientForm.work" name="work" class="form-input" />
+            </div>
+            <div class="form-field">
+              <label class="form-label">العضوية</label>
+              <input type="text" [(ngModel)]="clientForm.membership" name="membership" class="form-input" />
+            </div>
+            <div class="form-field">
+              <label class="form-label">ايميل الشركة</label>
+              <input type="email" [(ngModel)]="clientForm.companyEmail" name="companyEmail" class="form-input" />
+            </div>
+            <div class="form-field">
+              <label class="form-label">فاكس الشركة</label>
+              <input type="text" [(ngModel)]="clientForm.companyFax" name="companyFax" class="form-input" />
+            </div>
+            <div class="form-field">
+              <label class="form-label">سجل الشركة</label>
+              <input type="text" [(ngModel)]="clientForm.companyRegister" name="companyRegister" class="form-input" />
+            </div>
+            <div class="form-field">
+              <label class="form-label">نوع السجل</label>
+              <input type="text" [(ngModel)]="clientForm.registerType" name="registerType" class="form-input" />
+            </div>
+          </div>
+
+          <div class="form-grid form-grid-3">
+            <div class="form-field">
+              <label class="form-label">الشريك 1</label>
+              <input type="text" [(ngModel)]="clientForm.partner1" name="partner1" class="form-input" />
+            </div>
+            <div class="form-field">
+              <label class="form-label">الشريك 2</label>
+              <input type="text" [(ngModel)]="clientForm.partner2" name="partner2" class="form-input" />
+            </div>
+            <div class="form-field">
+              <label class="form-label">الشريك 3</label>
+              <input type="text" [(ngModel)]="clientForm.partner3" name="partner3" class="form-input" />
+            </div>
+          </div>
+
           <!-- Row 3: Cid, Address, Nationality -->
           <div class="form-grid form-grid-3">
             <div class="form-field">
@@ -96,6 +136,11 @@
             </div>
           </div>
 
+          <!-- Notes -->
+          <div class="form-field">
+            <label class="form-label">ملاحظات</label>
+            <textarea [(ngModel)]="clientForm.note" name="note" class="form-textarea" rows="2"></textarea>
+          </div>
 
           <!-- Contract Details -->
           <div class="form-field">
@@ -107,7 +152,6 @@
 
         <!-- Tab 2: أرقام التواصل -->
         <div *ngIf="activeTab() === 'contacts'" class="tab-content">
-          <!-- Add Contact Form -->
           <div class="form-section">
             <div class="form-section-title">إضافة رقم جديد</div>
             <div class="form-row" style="gap: 1rem;">
@@ -127,7 +171,6 @@
             </div>
           </div>
 
-          <!-- Contacts Table -->
           <div class="table-container">
             <table class="table">
               <thead>
@@ -138,20 +181,17 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let c of contacts">
+                <tr *ngFor="let c of clientForm.contacts">
                   <td>{{ c.relation }}</td>
                   <td>{{ c.phone }}</td>
                   <td>
-                    <button type="button" class="form-button form-button-danger" style="padding: 0.25rem 0.5rem;"
-                      (click)="removeContact(c)">
+                    <button type="button" class="form-button form-button-danger" (click)="removeContact(c)">
                       ✕
                     </button>
                   </td>
                 </tr>
-                <tr *ngIf="contacts.length === 0">
-                  <td colspan="3" class="text-center" style="color: var(--text-color-secondary); padding: 2rem;">
-                    لا توجد أرقام مضافة
-                  </td>
+                <tr *ngIf="clientForm.contacts.length === 0">
+                  <td colspan="3" class="text-center" style="padding: 2rem;">لا توجد أرقام مضافة</td>
                 </tr>
               </tbody>
             </table>
@@ -160,55 +200,30 @@
 
         <!-- Tab 3: البيانات المالية -->
         <div *ngIf="activeTab() === 'financial'" class="tab-content">
-          <!-- Add Financial Entry -->
-          <div class="form-section">
-            <div class="form-section-title">إضافة صف مالي</div>
-            <div class="form-row" style="gap: 1rem;">
-              <select [(ngModel)]="newFinancialEntry.type" name="newType" class="form-select" style="flex: 1;">
-                <option value="">اختر النوع</option>
-                <option *ngFor="let type of financialTypes" [ngValue]="type">
-                  {{ type }}
-                </option>
-              </select>
-              <button type="button" class="form-button form-button-primary" (click)="addFinancialEntry()">
-                إضافة صف
-              </button>
-            </div>
-          </div>
-
-          <!-- Financial Table -->
           <div class="table-container">
-            <table class="table">
+            <table class="table table-bordered financial-table">
               <thead>
                 <tr style="background: var(--primary-color); color: white;">
                   <th>#</th>
-                  <th>اتعاب</th>
-                  <th>ودي</th>
-                  <th>تنفيذ</th>
-                  <th>قضائي مدنى</th>
-                  <th>قضائي مدعى عليه</th>
-                  <th>خبراء</th>
-                  <th>اجراء</th>
-                  <th>إجراءات</th>
+                  <th>مقدم %</th>
+                  <th>موخر %</th>
+                  <th>عمولة تحصيل %</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let entry of financialEntries(); let i = index">
-                  <th style="font-weight: bold; color: var(--primary-color);">{{ entry.type }}</th>
-                  <td *ngFor="let col of financialCols" class="editable-cell" contenteditable="true"
-                    (blur)="updateFinancialValue($event, entry, col.key)">
-                    {{ entry?.values?.[col.key] || '' }}
+                <tr *ngFor="let det of clientForm.financialDetails">
+                  <th style="font-weight: bold; color: var(--primary-color); text-align: right;">{{ det.category }}</th>
+                  <td class="padding-0">
+                    <input type="number" [(ngModel)]="det.downPayment" [name]="det.category + '_dp'" class="table-input"
+                      placeholder="0" />
                   </td>
-                  <td>
-                    <button type="button" class="form-button form-button-danger" style="padding: 0.25rem 0.5rem;"
-                      (click)="deleteFinancialEntry(entry)">
-                      ✕
-                    </button>
+                  <td class="padding-0">
+                    <input type="number" [(ngModel)]="det.finalPayment" [name]="det.category + '_fp'"
+                      class="table-input" placeholder="0" />
                   </td>
-                </tr>
-                <tr *ngIf="financialEntries().length === 0">
-                  <td colspan="9" class="text-center" style="color: var(--text-color-secondary); padding: 2rem;">
-                    لا توجد بيانات مالية
+                  <td class="padding-0">
+                    <input type="number" [(ngModel)]="det.collectionCommission" [name]="det.category + '_cc'"
+                      class="table-input" placeholder="0" />
                   </td>
                 </tr>
               </tbody>

@@ -6,58 +6,27 @@
   <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- اسم جهة العمل -->
     <div class="form-control md:col-span-2">
-      <label class="label font-semibold" style="color: var(--text-color-secondary);">اسم جهة العمل</label>
-      <input
-        type="text"
-        [(ngModel)]="workForm.name"
-        name="name"
-        placeholder="أدخل اسم جهة العمل"
+      <label class="label font-semibold" style="color: var(--text-color-secondary);">جهة العمل</label>
+      <input type="text" [(ngModel)]="client.work" name="work" placeholder="أدخل اسم جهة العمل"
         class="input input-bordered w-full focus:ring-2 focus:ring-primary/50"
-        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-      />
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
     </div>
 
-    <!-- عنوان جهة العمل -->
+    <!-- مسمى جهة العمل (Membership/Sector) -->
     <div class="form-control md:col-span-2">
-      <label class="label font-semibold" style="color: var(--text-color-secondary);">عنوان جهة العمل</label>
-      <input
-        type="text"
-        [(ngModel)]="workForm.address"
-        name="address"
-        placeholder="أدخل عنوان جهة العمل"
+      <label class="label font-semibold" style="color: var(--text-color-secondary);">المسمى الوظيفي / العضوية</label>
+      <input type="text" [(ngModel)]="client.membership" name="membership" placeholder="أدخل المسمى الوظيفي"
         class="input input-bordered w-full focus:ring-2 focus:ring-primary/50"
-        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-      />
-    </div>
-
-    <!-- الرقم العسكري -->
-    <div class="form-control md:col-span-2">
-      <label class="label font-semibold" style="color: var(--text-color-secondary);">الرقم العسكري</label>
-      <input
-        type="text"
-        [(ngModel)]="workForm.militaryNumber"
-        name="militaryNumber"
-        placeholder="أدخل الرقم العسكري إن وجد"
-        class="input input-bordered w-full focus:ring-2 focus:ring-primary/50"
-        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);"
-      />
+        style="border-color: var(--surface-border); background-color: var(--surface-ground); color: var(--text-color);" />
     </div>
   </form>
 
   <!-- الأزرار -->
   <div class="flex justify-center gap-4 mt-8">
-    <button
-      type="button"
-      class="btn btn-primary px-10 py-2 text-base rounded-xl"
-      (click)="save()"
-    >
+    <button type="button" class="btn btn-primary px-10 py-2 text-base rounded-xl" (click)="save()">
       💾 حفظ
     </button>
-    <button
-      type="button"
-      class="btn btn-outline px-10 py-2 text-base rounded-xl"
-      (click)="cancel()"
-    >
+    <button type="button" class="btn btn-outline px-10 py-2 text-base rounded-xl" (click)="cancel()">
       ↩️ إلغاء
     </button>
   </div>

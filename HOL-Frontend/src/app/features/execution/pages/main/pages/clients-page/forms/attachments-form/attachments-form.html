@@ -1,32 +1,52 @@
-<div class="p-6 rounded-xl shadow-md" style="background-color: var(--surface-card);">
-  <h2 class="text-xl font-bold mb-6 flex items-center gap-2" style="color: var(--text-color);">
-    📎 المرفقات
-  </h2>
+<div class="rounded-2xl shadow-lg p-6 max-w-4xl mx-auto" style="background-color: var(--surface-card);">
+  <div class="flex justify-between items-center mb-6">
+    <h3 class="text-xl font-bold" style="color: var(--text-color);">
+      📁 مرفقات الموكل
+    </h3>
+    <div class="flex items-center gap-3">
+      <input type="file" #fileInput (change)="onFileSelected($event)" class="hidden" />
+      <button class="btn btn-primary rounded-xl flex items-center gap-2" (click)="fileInput.click()"
+        [disabled]="loadingVisible">
+        <span *ngIf="loadingVisible" class="loading loading-spinner loading-xs"></span>
+        <i class="pi pi-upload"></i>
+        رفع مرفق جديد
+      </button>
+    </div>
+  </div>
 
-  <!-- 📊 جدول عرض المرفقات -->
-  <div class="overflow-x-auto mt-8">
-    <table class="table table-zebra w-full text-center" style="border-color: var(--surface-border);">
+  <div class="overflow-x-auto rounded-xl border" style="border-color: var(--surface-border);">
+    <table class="table w-full">
       <thead style="background-color: var(--surface-section);">
-        <tr style="color: var(--text-color);">
-          <th style="color: var(--text-color);">الإجراء</th>
-          <th style="color: var(--text-color);">تاريخ الإجراء</th>
-          <th style="color: var(--text-color);">المرفق</th>
-          <th style="color: var(--text-color);">التحكم</th>
+        <tr>
+          <th style="color: var(--text-color);" class="text-right">اسم الملف</th>
+          <th style="color: var(--text-color);" class="text-right">ملاحظات</th>
+          <th style="color: var(--text-color);" class="text-right">تاريخ الرفع</th>
+          <th style="color: var(--text-color);" class="text-center">الإجراءات</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let attachment of attachments; let i = index" style="color: var(--text-color);">
-          <td>{{ attachment.action }}</td>
-          <td>{{ attachment.date | date: 'dd/MM/yyyy' }}</td>
-          <td>
-            <a *ngIf="attachment.file" [href]="attachment.file" target="_blank"
-              style="color: var(--primary-color, #3b82f6);" class="hover:underline">📂 عرض</a>
+        <tr *ngFor="let item of attachments" class="hover" style="color: var(--text-color);">
+          <td class="text-right">
+            <div class="flex items-center gap-3 justify-end">
+              <span class="font-medium">{{ item.fileName }}</span>
+              <i class="pi pi-file text-primary"></i>
+            </div>
           </td>
-          <td>
-            <button class="btn btn-sm btn-error" (click)="deleteAttachment(i)">
-              🗑️ حذف
-            </button>
+          <td class="text-right">{{ item.note || '---' }}</td>
+          <td class="text-right">{{ item.dateAdded | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td class="text-center">
+            <div class="flex gap-2 justify-center">
+              <button class="btn btn-ghost btn-xs text-primary" (click)="downloadAttachment(item.id, item.fileName)">
+                <i class="pi pi-download"></i>
+              </button>
+              <button class="btn btn-ghost btn-xs text-error" (click)="deleteAttachment(item.id)">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
           </td>
+        </tr>
+        <tr *ngIf="attachments.length === 0">
+          <td colspan="4" class="text-center py-10 opacity-50">لا توجد مرفقات حالياً</td>
         </tr>
       </tbody>
     </table>

@@ -1,16 +1,18 @@
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CreateClientDto } from '../../../../../../../finance/services/ClientService';
 
 @Component({
   selector: 'app-judgment-form',
-  imports: [CommonModule,FormsModule],
-  standalone:true,
+  imports: [CommonModule, FormsModule],
+  standalone: true,
   templateUrl: './judgment-form.html',
   styleUrl: './judgment-form.css'
 })
 export class JudgmentForm {
-judgments: any[] = [];
+  @Input() client!: CreateClientDto;
+  judgments: any[] = [];
   newJudgment: any = {
     statement: '',
     date: '',

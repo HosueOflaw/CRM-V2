@@ -1,86 +1,310 @@
-<div class="statementForm flex flex-col gap-6 bg-base-100 p-6 rounded-xl shadow-sm">
+<div class="statementForm flex flex-col gap-10 p-1 animate-fade-in">
 
-  <!-- ✅ نموذج البيانات -->
-  <form [formGroup]="statementForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <!-- ✅ رأس النموذج - Glassmorphism Card -->
+  <div
+    class="premium-card p-10 flex justify-between items-center relative overflow-hidden bg-gradient-to-br from-white/90 to-blue-50/10">
+    <div class="z-10">
+      <h2 class="text-3xl font-black tracking-tighter flex items-center gap-4 text-slate-900">
+        <span class="p-4 bg-blue-500/10 rounded-3xl text-blue-600 shadow-sm">
+          <i class="fas" [ngClass]="mode === 'add' ? 'fa-plus-circle' : 'fa-search-dollar'"></i>
+        </span>
+        {{ mode === 'add' ? 'إدخال عهدة جديدة' : 'استعلام عن عهدة' }}
+      </h2>
+      <p class="text-slate-400 text-sm mt-3 mr-20 font-medium">نظام الإدخال الذكي لضمان الدقة المالية والتوثيق الرقمي
+      </p>
+    </div>
 
-    <!-- الكود + زر البحث -->
-    <div class="flex items-end gap-2">
-      <div class="flex-1">
-        <label class="label text-gray-700 font-semibold">الكود</label>
-        <input type="text" formControlName="code" class="input input-bordered w-full" />
+    <div class="flex items-center gap-4 z-10">
+      <div *ngIf="isLoading"
+        class="flex items-center gap-3 px-5 py-2.5 bg-white/50 backdrop-blur-md rounded-2xl border border-blue-100 shadow-sm">
+        <span class="loading loading-spinner loading-sm text-blue-500"></span>
+        <span class="text-xs font-bold text-blue-600 tracking-wide">جاري المعالجة...</span>
       </div>
-      <button type="button" class="btn btn-primary mt-6" (click)="searchByCode()">🔍</button>
+      <div class="glass-badge flex items-center gap-2" *ngIf="statements.length > 0">
+        <i class="fas fa-layer-group text-[10px]"></i>
+        {{ statements.length }} سجلات تم حفظها
+      </div>
     </div>
 
-    <!-- باقي الحقول -->
-    <div *ngFor="let field of fieldList">
-      <label class="label text-gray-700 font-semibold">{{ labels[field] }}</label>
-      <input
-        [type]="field === 'date' ? 'date' : field === 'amount' ? 'number' : 'text'"
-        formControlName="{{field}}"
-        class="input input-bordered w-full"
-      />
-    </div>
-
-    <!-- المحكمة -->
-    <div>
-      <label class="label text-gray-700 font-semibold">المحكمة</label>
-      <select formControlName="court" class="select select-bordered w-full">
-        <option value="">اختر المحكمة</option>
-        <option *ngFor="let court of courts" [value]="court">{{ court }}</option>
-      </select>
-    </div>
-
-    <!-- ملاحظات -->
-    <div class="col-span-3">
-      <label class="label text-gray-700 font-semibold">ملاحظات</label>
-      <textarea formControlName="notes" rows="4" class="textarea textarea-bordered w-full"></textarea>
-    </div>
-  </form>
-  <!-- ✅ جدول النتائج -->
-  <div class="bg-base-100 p-6 rounded-xl shadow-sm">
-    <div class="flex gap-2 mb-4">
-      <input [(ngModel)]="query" placeholder="ابحث بالاسم أو الكود" class="input input-bordered w-full" />
-      <button class="btn btn-primary" (click)="search()">بحث</button>
-    </div>
-
-    <table class="table table-zebra w-full">
-      <thead>
-        <tr>
-          <th>الكود</th>
-          <th>الاسم</th>
-          <th>الرقم الآلي</th>
-          <th>الحالة</th>
-          <th>المبلغ</th>
-          <th>المحكمة</th>
-          <th>التاريخ</th>
-          <th>إجراء</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let s of statements; let i = index">
-          <td>{{s.code}}</td>
-          <td>{{s.name}}</td>
-          <td>{{s.autoNumber}}</td>
-          <td>{{s.status}}</td>
-          <td>{{s.amount}}</td>
-          <td>{{s.court}}</td>
-          <td>{{s.date}}</td>
-          <td>
-            <button class="btn btn-error btn-xs" (click)="deleteStatement(i)">حذف</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Background Decoration -->
+    <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px]"></div>
   </div>
 
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-10">
 
-  <!-- ✅ أزرار التحكم -->
-  <div class="flex justify-end gap-3 mt-4">
-    <button class="btn btn-success" *ngIf="mode === 'add'" class="btn btn-outline" (click)="save()">💾 حفظ</button>
-    <button class="btn btn-warning" *ngIf="mode === 'add'" class="btn btn-outline" (click)="edit()">✏️ تعديل</button>
-    <button class="btn btn-error" *ngIf="mode === 'add' || mode === 'inquiry'" (click)="delete()">🗑️ حذف</button>
-    <button class="btn btn-outline" *ngIf="mode === 'add'" class="btn btn-outline" (click)="print()">🖨️ طباعة</button>
-    <button class="btn btn-neutral" *ngIf="mode === 'add'" class="btn btn-outline" (click)="reset()">↩️ تراجع</button>
-  </div>
-</div>
+    <!-- ✅ قسم النموذج الرئيسي -->
+    <div class="xl:col-span-8 flex flex-col gap-8">
+      <div class="premium-card p-10 border-blue-50">
+        <form [formGroup]="statementForm" class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+
+          <!-- Row 1: الكود & رقم الكشف -->
+          <div class="form-control">
+            <label class="label-text-premium font-bold">الكود</label>
+            <input type="text" formControlName="fileCode" class="input premium-input w-full bg-slate-50 font-bold"
+              readonly />
+          </div>
+          <div class="form-control">
+            <label class="label-text-premium font-bold">{{ labels.statementNo }}</label>
+            <div class="relative">
+              <input type="text" formControlName="statementNo"
+                class="input premium-input w-full pr-10 text-xl font-black text-blue-600" />
+              <i class="fas fa-barcode absolute right-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+              <button type="button" class="absolute left-2 top-1/2 -translate-y-1/2 btn btn-xs btn-circle btn-ghost"
+                (click)="searchByStatementNo()">
+                <i class="fas fa-sync" [class.fa-spin]="isLoading"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 2: الشركة & الاسم (Using clientName/clientLookup) -->
+          <div class="form-control">
+            <label class="label-text-premium font-bold">الشركة</label>
+            <div class="relative cursor-pointer" (click)="openClientLookup()">
+              <input type="text" formControlName="clientName"
+                class="input premium-input w-full pr-10 cursor-pointer font-bold text-blue-600" readonly />
+              <i class="fas fa-building absolute right-4 top-1/2 -translate-y-1/2 text-blue-500"></i>
+            </div>
+          </div>
+          <div class="form-control">
+            <label class="label-text-premium font-bold">الاسم</label>
+            <input type="text" formControlName="personName" class="input premium-input w-full font-bold"
+              placeholder="الاسم الكامل" />
+          </div>
+
+          <!-- Row 3: المدني & رقم العقد -->
+          <div class="form-control">
+            <label class="label-text-premium font-bold">{{ labels.civilId }}</label>
+            <input type="text" formControlName="civilId" class="input premium-input w-full font-bold" />
+          </div>
+          <div class="form-control">
+            <label class="label-text-premium font-bold">{{ labels.contractNo }}</label>
+            <input type="text" formControlName="contractNo" class="input premium-input w-full font-bold" />
+          </div>
+
+          <!-- Row 4: الحالة & رقم الهاتف (رقم الخط) -->
+          <div class="form-control">
+            <label class="label-text-premium font-bold">{{ labels.codeStatus }}</label>
+            <input type="text" formControlName="codeStatus" class="input premium-input w-full" />
+          </div>
+          <div class="form-control">
+            <label class="label-text-premium font-bold">{{ labels.phoneNumber }}</label>
+            <input type="text" formControlName="phoneNumber" class="input premium-input w-full font-bold" />
+          </div>
+
+          <!-- Row 5: الرقم الالي & المصروف -->
+          <div class="form-control">
+            <label class="label-text-premium font-bold">{{ labels.codeAutoNo }}</label>
+            <input type="text" formControlName="codeAutoNo" class="input premium-input w-full font-bold" />
+          </div>
+          <div class="form-control">
+            <label class="label-text-premium font-bold">{{ labels.codeExpense }}</label>
+            <select formControlName="codeExpense" class="select premium-input w-full font-bold">
+              <option [ngValue]="null">اختر التصنيف</option>
+              <option *ngFor="let type of expenseTypes" [ngValue]="type.id">{{ type.name }}</option>
+            </select>
+          </div>
+
+          <!-- Row 6: المبلغ & المرفقات (Attachment Code) -->
+          <div class="form-control">
+            <label class="label-text-premium font-bold">{{ labels.amount }}</label>
+            <input type="number" formControlName="amount"
+              class="input premium-input w-full text-xl font-black text-green-600" />
+          </div>
+          <div class="form-control">
+            <label class="label-text-premium font-bold">المرفقات</label>
+            <input type="text" formControlName="codeAttach"
+              class="input premium-input w-full bg-slate-50 font-mono text-xs" readonly />
+          </div>
+
+          <!-- Row 7: التاريخ & المحكمة -->
+          <div class="form-control">
+            <label class="label-text-premium font-bold">التاريخ</label>
+            <input type="date" formControlName="dateAdded" class="input premium-input w-full font-bold" />
+          </div>
+          <div class="form-control">
+            <label class="label-text-premium font-bold">{{ labels.court }}</label>
+            <input type="text" formControlName="court" class="input premium-input w-full font-bold" />
+          </div>
+
+          <!-- Row 8: ملاحظات -->
+          <div class="form-control md:col-span-2">
+            <label class="label-text-premium font-bold">{{ labels.notes }}</label>
+            <textarea formControlName="notes" rows="2" class="textarea premium-input w-full min-h-[60px]"></textarea>
+          </div>
+        </form>
+
+        <!-- أزرار التحكم -->
+        <div class="flex justify-end gap-4 mt-10 pt-8 border-t border-slate-50">
+          <button type="button" class="btn premium-btn btn-ghost text-slate-400 hover:text-slate-600 px-8"
+            (click)="reset()">
+            تفريغ الحقول
+          </button>
+          <button type="button"
+            class="btn premium-btn btn-primary bg-blue-600 hover:bg-blue-700 border-none text-white px-12 shadow-xl shadow-blue-500/25"
+            (click)="save()" [disabled]="isLoading || statementForm.invalid">
+            <span *ngIf="!isLoading">تأكيد الإضافة</span>
+            <span *ngIf="isLoading" class="loading loading-spinner"></span>
+            <i class="fas fa-arrow-left mr-3" *ngIf="!isLoading"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ قسم المرفقات -->
+    <div class="xl:col-span-4 flex flex-col gap-8">
+      <div class="premium-card p-8 bg-gradient-to-b from-blue-50/20 to-transparent">
+        <h3 class="font-black text-lg mb-6 flex items-center gap-3 text-slate-800">
+          <span class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-xs">
+            <i class="fas fa-paperclip"></i>
+          </span>
+          المرفق الفني (PDF)
+        </h3>
+
+        <div class="flex flex-col gap-6">
+          <div class="group relative">
+            <button type="button"
+              class="btn premium-btn w-full bg-white border-dashed border-2 border-slate-200 hover:border-blue-400 text-slate-500 h-32 flex-col gap-3 transition-all active:scale-95"
+              (click)="fileInput.click()" [disabled]="isUploading">
+              <div class="p-3 bg-slate-50 rounded-2xl group-hover:bg-blue-50 transition-colors">
+                <i class="fas fa-cloud-upload-alt text-3xl text-slate-400 group-hover:text-blue-500"></i>
+              </div>
+              <span class="text-xs font-bold">اسحب الملف أو اختر من الجهاز</span>
+            </button>
+            <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" accept=".pdf" />
+          </div>
+
+          <div *ngIf="selectedFiles.length > 0"
+            class="p-5 bg-white rounded-2xl border border-blue-50 shadow-sm animate-fade-in ring-4 ring-blue-50/30">
+            <div class="flex items-center gap-4 mb-5">
+              <div class="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center shadow-inner">
+                <i class="fas fa-file-pdf text-2xl"></i>
+              </div>
+              <div class="flex-1 overflow-hidden">
+                <div class="text-[13px] font-black text-slate-700 truncate mb-0.5">{{ selectedFiles[0].name }}</div>
+                <div class="text-[10px] text-slate-400 font-bold uppercase">{{ (selectedFiles[0].size / 1024) |
+                  number:'1.1-1' }} KB</div>
+              </div>
+            </div>
+
+            <button type="button" class="btn premium-btn btn-primary w-full shadow-lg shadow-blue-500/15"
+              (click)="uploadFile()" [disabled]="isUploading">
+              <span *ngIf="!isUploading">بدء الرفع السحابي</span>
+              <span *ngIf="isUploading" class="loading loading-spinner loading-xs"></span>
+            </button>
+          </div>
+
+          <div class="form-control bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Attachment
+              ID</label>
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full"
+                [ngClass]="statementForm.get('codeAttach')?.value ? 'bg-green-500' : 'bg-slate-300'"></div>
+              <code
+                class="text-xs font-mono text-slate-500 truncate">{{ statementForm.get('codeAttach')?.value || 'Pending Upload...' }}</code>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- ✅ قائمة السجلات -->
+      <div class="premium-card p-10 mt-6 shadow-2xl shadow-slate-200/50">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+          <div>
+            <h3 class="font-black text-2xl text-slate-900 tracking-tight">قائمة العمليات المرفقة</h3>
+            <p class="text-slate-400 text-xs mt-2 font-medium">سجل تفصيلي بكافة السجلات التي تم حفظها ضمن رقم هذا الكشف
+            </p>
+          </div>
+          <div class="flex gap-4">
+            <button class="btn premium-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm"
+              (click)="print()">
+              <i class="fas fa-print mr-3 opacity-50"></i> طباعة السجل
+            </button>
+            <button
+              class="btn premium-btn btn-primary bg-slate-900 border-none text-white px-8 shadow-xl shadow-slate-900/10"
+              (click)="sendToAccounting()" [disabled]="statements.length === 0">
+              <i class="fas fa-paper-plane mr-3"></i> ترحيل للمحاسبة
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="table premium-table w-full">
+            <thead>
+              <tr class="border-b border-slate-100">
+                <th class="text-right">الرقم الآلي</th>
+                <th class="text-right">الموكل</th>
+                <th class="text-right">التصنيف</th>
+                <th class="text-right">المبلغ</th>
+                <th class="text-right">الحالة</th>
+                <th class="text-center">الترحيل</th>
+                <th class="text-center">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of statements; let i = index" class="animate-fade-in"
+                [style.animation-delay]="i * 50 + 'ms'">
+                <td class="font-black text-slate-900">{{ s.codeAutoNo }}</td>
+                <td class="font-bold text-slate-600">{{ s.clientName || '---' }}</td>
+                <td>
+                  <span class="px-4 py-1.5 bg-slate-50 rounded-xl text-[10px] font-black text-slate-500 uppercase">
+                    {{ s.expenseName }}
+                  </span>
+                </td>
+                <td>
+                  <span class="text-blue-600 font-black text-lg">{{ s.amount | number:'1.3-3' }}</span>
+                  <span class="text-[10px] font-black text-slate-300 mr-2">KWD</span>
+                </td>
+                <td>
+                  <span class="text-xs font-bold text-slate-400" [title]="s.codeStatus">
+                    {{ s.codeStatus || '---' }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase"
+                    [ngClass]="s.sendToACC ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'">
+                    <div class="w-1.5 h-1.5 rounded-full" [ngClass]="s.sendToACC ? 'bg-green-500' : 'bg-amber-500'">
+                    </div>
+                    {{ s.sendToACC ? 'Done' : 'Hold' }}
+                  </div>
+                </td>
+                <td class="text-center">
+                  <button class="btn btn-ghost btn-circle btn-sm text-slate-300 hover:text-red-500 hover:bg-red-50"
+                    (click)="deleteStatement(i)">
+                    <i class="fas fa-trash-alt text-xs"></i>
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Empty State -->
+              <tr *ngIf="statements.length === 0 && !isLoading">
+                <td colspan="7" class="py-24">
+                  <div class="flex flex-col items-center gap-6 text-slate-300">
+                    <div
+                      class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-2 border border-slate-100/50">
+                      <i class="fas fa-inbox text-4xl opacity-30"></i>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-lg font-black text-slate-800">لا توجد قيود حالياً</div>
+                      <p class="text-xs font-medium text-slate-400 mt-1">ابدأ بإضافة المعاملات المالية أعلى الصفحة لتظهر
+                        هنا
+                      </p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Loading State -->
+              <tr *ngIf="isLoading && statements.length === 0">
+                <td colspan="7" class="py-24 text-center">
+                  <span class="loading loading-bars loading-lg text-blue-400 opacity-50"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <app-lookup-modal #clientLookup (onSelect)="handleClientSelect($event)"></app-lookup-modal>
