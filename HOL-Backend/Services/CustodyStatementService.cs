@@ -239,6 +239,29 @@ public class CustodyStatementService : ICustodyStatementService
     return dtos;
   }
 
+  public async Task<string> GetNextStatementNoAsync()
+  {
+    var lastNo = await _repository.GetLastStatementNoAsync();
+    if (string.IsNullOrEmpty(lastNo))
+    {
+      return "CS-1000";
+    }
+
+    try
+    {
+      if (lastNo.StartsWith("CS-") && int.TryParse(lastNo.Substring(3), out int numericPart))
+      {
+        return $"CS-{numericPart + 1}";
+      }
+    }
+    catch
+    {
+      // Fallback
+    }
+
+    return "CS-1000";
+  }
+
 
   public async Task<bool> UpdateStatusBulkAsync(List<int> ids, bool toCompany, bool toOffice)
   {

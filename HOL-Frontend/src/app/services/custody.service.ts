@@ -63,6 +63,10 @@ export class CustodyService {
         return this.http.get<CustodyStatement[]>(`${this.apiUrl}/by-user/${userId}`);
     }
 
+    getNextStatementNo(): Observable<{ statementNo: string }> {
+        return this.http.get<{ statementNo: string }>(`${this.apiUrl}/next-statement-no`);
+    }
+
     getReportData(companyCode?: number, expenseType?: number): Observable<CustodyStatement[]> {
         let params: any = {};
         if (companyCode) params.companyCode = companyCode.toString();

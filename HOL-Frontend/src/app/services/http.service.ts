@@ -11,10 +11,10 @@ export class HttpService {
   constructor(
     private http: HttpClient,
     private cacheService: CacheService
-  ) {}
+  ) { }
 
   BASE_URL = environment.apiUrl;
-  
+
   private getHeaders() {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     return new HttpHeaders({
@@ -30,7 +30,7 @@ export class HttpService {
    */
   public get<T = any>(endpoint: string, options?: CacheOptions): Observable<T> {
     const cacheKey = `GET_${endpoint}`;
-    
+
     // If cache options provided, use caching
     if (options !== undefined) {
       return this.cacheService.get(
@@ -39,7 +39,7 @@ export class HttpService {
         { ...options, key: cacheKey }
       );
     }
-    
+
     // Otherwise, normal request without cache
     return this.httpRequest<T>(endpoint, 'get');
   }
@@ -52,15 +52,15 @@ export class HttpService {
    */
   public post<T = any>(endpoint: string, data?: any, clearCachePattern?: string): Observable<T> {
     const result = this.httpRequest<T>(endpoint, 'post', data);
-    
+
     // Clear cache if pattern provided
     if (clearCachePattern) {
       result.subscribe({
         next: () => this.cacheService.clearByPattern(clearCachePattern),
-        error: () => {} // Don't clear cache on error
+        error: () => { } // Don't clear cache on error
       });
     }
-    
+
     return result;
   }
 
@@ -72,15 +72,15 @@ export class HttpService {
    */
   public put<T = any>(endpoint: string, data: any, clearCachePattern?: string): Observable<T> {
     const result = this.httpRequest<T>(endpoint, 'put', data);
-    
+
     // Clear cache if pattern provided
     if (clearCachePattern) {
       result.subscribe({
         next: () => this.cacheService.clearByPattern(clearCachePattern),
-        error: () => {} // Don't clear cache on error
+        error: () => { } // Don't clear cache on error
       });
     }
-    
+
     return result;
   }
 
@@ -92,15 +92,15 @@ export class HttpService {
    */
   public delete<T = any>(endpoint: string, data?: any, clearCachePattern?: string): Observable<T> {
     const result = this.httpRequest<T>(endpoint, 'delete', data);
-    
+
     // Clear cache if pattern provided
     if (clearCachePattern) {
       result.subscribe({
         next: () => this.cacheService.clearByPattern(clearCachePattern),
-        error: () => {} // Don't clear cache on error
+        error: () => { } // Don't clear cache on error
       });
     }
-    
+
     return result;
   }
 
@@ -109,7 +109,8 @@ export class HttpService {
       body: data,
       headers: this.getHeaders(),
     };
-    return this.http.request<T>(method, `${this.BASE_URL}${endpoint}`, options);
+    const url = this.BASE_URL.endsWith('/') ? `${this.BASE_URL}${endpoint}` : `${this.BASE_URL}/${endpoint}`;
+    return this.http.request<T>(method, url, options);
   }
 
   /**

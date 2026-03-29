@@ -50,7 +50,7 @@ export const routes: Routes = [
           { path: '', component: NegotiationsDashboard },
           {
             path: 'client-follow-up',
-            data: { title: 'متابعة العملاء | المفاوضات' },
+            data: { title: 'متابعة العملاء | المفاوضات', hideSidebar: true },
             loadComponent: () =>
               import('./features/negotiations/pages/client-follow-up copy/client-follow-up').then((m) => m.ClientFollowUp),
           },

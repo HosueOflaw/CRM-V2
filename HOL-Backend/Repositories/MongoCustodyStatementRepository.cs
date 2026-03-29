@@ -147,4 +147,13 @@ public class MongoCustodyStatementRepository : ICustodyStatementRepository
                                 .SortByDescending(x => x.DateAdded)
                                 .ToListAsync();
     }
+
+    public async Task<string> GetLastStatementNoAsync()
+    {
+        var last = await _collection.Find(x => x.StatementNo != null)
+                                    .SortByDescending(x => x.Id)
+                                    .Limit(1)
+                                    .FirstOrDefaultAsync();
+        return last?.StatementNo;
+    }
 }

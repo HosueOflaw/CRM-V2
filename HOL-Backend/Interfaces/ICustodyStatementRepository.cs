@@ -6,4 +6,5 @@ public interface ICustodyStatementRepository : IBaseRepository<CustodyStatement>
     Task<IEnumerable<CustodyStatement>> GetByAutoNoAsync(long autoNo);
     Task<IEnumerable<CustodyStatement>> GetReportDataAsync(long? companyCode, int? expenseType);
     Task<IEnumerable<CustodyStatement>> GetByUserAddedAsync(int userId);
+    Task<string> GetLastStatementNoAsync();
 }

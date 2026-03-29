@@ -15,16 +15,6 @@ import { GoBack } from '../../../../shared/components/go-back/go-back';
 })
 export class CustodyPage implements OnInit {
   activeTab: string = 'add';
-  previewUrl: SafeResourceUrl | null = null;
-  private sanitizer = inject(DomSanitizer);
-
-  onFilePreview(url: string | null) {
-    if (url) {
-      this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-    } else {
-      this.previewUrl = null;
-    }
-  }
 
   constructor(private route: ActivatedRoute, private router: Router) { }
 

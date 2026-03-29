@@ -66,6 +66,13 @@ public class CustodyStatementsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("next-statement-no")]
+    public async Task<ActionResult<string>> GetNextStatementNo()
+    {
+        var result = await _service.GetNextStatementNoAsync();
+        return Ok(new { statementNo = result });
+    }
+
     [HttpGet("report")]
     public async Task<ActionResult<IEnumerable<CustodyStatementDto>>> GetReport(long? companyCode, int? expenseType)
     {

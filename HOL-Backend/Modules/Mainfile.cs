@@ -61,6 +61,18 @@ public class Mainfile
   [Column("added_by")]
   public int? AddedBy { get; set; }
 
+  [Column("cooperation_status_id")]
+  public int? CooperationStatusId { get; set; }
+
+  [Column("contact_status_id")]
+  public int? ContactStatusId { get; set; }
+
+  [Column("civil_status_id")]
+  public int? CivilStatusId { get; set; }
+
+  [Column("internal_status_id")]
+  public int? InternalStatusId { get; set; }
+
   [Column("import_job_id")]
   public int? ImportJobId { get; set; }
 

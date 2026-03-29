@@ -1,304 +1,405 @@
-<div class="statementForm flex flex-col gap-10 p-1 animate-fade-in">
+<div class="statementForm flex flex-col gap-10 p-2 animate-fade-in">
 
-  <!-- ✅ رأس النموذج - Glassmorphism Card -->
-  <div
-    class="premium-card p-10 flex justify-between items-center relative overflow-hidden bg-gradient-to-br from-white/90 to-blue-50/10">
-    <div class="z-10">
-      <h2 class="text-3xl font-black tracking-tighter flex items-center gap-4 text-slate-900">
-        <span class="p-4 bg-blue-500/10 rounded-3xl text-blue-600 shadow-sm">
+  <!-- ✅ رأس الصفحة - Premium Header -->
+  <div class="premium-card p-10 flex justify-between items-center bg-gradient-to-l from-white to-blue-50/20">
+    <div>
+      <h2 class="text-3xl font-black tracking-tight flex items-center gap-4 text-slate-900">
+        <span class="p-4 bg-blue-600/10 rounded-2xl text-blue-600 shadow-inner">
           <i class="fas" [ngClass]="mode === 'add' ? 'fa-plus-circle' : 'fa-search-dollar'"></i>
         </span>
         {{ mode === 'add' ? 'إدخال عهدة جديدة' : 'استعلام عن عهدة' }}
       </h2>
-      <p class="text-slate-400 text-sm mt-3 mr-20 font-medium">نظام الإدخال الذكي لضمان الدقة المالية والتوثيق الرقمي
+      <p class="text-slate-500 text-sm mt-3 font-medium opacity-80">
+        {{ mode === 'add' ? 'قم بتعبئة البيانات المالية والوثائق المطلوبة بدقة' : 'ابحث عن سجلات العهدة وتابع حالتها
+        المالية' }}
       </p>
     </div>
 
-    <div class="flex items-center gap-4 z-10">
-      <div *ngIf="isLoading"
-        class="flex items-center gap-3 px-5 py-2.5 bg-white/50 backdrop-blur-md rounded-2xl border border-blue-100 shadow-sm">
-        <span class="loading loading-spinner loading-sm text-blue-500"></span>
-        <span class="text-xs font-bold text-blue-600 tracking-wide">جاري المعالجة...</span>
+    <div class="flex items-center gap-6">
+      <div *ngIf="isLoading" class="flex items-center gap-3 px-4 py-2 bg-blue-50 rounded-xl border border-blue-100">
+        <span class="loading loading-spinner loading-xs text-blue-600"></span>
+        <span class="text-xs font-bold text-blue-600 uppercase tracking-widest">Processing</span>
       </div>
-      <div class="glass-badge flex items-center gap-2" *ngIf="statements.length > 0">
-        <i class="fas fa-layer-group text-[10px]"></i>
+      <div class="glass-badge" *ngIf="statements.length > 0">
+        <i class="fas fa-database text-[10px]"></i>
         {{ statements.length }} سجلات تم حفظها
       </div>
     </div>
-
-    <!-- Background Decoration -->
-    <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px]"></div>
   </div>
 
-  <div class="grid grid-cols-1 xl:grid-cols-12 gap-10">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
 
     <!-- ✅ قسم النموذج الرئيسي -->
-    <div class="xl:col-span-8 flex flex-col gap-8">
-      <div class="premium-card p-10 border-blue-50">
-        <form [formGroup]="statementForm" class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+    <div class="lg:col-span-8 flex flex-col gap-8">
+      <div class="premium-card p-10">
+        <form [formGroup]="statementForm" class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-7">
 
           <!-- Row 1: الكود & رقم الكشف -->
           <div class="form-control">
-            <label class="label-text-premium font-bold">الكود</label>
-            <input type="text" formControlName="fileCode" class="input premium-input w-full bg-slate-50 font-bold"
-              readonly />
+            <label class="label-text-premium">الكود الفرعي</label>
+            <input type="text" formControlName="fileCode" class="input premium-input bg-slate-100/50" readonly />
           </div>
-          <div class="form-control">
-            <label class="label-text-premium font-bold">{{ labels.statementNo }}</label>
-            <div class="relative">
-              <input type="text" formControlName="statementNo"
-                class="input premium-input w-full pr-10 text-xl font-black text-blue-600" />
-              <i class="fas fa-barcode absolute right-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
-              <button type="button" class="absolute left-2 top-1/2 -translate-y-1/2 btn btn-xs btn-circle btn-ghost"
+
+          <div class="form-control highlight-field">
+            <label class="label-text-premium">رقم الكشف</label>
+            <div class="relative group">
+              <input type="text" formControlName="statementNo" class="input premium-input w-full pr-11"
+                [readonly]="mode === 'add'" />
+              <i
+                class="fas fa-hashtag absolute right-4 top-1/2 -translate-y-1/2 text-blue-400 group-focus-within:text-blue-600"></i>
+              <button *ngIf="mode === 'inquiry'" type="button"
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-700 transition-colors"
                 (click)="searchByStatementNo()">
-                <i class="fas fa-sync" [class.fa-spin]="isLoading"></i>
+                <i class="fas fa-search" [class.fa-spin]="isLoading"></i>
               </button>
             </div>
           </div>
 
-          <!-- Row 2: الشركة & الاسم (Using clientName/clientLookup) -->
+          <!-- Row 2: الشركة & والاسم -->
           <div class="form-control">
-            <label class="label-text-premium font-bold">الشركة</label>
-            <div class="relative cursor-pointer" (click)="openClientLookup()">
-              <input type="text" formControlName="clientName"
-                class="input premium-input w-full pr-10 cursor-pointer font-bold text-blue-600" readonly />
-              <i class="fas fa-building absolute right-4 top-1/2 -translate-y-1/2 text-blue-500"></i>
+            <label class="label-text-premium">الشركة / الموكل</label>
+            <div class="lookup-group" (click)="openClientLookup()">
+              <input type="text" formControlName="clientName" class="input premium-input w-full pr-11" readonly
+                placeholder="ابحث واختر الشركة..." />
+              <i
+                class="fas fa-building absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-blue-500"></i>
+              <span class="lookup-indicator">...</span>
             </div>
           </div>
+
           <div class="form-control">
-            <label class="label-text-premium font-bold">الاسم</label>
-            <input type="text" formControlName="personName" class="input premium-input w-full font-bold"
-              placeholder="الاسم الكامل" />
+            <label class="label-text-premium">الاسم (الشخصي)</label>
+            <div class="relative group">
+              <input type="text" formControlName="personName" class="input premium-input w-full pr-11"
+                placeholder="أدخل اسم الشخص..." />
+              <i class="fas fa-user absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            </div>
           </div>
 
           <!-- Row 3: المدني & رقم العقد -->
           <div class="form-control">
-            <label class="label-text-premium font-bold">{{ labels.civilId }}</label>
-            <input type="text" formControlName="civilId" class="input premium-input w-full font-bold" />
-          </div>
-          <div class="form-control">
-            <label class="label-text-premium font-bold">{{ labels.contractNo }}</label>
-            <input type="text" formControlName="contractNo" class="input premium-input w-full font-bold" />
-          </div>
-
-          <!-- Row 4: الحالة & رقم الهاتف (رقم الخط) -->
-          <div class="form-control">
-            <label class="label-text-premium font-bold">{{ labels.codeStatus }}</label>
-            <input type="text" formControlName="codeStatus" class="input premium-input w-full" />
-          </div>
-          <div class="form-control">
-            <label class="label-text-premium font-bold">{{ labels.phoneNumber }}</label>
-            <input type="text" formControlName="phoneNumber" class="input premium-input w-full font-bold" />
+            <label class="label-text-premium">الرقم المدني</label>
+            <div class="relative group">
+              <input type="text" formControlName="civilId" class="input premium-input w-full pr-11"
+                placeholder="000000000000" />
+              <i class="fas fa-id-card absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            </div>
           </div>
 
-          <!-- Row 5: الرقم الالي & المصروف -->
           <div class="form-control">
-            <label class="label-text-premium font-bold">{{ labels.codeAutoNo }}</label>
-            <input type="text" formControlName="codeAutoNo" class="input premium-input w-full font-bold" />
-          </div>
-          <div class="form-control">
-            <label class="label-text-premium font-bold">{{ labels.codeExpense }}</label>
-            <select formControlName="codeExpense" class="select premium-input w-full font-bold">
-              <option [ngValue]="null">اختر التصنيف</option>
-              <option *ngFor="let type of expenseTypes" [ngValue]="type.id">{{ type.name }}</option>
-            </select>
+            <label class="label-text-premium">رقم ملف العقد</label>
+            <div class="relative group">
+              <input type="text" formControlName="contractNo" class="input premium-input w-full pr-11"
+                placeholder="مثال: CR-2024" />
+              <i class="fas fa-file-contract absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            </div>
           </div>
 
-          <!-- Row 6: المبلغ & المرفقات (Attachment Code) -->
+          <!-- Row 4: الحالة & الهاتف -->
           <div class="form-control">
-            <label class="label-text-premium font-bold">{{ labels.amount }}</label>
-            <input type="number" formControlName="amount"
-              class="input premium-input w-full text-xl font-black text-green-600" />
+            <label class="label-text-premium">حالة المعاملة</label>
+            <div class="relative group">
+              <input type="text" formControlName="codeStatus" class="input premium-input w-full pr-11"
+                placeholder="مثال: قيد التنفيذ" />
+              <i class="fas fa-info-circle absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            </div>
           </div>
+
           <div class="form-control">
-            <label class="label-text-premium font-bold">المرفقات</label>
-            <input type="text" formControlName="codeAttach"
-              class="input premium-input w-full bg-slate-50 font-mono text-xs" readonly />
+            <label class="label-text-premium">رقم الهاتف</label>
+            <div class="relative group">
+              <input type="text" formControlName="phoneNumber" class="input premium-input w-full pr-11"
+                placeholder="965+ 00000000" />
+              <i class="fas fa-phone absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            </div>
+          </div>
+
+          <!-- Row 5: الرقم الآلي & المصروف -->
+          <div class="form-control">
+            <label class="label-text-premium">الرقم الآلي (Case ID)</label>
+            <div class="relative group">
+              <input type="text" formControlName="codeAutoNo" class="input premium-input w-full pr-11"
+                placeholder="أدخل الرقم الآلي..." />
+              <i class="fas fa-fingerprint absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            </div>
+          </div>
+
+          <div class="form-control">
+            <label class="label-text-premium">تصنيف المصروف</label>
+            <div class="lookup-group" (click)="openExpenseLookup()">
+              <input type="text"
+                [value]="statementForm.get('codeExpense')?.value ? expenseTypes[statementForm.get('codeExpense')?.value - 1].name : ''"
+                class="input premium-input w-full pr-11" readonly placeholder="اختر التصنيف..." />
+              <i class="fas fa-wallet absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <span class="lookup-indicator">...</span>
+            </div>
+            <input type="hidden" formControlName="codeExpense" />
+          </div>
+
+          <!-- Row 6: المبلغ & المرفق -->
+          <div class="form-control">
+            <label class="label-text-premium">المبلغ (دينار كويتي)</label>
+            <div class="relative group">
+              <input type="number" formControlName="amount"
+                class="input premium-input w-full pr-11 text-lg font-black text-blue-700" placeholder="0.000" />
+              <i class="fas fa-money-bill-alt absolute right-4 top-1/2 -translate-y-1/2 text-blue-500"></i>
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-300">KWD</span>
+            </div>
+          </div>
+
+          <div class="form-control">
+            <label class="label-text-premium">كود المرفق التقني</label>
+            <div class="relative group">
+              <input type="text" formControlName="codeAttach"
+                class="input premium-input w-full bg-slate-50 font-mono text-xs pr-11" readonly
+                placeholder="يُولد تلقائياً..." />
+              <i class="fas fa-paperclip absolute right-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+            </div>
           </div>
 
           <!-- Row 7: التاريخ & المحكمة -->
           <div class="form-control">
-            <label class="label-text-premium font-bold">التاريخ</label>
-            <input type="date" formControlName="dateAdded" class="input premium-input w-full font-bold" />
-          </div>
-          <div class="form-control">
-            <label class="label-text-premium font-bold">{{ labels.court }}</label>
-            <input type="text" formControlName="court" class="input premium-input w-full font-bold" />
+            <label class="label-text-premium">تاريخ الإضافة</label>
+            <div class="relative group">
+              <input type="date" formControlName="dateAdded" class="input premium-input w-full pr-11" />
+              <i class="fas fa-calendar-alt absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            </div>
           </div>
 
-          <!-- Row 8: ملاحظات -->
+          <div class="form-control">
+            <label class="label-text-premium">المحكمة المختصة</label>
+            <div class="relative group">
+              <select formControlName="court" class="select premium-input w-full pr-11 appearance-none">
+                <option value="">-- اختر المحكمة --</option>
+                <option *ngFor="let court of courts" [value]="court">{{ court }}</option>
+              </select>
+              <i class="fas fa-gavel absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+              <i
+                class="fas fa-chevron-down absolute left-4 top-1/2 -translate-y-1/2 text-xs text-slate-300 pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- Rows 8: ملاحظات -->
           <div class="form-control md:col-span-2">
-            <label class="label-text-premium font-bold">{{ labels.notes }}</label>
-            <textarea formControlName="notes" rows="2" class="textarea premium-input w-full min-h-[60px]"></textarea>
+            <label class="label-text-premium">ملاحظات العهدة</label>
+            <textarea formControlName="notes" rows="2" class="textarea premium-input w-full min-h-[80px]"
+              placeholder="أدخل أي ملاحظات إضافية هنا..."></textarea>
           </div>
         </form>
 
-        <!-- أزرار التحكم -->
-        <div class="flex justify-end gap-4 mt-10 pt-8 border-t border-slate-50">
-          <button type="button" class="btn premium-btn btn-ghost text-slate-400 hover:text-slate-600 px-8"
-            (click)="reset()">
-            تفريغ الحقول
+        <div class="flex justify-end gap-5 mt-10 pt-8 border-t border-slate-100/80">
+          <button type="button" class="premium-btn text-slate-400 hover:text-slate-600 px-8" (click)="reset()">
+            <i class="fas fa-undo-alt opacity-50"></i>
+            إعادة تعيين الحقول
           </button>
           <button type="button"
-            class="btn premium-btn btn-primary bg-blue-600 hover:bg-blue-700 border-none text-white px-12 shadow-xl shadow-blue-500/25"
+            class="premium-btn bg-blue-600 text-white hover:bg-blue-700 px-12 shadow-lg shadow-blue-500/20"
             (click)="save()" [disabled]="isLoading || statementForm.invalid">
-            <span *ngIf="!isLoading">تأكيد الإضافة</span>
-            <span *ngIf="isLoading" class="loading loading-spinner"></span>
-            <i class="fas fa-arrow-left mr-3" *ngIf="!isLoading"></i>
+            <span *ngIf="!isLoading">تأكيد وحفظ السجل</span>
+            <span *ngIf="isLoading" class="loading loading-spinner loading-xs"></span>
+            <i class="fas fa-check-double" *ngIf="!isLoading"></i>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- ✅ قسم المرفقات -->
-    <div class="xl:col-span-4 flex flex-col gap-8">
-      <div class="premium-card p-8 bg-gradient-to-b from-blue-50/20 to-transparent">
+    <!-- ✅ قسم المرفقات - Side Panel -->
+    <div class="lg:col-span-4 flex flex-col gap-8">
+      <div class="premium-card p-8">
         <h3 class="font-black text-lg mb-6 flex items-center gap-3 text-slate-800">
-          <span class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-xs">
-            <i class="fas fa-paperclip"></i>
+          <span class="w-8 h-8 bg-red-50 text-red-500 rounded-lg flex items-center justify-center text-xs shadow-inner">
+            <i class="fas fa-file-pdf"></i>
           </span>
           المرفق الفني (PDF)
         </h3>
 
         <div class="flex flex-col gap-6">
-          <div class="group relative">
+          <div class="relative group">
             <button type="button"
-              class="btn premium-btn w-full bg-white border-dashed border-2 border-slate-200 hover:border-blue-400 text-slate-500 h-32 flex-col gap-3 transition-all active:scale-95"
+              class="w-full h-40 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center gap-3 hover:border-blue-400 hover:bg-blue-50/30 transition-all active:scale-[0.98]"
               (click)="fileInput.click()" [disabled]="isUploading">
-              <div class="p-3 bg-slate-50 rounded-2xl group-hover:bg-blue-50 transition-colors">
-                <i class="fas fa-cloud-upload-alt text-3xl text-slate-400 group-hover:text-blue-500"></i>
+              <div
+                class="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:bg-blue-100/50 transition-colors">
+                <i class="fas fa-cloud-upload-alt text-2xl"></i>
               </div>
-              <span class="text-xs font-bold">اسحب الملف أو اختر من الجهاز</span>
+              <div class="text-center px-4">
+                <div class="text-xs font-black text-slate-600 mb-1">اسحب ملف PDF هنا</div>
+                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wide">أقصى حجم: 10 ميجابايت</div>
+              </div>
             </button>
             <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" accept=".pdf" />
           </div>
 
           <div *ngIf="selectedFiles.length > 0"
-            class="p-5 bg-white rounded-2xl border border-blue-50 shadow-sm animate-fade-in ring-4 ring-blue-50/30">
-            <div class="flex items-center gap-4 mb-5">
-              <div class="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center shadow-inner">
-                <i class="fas fa-file-pdf text-2xl"></i>
+            class="p-6 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner flex flex-col gap-5 animate-fade-in">
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-red-500 border border-red-50">
+                <i class="fas fa-file-pdf text-xl"></i>
               </div>
               <div class="flex-1 overflow-hidden">
                 <div class="text-[13px] font-black text-slate-700 truncate mb-0.5">{{ selectedFiles[0].name }}</div>
                 <div class="text-[10px] text-slate-400 font-bold uppercase">{{ (selectedFiles[0].size / 1024) |
-                  number:'1.1-1' }} KB</div>
+                  number:'1.0-1' }} KB</div>
               </div>
             </div>
 
-            <button type="button" class="btn premium-btn btn-primary w-full shadow-lg shadow-blue-500/15"
+            <button type="button" class="premium-btn bg-blue-600 text-white w-full shadow-md shadow-blue-500/15"
               (click)="uploadFile()" [disabled]="isUploading">
-              <span *ngIf="!isUploading">بدء الرفع السحابي</span>
+              <i class="fas fa-upload text-xs" *ngIf="!isUploading"></i>
+              <span *ngIf="!isUploading">بـدء رفـع المـلف</span>
               <span *ngIf="isUploading" class="loading loading-spinner loading-xs"></span>
             </button>
           </div>
 
-          <div class="form-control bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Attachment
-              ID</label>
-            <div class="flex items-center gap-2">
-              <div class="w-2 h-2 rounded-full"
-                [ngClass]="statementForm.get('codeAttach')?.value ? 'bg-green-500' : 'bg-slate-300'"></div>
-              <code
-                class="text-xs font-mono text-slate-500 truncate">{{ statementForm.get('codeAttach')?.value || 'Pending Upload...' }}</code>
+          <div class="p-4 bg-slate-100/40 rounded-xl border border-slate-200/50">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Upload Sync
+              Status</label>
+            <div class="flex items-center gap-3">
+              <div class="w-2.5 h-2.5 rounded-full"
+                [ngClass]="statementForm.get('codeAttach')?.value ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-slate-300'">
+              </div>
+              <span class="text-[10px] font-bold text-slate-500 truncate">{{ statementForm.get('codeAttach')?.value ?
+                'File Synced via MongoDB' : 'Waiting for file...' }}</span>
             </div>
           </div>
         </div>
       </div>
 
-
-
-      <!-- ✅ قائمة السجلات -->
-      <div class="premium-card p-10 mt-6 shadow-2xl shadow-slate-200/50">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
-          <div>
-            <h3 class="font-black text-2xl text-slate-900 tracking-tight">قائمة العمليات المرفقة</h3>
-            <p class="text-slate-400 text-xs mt-2 font-medium">سجل تفصيلي بكافة السجلات التي تم حفظها ضمن رقم هذا الكشف
-            </p>
+      <!-- ✅ Preview Panel (New) -->
+      <div class="premium-card p-0 overflow-hidden animate-fade-in" *ngIf="previewUrl">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <div class="flex items-center gap-3">
+            <span
+              class="w-8 h-8 bg-blue-600/10 text-blue-600 rounded-lg flex items-center justify-center text-xs shadow-inner">
+              <i class="fas fa-eye"></i>
+            </span>
+            <span class="font-black text-sm text-slate-800">معاينة الملف المختار</span>
           </div>
-          <div class="flex gap-4">
-            <button class="btn premium-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm"
-              (click)="print()">
-              <i class="fas fa-print mr-3 opacity-50"></i> طباعة السجل
-            </button>
-            <button
-              class="btn premium-btn btn-primary bg-slate-900 border-none text-white px-8 shadow-xl shadow-slate-900/10"
-              (click)="sendToAccounting()" [disabled]="statements.length === 0">
-              <i class="fas fa-paper-plane mr-3"></i> ترحيل للمحاسبة
-            </button>
+          <button class="btn btn-xs btn-circle btn-ghost text-slate-400" (click)="previewUrl = null">✕</button>
+        </div>
+        <div class="p-4 bg-slate-50">
+          <iframe [src]="previewUrl" class="w-full h-[500px] rounded-xl border border-slate-200 shadow-sm bg-white"
+            title="File Preview"></iframe>
+        </div>
+      </div>
+
+      <!-- ✅ قائمة المعاملات المرفقة للمحاسبة (Quick Actions) -->
+      <div class="premium-card p-8 bg-slate-900 text-white overflow-hidden group">
+        <h3 class="text-sm font-black mb-4 flex items-center gap-2 opacity-90 tracking-wide uppercase">
+          <i class="fas fa-external-link-square-alt text-blue-400"></i> خيارات التـرحيل
+        </h3>
+        <p class="text-[11px] text-slate-400 mb-6 font-medium leading-relaxed">يمكنك ترحيل كافة السجلات المسجلة لهذا
+          الكشف إلى الإدارة المالية دفعة واحدة بعد المراجعة النهائية.</p>
+
+        <div class="flex flex-col gap-3 relative z-10">
+          <button class="premium-btn bg-white/10 hover:bg-white/20 text-white border border-white/10 w-full"
+            (click)="sendToAccounting()" [disabled]="statements.length === 0">
+            <i class="fas fa-share-all text-sm text-blue-300"></i> ترحيل الكشف كـاملاً
+          </button>
+          <button class="premium-btn bg-blue-600 hover:bg-blue-500 text-white w-full" (click)="print()"
+            [disabled]="statements.length === 0">
+            <i class="fas fa-print text-sm"></i> طباعة كشف البيانات
+          </button>
+        </div>
+
+        <i
+          class="fas fa-file-invoice-dollar absolute -bottom-8 -left-8 text-7xl opacity-5 group-hover:opacity-10 transition-opacity"></i>
+      </div>
+    </div>
+
+    <!-- ✅ جدول السجلات المحفوظة - Full Width Section -->
+    <div class="lg:col-span-12">
+      <div class="premium-card p-0">
+        <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+          <div>
+            <h3 class="text-xl font-black text-slate-900 tracking-tight">سجل المعاملات المسجلة</h3>
+            <p class="text-slate-400 text-xs mt-1 font-medium">قائمة تفصيلية بالعهد المرتبطة بـ رقم الكشف الحالي</p>
+          </div>
+          <div
+            class="px-5 py-2 bg-white rounded-full border border-slate-200 text-xs font-black text-slate-500 shadow-sm">
+            إجمالي السجلات: {{ statements.length }}
           </div>
         </div>
 
         <div class="overflow-x-auto">
-          <table class="table premium-table w-full">
+          <table class="premium-table">
             <thead>
-              <tr class="border-b border-slate-100">
-                <th class="text-right">الرقم الآلي</th>
-                <th class="text-right">الموكل</th>
-                <th class="text-right">التصنيف</th>
-                <th class="text-right">المبلغ</th>
-                <th class="text-right">الحالة</th>
+              <tr>
+                <th class="w-20">ت</th>
+                <th>الرقم الآلي</th>
+                <th>الموكل / الخصم</th>
+                <th>التصنيف</th>
+                <th>المبلغ</th>
+                <th>الحالة</th>
                 <th class="text-center">الترحيل</th>
                 <th class="text-center">إجراءات</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let s of statements; let i = index" class="animate-fade-in"
-                [style.animation-delay]="i * 50 + 'ms'">
+                [style.animation-delay]="i * 40 + 'ms'">
+                <td class="text-slate-300 font-black text-xs">{{ i + 1 }}</td>
                 <td class="font-black text-slate-900">{{ s.codeAutoNo }}</td>
-                <td class="font-bold text-slate-600">{{ s.clientName || '---' }}</td>
+                <td class="font-bold text-slate-600">
+                  <div class="flex flex-col gap-0.5">
+                    <span class="text-sm">{{ s.clientName || '---' }}</span>
+                    <span class="text-[10px] text-slate-400">{{ s.personName || 'بدون اسم' }}</span>
+                  </div>
+                </td>
                 <td>
-                  <span class="px-4 py-1.5 bg-slate-50 rounded-xl text-[10px] font-black text-slate-500 uppercase">
+                  <span
+                    class="px-3 py-1 bg-slate-100 rounded-lg text-[10px] font-black text-slate-500 uppercase tracking-tight">
                     {{ s.expenseName }}
                   </span>
                 </td>
                 <td>
-                  <span class="text-blue-600 font-black text-lg">{{ s.amount | number:'1.3-3' }}</span>
-                  <span class="text-[10px] font-black text-slate-300 mr-2">KWD</span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-blue-700 font-black text-base">{{ s.amount | number:'1.3-3' }}</span>
+                    <span class="text-[9px] font-black text-slate-400">KWD</span>
+                  </div>
                 </td>
                 <td>
-                  <span class="text-xs font-bold text-slate-400" [title]="s.codeStatus">
+                  <span
+                    class="text-xs font-bold text-slate-500 bg-slate-50 px-2 py-1 rounded-md border border-slate-100"
+                    [title]="s.codeStatus">
                     {{ s.codeStatus || '---' }}
                   </span>
                 </td>
                 <td class="text-center">
-                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase"
-                    [ngClass]="s.sendToACC ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'">
-                    <div class="w-1.5 h-1.5 rounded-full" [ngClass]="s.sendToACC ? 'bg-green-500' : 'bg-amber-500'">
+                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase"
+                    [ngClass]="s.sendToACC ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-amber-100 text-amber-700 border border-amber-200'">
+                    <div class="w-1.5 h-1.5 rounded-full"
+                      [ngClass]="s.sendToACC ? 'bg-green-600 shadow-[0_0_5px_rgba(34,197,94,0.4)]' : 'bg-amber-600 flex animate-pulse'">
                     </div>
                     {{ s.sendToACC ? 'Done' : 'Hold' }}
                   </div>
                 </td>
                 <td class="text-center">
-                  <button class="btn btn-ghost btn-circle btn-sm text-slate-300 hover:text-red-500 hover:bg-red-50"
-                    (click)="deleteStatement(i)">
-                    <i class="fas fa-trash-alt text-xs"></i>
-                  </button>
+                  <div class="flex justify-center gap-1">
+                    <button
+                      class="w-8 h-8 rounded-full flex items-center justify-center text-slate-300 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      (click)="deleteStatement(i)">
+                      <i class="fas fa-trash-alt text-xs"></i>
+                    </button>
+                  </div>
                 </td>
               </tr>
 
               <!-- Empty State -->
               <tr *ngIf="statements.length === 0 && !isLoading">
-                <td colspan="7" class="py-24">
-                  <div class="flex flex-col items-center gap-6 text-slate-300">
+                <td colspan="8" class="p-20 text-center">
+                  <div class="flex flex-col items-center gap-4 text-slate-300">
                     <div
-                      class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-2 border border-slate-100/50">
-                      <i class="fas fa-inbox text-4xl opacity-30"></i>
+                      class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center border-2 border-dashed border-slate-200">
+                      <i class="fas fa-layer-group text-3xl opacity-20"></i>
                     </div>
-                    <div class="text-center">
-                      <div class="text-lg font-black text-slate-800">لا توجد قيود حالياً</div>
-                      <p class="text-xs font-medium text-slate-400 mt-1">ابدأ بإضافة المعاملات المالية أعلى الصفحة لتظهر
-                        هنا
-                      </p>
+                    <div>
+                      <div class="text-lg font-black text-slate-800">لا يوجد بيانات حالية</div>
+                      <p class="text-xs font-medium text-slate-400 mt-1 uppercase tracking-widest">No matching records
+                        found for this statement</p>
                     </div>
                   </div>
-                </td>
-              </tr>
-
-              <!-- Loading State -->
-              <tr *ngIf="isLoading && statements.length === 0">
-                <td colspan="7" class="py-24 text-center">
-                  <span class="loading loading-bars loading-lg text-blue-400 opacity-50"></span>
                 </td>
               </tr>
             </tbody>
@@ -306,5 +407,9 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <app-lookup-modal #clientLookup (onSelect)="handleClientSelect($event)"></app-lookup-modal>
+  <!-- Lookups Modals -->
+  <app-lookup-modal #clientLookup (itemSelected)="handleClientSelect($event)"></app-lookup-modal>
+  <app-lookup-modal #expenseLookup (itemSelected)="handleExpenseSelect($event)"></app-lookup-modal>
+</div>

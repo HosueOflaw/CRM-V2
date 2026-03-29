@@ -150,7 +150,7 @@ export class AppMenu implements OnInit, OnDestroy {
                 icon: 'pi pi-fw pi-comments',
                 items: [
                     { label: 'لوحة التحكم', icon: 'pi pi-fw pi-th-large', routerLink: ['/negotiations'] },
-                    { label: 'متابعة العملاء', icon: 'pi pi-fw pi-users', routerLink: ['/negotiations/client-follow-up'] }
+                    { label: 'متابعة العملاء', icon: 'pi pi-fw pi-users', routerLink: ['/negotiations/client-follow-up'], target:"_blank" }
                 ]
             },
             {

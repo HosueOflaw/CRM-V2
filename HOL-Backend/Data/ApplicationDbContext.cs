@@ -31,6 +31,7 @@ public class ApplicationDbContext : DbContext
   public DbSet<ClientContact> ClientContacts { get; set; }
   public DbSet<ClientFinancialDetail> ClientFinancialDetails { get; set; }
   public DbSet<CustodyStatement> CustodyStatements => Set<CustodyStatement>();
+  public DbSet<LookupValue> LookupValues => Set<LookupValue>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {

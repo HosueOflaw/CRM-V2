@@ -9,6 +9,7 @@ public interface ICustodyStatementService
     Task<IEnumerable<CustodyStatementDto>> GetByStatementNoAsync(string statementNo);
     Task<IEnumerable<CustodyStatementDto>> GetByAutoNoAsync(long autoNo);
     Task<IEnumerable<CustodyStatementDto>> GetReportDataAsync(long? companyCode, int? expenseType);
+    Task<string> GetNextStatementNoAsync();
     Task<bool> UpdateStatusBulkAsync(List<int> ids, bool toCompany, bool toOffice);
     Task<byte[]> GetZippedAttachmentsAsync(List<int> ids);
     Task<IEnumerable<CustodyStatementDto>> GetByUserAddedAsync(int userId);

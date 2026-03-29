@@ -11,6 +11,11 @@ public class MainfileRepository : BaseRepository<Mainfile>, IMainfileRepository
         return await _dbSet.FirstOrDefaultAsync(m => m.Code == code);
     }
 
+    public async Task<Mainfile> GetByCidAsync(string cid)
+    {
+        return await _dbSet.FirstOrDefaultAsync(m => m.Cid == cid);
+    }
+
     public async Task<IEnumerable<Mainfile>> GetByDeptCodeAsync(long? deptCode)
     {
         if (!deptCode.HasValue)
@@ -21,13 +26,19 @@ public class MainfileRepository : BaseRepository<Mainfile>, IMainfileRepository
             .ToListAsync();
     }
 
-  public async Task<IEnumerable<Mainfile>> SearchByNameAsync(string searchTerm)
+  public async Task<IEnumerable<Mainfile>> SearchAsync(string searchTerm)
   {
     if (string.IsNullOrWhiteSpace(searchTerm))
       return await GetAllAsync();
 
+    bool isNumeric = int.TryParse(searchTerm, out int searchCode);
+
     return await _dbSet
-        .Where(m => m.Name != null && m.Name.Contains(searchTerm))
+        .Where(m => (m.Name != null && m.Name.Contains(searchTerm)) || 
+                    (m.Cid != null && m.Cid.Contains(searchTerm)) ||
+                    (isNumeric && m.Code == searchCode))
+        .OrderByDescending(m => isNumeric && m.Code == searchCode) // Prioritize exact code match
+        .ThenByDescending(m => m.Cid == searchTerm) // Then exact CID match
         .ToListAsync();
   }
     public async Task<IEnumerable<ClientDto>> GetAllClientsOptimizedAsync()
@@ -36,8 +47,8 @@ public class MainfileRepository : BaseRepository<Mainfile>, IMainfileRepository
             .AsNoTracking()
             .GroupJoin(
                 _context.FileDetails.AsNoTracking(),
-                m => m.Id,
-                f => f.FileCode,
+                m => m.Code, // Corrected from m.Id to m.Code
+                f => (int?)f.FileCode,
                 (m, details) => new { m, detail = details.FirstOrDefault() }
             )
             .Select(x => new ClientDto

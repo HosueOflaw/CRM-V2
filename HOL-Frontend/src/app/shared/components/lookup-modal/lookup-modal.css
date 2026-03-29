@@ -1,0 +1,55 @@
+.modal-box {
+    border-radius: 2rem !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.premium-search {
+    background: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 1rem !important;
+    padding: 1rem 1.25rem !important;
+    font-size: 0.95rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.premium-search:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08) !important;
+    background: #fff !important;
+}
+
+.lookup-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+.lookup-table th {
+    background: #f8fafc !important;
+    color: #64748b !important;
+    font-weight: 800 !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem !important;
+    border-bottom: 2px solid #f1f5f9 !important;
+}
+
+.lookup-table td {
+    padding: 1rem !important;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.9rem;
+    color: #334155;
+    font-weight: 500;
+}
+
+.lookup-table tr:hover td {
+    background: #fbfcfe;
+}
+
+.select-btn {
+    border-radius: 0.75rem !important;
+    font-weight: 800 !important;
+    text-transform: none !important;
+}

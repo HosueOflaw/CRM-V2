@@ -360,7 +360,7 @@ builder.Services.AddScoped<IFileClassificationRepository, FileClassificationRepo
 builder.Services.AddScoped<ICallcenterStatementRepository, CallcenterStatementRepository>();
 builder.Services.AddScoped<IAdditionalAmountRepository, AdditionalAmountRepository>();
 builder.Services.AddScoped<IAuditsFileRepository, AuditsFileRepository>();
-builder.Services.AddScoped<ICustodyStatementRepository, MongoCustodyStatementRepository>();
+builder.Services.AddScoped<ICustodyStatementRepository, CustodyStatementRepository>();
 builder.Services.AddScoped<IMongoCustodyAttachmentRepository, MongoCustodyAttachmentRepository>();
 
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();

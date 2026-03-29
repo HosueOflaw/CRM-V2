@@ -40,9 +40,13 @@ public class FileDetailDto
   public decimal? DeptAmount { get; set; }
   public string LegalPlaintiff { get; set; }
   public int? LawyerUser { get; set; }
+  public string LawyerUserName { get; set; }
   public int? CourtUser { get; set; }
+  public string CourtUserName { get; set; }
   public int? MdUser { get; set; }
+  public string MdUserName { get; set; }
   public int? LegalAdvisorUser { get; set; }
+  public string LegalAdvisorUserName { get; set; }
   public int? ImportJobId { get; set; }
 }
 
@@ -61,4 +65,97 @@ public class AutoNumberDto
   public DateTime? DateAdded { get; set; }
   public int? DeptCode { get; set; }
   public int? ImportJobId { get; set; }
+}
+
+// DTO لعرض الدفعات
+public class PaymentDisplayDto
+{
+    public int Id { get; set; }
+    public long? FileCode { get; set; }
+    public decimal? Value { get; set; }
+    public DateTime? DateAdded { get; set; }
+    public string PaymentMethod { get; set; }
+    public string UserAddedName { get; set; }
+}
+
+// DTO للمرفقات
+public class AttachmentDisplayDto
+{
+    public int Id { get; set; }
+    public long? FileCode { get; set; }
+    public string AttachCode { get; set; }
+    public string AttachType { get; set; }
+    public string Value { get; set; }
+    public string Notes { get; set; }
+    public DateTime? DateAdded { get; set; }
+}
+
+// DTO للمبالغ الإضافية
+public class AdditionalAmountDto
+{
+    public int Id { get; set; }
+    public long? FileCode { get; set; }
+    public decimal? Value { get; set; }
+    public string AmountType { get; set; }
+    public DateTime? DateAdded { get; set; }
+}
+
+// DTO لسجل التدقيق
+public class AuditsFileDto
+{
+    public int Id { get; set; }
+    public long? FileCode { get; set; }
+    public string Action { get; set; }
+    public string Description { get; set; }
+    public string PreviousState { get; set; }
+    public string CurrentState { get; set; }
+    public string UserName { get; set; }
+    public DateTime ActionDate { get; set; }
+}
+
+// DTO لجهات الاتصال
+public class ClientContactDisplayDto
+{
+    public int Id { get; set; }
+    public string Phone { get; set; }
+    public string Relation { get; set; }
+}
+
+// DTO لتصنيفات الملف
+public class FileClassificationDto
+{
+    public int Id { get; set; }
+    public string Code { get; set; } = string.Empty;
+    public long? FileCode { get; set; }
+    public long? DeptCode { get; set; }
+    public string Classification { get; set; } = string.Empty;
+    public string Department { get; set; } = string.Empty;
+    public DateTime? DateAdded { get; set; }
+}
+
+// DTO لحالات الملف
+public class FileStatusDto
+{
+    public int Id { get; set; }
+    public long? FileCode { get; set; }
+    public int? DeptCode { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public DateTime? DateAdded { get; set; }
+}
+
+public class CallcenterStatementDto
+{
+    public int Id { get; set; }
+    public long? FileCode { get; set; }
+    public long? DeptCode { get; set; }
+    public DateTime? DateAdded { get; set; }
+    public string? Notes { get; set; } = string.Empty;
+    public string? ContactMethod { get; set; } = string.Empty;
+    public string? ConnectedStatus { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; } = string.Empty;
+    public string? PhoneOwner { get; set; } = string.Empty;
+    public string? NextAction { get; set; } = string.Empty;
+    public DateTime? NextDate { get; set; }
+    public decimal? PromiseAmount { get; set; }
+    public string? UserAddedName { get; set; } = string.Empty;
 }

@@ -54,4 +54,13 @@ public class CustodyStatementRepository : BaseRepository<CustodyStatement>, ICus
             .OrderByDescending(x => x.DateAdded)
             .ToListAsync();
     }
+
+    public async Task<string> GetLastStatementNoAsync()
+    {
+        return await _dbSet
+            .Where(x => x.StatementNo != null)
+            .OrderByDescending(x => x.Id)
+            .Select(x => x.StatementNo)
+            .FirstOrDefaultAsync();
+    }
 }

@@ -1,6 +1,6 @@
-import { Component, Renderer2, ViewChild, OnDestroy } from '@angular/core';
+import { Component, Renderer2, ViewChild, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { filter, Subscription, interval } from 'rxjs';
 import { AppTopbar } from './app.topbar';
 import { AppSidebar } from './app.sidebar';
@@ -16,10 +16,10 @@ import Swal from 'sweetalert2';
     standalone: true,
     imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter, CommandPaletteComponent, AiAssistantComponent],
     template: `
-    <div class="layout-wrapper" [ngClass]="containerClass" [class.app-dark]="layoutService.isDarkTheme()">
+    <div class="layout-wrapper" [ngClass]="containerClass" [class.app-dark]="layoutService.isDarkTheme()" [class.layout-no-sidebar]="hideSidebar">
         <app-topbar></app-topbar>
-        <app-sidebar></app-sidebar>
-        <div class="layout-main-container">
+        <app-sidebar *ngIf="!hideSidebar"></app-sidebar>
+        <div class="layout-main-container" [style.marginRight]="hideSidebar ? '0px' : null" [style.marginLeft]="hideSidebar ? '0px' : null">
             <div class="layout-main" [class.app-dark]="layoutService.isDarkTheme()">
                 <router-outlet></router-outlet>
             </div>
@@ -61,7 +61,7 @@ import Swal from 'sweetalert2';
         <app-ai-assistant></app-ai-assistant>
     </div> `
 })
-export class AppLayout implements OnDestroy {
+export class AppLayout implements OnDestroy, OnInit {
     isElectron = !!(window as any).appWindow;
     overlayMenuOpenSubscription: Subscription;
     breakSubscription?: Subscription;
@@ -69,6 +69,7 @@ export class AppLayout implements OnDestroy {
 
     isOnBreak = false;
     breakTimer = '00:00';
+    hideSidebar = false;
 
     menuOutsideClickListener: any;
 
@@ -81,7 +82,8 @@ export class AppLayout implements OnDestroy {
         public renderer: Renderer2,
         public router: Router,
         public breakService: BreakService,
-        public authService: AuthService
+        public authService: AuthService,
+        private activatedRoute: ActivatedRoute
     ) {
         this.checkBreakStatus();
 
@@ -106,6 +108,21 @@ export class AppLayout implements OnDestroy {
 
         this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
             this.hideMenu();
+            this.updateSidebarVisibility();
+        });
+    }
+
+    ngOnInit() {
+        this.updateSidebarVisibility();
+    }
+
+    updateSidebarVisibility() {
+        let route = this.activatedRoute;
+        while (route.firstChild) {
+            route = route.firstChild;
+        }
+        route.data.subscribe(data => {
+            this.hideSidebar = !!data['hideSidebar'];
         });
     }
 

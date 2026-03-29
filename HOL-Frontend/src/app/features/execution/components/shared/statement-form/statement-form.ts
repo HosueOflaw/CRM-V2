@@ -34,6 +34,7 @@ export class StatementForm implements OnInit {
   private clientService = inject(ClientService);
 
   @ViewChild('clientLookup') clientLookup!: LookupModal;
+  @ViewChild('expenseLookup') expenseLookup!: LookupModal;
   clientsData: any[] = [];
 
   // ✅ التسميات بالعربي
@@ -59,6 +60,17 @@ export class StatementForm implements OnInit {
     { id: 4, name: 'تصوير ومصروفات ادارية' },
     { id: 5, name: 'ايجار كرين' },
     { id: 6, name: 'مصروفات غير مستردة' }
+  ];
+
+  courts = [
+    'محكمة الرقعي (التحصيل)',
+    'محكمة حولي',
+    'محكمة الأحمدي',
+    'محكمة الجهراء',
+    'محكمة مبارك الكبير',
+    'محكمة الفروانية',
+    'قصر العدل',
+    'الإدارة العامة للتنفيذ'
   ];
 
   constructor() {
@@ -95,6 +107,20 @@ export class StatementForm implements OnInit {
 
   ngOnInit() {
     this.loadClients();
+    if (this.mode === 'add') {
+      this.fetchNextStatementNo();
+    }
+  }
+
+  fetchNextStatementNo() {
+    this.custodyService.getNextStatementNo().subscribe({
+      next: (res) => {
+        if (res && res.statementNo) {
+          this.statementForm.patchValue({ statementNo: res.statementNo });
+        }
+      },
+      error: (err) => console.error('Failed to fetch next statement no', err)
+    });
   }
 
   loadClients() {
@@ -117,6 +143,19 @@ export class StatementForm implements OnInit {
     this.statementForm.patchValue({
       clientName: item.name,
       companyCode: item.id
+    });
+  }
+
+  openExpenseLookup() {
+    this.expenseLookup.title = 'اختر نوع المصروف';
+    this.expenseLookup.columns = ['id', 'name'];
+    this.expenseLookup.data = this.expenseTypes;
+    this.expenseLookup.open();
+  }
+
+  handleExpenseSelect(item: any) {
+    this.statementForm.patchValue({
+      codeExpense: item.id
     });
   }
 
@@ -149,6 +188,7 @@ export class StatementForm implements OnInit {
 
       // ✅ توليد معاينة للملف PDF
       const fileURL = URL.createObjectURL(file);
+      this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fileURL);
       this.filePreview.emit(fileURL);
     }
   }
@@ -227,7 +267,8 @@ export class StatementForm implements OnInit {
         this.statementForm.reset({
           statementNo: currentStmtNo,
           amount: 0,
-          sendToACC: false
+          sendToACC: false,
+          dateAdded: new Date().toISOString().split('T')[0]
         });
         Swal.fire('نجاح', 'تم حفظ السجل بنجاح', 'success');
       }
@@ -285,12 +326,17 @@ export class StatementForm implements OnInit {
   reset() {
     this.statementForm.reset({
       amount: 0,
-      sendToACC: false
+      sendToACC: false,
+      dateAdded: new Date().toISOString().split('T')[0]
     });
     this.statements = [];
     this.statementsChange.emit([]);
+    this.previewUrl = null;
     this.filePreview.emit(null);
     this.selectedIndex = null;
+    if (this.mode === 'add') {
+      this.fetchNextStatementNo();
+    }
   }
 
   // ✅ حذف عنصر من الجدول

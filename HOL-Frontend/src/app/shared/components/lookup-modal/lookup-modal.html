@@ -1,37 +1,60 @@
-<dialog #lookupModal class="modal">
-  <div class="modal-box w-11/12 max-w-4xl">
-    <h3 class="font-bold text-lg mb-3">{{ title }}</h3>
+<dialog #lookupModal class="modal modal-bottom sm:modal-middle">
+  <div class="modal-box w-11/12 max-w-3xl p-8 bg-white overflow-hidden">
 
-    <input
-      [(ngModel)]="search"
-      (input)="filterData()"
-      placeholder="ابحث..."
-      class="input input-bordered w-full mb-4"
-    />
+    <div class="flex items-center justify-between mb-8">
+      <h3 class="font-black text-2xl text-slate-900 tracking-tight flex items-center gap-3">
+        <span class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shadow-inner">
+          <i class="fas fa-list-ul"></i>
+        </span>
+        {{ title }}
+      </h3>
+      <button class="btn btn-sm btn-circle btn-ghost text-slate-400" (click)="close()">✕</button>
+    </div>
 
-    <div class="overflow-y-auto max-h-[400px]">
-      <table class="table table-sm w-full text-sm">
+    <div class="relative group mb-8">
+      <input [(ngModel)]="search" (input)="filterData()" placeholder="ابحث هنا عن الكود، الاسم، أو أي التفاصيل..."
+        class="input premium-search w-full pr-12 focus:outline-none" />
+      <i
+        class="fas fa-search absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors"></i>
+    </div>
+
+    <div class="overflow-y-auto max-h-[450px] rounded-2xl border border-slate-100 shadow-inner bg-slate-50/30">
+      <table class="lookup-table">
         <thead>
           <tr>
-            <th *ngFor="let col of columns">{{ col }}</th>
-            <th></th>
+            <th *ngFor="let col of columns" class="text-right">{{ col === 'id' ? 'كود' : (col === 'name' ? 'الاسم' :
+              col) }}</th>
+            <th class="w-24 text-center">إجراء</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of filteredData">
-            <td *ngFor="let col of columns">{{ row[col] }}</td>
-            <td>
-              <button class="btn btn-xs btn-primary" (click)="selectItem(row)">
+          <tr *ngFor="let row of filteredData" class="group cursor-pointer" (click)="selectItem(row)">
+            <td *ngFor="let col of columns"
+              class="text-right font-bold text-slate-600 group-hover:text-blue-600 transition-colors">{{ row[col] }}
+            </td>
+            <td class="text-center">
+              <button
+                class="select-btn btn btn-sm btn-primary bg-blue-600 border-none text-white px-5 shadow-lg shadow-blue-500/20">
                 اختيار
               </button>
+            </td>
+          </tr>
+
+          <!-- Empty state in modal -->
+          <tr *ngIf="filteredData.length === 0">
+            <td [attr.colspan]="columns.length + 1" class="py-20 text-center">
+              <div class="flex flex-col items-center gap-3 opacity-30">
+                <i class="fas fa-search text-3xl"></i>
+                <div class="font-black text-xs uppercase tracking-widest">لا يوجد نتائج</div>
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div class="modal-action">
-      <button class="btn btn-outline" (click)="close()">إغلاق</button>
+    <div class="modal-action mt-8 border-t border-slate-50 pt-6">
+      <button class="btn btn-ghost text-slate-400 font-bold" (click)="close()">إلغـاء</button>
     </div>
   </div>
 </dialog>

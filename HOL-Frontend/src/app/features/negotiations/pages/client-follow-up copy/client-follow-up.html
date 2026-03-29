@@ -1,10 +1,19 @@
-
 <div class="grid grid-cols-12 gap-4 p-1 bg-base-200 min-h-screen" dir="rtl">
   <div class="col-span-12 md:col-span-2">
-    <app-app-sidebar></app-app-sidebar>
+    <app-app-sidebar (search)="onClientSelected($event)" [financialData]="financial"></app-app-sidebar>
   </div>
-  <div class="col-span-12 md:col-span-10">
-    <app-main-content></app-main-content>
+  <div class="col-span-12 md:col-span-10 relative">
+    <div *ngIf="loading"
+      class="absolute inset-0 bg-white/50 backdrop-blur-[2px] z-50 flex items-center justify-center rounded-2xl">
+      <div class="flex flex-col items-center gap-3">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+        <span class="text-sm font-bold text-primary animate-pulse">جاري جلب البيانات...</span>
+      </div>
+    </div>
+    <app-main-content [selectedPerson]="selectedPerson" [financialData]="financial" [clientRows]="clientRows"
+      [attachments]="attachments" [payments]="payments" [additionalAmounts]="additionalAmounts" [audits]="audits"
+      [autoNumbers]="autoNumbers" [callcenterStatements]="callcenterStatements" [classifications]="classifications"
+      [statuses]="statuses">
+    </app-main-content>
   </div>
 </div>
-

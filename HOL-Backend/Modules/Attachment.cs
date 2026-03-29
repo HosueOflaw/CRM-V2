@@ -1,4 +1,4 @@
-
+#nullable enable
 namespace House_of_law_api.Modules;
 
 [Table("attachments", Schema = "dbo")]
@@ -15,19 +15,19 @@ public class Attachment
   public long? DeptCode { get; set; }
 
   [Column("attach_code")]
-  public string AttachCode { get; set; }
-
+  public string AttachCode { get; set; } = string.Empty;
+  
   [Column("attach_type")]
-  public string AttachType { get; set; }
-
+  public string AttachType { get; set; } = string.Empty;
+  
   [Column("auto_number_code")]
-  public string AutoNumberCode { get; set; }
-
+  public string AutoNumberCode { get; set; } = string.Empty;
+  
   [Column("value")]
-  public string Value { get; set; }
-
+  public string Value { get; set; } = string.Empty;
+  
   [Column("notes")]
-  public string Notes { get; set; }
+  public string Notes { get; set; } = string.Empty;
 
   [Column("user_added")]
   public int? UserAdded { get; set; }

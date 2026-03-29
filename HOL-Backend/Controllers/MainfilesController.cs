@@ -34,7 +34,7 @@ public class MainfilesController : ControllerBase
 
         if (!string.IsNullOrEmpty(search))
         {
-            var results = await _repository.SearchByNameAsync(search);
+            var results = await _repository.SearchAsync(search);
             return Ok(results);
         }
 
@@ -54,6 +54,14 @@ public class MainfilesController : ControllerBase
     public async Task<ActionResult<Mainfile>> GetMainfileByCode(int code)
     {
         var mainfile = await _repository.GetByCodeAsync(code);
+        if (mainfile == null) return NotFound();
+        return Ok(mainfile);
+    }
+
+    [HttpGet("cid/{cid}")]
+    public async Task<ActionResult<Mainfile>> GetMainfileByCid(string cid)
+    {
+        var mainfile = await _repository.GetByCidAsync(cid);
         if (mainfile == null) return NotFound();
         return Ok(mainfile);
     }
@@ -161,5 +169,61 @@ public class MainfilesController : ControllerBase
         await _notificationService.BroadcastToChannelAsync(deptGroupName, "excel_data_updated", new { type = "Mainfile", id = id, action = "deleted" });
 
         return NoContent();
+    }
+
+    [HttpPut("{id}/status")]
+    public async Task<IActionResult> UpdateStatus(long id, [FromBody] StatusUpdateDto request)
+    {
+        var existing = await _repository.GetByIdAsync(id);
+        if (existing == null) return NotFound();
+
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized();
+
+        var currentUser = await _context.Users.FindAsync(userId);
+
+        object previousValue = null;
+        object newValue = null;
+        string fieldName = request.Field.ToLower();
+
+        switch (fieldName)
+        {
+            case "cooperation":
+                previousValue = existing.CooperationStatusId;
+                existing.CooperationStatusId = request.NewValueId;
+                newValue = request.NewValueId;
+                break;
+            case "contact":
+                previousValue = existing.ContactStatusId;
+                existing.ContactStatusId = request.NewValueId;
+                newValue = request.NewValueId;
+                break;
+            case "civil":
+                previousValue = existing.CivilStatusId;
+                existing.CivilStatusId = request.NewValueId;
+                newValue = request.NewValueId;
+                break;
+            case "internal":
+                previousValue = existing.InternalStatusId;
+                existing.InternalStatusId = request.NewValueId;
+                newValue = request.NewValueId;
+                break;
+            case "work":
+                previousValue = existing.Work;
+                existing.Work = request.NewValueText;
+                newValue = request.NewValueText;
+                break;
+            default:
+                return BadRequest("Invalid status field");
+        }
+
+        await _repository.UpdateAsync(existing);
+
+        // Audit Log
+        string description = $"تعديل حالة {request.Field}: من {previousValue ?? "N/A"} إلى {newValue ?? "N/A"}";
+        await _auditService.LogActionAsync(existing.Code, null, "UPDATE_STATUS", description, previousValue, "Mainfile", existing.Id.ToString(), existing.DateAdded, DateTime.UtcNow, userId);
+
+        return Ok(new { message = "Status updated successfully", field = request.Field, newValue });
     }
 }
