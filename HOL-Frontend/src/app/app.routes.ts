@@ -7,8 +7,15 @@ import NegotiationsDashboard from './features/negotiations/pages/negotiations-da
 import { MainLayout } from './features/execution/pages/main/main-layout/main-layout';
 import { authGuard } from './guards/auth.guard';
 import { departmentGuard } from './guards/department.guard';
+import { PrintPage } from './shared/pages/print-page/print-page';
 
 export const routes: Routes = [
+  // Print Routes (Isolated from layout)
+  {
+    path: 'print/:type',
+    component: PrintPage,
+    data: { title: 'طباعة التقرير' }
+  },
   // Login Routes (without guard)
   {
     path: 'login',

@@ -42,75 +42,83 @@
 
 <!-- clients -->
 <div *ngIf="activeMainTab === 'clients'" class="page-content">
-  <div class="premium-table">
-    <table class="premium-table">
+  <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+    <table class="premium-table w-full">
       <thead>
-        <tr>
-          <th>#</th>
-          <th>الكود</th>
-          <th>الاسم</th>
-          <th>المحامي</th>
-          <th>المحكمة</th>
-          <th>المسؤول (MD)</th>
-          <th>المستشار</th>
-          <th>حالة الملف</th>
-          <th>سبب المديونية</th>
-          <th>رقم الباتش</th>
-          <th>رقم العقد</th>
-          <th>الجنسية</th>
-          <th>الرقم المدني</th>
-          <th>المدفوع</th>
-          <th>قيمة المطالبة</th>
-          <th>المتبقي</th>
-          <th>العنوان</th>
-          <th>الموكل</th>
-          <th>حالة المتابعة</th>
-          <th>حالة العميل</th>
-          <th>حالة التواصل</th>
-          <th>حالة التعاون</th>
-          <th>حالة المدنية</th>
-          <th>حالة الداخلية</th>
-          <th>اخر سداد</th>
-          <th>تاريخ اخر سداد</th>
-          <th>اخر افادة</th>
-          <th>تاريخ اخر افادة</th>
-          <th>تاريخ المراجعة</th>
+        <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الكود</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الاسم</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المحامي</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المحكمة</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المسؤول (MD)</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المستشار</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة الملف</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">سبب المديونية</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">رقم الباتش</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">رقم العقد</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الجنسية</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الرقم المدني</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المدفوع</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">قيمة المطالبة</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المتبقي</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">العنوان</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الموكل</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة المتابعة</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة العميل</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة التواصل</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة التعاون</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة المدنية</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة الداخلية</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">اخر سداد</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ اخر سداد</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">اخر افادة</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ اخر افادة</th>
+          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ المراجعة</th>
         </tr>
       </thead>
-      <tbody>
-        <tr *ngFor="let row of clientRows; let i = index">
-          <td class="text-center">{{ i + 1 }}</td>
-          <td>{{row.code}}</td>
-          <td style="font-weight: 600; color: var(--primary-color);">{{row.name}}</td>
-          <td>{{row.lawyerName}}</td>
-          <td>{{row.courtName}}</td>
-          <td>{{row.mdName}}</td>
-          <td>{{row.advisorName}}</td>
-          <td>{{row.fileStatus}}</td>
-          <td>{{row.debtReason}}</td>
-          <td>{{row.batch}}</td>
-          <td>{{row.contractNum}}</td>
-          <td>{{row.nationality}}</td>
-          <td>{{row.civilId}}</td>
-          <td style="color: var(--green-500); font-weight: 600;">{{row.paid | number}}</td>
-          <td style="color: var(--red-500); font-weight: 600;">{{row.claim | number}}</td>
-          <td>{{row.remaining | number}}</td>
-          <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{row.address}}
+      <tbody class="text-[11px]">
+        <tr *ngFor="let row of clientRows; let i = index" (click)="selectFile(row)"
+          class="border-b border-slate-50 dark:border-slate-800 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 cursor-pointer transition-colors">
+          <td class="py-2 px-3 text-center text-slate-400 font-mono">{{ i + 1 }}</td>
+          <td class="py-2 px-3 font-medium text-slate-600 dark:text-slate-400">{{row.code}}</td>
+          <td class="py-2 px-3 font-bold text-indigo-600 dark:text-indigo-400">{{row.name}}</td>
+          <td class="py-2 px-3 text-slate-500">{{row.lawyerName}}</td>
+          <td class="py-2 px-3 text-slate-500">{{row.courtName}}</td>
+          <td class="py-2 px-3 text-slate-500">{{row.mdName}}</td>
+          <td class="py-2 px-3 text-slate-500">{{row.advisorName}}</td>
+          <td class="py-2 px-3">
+             <span class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{{row.fileStatus}}</span>
           </td>
-          <td style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
-            [title]="row.client">{{row.client}}</td>
-          <td>{{row.followUpStatus}}</td>
-          <td>{{row.clientStatus}}</td>
-          <td>{{row.contactStatus}}</td>
-          <td>{{row.cooperationStatus}}</td>
-          <td>{{row.civilStatus}}</td>
-          <td>{{row.internalStatus}}</td>
-          <td>{{row.lastPaymentAmount | number}}</td>
-          <td>{{row.lastPaymentDate}}</td>
-          <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
-            [title]="row.lastStatement">{{row.lastStatement}}</td>
-          <td>{{row.lastStatementDate}}</td>
-          <td>{{row.reviewDate}}</td>
+          <td class="py-2 px-3 text-slate-500">{{row.debtReason}}</td>
+          <td class="py-2 px-3 text-slate-500">{{row.batch}}</td>
+          <td class="py-2 px-3 text-slate-500">{{row.contractNum}}</td>
+          <td class="py-2 px-3 text-slate-500">{{row.nationality}}</td>
+          <td class="py-2 px-3 text-slate-500">{{row.civilId}}</td>
+          <td class="py-2 px-3 font-bold text-emerald-600">{{row.paid | number}}</td>
+          <td class="py-2 px-3 font-bold text-rose-600">{{row.claim | number}}</td>
+          <td class="py-2 px-3 font-bold text-amber-600">{{row.remaining | number}}</td>
+          <td class="py-2 px-3 text-slate-400 max-w-[150px] truncate" [title]="row.address">{{row.address}}</td>
+          <td class="py-2 px-3 text-slate-400 max-w-[100px] truncate" [title]="row.client">{{row.client}}</td>
+          <td class="py-2 px-3 italic">{{row.followUpStatus}}</td>
+          <td class="py-2 px-3 italic">{{row.clientStatus}}</td>
+          <td class="py-2 px-3 italic">{{row.contactStatus}}</td>
+          <td class="py-2 px-3 italic">{{row.cooperationStatus}}</td>
+          <td class="py-2 px-3 italic">{{row.civilStatus}}</td>
+          <td class="py-2 px-3 italic">{{row.internalStatus}}</td>
+          <td class="py-2 px-3 text-emerald-500 font-bold">{{row.lastPaymentAmount | number}}</td>
+          <td class="py-2 px-3 text-slate-400">{{row.lastPaymentDate}}</td>
+          <td class="py-2 px-3 text-slate-400 truncate max-w-[150px]" [title]="row.lastStatement">{{row.lastStatement}}</td>
+          <td class="py-2 px-3 text-slate-400">{{row.lastStatementDate}}</td>
+          <td class="py-2 px-3 text-slate-400">{{row.reviewDate}}</td>
+        </tr>
+        <tr *ngIf="!clientRows || clientRows.length === 0">
+           <td colspan="29" class="text-center py-20 bg-slate-50/20 dark:bg-slate-900/10">
+             <div class="flex flex-col items-center gap-3">
+               <span class="text-4xl grayscale opacity-50">🔍</span>
+               <span class="text-slate-400 italic">لا توجد سجلات مطابقة للبحث</span>
+             </div>
+           </td>
         </tr>
       </tbody>
     </table>
@@ -148,7 +156,7 @@
             </div>
             <div class="form-field">
               <label class="form-label">التصنيف</label>
-              <input type="text" class="form-input" [value]="selectedPerson?.classification || 'غير موجود'" readonly />
+              <input type="text" class="form-input" [value]="selectedPerson?.classification?.classification || 'غير موجود'" readonly />
             </div>
             <div class="form-field">
               <label class="form-label">العقد</label>
@@ -181,6 +189,10 @@
           <div class="premium-tabs-container w-full overflow-x-auto">
             <a class="premium-tab" [class.active]="activeSubTab === 'main'" (click)="changeTab('main')">
               الرئيسية
+            </a>
+            <a class="premium-tab" [class.active]="activeSubTab === 'classification'"
+              (click)="changeTab('classification')">
+              تصنيف
             </a>
             <a class="premium-tab" [class.active]="activeSubTab === 'files'" (click)="changeTab('files')">
               الديون
@@ -228,15 +240,19 @@
                 <div class="form-grid form-grid-3">
                   <div class="form-field">
                     <label class="form-label">القطاع</label>
-                    <input type="text" class="premium-input" />
+                    <input type="text" class="premium-input" [value]="selectedFile?.mdName || ''" readonly />
                   </div>
                   <div class="form-field">
                     <label class="form-label">المحامي</label>
-                    <input type="text" class="premium-input" />
+                    <input type="text" class="premium-input" [value]="selectedFile?.lawyerName || ''" readonly />
                   </div>
                   <div class="form-field">
                     <label class="form-label">اسم المدعي القانوني</label>
-                    <input type="text" class="premium-input" />
+                    <input type="text" class="premium-input" [value]="selectedFile?.name || ''" readonly />
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label">المستشار القانوني</label>
+                    <input type="text" class="premium-input" [value]="selectedFile?.advisorName || ''" readonly />
                   </div>
                 </div>
 
@@ -258,12 +274,18 @@
                       (click)="activeNoteTab=6">ملاحظات 6</button>
                   </div>
 
-                  <textarea *ngIf="activeNoteTab===1" class="premium-input" rows="4"></textarea>
-                  <textarea *ngIf="activeNoteTab===2" class="premium-input" rows="4"></textarea>
-                  <textarea *ngIf="activeNoteTab===3" class="premium-input" rows="4"></textarea>
-                  <textarea *ngIf="activeNoteTab===4" class="premium-input" rows="4"></textarea>
-                  <textarea *ngIf="activeNoteTab===5" class="premium-input" rows="4"></textarea>
-                  <textarea *ngIf="activeNoteTab===6" class="premium-input" rows="4"></textarea>
+                  <textarea *ngIf="activeNoteTab===1" class="premium-input" rows="4" [value]="selectedFile?.note1 || ''"
+                    readonly></textarea>
+                  <textarea *ngIf="activeNoteTab===2" class="premium-input" rows="4" [value]="selectedFile?.note2 || ''"
+                    readonly></textarea>
+                  <textarea *ngIf="activeNoteTab===3" class="premium-input" rows="4" [value]="selectedFile?.note3 || ''"
+                    readonly></textarea>
+                  <textarea *ngIf="activeNoteTab===4" class="premium-input" rows="4" [value]="selectedFile?.note4 || ''"
+                    readonly></textarea>
+                  <textarea *ngIf="activeNoteTab===5" class="premium-input" rows="4" [value]="selectedFile?.note5 || ''"
+                    readonly></textarea>
+                  <textarea *ngIf="activeNoteTab===6" class="premium-input" rows="4" [value]="selectedFile?.note6 || ''"
+                    readonly></textarea>
                 </div>
 
                 <div class="flex flex-col xl:flex-row justify-between gap-6">
@@ -273,19 +295,23 @@
                       <div class="grid grid-cols-2 gap-4">
                         <div class="form-field">
                           <label class="form-label">تاريخ الورود</label>
-                          <input type="date" class="premium-input" />
+                          <input type="date" class="premium-input" [value]="selectedFile?.dateAdded | date:'yyyy-MM-dd'"
+                            readonly />
                         </div>
                         <div class="form-field">
                           <label class="form-label">تاريخ الاستلام</label>
-                          <input type="date" class="premium-input" />
+                          <input type="date" class="premium-input" [value]="selectedFile?.dateAdded | date:'yyyy-MM-dd'"
+                            readonly />
                         </div>
                         <div class="form-field">
                           <label class="form-label">تاريخ السحب</label>
-                          <input type="date" class="premium-input" />
+                          <input type="date" class="premium-input"
+                            [value]="selectedFile?.dateFinished | date:'yyyy-MM-dd'" readonly />
                         </div>
                         <div class="form-field">
                           <label class="form-label">تاريخ أول ورود</label>
-                          <input type="date" class="premium-input" />
+                          <input type="date" class="premium-input" [value]="selectedFile?.dateAdded | date:'yyyy-MM-dd'"
+                            readonly />
                         </div>
                       </div>
                     </div>
@@ -341,27 +367,11 @@
                       <label class="form-label">المحكمة</label>
                       <div class="flex gap-2">
                         <input type="text" class="premium-input" style="flex: 1;"
-                          [value]="selectedPerson?.court || 'غير موجود'" readonly />
+                          [value]="selectedFile?.courtName || 'غير موجود'" readonly />
                         <button class="premium-btn premium-btn-outline px-4" (click)="openLookup('court')">🔍</button>
                       </div>
                     </div>
-                    <div class="form-field border-t border-slate-100 pt-3 mt-1">
-                      <label class="form-label">حالة الداخلية</label>
-                      <div class="flex gap-2">
-                        <input type="text" class="premium-input" style="flex: 1;"
-                          [value]="selectedPerson?.internalStatus || 'غير موجود'" readonly />
-                        <button class="premium-btn premium-btn-outline px-4"
-                          (click)="openLookup('interior')">🔍</button>
-                      </div>
-                    </div>
-                    <div class="form-field border-t border-slate-100 pt-3 mt-1">
-                      <label class="form-label">حالة المدنية</label>
-                      <div class="flex gap-2">
-                        <input type="text" class="premium-input" style="flex: 1;"
-                          [value]="selectedPerson?.civilStatus || 'غير موجود'" readonly />
-                        <button class="premium-btn premium-btn-outline px-4" (click)="openLookup('civil')">🔍</button>
-                      </div>
-                    </div>
+
                   </div>
                 </div>
 
@@ -384,28 +394,38 @@
 
 
           </div>
-          <!-- (2) الديون -->
           <div *ngIf="activeSubTab === 'files'" class="p-2">
-            <div class="premium-table overflow-x-auto">
-              <table class="premium-table">
+            <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+              <table class="premium-table w-full">
                 <thead>
-                  <tr>
-                    <th>الكود</th>
-                    <th>الموكل</th>
-                    <th>سبب المديونية</th>
-                    <th>المطالبة</th>
-                    <th>المحامي</th>
-                    <th>المحكمة</th>
+                  <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                    <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الكود</th>
+                    <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الموكل</th>
+                    <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">سبب المديونية</th>
+                    <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المطالبة</th>
+                    <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المسدد</th>
+                    <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المتبقي</th>
+                    <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المحامي</th>
+                    <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المحكمة</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr *ngFor="let row of clientRows">
-                    <td>{{row.code}}</td>
-                    <td>{{row.client}}</td>
-                    <td>{{row.debtReason}}</td>
-                    <td style="color: var(--red-500); font-weight: 600;">{{row.claim | number}}</td>
-                    <td>{{row.lawyerName}}</td>
-                    <td>{{row.courtName}}</td>
+                <tbody class="text-[11px]">
+                  <tr *ngFor="let row of clientRows"
+                    (click)="selectFile(row); selectDebtForModal(row); debtModal.showModal()"
+                    class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-700/30 cursor-pointer transition-colors">
+                    <td class="py-2 px-3 font-medium text-slate-600 dark:text-slate-400">{{row.code}}</td>
+                    <td class="py-2 px-3 text-slate-500">{{row.client}}</td>
+                    <td class="py-2 px-3 text-slate-500">{{row.debtReason}}</td>
+                    <td class="py-2 px-3 font-bold text-rose-600">{{row.claim | number}}</td>
+                    <td class="py-2 px-3 font-bold text-emerald-600">{{row.paid | number}}</td>
+                    <td class="py-2 px-3 font-bold text-indigo-600">{{row.remaining | number}}</td>
+                    <td class="py-2 px-3 text-slate-500">{{row.lawyerName}}</td>
+                    <td class="py-2 px-3 text-slate-500">{{row.courtName}}</td>
+                  </tr>
+                  <tr *ngIf="!clientRows || clientRows.length === 0">
+                     <td colspan="8" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+                       لا توجد ديون مسجلة لهذه الفئة
+                     </td>
                   </tr>
                 </tbody>
               </table>
@@ -413,142 +433,198 @@
           </div>
 
           <!-- (3) الدفعات والمبالغ -->
-          <div *ngIf="activeSubTab === 'payments'" class="p-2 space-y-4">
-            <h4 class="text-sm font-bold text-slate-500">سجل الدفعات</h4>
-            <div class="premium-table">
-              <table class="premium-table">
-                <thead>
-                  <tr>
-                    <th>التاريخ</th>
-                    <th>المبلغ</th>
-                    <th>الوسيلة</th>
-                    <th>بواسطة</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let p of payments">
-                    <td>{{p.dateAdded | date:'yyyy-MM-dd'}}</td>
-                    <td style="color: var(--green-600); font-weight: 600;">{{p.value | number}}</td>
-                    <td>{{p.paymentMethod}}</td>
-                    <td>{{p.userAddedName}}</td>
-                  </tr>
-                  <tr *ngIf="payments.length === 0">
-                    <td colspan="4" class="text-center text-slate-400">لا توجد دفعات مسجلة</td>
-                  </tr>
-                </tbody>
-              </table>
+          <div *ngIf="activeSubTab === 'payments'" class="p-2 space-y-6">
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-1.5 h-4 bg-emerald-500 rounded-full"></span>
+                <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">سجل الدفعات</h4>
+              </div>
+              <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+                <table class="premium-table w-full">
+                  <thead>
+                    <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المبلغ</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الوسيلة</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">بواسطة</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">مندوب المبيعات</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">رقم السند</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة الملف بعد السداد</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-[11px]">
+                    <tr *ngFor="let p of payments" (click)="selectPaymentForModal(p); paymentModal.showModal()"
+                      class="border-b border-slate-50 dark:border-slate-800 hover:bg-emerald-50/30 dark:hover:bg-emerald-900/10 cursor-pointer transition-colors">
+                      <td class="py-2 px-3 text-slate-400">{{p.dateAdded | date:'yyyy-MM-dd'}}</td>
+                      <td class="py-2 px-3 font-bold text-emerald-600">{{p.value | number}}</td>
+                      <td class="py-2 px-3 text-slate-500">{{p.paymentMethod}}</td>
+                      <td class="py-2 px-3 font-medium text-slate-600">{{p.userAddedName}}</td>
+                      <td class="py-2 px-3 text-slate-400">{{p.salesAgent || '-'}}</td>
+                      <td class="py-2 px-3 text-slate-400 font-mono">{{p.jouralEntry || '-'}}</td>
+                      <td class="py-2 px-3">
+                        <span class="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 text-[10px] font-bold">
+                          {{p.fileStatusAfter || '-'}}
+                        </span>
+                      </td>
+                    </tr>
+                    <tr *ngIf="!payments || payments.length === 0">
+                      <td colspan="7" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+                        لا توجد دفعات مسجلة لهذا الملف
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            <h4 class="text-sm font-bold text-slate-500 mt-4">المبالغ الإضافية</h4>
-            <div class="premium-table">
-              <table class="premium-table">
-                <thead>
-                  <tr>
-                    <th>التاريخ</th>
-                    <th>المبلغ</th>
-                    <th>النوع</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let a of additionalAmounts">
-                    <td>{{a.dateAdded | date:'yyyy-MM-dd'}}</td>
-                    <td>{{a.value | number}}</td>
-                    <td>{{a.amountType}}</td>
-                  </tr>
-                  <tr *ngIf="additionalAmounts.length === 0">
-                    <td colspan="3" class="text-center text-slate-400">لا توجد مبالغ إضافية</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-1.5 h-4 bg-amber-500 rounded-full"></span>
+                <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">المبالغ الإضافية</h4>
+              </div>
+              <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+                <table class="premium-table w-full">
+                  <thead>
+                    <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المبلغ</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">النوع</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-[11px]">
+                    <tr *ngFor="let a of additionalAmounts"
+                      class="border-b border-slate-50 dark:border-slate-800 hover:bg-amber-50/30 dark:hover:bg-amber-900/10 transition-colors">
+                      <td class="py-2 px-3 text-slate-400">{{a.dateAdded | date:'yyyy-MM-dd'}}</td>
+                      <td class="py-2 px-3 font-bold text-amber-600">{{a.value | number}}</td>
+                      <td class="py-2 px-3 text-slate-500 font-medium">{{a.amountType}}</td>
+                    </tr>
+                    <tr *ngIf="!additionalAmounts || additionalAmounts.length === 0">
+                      <td colspan="3" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+                        لا توجد مبالغ إضافية مسجلة
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
           <!-- (4) البيانات القانونية -->
-          <div *ngIf="activeSubTab === 'legal'" class="p-2 space-y-4">
-            <h4 class="text-sm font-bold text-slate-500">الأرقام الآلية والمراجع</h4>
-            <div class="premium-table">
-              <table class="premium-table">
-                <thead>
-                  <tr>
-                    <th>الرقم</th>
-                    <th>النوع</th>
-                    <th>المرجع</th>
-                    <th>الخصم</th>
-                    <th>ملاحظات</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let n of autoNumbers">
-                    <td class="font-bold">{{n.autoNumberValue}}</td>
-                    <td>{{n.type}}</td>
-                    <td>{{n.caseRef}}</td>
-                    <td>{{n.claimant}}</td>
-                    <td>{{n.note}}</td>
-                  </tr>
-                </tbody>
-              </table>
+          <div *ngIf="activeSubTab === 'legal'" class="p-2 space-y-6">
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
+                <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">الأرقام الآلية والمراجع</h4>
+              </div>
+              <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+                <table class="premium-table w-full">
+                  <thead>
+                    <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الرقم</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">النوع</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المرجع</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الخصم</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">ملاحظات</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-[11px]">
+                    <tr *ngFor="let n of autoNumbers" class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
+                      <td class="py-2 px-3 font-bold text-indigo-600">{{n.autoNumberValue}}</td>
+                      <td class="py-2 px-3 text-slate-500">{{n.type}}</td>
+                      <td class="py-2 px-3 text-slate-400 font-mono text-[10px]">{{n.caseRef}}</td>
+                      <td class="py-2 px-3 text-slate-500">{{n.claimant}}</td>
+                      <td class="py-2 px-3 text-slate-400 italic">{{n.note}}</td>
+                    </tr>
+                    <tr *ngIf="!autoNumbers || autoNumbers.length === 0">
+                      <td colspan="5" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+                        لا توجد أرقام آلية مسجلة
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            <h4 class="text-sm font-bold text-slate-500 mt-4">تصنيفات الملف</h4>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div *ngFor="let c of classifications" class="p-3 rounded-lg bg-slate-50 border border-slate-100">
-                <div class="text-[10px] uppercase text-slate-400">{{c.department}}</div>
-                <div class="text-sm font-bold text-slate-700">{{c.classification}}</div>
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-1.5 h-4 bg-slate-400 rounded-full"></span>
+                <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">تصنيفات الملف</h4>
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div *ngFor="let c of classifications"
+                  class="p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 transition-all hover:border-indigo-200">
+                  <div class="text-[9px] uppercase text-slate-400 dark:text-slate-500 font-bold mb-1">{{c.department}}</div>
+                  <div class="text-sm font-bold text-slate-700 dark:text-slate-300">{{c.classification}}</div>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- (5) المرفقات -->
+          <!-- (5) المرفقات (Already modernized) -->
           <div *ngIf="activeSubTab === 'attachments'" class="p-2">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div *ngFor="let file of attachments"
-                class="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-all">
                 <div class="flex items-center gap-3">
                   <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">📄</div>
                   <div>
-                    <div class="text-sm font-bold text-slate-700">{{ file.attachType || 'مرفق' }}</div>
-                    <div class="text-[10px] text-slate-400">{{ file.dateAdded | date: 'yyyy-MM-dd' }}</div>
+                    <div class="text-sm font-bold text-slate-700 dark:text-slate-300">{{ file.attachType || 'مرفق' }}
+                    </div>
+                    <div class="text-[10px] text-slate-400 dark:text-slate-500">{{ file.dateAdded | date: 'yyyy-MM-dd'
+                      }}</div>
                   </div>
                 </div>
                 <button class="premium-btn premium-btn-outline text-xs" (click)="openAttachment(file)">فتح</button>
               </div>
-              <div *ngIf="attachments.length === 0" class="col-span-2 text-center p-8 text-slate-400">
+              <div *ngIf="!attachments || attachments.length === 0" class="col-span-2 text-center p-12 bg-slate-50/20 dark:bg-slate-900/10 rounded-2xl text-slate-400 italic">
                 لا توجد مرفقات لهذا الملف
               </div>
             </div>
           </div>
 
           <!-- (6) تاريخ الملف -->
-          <div *ngIf="activeSubTab === 'history'" class="p-2 space-y-4">
-            <h4 class="text-sm font-bold text-slate-500">سجل التعديلات (Audit)</h4>
-            <div class="premium-table">
-              <table class="premium-table">
-                <thead>
-                  <tr>
-                    <th>التاريخ</th>
-                    <th>الإجراء</th>
-                    <th>الوصف</th>
-                    <th>المستخدم</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let a of audits">
-                    <td>{{a.actionDate | date:'yyyy-MM-dd HH:mm'}}</td>
-                    <td><span class="px-2 py-0.5 rounded-full bg-slate-100 text-[10px] font-bold">{{a.action}}</span>
-                    </td>
-                    <td class="text-xs">{{a.description}}</td>
-                    <td>{{a.userName}}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <h4 class="text-sm font-bold text-slate-500 mt-4">تاريخ الحالات</h4>
-            <div class="flex flex-wrap gap-2">
-              <div *ngFor="let s of statuses"
-                class="px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700">
-                <div class="text-[10px] opacity-60">{{s.dateAdded | date:'yyyy-MM-dd'}}</div>
-                <div class="font-bold">{{s.status}}</div>
+          <div *ngIf="activeSubTab === 'history'" class="p-2 space-y-6">
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
+                <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">سجل التعديلات (Audit)</h4>
+              </div>
+              <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+                <table class="premium-table w-full">
+                  <thead>
+                    <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الإجراء</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الوصف</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المستخدم</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-[11px]">
+                    <tr *ngFor="let a of audits" class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
+                      <td class="py-2 px-3 text-slate-400 text-[10px] font-mono">{{a.actionDate | date:'yyyy-MM-dd HH:mm'}}</td>
+                      <td class="py-2 px-3">
+                        <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-tighter" [ngClass]="{
+                          'bg-emerald-100 text-emerald-700': a.action === 'ADD' || a.action === 'INSERT',
+                          'bg-blue-100 text-blue-700': a.action === 'UPDATE',
+                          'bg-rose-100 text-rose-700': a.action === 'DELETE',
+                          'bg-slate-100 text-slate-600': !['ADD', 'INSERT', 'UPDATE', 'DELETE'].includes(a.action)
+                        }">{{a.action}}</span>
+                      </td>
+                      <td class="py-2 px-3 text-slate-600 dark:text-slate-400 text-xs">{{a.description}}</td>
+                      <td class="py-2 px-3">
+                        <div class="flex items-center gap-2">
+                          <span class="w-5 h-5 rounded-full bg-indigo-50 flex items-center justify-center text-[9px] font-bold text-indigo-600 border border-indigo-100">{{a.userName?.charAt(0) || 'U'}}</span>
+                          <span class="font-medium text-slate-500">{{a.userName}}</span>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr *ngIf="!audits || audits.length === 0">
+                      <td colspan="4" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+                        لا توجد سجلات تدقيق متاحة
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -557,45 +633,293 @@
           <div *ngIf="activeSubTab === 'callcenter'" class="p-2">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div *ngFor="let s of callcenterStatements"
-                class="p-4 rounded-2xl bg-gradient-to-br from-white to-slate-50 border border-slate-100 shadow-sm hover:border-primary transition-all group">
+                class="p-4 rounded-2xl bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm hover:border-primary transition-all group">
                 <div class="flex justify-between items-start mb-3">
-                  <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{s.dateAdded |
+                  <div class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
+                    {{s.dateAdded |
                     date:'dd/MM/yyyy HH:mm'}}</div>
                   <span class="px-2 py-0.5 rounded text-[10px] font-bold" [ngClass]="{
-                    'bg-emerald-100 text-emerald-700': s.connectedStatus === 'تم الاتصال',
-                    'bg-amber-100 text-amber-700': s.connectedStatus === 'لا يرد',
-                    'bg-red-100 text-red-700': s.connectedStatus === 'رقم خطأ'
+                    'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': s.connectedStatus === 'تم الاتصال',
+                    'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': s.connectedStatus === 'لا يرد',
+                    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': s.connectedStatus === 'رقم خطأ'
                   }">{{s.connectedStatus}}</span>
                 </div>
 
-                <div class="text-lg font-bold text-primary mb-1">{{s.promiseAmount | number:'1.3-3'}} د.ك</div>
-                <div class="text-xs text-slate-600 mb-3 flex items-center gap-1">
+                <div class="text-lg font-bold text-primary dark:text-primary-focus mb-1">{{s.promiseAmount |
+                  number:'1.3-3'}} د.ك</div>
+                <div class="text-xs text-slate-600 dark:text-slate-400 mb-3 flex items-center gap-1">
                   <span class="opacity-50">بواسطة:</span> {{s.userAddedName}}
                 </div>
 
-                <div class="space-y-2 text-sm border-t border-slate-50 pt-3">
+                <div class="space-y-2 text-sm border-t border-slate-50 dark:border-slate-700 pt-3">
                   <div class="flex justify-between">
-                    <span class="text-slate-400">الوسيلة:</span>
-                    <span class="font-medium text-slate-700">{{s.contactMethod}}</span>
+                    <span class="text-slate-400 dark:text-slate-500">الوسيلة:</span>
+                    <span class="font-medium text-slate-700 dark:text-slate-300">{{s.contactMethod}}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-slate-400">رقم الهاتف:</span>
-                    <span class="font-medium text-slate-700">{{s.phoneNumber}}</span>
+                    <span class="text-slate-400 dark:text-slate-500">رقم الهاتف:</span>
+                    <span class="font-medium text-slate-700 dark:text-slate-300">{{s.phoneNumber}}</span>
                   </div>
                 </div>
 
-                <div class="mt-4 p-2 bg-slate-50 rounded-xl text-xs text-slate-500 italic">
+                <div
+                  class="mt-4 p-2 bg-slate-50 dark:bg-slate-700/50 rounded-xl text-xs text-slate-500 dark:text-slate-400 italic">
                   {{s.notes || 'لا يوجد ملاحظات'}}
                 </div>
               </div>
 
               <div *ngIf="callcenterStatements.length === 0"
-                class="col-span-full text-center p-12 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 text-slate-400">
+                class="col-span-full text-center p-12 bg-slate-50 dark:bg-slate-800 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500">
                 <div class="text-4xl mb-2">📋</div>
                 لا توجد إفادات مسجلة لهذا الملف
               </div>
             </div>
           </div>
+
+          <!-- (8) تصنيف (Classification Tab Modernized) -->
+          <div *ngIf="activeSubTab === 'classification'" class="p-4 animate-in fade-in duration-500 min-h-[400px]">
+            <!-- Action Header -->
+            <div class="flex items-center justify-between mb-8">
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                  🏷️
+                </div>
+                <div>
+                  <h2 class="text-xl font-black text-slate-800 tracking-tight font-sans">تصنيف الملف القانوني</h2>
+                  <p class="text-xs text-slate-400 font-bold">إدارة حالات الملف، الخصومات، وبيانات الدخل</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button (click)="saveAllClassifications()" [disabled]="loading"
+                  class="premium-btn premium-btn-primary flex items-center gap-2 px-8 py-3 group">
+                  <span *ngIf="loading"
+                    class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  <span *ngIf="!loading">💾</span>
+                  <span>حفظ التصنيف الكلي</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6">
+
+              <!-- Left Column: Status Grid -->
+              <div class="col-span-12 lg:col-span-8 space-y-6">
+
+                <!-- Status Row 1 -->
+                <div class="premium-card p-6">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="form-field">
+                      <label class="form-label text-slate-500 font-bold mb-2 block font-sans text-xs">حالة
+                        العميل</label>
+                      <select class="premium-input bg-white/50 border-slate-200 text-xs font-bold"
+                        [(ngModel)]="selectedPerson.classification.clientStatusId"
+                        (change)="onLookupSelected({id: selectedPerson.classification.clientStatusId, name: ''}, 'client')">
+                        <option [ngValue]="null">اختر الحالة...</option>
+                        <option *ngFor="let item of lookupLists.client" [ngValue]="item.id">{{item.name}}</option>
+                      </select>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-label text-slate-500 font-bold mb-2 block font-sans text-xs">حالة
+                        المطالبة</label>
+                      <select class="premium-input bg-white/50 border-slate-200 text-xs font-bold"
+                        [(ngModel)]="selectedPerson.classification.claimStatusId"
+                        (change)="onLookupSelected({id: selectedPerson.classification.claimStatusId, name: ''}, 'claim')">
+                        <option [ngValue]="null">اختر الحالة...</option>
+                        <option *ngFor="let item of lookupLists.claim" [ngValue]="item.id">{{item.name}}</option>
+                      </select>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-label text-slate-500 font-bold mb-2 block font-sans text-xs">حالة
+                        السداد</label>
+                      <select class="premium-input bg-white/50 border-slate-200 text-xs font-bold"
+                        [(ngModel)]="selectedPerson.classification.paymentStatusId"
+                        (change)="onLookupSelected({id: selectedPerson.classification.paymentStatusId, name: ''}, 'payment')">
+                        <option [ngValue]="null">اختر الحالة...</option>
+                        <option *ngFor="let item of lookupLists.payment" [ngValue]="item.id">{{item.name}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Status Row 2 -->
+                <div class="premium-card p-6">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="form-field">
+                      <label class="form-label text-slate-500 font-bold mb-2 block font-sans text-xs">حالة الملف</label>
+                      <select class="premium-input bg-white/50 border-slate-200 text-xs font-bold"
+                        [(ngModel)]="selectedPerson.classification.fileStatusId"
+                        (change)="onLookupSelected({id: selectedPerson.classification.fileStatusId, name: ''}, 'file')">
+                        <option [ngValue]="null">اختر الحالة...</option>
+                        <option *ngFor="let item of lookupLists.file" [ngValue]="item.id">{{item.name}}</option>
+                      </select>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-label text-slate-500 font-bold mb-2 block font-sans text-xs">حالة
+                        الاجراءات</label>
+                      <select class="premium-input bg-white/50 border-slate-200 text-xs font-bold"
+                        [(ngModel)]="selectedPerson.classification.actionStatusId"
+                        (change)="onLookupSelected({id: selectedPerson.classification.actionStatusId, name: ''}, 'action')">
+                        <option [ngValue]="null">اختر الحالة...</option>
+                        <option *ngFor="let item of lookupLists.action" [ngValue]="item.id">{{item.name}}</option>
+                      </select>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-label text-slate-500 font-bold mb-2 block font-sans text-xs">حالة
+                        المتابعة</label>
+                      <select class="premium-input bg-white/50 border-slate-200 text-xs font-bold"
+                        [(ngModel)]="selectedPerson.classification.followUpStatusId"
+                        (change)="onLookupSelected({id: selectedPerson.classification.followUpStatusId, name: ''}, 'followup')">
+                        <option [ngValue]="null">اختر الحالة...</option>
+                        <option *ngFor="let item of lookupLists.followup" [ngValue]="item.id">{{item.name}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Financial & Acceptance -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="premium-card p-6 h-full flex flex-col border-t-4 border-t-amber-400">
+                    <h3 class="text-sm font-bold text-amber-600 mb-4 flex items-center gap-2 font-sans">
+                      <span class="w-2 h-4 bg-amber-400 rounded-full"></span>
+                      الخصم والقبول
+                    </h3>
+                    <div class="space-y-4 flex-grow">
+                      <div class="form-field">
+                        <label class="form-label text-slate-400 text-[10px] font-bold uppercase">الخصم %</label>
+                        <div class="relative">
+                          <input type="number" class="premium-input pr-12 text-lg font-black text-slate-700"
+                            [(ngModel)]="selectedPerson.classification.discount"
+                            (change)="updateField('discount', selectedPerson.classification.discount)" />
+                          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
+                        </div>
+                      </div>
+                      <div class="form-field">
+                        <label class="form-label text-slate-400 text-[10px] font-bold uppercase">القبول</label>
+                        <select class="premium-input font-bold text-sm"
+                          [(ngModel)]="selectedPerson.classification.acceptance"
+                          (change)="updateField('acceptance', selectedPerson.classification.acceptance)">
+                          <option value="">لا يوجد خصم</option>
+                          <option value="قبول">✅ قبول</option>
+                          <option value="رفض">❌ رفض</option>
+                          <option value="معلق">⏳ معلق</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="premium-card p-6 h-full flex flex-col border-t-4 border-t-blue-400">
+                    <h3 class="text-sm font-bold text-blue-600 mb-4 flex items-center gap-2 font-sans">
+                      <span class="w-2 h-4 bg-blue-400 rounded-full"></span>
+                      مصدر الدخل
+                    </h3>
+                    <div class="space-y-4 flex-grow">
+                      <div class="form-field">
+                        <label class="form-label text-slate-400 text-[10px] font-bold uppercase">الدوام /
+                          الوظيفة</label>
+                        <input type="text" class="premium-input font-bold text-sm" [(ngModel)]="selectedPerson.work"
+                          (blur)="updateField('work', selectedPerson.work)" placeholder="ادخل وظيفة العميل..." />
+                      </div>
+                      <div class="form-field">
+                        <label class="form-label text-slate-400 text-[10px] font-bold uppercase">تاريخ الراتب</label>
+                        <input type="date" class="premium-input font-bold text-xs"
+                          [(ngModel)]="selectedPerson.classification.salaryDate"
+                          (change)="updateField('salarydate', selectedPerson.classification.salaryDate)" />
+                      </div>
+                      <div class="form-field">
+                        <label class="form-label text-slate-400 text-[10px] font-bold uppercase">ملاحظات الدخل</label>
+                        <textarea class="premium-input text-xs" rows="2"
+                          [(ngModel)]="selectedPerson.classification.incomeNotes"
+                          (blur)="updateField('incomenotes', selectedPerson.classification.incomeNotes)"
+                          placeholder="اي ملاحظات اضافية..."></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Right Column: Secondary Statuses Stack -->
+              <div class="col-span-12 lg:col-span-4">
+                <div class="premium-card p-6 h-full bg-slate-50/30">
+                  <h3
+                    class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2 font-sans">
+                    <span class="w-1.5 h-5 bg-primary rounded-full"></span>
+                    تصنيفات إضافية
+                  </h3>
+                  <div class="space-y-4">
+                    <!-- Internal Status -->
+                    <div
+                      class="p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/30 transition-all group shadow-sm">
+                      <label
+                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 block font-sans">حالة
+                        الداخلية</label>
+                      <select class="premium-input bg-slate-50/50 border-none text-xs font-black p-0 h-auto"
+                        [(ngModel)]="selectedPerson.classification.internalStatusId"
+                        (change)="onLookupSelected({id: selectedPerson.classification.internalStatusId, name: ''}, 'internal')">
+                        <option *ngFor="let item of lookupLists.interior" [ngValue]="item.id">{{item.name}}</option>
+                      </select>
+                    </div>
+
+                    <!-- Civil Status -->
+                    <div
+                      class="p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/30 transition-all group shadow-sm">
+                      <label
+                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 block font-sans">حالة
+                        المدنية</label>
+                      <select class="premium-input bg-slate-50/50 border-none text-xs font-black p-0 h-auto"
+                        [(ngModel)]="selectedPerson.classification.civilStatusId"
+                        (change)="onLookupSelected({id: selectedPerson.classification.civilStatusId, name: ''}, 'civil')">
+                        <option *ngFor="let item of lookupLists.civil" [ngValue]="item.id">{{item.name}}</option>
+                      </select>
+                    </div>
+
+                    <!-- Contact Status -->
+                    <div
+                      class="p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/30 transition-all group shadow-sm">
+                      <label
+                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 block font-sans">حالة
+                        التواصل</label>
+                      <select class="premium-input bg-slate-50/50 border-none text-xs font-black p-0 h-auto"
+                        [(ngModel)]="selectedPerson.classification.contactStatusId"
+                        (change)="onLookupSelected({id: selectedPerson.classification.contactStatusId, name: ''}, 'contact')">
+                        <option *ngFor="let item of lookupLists.contact" [ngValue]="item.id">{{item.name}}</option>
+                      </select>
+                    </div>
+
+                    <!-- Cooperation Status -->
+                    <div
+                      class="p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/30 transition-all group shadow-sm">
+                      <label
+                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 block font-sans">حالة
+                        التعاون</label>
+                      <select class="premium-input bg-slate-50/50 border-none text-xs font-black p-0 h-auto"
+                        [(ngModel)]="selectedPerson.classification.cooperationStatusId"
+                        (change)="onLookupSelected({id: selectedPerson.classification.cooperationStatusId, name: ''}, 'cooperation')">
+                        <option *ngFor="let item of lookupLists.cooperation" [ngValue]="item.id">{{item.name}}</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Summary Sticker -->
+                  <div
+                    class="mt-8 p-6 rounded-3xl bg-primary text-white relative overflow-hidden shadow-xl shadow-primary/20">
+                    <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/20 rounded-full blur-2xl"></div>
+                    <div class="relative z-10">
+                      <div class="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-1 font-sans">ملخص
+                        التصنيف
+                      </div>
+                      <div class="text-xl font-black">{{selectedPerson?.clientStatus || 'معلق'}}</div>
+                      <div class="text-[10px] text-white/50 mt-1 font-bold">تحديث دوري نشط</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -658,15 +982,17 @@
                     <tr>
                       <th class="text-center w-16">#</th>
                       <th>الرقم</th>
-                      <th>المستخدم</th>
+                      <th>العلاقة</th>
+                      <th>المصدر</th>
                       <th class="text-center">الحالة</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let row of numbers; let i = index">
                       <td class="text-center text-slate-400 font-mono text-xs">{{ i + 1 }}</td>
-                      <td class="font-bold text-slate-700">{{ row.number }}</td>
-                      <td>{{ row.user }}</td>
+                      <td class="font-bold text-slate-700">{{ row.phone }}</td>
+                      <td>{{ row.relation }}</td>
+                      <td>{{ row.source }}</td>
                       <td class="text-center">
                         <span class="px-2 py-1 rounded-full text-[10px] font-bold" [ngClass]="{
                                 'bg-emerald-100 text-emerald-700': row.status === 'نشط',
@@ -675,6 +1001,9 @@
                           {{ row.status }}
                         </span>
                       </td>
+                    </tr>
+                    <tr *ngIf="!numbers || numbers.length === 0">
+                      <td colspan="5" class="text-center py-4 text-slate-500">لا توجد أرقام مسجلة</td>
                     </tr>
                   </tbody>
                 </table>
@@ -685,18 +1014,111 @@
             <div *ngIf="activeTab === 'add'" class="p-6 animate-in slide-in-from-bottom-2 duration-300">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
                 <div class="form-field">
-                  <label class="form-label">مستخدم الرقم</label>
-                  <input type="text" class="premium-input" [(ngModel)]="addForm.user" name="user"
-                    placeholder="اسم المستخدم..." />
+                  <label class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">رقم
+                    الهاتف</label>
+                  <input type="text" class="premium-input" [(ngModel)]="addForm.phone" name="phone"
+                    placeholder="أدخل الرقم..." />
                 </div>
                 <div class="form-field">
-                  <label class="form-label">المصدر</label>
+                  <label
+                    class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">العلاقة</label>
+                  <input type="text" class="premium-input" [(ngModel)]="addForm.relation" name="relation"
+                    placeholder="مثل: صاحب الرقم، أخ، أب..." />
+                </div>
+                <div class="form-field">
+                  <label
+                    class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">المصدر</label>
                   <input type="text" class="premium-input" [(ngModel)]="addForm.source" name="source"
                     placeholder="تحديد المصدر..." />
                 </div>
+                <div class="form-field">
+                  <label
+                    class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">الحالة</label>
+                  <select [(ngModel)]="addForm.status" name="status"
+                    class="premium-input bg-white cursor-pointer hover:bg-slate-50 transition-colors">
+                    <option value="نشط">نشط</option>
+                    <option value="غير نشط">غير نشط</option>
+                    <option value="مغلق">مغلق</option>
+                  </select>
+                </div>
                 <div class="md:col-span-2 flex justify-end gap-3 mt-4">
-                  <button class="premium-btn premium-btn-secondary px-8">إلغاء</button>
+                  <button class="premium-btn premium-btn-secondary px-8" (click)="activeTab = 'numbers'">إلغاء</button>
                   <button class="premium-btn premium-btn-primary px-8" (click)="saveNumber()">💾 حفظ الرقم</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Status History Table (New Section) -->
+            <div class="mt-8">
+              <div class="premium-card p-6 border-b-4 border-b-primary shadow-lg bg-white/80 backdrop-blur-sm">
+                <div class="flex items-center justify-between mb-6">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                      📋
+                    </div>
+                    <div>
+                      <h3 class="text-lg font-black text-slate-800 tracking-tight font-sans">سجل تحديثات الحالات</h3>
+                      <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Linked by File_code
+                        Audit Trail</p>
+                    </div>
+                  </div>
+                  <div
+                    class="px-4 py-1.5 rounded-full bg-slate-50 border border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
+                    {{ statuses.length || 0 }} Entries
+                  </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-2xl border border-slate-100 shadow-sm">
+                  <table class="premium-table w-full text-right border-collapse">
+                    <thead>
+                      <tr
+                        class="bg-slate-50/50 text-[11px] uppercase font-bold text-slate-500 border-b border-slate-100">
+                        <th class="py-4 px-6 text-right">التاريخ</th>
+                        <th class="py-4 px-6 text-right">الموظف</th>
+                        <th class="py-4 px-6 text-right">نوع الحالة</th>
+                        <th class="py-4 px-6 text-right">الحالة الجديدة</th>
+                      </tr>
+                    </thead>
+                    <tbody class="text-xs">
+                      <tr *ngFor="let status of statuses"
+                        class="group border-b border-slate-50 hover:bg-primary/[0.02] transition-all">
+                        <td
+                          class="py-4 px-6 font-mono text-slate-400 font-bold group-hover:text-primary transition-colors">
+                          {{ status.dateAdded | date:'dd/MM/yyyy HH:mm' }}
+                        </td>
+                        <td class="py-4 px-6">
+                          <div class="flex items-center gap-2">
+                            <div
+                              class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500 shadow-sm">
+                              {{ status.userName?.substring(0,2) || 'S' }}
+                            </div>
+                            <span class="font-bold text-slate-600 truncate max-w-[120px]">{{ status.userName || 'System'
+                              }}</span>
+                          </div>
+                        </td>
+                        <td class="py-4 px-6 font-black text-slate-500 uppercase tracking-tighter italic">
+                          {{ status.statusType || '---' }}
+                        </td>
+                        <td class="py-4 px-6">
+                          <span
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 font-black text-[11px] shadow-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            {{ status.statusName || '---' }}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr *ngIf="!statuses || statuses.length === 0">
+                        <td colspan="4" class="py-12 text-center">
+                          <div class="flex flex-col items-center gap-3 opacity-30 grayscale">
+                            <div class="text-4xl">📭</div>
+                            <p class="text-sm italic font-bold text-slate-400">لا يوجد سجل تحديثات متاح لهذا الملف
+                              حالياً</p>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -715,14 +1137,34 @@
           <h3 class="text-sm font-bold">وسيلة التفاوض</h3>
         </div>
         <div class="card-body p-3">
-          <div class="grid grid-cols-2 gap-2">
-            <button *ngFor="let method of negotiationMethods" class="premium-btn premium-btn-outline"
-              style="padding: 0.4rem; font-size: 0.75rem;" (click)="selectAction(method)">
-              {{ method }}
-            </button>
+          <div class="grid grid-cols-2 gap-2 mb-2">
+            <ng-container *ngFor="let row of negotiationMethodsRows">
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 shadow-sm"
+                [class.bg-primary]="selectedAction === row.left" [class.border-primary]="selectedAction === row.left"
+                [class.text-white]="selectedAction === row.left" [class.bg-white]="selectedAction !== row.left"
+                [class.dark:bg-slate-800]="selectedAction !== row.left"
+                [class.border-slate-200]="selectedAction !== row.left"
+                [class.dark:border-slate-700]="selectedAction !== row.left"
+                [class.text-slate-700]="selectedAction !== row.left"
+                [class.dark:text-slate-300]="selectedAction !== row.left" (click)="selectAction(row.left)">
+                {{ row.left }}
+              </button>
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 shadow-sm"
+                [class.bg-primary]="selectedAction === row.right" [class.border-primary]="selectedAction === row.right"
+                [class.text-white]="selectedAction === row.right" [class.bg-white]="selectedAction !== row.right"
+                [class.dark:bg-slate-800]="selectedAction !== row.right"
+                [class.border-slate-200]="selectedAction !== row.right"
+                [class.dark:border-slate-700]="selectedAction !== row.right"
+                [class.text-slate-700]="selectedAction !== row.right"
+                [class.dark:text-slate-300]="selectedAction !== row.right" (click)="selectAction(row.right)">
+                {{ row.right }}
+              </button>
+            </ng-container>
           </div>
-          <div class="mt-2">
-            <button class="premium-btn premium-btn-outline w-full text-xs py-1.5">تحليل الإفادات</button>
+          <div class="mt-2 text-center">
+            <button class="premium-btn premium-btn-outline w-full py-1.5 text-xs">تحليل الإفادات</button>
           </div>
         </div>
       </div>
@@ -730,29 +1172,307 @@
       <!-- Negotiation Outcome -->
       <div class="col-span-12 lg:col-span-8 premium-card p-0">
         <div class="card-header py-2 px-3">
-          <h3 class="text-sm font-bold">نتيجة التفاوض</h3>
+          <h3 class="text-sm font-bold w-full text-center">نتيجة التفاوض</h3>
         </div>
         <div class="card-body p-3">
-          <div class="grid grid-cols-3 md:grid-cols-5 gap-2">
-            <button *ngFor="let result of negotiationResults" class="premium-btn"
-              [class.premium-btn-success]="result === 'وعد بالسداد' || result === 'تقسيط'"
-              [class.premium-btn-warning]="result === 'طلب مهلة' || result === 'شكوى'"
-              [class.premium-btn-danger]="result === 'رفض السداد' || result === 'غير معترف' || result === 'أنكر نفسه'"
-              [class.premium-btn-outline]="result === 'مراجعة' || result === 'لا يوجد رقم' || result === 'مطلوب رقم 2' || result === 'رقم خطأ'"
-              [class.premium-btn-secondary]="result === 'مطلوب إجراء' || result === 'تأجيل متابعة' || result === 'رفع الإجراءات' || result === 'خصم'"
-              style="padding: 0.4rem; font-size: 0.75rem;" (click)="selectedResult = result">
-              {{ result }}
-            </button>
+          <div class="flex flex-col gap-2.5">
+            <!-- Row 1: Key Positive Outcomes (Emerald Theme) -->
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-emerald-600]="selectedResult === 'طلب مهلة'"
+                [class.border-emerald-600]="selectedResult === 'طلب مهلة'"
+                [class.text-white]="selectedResult === 'طلب مهلة'" [class.scale-[1.02]]="selectedResult === 'طلب مهلة'"
+                [class.bg-white]="selectedResult !== 'طلب مهلة'"
+                [class.dark:bg-slate-800]="selectedResult !== 'طلب مهلة'"
+                [class.border-emerald-100]="selectedResult !== 'طلب مهلة'"
+                [class.dark:border-emerald-900/30]="selectedResult !== 'طلب مهلة'"
+                [class.text-emerald-700]="selectedResult !== 'طلب مهلة'"
+                [class.dark:text-emerald-400]="selectedResult !== 'طلب مهلة'"
+                (click)="handleResultClick('طلب مهلة')">طلب مهلة</button>
+
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-emerald-600]="selectedResult.includes('تقسيط')"
+                [class.border-emerald-600]="selectedResult.includes('تقسيط')"
+                [class.text-white]="selectedResult.includes('تقسيط')"
+                [class.scale-[1.02]]="selectedResult.includes('تقسيط')"
+                [class.bg-white]="selectedResult.includes('تقسيط') === false"
+                [class.dark:bg-slate-800]="selectedResult.includes('تقسيط') === false"
+                [class.border-emerald-100]="selectedResult.includes('تقسيط') === false"
+                [class.dark:border-emerald-900/30]="selectedResult.includes('تقسيط') === false"
+                [class.text-emerald-700]="selectedResult.includes('تقسيط') === false"
+                [class.dark:text-emerald-400]="selectedResult.includes('تقسيط') === false"
+                (click)="handleResultClick('تقسيط')">تقسيط</button>
+
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-emerald-600]="selectedResult.includes('وعد بالسداد')"
+                [class.border-emerald-600]="selectedResult.includes('وعد بالسداد')"
+                [class.text-white]="selectedResult.includes('وعد بالسداد')"
+                [class.scale-[1.02]]="selectedResult.includes('وعد بالسداد')"
+                [class.bg-white]="selectedResult.includes('وعد بالسداد') === false"
+                [class.dark:bg-slate-800]="selectedResult.includes('وعد بالسداد') === false"
+                [class.border-emerald-100]="selectedResult.includes('وعد بالسداد') === false"
+                [class.dark:border-emerald-900/30]="selectedResult.includes('وعد بالسداد') === false"
+                [class.text-emerald-700]="selectedResult.includes('وعد بالسداد') === false"
+                [class.dark:text-emerald-400]="selectedResult.includes('وعد بالسداد') === false"
+                (click)="handleResultClick('وعد بالسداد')">وعد بالسداد</button>
+            </div>
+
+            <!-- Row 2: Operational/Review (Blue Theme) -->
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-blue-600]="selectedResult === 'شكوى'" [class.border-blue-600]="selectedResult === 'شكوى'"
+                [class.text-white]="selectedResult === 'شكوى'" [class.bg-white]="selectedResult !== 'شكوى'"
+                [class.dark:bg-slate-800]="selectedResult !== 'شكوى'"
+                [class.border-blue-100]="selectedResult !== 'شكوى'"
+                [class.dark:border-blue-900/30]="selectedResult !== 'شكوى'"
+                [class.text-blue-700]="selectedResult !== 'شكوى'" [class.dark:text-blue-400]="selectedResult !== 'شكوى'"
+                (click)="handleResultClick('شكوى')">شكوى</button>
+
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-indigo-600]="selectedResult.includes('مراجعة')"
+                [class.border-indigo-600]="selectedResult.includes('مراجعة')"
+                [class.text-white]="selectedResult.includes('مراجعة')"
+                [class.bg-white]="selectedResult.includes('مراجعة') === false"
+                [class.dark:bg-slate-800]="selectedResult.includes('مراجعة') === false"
+                [class.border-indigo-100]="selectedResult.includes('مراجعة') === false"
+                [class.dark:border-indigo-900/30]="selectedResult.includes('مراجعة') === false"
+                [class.text-indigo-700]="selectedResult.includes('مراجعة') === false"
+                [class.dark:text-indigo-400]="selectedResult.includes('مراجعة') === false"
+                (click)="handleResultClick('مراجعة')">مراجعة</button>
+
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-blue-600]="selectedResult === 'فتح و إغلاق'"
+                [class.border-blue-600]="selectedResult === 'فتح و إغلاق'"
+                [class.text-white]="selectedResult === 'فتح و إغلاق'"
+                [class.bg-white]="selectedResult !== 'فتح و إغلاق'"
+                [class.dark:bg-slate-800]="selectedResult !== 'فتح و إغلاق'"
+                [class.border-blue-100]="selectedResult !== 'فتح و إغلاق'"
+                [class.dark:border-blue-900/30]="selectedResult !== 'فتح و إغلاق'"
+                [class.text-blue-700]="selectedResult !== 'فتح و إغلاق'"
+                [class.dark:text-blue-400]="selectedResult !== 'فتح و إغلاق'"
+                (click)="handleResultClick('فتح و إغلاق')">فتح و إغلاق</button>
+            </div>
+
+            <!-- Row 3: Denials (Rose Theme) -->
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-rose-600]="selectedResult === 'أنكر نفسه'"
+                [class.border-rose-600]="selectedResult === 'أنكر نفسه'"
+                [class.text-white]="selectedResult === 'أنكر نفسه'" [class.bg-white]="selectedResult !== 'أنكر نفسه'"
+                [class.dark:bg-slate-800]="selectedResult !== 'أنكر نفسه'"
+                [class.border-rose-100]="selectedResult !== 'أنكر نفسه'"
+                [class.dark:border-rose-900/30]="selectedResult !== 'أنكر نفسه'"
+                [class.text-rose-700]="selectedResult !== 'أنكر نفسه'"
+                [class.dark:text-rose-400]="selectedResult !== 'أنكر نفسه'"
+                (click)="handleResultClick('أنكر نفسه')">أنكر نفسه</button>
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-rose-600]="selectedResult === 'غير معترف'"
+                [class.border-rose-600]="selectedResult === 'غير معترف'"
+                [class.text-white]="selectedResult === 'غير معترف'" [class.bg-white]="selectedResult !== 'غير معترف'"
+                [class.dark:bg-slate-800]="selectedResult !== 'غير معترف'"
+                [class.border-rose-100]="selectedResult !== 'غير معترف'"
+                [class.dark:border-rose-900/30]="selectedResult !== 'غير معترف'"
+                [class.text-rose-700]="selectedResult !== 'غير معترف'"
+                [class.dark:text-rose-400]="selectedResult !== 'غير معترف'" (click)="handleResultClick('غير معترف')">غير
+                معترف</button>
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-emerald-600]="selectedResult === 'خصم'" [class.border-emerald-600]="selectedResult === 'خصم'"
+                [class.text-white]="selectedResult === 'خصم'" [class.bg-white]="selectedResult !== 'خصم'"
+                [class.dark:bg-slate-800]="selectedResult !== 'خصم'"
+                [class.border-emerald-100]="selectedResult !== 'خصم'"
+                [class.dark:border-emerald-900/30]="selectedResult !== 'خصم'"
+                [class.text-emerald-700]="selectedResult !== 'خصم'"
+                [class.dark:text-emerald-400]="selectedResult !== 'خصم'" (click)="handleResultClick('خصم')">خصم</button>
+            </div>
+
+            <!-- Row 4: Statuses (Amber Theme) -->
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-amber-600]="selectedResult === 'مفصول'" [class.border-amber-600]="selectedResult === 'مفصول'"
+                [class.text-white]="selectedResult === 'مفصول'" [class.bg-white]="selectedResult !== 'مفصول'"
+                [class.dark:bg-slate-800]="selectedResult !== 'مفصول'"
+                [class.border-amber-100]="selectedResult !== 'مفصول'"
+                [class.dark:border-amber-900/30]="selectedResult !== 'مفصول'"
+                [class.text-amber-700]="selectedResult !== 'مفصول'"
+                [class.dark:text-amber-400]="selectedResult !== 'مفصول'"
+                (click)="handleResultClick('مفصول')">مفصول</button>
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-amber-600]="selectedResult === 'لا يرد'"
+                [class.border-amber-600]="selectedResult === 'لا يرد'" [class.text-white]="selectedResult === 'لا يرد'"
+                [class.bg-white]="selectedResult !== 'لا يرد'" [class.dark:bg-slate-800]="selectedResult !== 'لا يرد'"
+                [class.border-amber-100]="selectedResult !== 'لا يرد'"
+                [class.dark:border-amber-900/30]="selectedResult !== 'لا يرد'"
+                [class.text-amber-700]="selectedResult !== 'لا يرد'"
+                [class.dark:text-amber-400]="selectedResult !== 'لا يرد'" (click)="handleResultClick('لا يرد')">لا
+                يرد</button>
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-amber-600]="selectedResult === 'مغلق'" [class.border-amber-600]="selectedResult === 'مغلق'"
+                [class.text-white]="selectedResult === 'مغلق'" [class.bg-white]="selectedResult !== 'مغلق'"
+                [class.dark:bg-slate-800]="selectedResult !== 'مغلق'"
+                [class.border-amber-100]="selectedResult !== 'مغلق'"
+                [class.dark:border-amber-900/30]="selectedResult !== 'مغلق'"
+                [class.text-amber-700]="selectedResult !== 'مغلق'"
+                [class.dark:text-amber-400]="selectedResult !== 'مغلق'"
+                (click)="handleResultClick('مغلق')">مغلق</button>
+            </div>
+
+            <!-- Row 5: Errors (Rose Theme) -->
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-rose-600]="selectedResult === 'رفض السداد'"
+                [class.border-rose-600]="selectedResult === 'رفض السداد'"
+                [class.text-white]="selectedResult === 'رفض السداد'" [class.bg-white]="selectedResult !== 'رفض السداد'"
+                [class.dark:bg-slate-800]="selectedResult !== 'رفض السداد'"
+                [class.border-rose-100]="selectedResult !== 'رفض السداد'"
+                [class.dark:border-rose-900/30]="selectedResult !== 'رفض السداد'"
+                [class.text-rose-700]="selectedResult !== 'رفض السداد'"
+                [class.dark:text-rose-400]="selectedResult !== 'رفض السداد'"
+                (click)="handleResultClick('رفض السداد')">رفض السداد</button>
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-rose-600]="selectedResult === 'رقم خطأ'"
+                [class.border-rose-600]="selectedResult === 'رقم خطأ'" [class.text-white]="selectedResult === 'رقم خطأ'"
+                [class.bg-white]="selectedResult !== 'رقم خطأ'" [class.dark:bg-slate-800]="selectedResult !== 'رقم خطأ'"
+                [class.border-rose-100]="selectedResult !== 'رقم خطأ'"
+                [class.dark:border-rose-900/30]="selectedResult !== 'رقم خطأ'"
+                [class.text-rose-700]="selectedResult !== 'رقم خطأ'"
+                [class.dark:text-rose-400]="selectedResult !== 'رقم خطأ'" (click)="handleResultClick('رقم خطأ')">رقم
+                خطأ</button>
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-rose-600]="selectedResult === 'لا يوجد رقم'"
+                [class.border-rose-600]="selectedResult === 'لا يوجد رقم'"
+                [class.text-white]="selectedResult === 'لا يوجد رقم'"
+                [class.bg-white]="selectedResult !== 'لا يوجد رقم'"
+                [class.dark:bg-slate-800]="selectedResult !== 'لا يوجد رقم'"
+                [class.border-rose-100]="selectedResult !== 'لا يوجد رقم'"
+                [class.dark:border-rose-900/30]="selectedResult !== 'لا يوجد رقم'"
+                [class.text-rose-700]="selectedResult !== 'لا يوجد رقم'"
+                [class.dark:text-rose-400]="selectedResult !== 'لا يوجد رقم'"
+                (click)="handleResultClick('لا يوجد رقم')">لا يوجد رقم</button>
+            </div>
+
+            <!-- Row 6: Actions (Slate Theme) -->
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-slate-600]="selectedResult === 'رفع الإجراءات'"
+                [class.border-slate-600]="selectedResult === 'رفع الإجراءات'"
+                [class.text-white]="selectedResult === 'رفع الإجراءات'"
+                [class.bg-slate-50]="selectedResult !== 'رفع الإجراءات'"
+                [class.dark:bg-slate-800]="selectedResult !== 'رفع الإجراءات'"
+                [class.border-slate-200]="selectedResult !== 'رفع الإجراءات'"
+                [class.dark:border-slate-700]="selectedResult !== 'رفع الإجراءات'"
+                [class.text-slate-600]="selectedResult !== 'رفع الإجراءات'"
+                [class.dark:text-slate-400]="selectedResult !== 'رفع الإجراءات'"
+                (click)="handleResultClick('رفع الإجراءات')">رفع الإجراءات</button>
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-slate-600]="selectedResult === 'تأجيل متابعة'"
+                [class.border-slate-600]="selectedResult === 'تأجيل متابعة'"
+                [class.text-white]="selectedResult === 'تأجيل متابعة'"
+                [class.bg-slate-50]="selectedResult !== 'تأجيل متابعة'"
+                [class.dark:bg-slate-800]="selectedResult !== 'تأجيل متابعة'"
+                [class.border-slate-200]="selectedResult !== 'تأجيل متابعة'"
+                [class.dark:border-slate-700]="selectedResult !== 'تأجيل متابعة'"
+                [class.text-slate-600]="selectedResult !== 'تأجيل متابعة'"
+                [class.dark:text-slate-400]="selectedResult !== 'تأجيل متابعة'"
+                (click)="handleResultClick('تأجيل متابعة')">تأجيل متابعة</button>
+              <button
+                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+                [class.bg-slate-600]="selectedResult === 'مطلوب إجراء'"
+                [class.border-slate-600]="selectedResult === 'مطلوب إجراء'"
+                [class.text-white]="selectedResult === 'مطلوب إجراء'"
+                [class.bg-slate-50]="selectedResult !== 'مطلوب إجراء'"
+                [class.dark:bg-slate-800]="selectedResult !== 'مطلوب إجراء'"
+                [class.border-slate-200]="selectedResult !== 'مطلوب إجراء'"
+                [class.dark:border-slate-700]="selectedResult !== 'مطلوب إجراء'"
+                [class.text-slate-600]="selectedResult !== 'مطلوب إجراء'"
+                [class.dark:text-slate-400]="selectedResult !== 'مطلوب إجراء'"
+                (click)="handleResultClick('مطلوب إجراء')">مطلوب إجراء</button>
+            </div>
           </div>
 
-          <div class="premium-card mt-3" style="background: var(--surface-hover);">
-            <div class="card-body p-2">
-              <div class="flex items-center justify-between text-[11px]">
-                <span class="font-bold text-slate-700">الملخص:</span>
-                <span class="text-slate-600">{{ selectedAction ? 'الوسيلة: ' + selectedAction : 'اختر وسيلة' }}</span>
-                <span class="text-slate-600">{{ selectedResult ? 'النتيجة: ' + selectedResult : 'اختر نتيجة' }}</span>
+          <!-- Advanced Statement Details (New Request) -->
+          <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
+            <h5
+              class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 flex items-center gap-2 mb-2">
+              <i class="fas fa-edit"></i> تفاصيل إضافية للإفادة
+            </h5>
+
+            <div class="grid grid-cols-2 gap-3">
+              <!-- Phone & Owner -->
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">رقم الهاتف المتواصل
+                  معه</label>
+                <div class="relative">
+                  <input type="text" [(ngModel)]="statementDetails.phoneNumber"
+                    class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-8 px-2 text-xs font-bold text-blue-600 dark:text-blue-400 focus:outline-none focus:border-blue-500 transition-all"
+                    placeholder="رقم الهاتف...">
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">صاحب الهاتف</label>
+                <input type="text" [(ngModel)]="statementDetails.phoneOwner"
+                  class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-8 px-2 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-blue-500 transition-all"
+                  placeholder="الموكل، الاب، الخ...">
+              </div>
+
+              <!-- Next Action & Date -->
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">الإجراء القادم</label>
+                <input type="text" [(ngModel)]="statementDetails.nextAction"
+                  class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-8 px-2 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-blue-500 transition-all"
+                  placeholder="إعادة اتصال، رفع إجراء...">
+              </div>
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">تاريخ المتابعة</label>
+                <input type="date" [(ngModel)]="statementDetails.nextDate"
+                  class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-8 px-2 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-blue-500 transition-all">
               </div>
             </div>
+
+            <!-- Full-width Notes -->
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">الملاحظات
+                (Notes)</label>
+              <textarea [(ngModel)]="statementDetails.notes"
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-2 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-inner focus:outline-none focus:border-blue-500 min-h-[50px] resize-none transition-all"
+                placeholder="اكتب تفاصيل المكالمة أو أي ملاحظات أخرى هنا..."></textarea>
+            </div>
+          </div>
+
+          <div
+            class="bg-slate-50/80 dark:bg-slate-800/80 mt-4 rounded-xl p-3 border border-slate-100 dark:border-slate-700 transition-all flex items-center justify-between shadow-inner">
+            <div class="flex items-center gap-3 text-[11px]">
+              <span class="font-bold text-slate-700 dark:text-slate-300">الملخص:</span>
+              <span
+                class="text-slate-500 dark:text-slate-400 font-medium px-2 py-1 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 shadow-sm min-w-24 text-center">{{
+                selectedAction ? selectedAction : 'اختر وسيلة' }}</span>
+              <span class="text-slate-400">—</span>
+              <span
+                class="text-slate-500 dark:text-slate-400 font-medium px-2 py-1 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 shadow-sm min-w-32 text-center text-primary dark:text-primary">{{
+                selectedResult ? selectedResult : 'النتيجة' }}</span>
+            </div>
+
+            <button
+              class="premium-btn premium-btn-primary py-1 px-4 text-xs font-bold shadow-md hover:shadow-lg transition-all"
+              (click)="triggerSaveStatement()">
+              <span class="ml-1 text-sm">💾</span> حفظ
+            </button>
           </div>
         </div>
       </div>
@@ -782,7 +1502,12 @@
 
       <a role="tab" class="premium-tab" [class.active]="activeSubTabLower === 'record'"
         (click)="setSubActiveLower('record')">
-        السجل
+        سجل العمليات
+      </a>
+
+      <a role="tab" class="premium-tab" [class.active]="activeSubTabLower === 'statusHistory'"
+        (click)="setSubActiveLower('statusHistory')">
+        سجل تحديثات الحالات
       </a>
 
       <a role="tab" class="premium-tab" [class.active]="activeSubTabLower === 'executions'"
@@ -825,134 +1550,263 @@
 
     <!-- الملاحظات -->
     <div *ngIf="activeSubTabLower === 'notes'" class="mt-4">
-      <h3 class="font-bold mb-2">الملاحظات</h3>
-      <table class="premium-table">
-        <thead>
-          <tr>
-            <th>الكود</th>
-            <th>التاريخ</th>
-            <th>الملاحظات</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let note of notesData">
-            <td>{{ note.code }}</td>
-            <td>{{ note.date }}</td>
-            <td>{{ note.text }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
+        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">الملاحظات</h4>
+      </div>
+      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+        <table class="premium-table w-full">
+          <thead>
+            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الكود</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الملاحظات</th>
+            </tr>
+          </thead>
+          <tbody class="text-[11px]">
+            <tr *ngFor="let note of notes" class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
+              <td class="py-2 px-3 font-mono text-slate-400">{{ note.id }}</td>
+              <td class="py-2 px-3 text-slate-500" dir="ltr">{{ note.dateAdded | date:'yyyy-MM-dd HH:mm' }}</td>
+              <td class="py-2 px-3 text-slate-700 dark:text-slate-300">{{ note.noteText }}</td>
+            </tr>
+            <tr *ngIf="!notes || notes.length === 0">
+              <td colspan="3" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد ملاحظات مسجلة</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- الإفادة -->
     <div *ngIf="activeSubTabLower === 'efada'" class="mt-4">
-      <h3 class="font-bold mb-2">الإفادة</h3>
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-1.5 h-4 bg-emerald-500 rounded-full"></span>
+        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">الإفادة</h4>
+      </div>
+      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+        <table class="premium-table w-full">
+          <thead>
+            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ الإفادة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">النتيجة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الوسيلة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">رقم الهاتف</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">صاحب الهاتف</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المبلغ</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الإجراء القادم</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ المتابعة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right w-1/4">الملاحظات</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الموظف</th>
+            </tr>
+          </thead>
+          <tbody class="text-[11px]">
+            <tr *ngFor="let ef of callcenterStatements; let i = index"
+              class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
+              <td class="py-2 px-3 font-mono text-slate-400">{{ i + 1 }}</td>
+              <td class="py-2 px-3 font-bold text-slate-700 dark:text-slate-200">{{ ef.dateAdded | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="py-2 px-3">
+                <span class="px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 font-bold border border-blue-100 dark:border-blue-800/50 text-[10px]">
+                  {{ ef.connectedStatus }}
+                </span>
+              </td>
+              <td class="py-2 px-3 text-slate-500">{{ ef.contactMethod }}</td>
+              <td class="py-2 px-3 font-mono text-indigo-600">{{ ef.phoneNumber }}</td>
+              <td class="py-2 px-3 text-slate-500">{{ ef.phoneOwner || '---' }}</td>
+              <td class="py-2 px-3 font-black text-emerald-600">{{ (ef.promiseAmount | number) || '0' }}</td>
+              <td class="py-2 px-3 font-bold text-indigo-600">{{ ef.nextAction || '---' }}</td>
+              <td class="py-2 px-3 text-slate-400">{{ (ef.nextDate | date:'dd/MM/yyyy') || '---' }}</td>
+              <td class="py-2 px-3 text-slate-500 italic">"{{ ef.notes || 'بدون ملاحظات' }}"</td>
+              <td class="py-2 px-3">
+                <div class="flex items-center gap-1">
+                  <span class="w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-500 border border-slate-200">{{ ef.userAddedName?.charAt(0) }}</span>
+                  <span class="font-medium text-slate-500">{{ ef.userAddedName }}</span>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="!callcenterStatements || callcenterStatements.length === 0">
+              <td colspan="11" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد إفادات مسجلة</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- السجل (Audit History) -->
+    <div *ngIf="activeSubTabLower === 'record'" class="mt-4">
+      <h3 class="font-bold mb-2">سجل العمليات</h3>
       <table class="premium-table">
         <thead>
-          <tr>
-            <th>Serial</th>
-            <th>تاريخ الإفادة</th>
-            <th>الإفادة</th>
-            <th>تاريخ المراجعة</th>
-            <th>الإجراء القادم</th>
+          <tr class="bg-slate-50 dark:bg-slate-800/50 text-[10px] uppercase font-bold text-slate-500">
+            <th class="py-2 px-3 border-b border-slate-100 dark:border-slate-700 text-right">التاريخ</th>
+            <th class="py-2 px-3 border-b border-slate-100 dark:border-slate-700 text-right">الحدث</th>
+            <th class="py-2 px-3 border-b border-slate-100 dark:border-slate-700 text-right">الوصف</th>
+            <th class="py-2 px-3 border-b border-slate-100 dark:border-slate-700 text-right">المستخدم</th>
           </tr>
         </thead>
-        <tbody>
-          <tr *ngFor="let ef of efadaData">
-            <td>{{ ef.serial }}</td>
-            <td>{{ ef.efadaDate }}</td>
-            <td>{{ ef.efadaText }}</td>
-            <td>{{ ef.reviewDate }}</td>
-            <td>{{ ef.nextAction }}</td>
+        <tbody class="text-[11px]">
+          <tr *ngFor="let audit of audits" class="border-b border-slate-50 dark:border-slate-800">
+            <td class="py-2 px-3 font-mono text-slate-400">{{ audit.actionDate | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td class="py-2 px-3 font-bold text-blue-600 dark:text-blue-400">{{ audit.action }}</td>
+            <td class="py-2 px-3 text-slate-600 dark:text-slate-300">{{ audit.description }}</td>
+            <td class="py-2 px-3 font-semibold text-slate-500">{{ audit.userName }}</td>
+          </tr>
+          <tr *ngIf="audits.length === 0">
+            <td colspan="4" class="text-center py-6 text-slate-400 italic bg-slate-50/30 dark:bg-slate-900/10">لا يوجد
+              سجل عمليات مسجل لهذه القضية</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- السجل -->
-    <div *ngIf="activeSubTabLower === 'record'" class="mt-4">
-      <h3 class="font-bold mb-2">السجل</h3>
-      <table class="premium-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>التاريخ</th>
-            <th>الإفادة</th>
-            <th>المراجعة</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let record of recordData; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ record.date }}</td>
-            <td>{{ record.efada }}</td>
-            <td>{{ record.review }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- سجل تحديثات الحالات (Status History) -->
+    <div *ngIf="activeSubTabLower === 'statusHistory'" class="mt-4">
+      <div class="flex items-center justify-between mb-4 bg-indigo-50/50 dark:bg-indigo-900/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-lg">
+            📜
+          </div>
+          <h3 class="font-bold text-indigo-900 dark:text-indigo-100">سجل تحديثات الحالات</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <button (click)="prevHistoryPage()" [disabled]="historyPage === 1"
+            class="premium-btn premium-btn-outline px-3 py-1.5 text-xs flex items-center gap-1">
+            <span>◀️</span> السابق
+          </button>
+          <div class="px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 shadow-sm">
+            صفحة {{ historyPage }}
+          </div>
+          <button (click)="nextHistoryPage()" [disabled]="historyPage * historyPageSize >= (statuses.length || 0)"
+            class="premium-btn premium-btn-outline px-3 py-1.5 text-xs flex items-center gap-1">
+            التالي <span>▶️</span>
+          </button>
+        </div>
+      </div>
+      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
+        <table class="premium-table w-full">
+          <thead>
+            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ والوقت</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الموظف</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">نوع الحالة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الحالة الجديدة</th>
+            </tr>
+          </thead>
+          <tbody class="text-[11px]">
+            <tr *ngFor="let s of statuses | slice:(historyPage-1)*historyPageSize:historyPage*historyPageSize; let i = index" 
+                class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
+              <td class="py-3 px-4 font-mono text-slate-400">{{ (historyPage-1)*historyPageSize + i + 1 }}</td>
+              <td class="py-3 px-4 font-bold text-slate-700 dark:text-slate-200">{{ s.dateAdded | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+              <td class="py-3 px-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[10px] text-slate-500 font-bold border border-slate-200 dark:border-slate-600">
+                    {{ s.userName?.charAt(0) || 'U' }}
+                  </div>
+                  <span class="font-medium text-slate-600 dark:text-slate-400">{{ s.userName || 'موظف النظام' }}</span>
+                </div>
+              </td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-0.5 rounded text-[10px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/50 font-bold">
+                  {{ splitStatus(s.status).type }}
+                </span>
+              </td>
+              <td class="py-3 px-4">
+                <span class="px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-100 dark:border-emerald-800/50 shadow-sm">
+                  {{ splitStatus(s.status).value }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="!statuses || statuses.length === 0">
+              <td colspan="5" class="text-center py-12 text-slate-400 italic bg-slate-50/30 dark:bg-slate-900/5">
+                <div class="flex flex-col items-center gap-2">
+                  <span class="text-2xl">⏳</span>
+                  <span>لا يوجد سجل تحديثات مسجل لهذه الحالات حتى الآن</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- executions -->
     <div *ngIf="activeSubTabLower === 'executions'" class="mt-4">
-      <h3 class="font-bold mb-2">تنفيذات</h3>
-      <table class="premium-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>التاريخ</th>
-            <th>آخر إجراء</th>
-            <th>تاريخ آخر إجراء</th>
-            <th>الإجراء القادم</th>
-            <th>تاريخ الإجراء القادم</th>
-            <th>مكان الملف</th>
-            <th>ملاحظات</th>
-            <th>المستخدم</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let exec of executionsData; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ exec.date }}</td>
-            <td>{{ exec.lastAction }}</td>
-            <td>{{ exec.lastActionDate }}</td>
-            <td>{{ exec.nextAction }}</td>
-            <td>{{ exec.nextActionDate }}</td>
-            <td>{{ exec.fileLocation }}</td>
-            <td>{{ exec.notes }}</td>
-            <td>{{ exec.user }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-1.5 h-4 bg-rose-500 rounded-full"></span>
+        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">تنفيذات</h4>
+      </div>
+      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+        <table class="premium-table w-full">
+          <thead>
+            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">آخر إجراء</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ آخر إجراء</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الإجراء القادم</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ الإجراء القادم</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">مكان الملف</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right w-1/4">ملاحظات</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المستخدم</th>
+            </tr>
+          </thead>
+          <tbody class="text-[11px]">
+            <tr *ngFor="let exec of executionsData; let i = index" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+              <td class="py-2 px-3 text-slate-400">{{ i + 1 }}</td>
+              <td class="py-2 px-3 text-slate-500">{{ exec.date }}</td>
+              <td class="py-2 px-3 font-bold text-rose-600">{{ exec.lastAction }}</td>
+              <td class="py-2 px-3 text-slate-400">{{ exec.lastActionDate }}</td>
+              <td class="py-2 px-3 font-bold text-indigo-600">{{ exec.nextAction }}</td>
+              <td class="py-2 px-3 text-slate-400">{{ exec.nextActionDate }}</td>
+              <td class="py-2 px-3 text-slate-500">{{ exec.fileLocation }}</td>
+              <td class="py-2 px-3 text-slate-500 italic">{{ exec.notes }}</td>
+              <td class="py-2 px-3 font-medium text-slate-600">{{ exec.user }}</td>
+            </tr>
+            <tr *ngIf="!executionsData || executionsData.length === 0">
+              <td colspan="9" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد بيانات تنفيذ متاحة</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
 
     <!-- trader -->
     <div *ngIf="activeSubTabLower === 'trader'" class="mt-4">
-      <h3 class="font-bold mb-2">جلسات المتداول</h3>
-      <table class="premium-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>تاريخ الإفادة</th>
-            <th>نوع الجلسة</th>
-            <th>القرار</th>
-            <th>الجلسة القادمة</th>
-            <th>توقيت الخبراء</th>
-            <th>ملاحظات الجلسة</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let session of traderData; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ session.efadaDate }}</td>
-            <td>{{ session.sessionType }}</td>
-            <td>{{ session.decision }}</td>
-            <td>{{ session.nextSession }}</td>
-            <td>{{ session.expertsTime }}</td>
-            <td>{{ session.notes }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-1.5 h-4 bg-amber-500 rounded-full"></span>
+        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">جلسات المتداول</h4>
+      </div>
+      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+        <table class="premium-table w-full">
+          <thead>
+            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ الإفادة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">نوع الجلسة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">القرار</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الجلسة القادمة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">توقيت الخبراء</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">ملاحظات الجلسة</th>
+            </tr>
+          </thead>
+          <tbody class="text-[11px]">
+            <tr *ngFor="let session of traderData; let i = index" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+              <td class="py-2 px-3 text-slate-400">{{ i + 1 }}</td>
+              <td class="py-2 px-3 text-slate-500">{{ session.efadaDate }}</td>
+              <td class="py-2 px-3 font-bold text-amber-600">{{ session.sessionType }}</td>
+              <td class="py-2 px-3 text-slate-700">{{ session.decision }}</td>
+              <td class="py-2 px-3 font-bold text-indigo-600">{{ session.nextSession }}</td>
+              <td class="py-2 px-3 text-slate-400">{{ session.expertsTime }}</td>
+              <td class="py-2 px-3 text-slate-500 italic">{{ session.notes }}</td>
+            </tr>
+            <tr *ngIf="!traderData || traderData.length === 0">
+              <td colspan="7" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد جلسات مسجلة</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- link-->
@@ -962,50 +1816,53 @@
     </div>
 
     <!-- files -->
-    <div *ngIf="activeSubTabLower === 'files'" class="mt-4 overflow-auto">
-      <h3 class="font-bold mb-2">ملفات العميل</h3>
-      <table class="premium-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>الكود</th>
-            <th>سبب المديونية</th>
-            <th>المدني</th>
-            <th>حالة الملف</th>
-            <th>الموكل</th>
-            <th>رقم العقد</th>
-            <th>قيمة المطالبة</th>
-            <th>المدفوع</th>
-            <th>المتبقي</th>
-            <th>الموكل الفرعي</th>
-            <th>الموظف</th>
-            <th>رقم الباتش</th>
-            <th>CASE_CLINT</th>
-            <th>CODE_CLINT</th>
-            <th>EMPLOYEE</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let file of filesData; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ file.code }}</td>
-            <td>{{ file.debtReason }}</td>
-            <td>{{ file.civil }}</td>
-            <td>{{ file.fileStatus }}</td>
-            <td>{{ file.client }}</td>
-            <td>{{ file.contractNumber }}</td>
-            <td>{{ file.claimAmount }}</td>
-            <td>{{ file.paid }}</td>
-            <td>{{ file.remaining }}</td>
-            <td>{{ file.subClient }}</td>
-            <td>{{ file.employee }}</td>
-            <td>{{ file.batchNumber }}</td>
-            <td>{{ file.caseClient }}</td>
-            <td>{{ file.codeClient }}</td>
-            <td>{{ file.employeeCode }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <div *ngIf="activeSubTabLower === 'files'" class="mt-4">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-1.5 h-4 bg-blue-500 rounded-full"></span>
+        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">ملفات المديونية</h4>
+      </div>
+      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+        <table class="premium-table w-full">
+          <thead>
+            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الكود</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">سبب المديونية</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة الملف</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الموكل</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">رقم العقد</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">قيمة المطالبة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المدفوع</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المتبقي</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">رقم الباتش</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الموظف/المحامي</th>
+            </tr>
+          </thead>
+          <tbody class="text-[11px]">
+            <tr *ngFor="let file of clientRows; let i = index"
+              class="border-b border-slate-50 dark:border-slate-800 hover:bg-blue-50/30 transition-colors">
+              <td class="py-2 px-3 font-mono text-slate-400">{{ i + 1 }}</td>
+              <td class="py-2 px-3 font-bold text-indigo-600">{{ file.code }}</td>
+              <td class="py-2 px-3 text-slate-500">{{ file.debtReason }}</td>
+              <td class="py-2 px-3">
+                <span class="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-bold">
+                  {{ file.fileStatus }}
+                </span>
+              </td>
+              <td class="py-2 px-3 text-slate-400">{{ file.client }}</td>
+              <td class="py-2 px-3 font-mono text-slate-400">{{ file.contractNum }}</td>
+              <td class="py-2 px-3 font-bold text-slate-700">{{ (file.claim | number) || '0' }}</td>
+              <td class="py-2 px-3 font-bold text-emerald-600">{{ (file.paid | number) || '0' }}</td>
+              <td class="py-2 px-3 font-black text-rose-600">{{ (file.remaining | number) || '0' }}</td>
+              <td class="py-2 px-3 font-mono text-slate-400">{{ file.batch }}</td>
+              <td class="py-2 px-3 text-slate-500">{{ file.lawyerName }}</td>
+            </tr>
+            <tr *ngIf="!clientRows || clientRows.length === 0">
+              <td colspan="11" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد ملفات مديونية متاحة</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
 
@@ -1017,32 +1874,75 @@
 
     <!-- secretary -->
     <div *ngIf="activeSubTabLower === 'secretary'" class="mt-4">
-      <h3 class="font-bold mb-2">سكرتارية</h3>
-      <table class="premium-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>التاريخ</th>
-            <th>الملاحظة</th>
-            <th>الاسم</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let sec of secretaryData; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>{{ sec.date }}</td>
-            <td>{{ sec.note }}</td>
-            <td>{{ sec.name }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
+        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">السكرتارية</h4>
+      </div>
+      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+        <table class="premium-table w-full">
+          <thead>
+            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الملاحظة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الموظف</th>
+            </tr>
+          </thead>
+          <tbody class="text-[11px]">
+            <tr *ngFor="let sec of notes" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+              <td class="py-2 px-3 font-mono text-slate-400">{{ sec.dateAdded | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="py-2 px-3 text-slate-700 dark:text-slate-300 leading-relaxed">{{ sec.noteText }}</td>
+              <td class="py-2 px-3">
+                 <div class="flex items-center gap-1">
+                   <span class="w-4 h-4 rounded-full bg-indigo-50 flex items-center justify-center text-[8px] font-bold text-indigo-600 border border-indigo-100">{{ sec.userName?.charAt(0) || 'S' }}</span>
+                   <span class="font-medium text-slate-500">{{ sec.userName || 'System' }}</span>
+                 </div>
+              </td>
+            </tr>
+            <tr *ngIf="!notes || notes.length === 0">
+              <td colspan="3" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد ملاحظات سكرتارية</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
 
-    <!-- autoNumbers-->
+    <!-- autoNumbers -->
     <div *ngIf="activeSubTabLower === 'autoNumbers'" class="mt-4">
-      <h3 class="font-bold mb-2">autoNumbers</h3>
-      <p>سيتم عرض نتائج البحث بعد اختيار الرقم…</p>
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
+        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">أرقام آلية</h4>
+      </div>
+      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+        <table class="premium-table w-full">
+          <thead>
+            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الرقم</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">النوع</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المرجع</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المطالب/الخصم</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">ملاحظة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ الإضافة</th>
+            </tr>
+          </thead>
+          <tbody class="text-[11px]">
+            <tr *ngFor="let auto of autoNumbers; let i = index"
+              class="border-b border-slate-50 dark:border-slate-800 hover:bg-indigo-50/30 transition-colors">
+              <td class="py-2 px-3 text-slate-400">{{ i + 1 }}</td>
+              <td class="py-2 px-3 font-mono font-bold text-indigo-600">{{ auto.autoNumberValue }}</td>
+              <td class="py-2 px-3 text-slate-500">{{ auto.type || '---' }}</td>
+              <td class="py-2 px-3 text-slate-400 font-mono text-[10px]">{{ auto.caseRef || '---' }}</td>
+              <td class="py-2 px-3 font-semibold text-slate-600 dark:text-slate-300">{{ auto.claimant || '---' }}</td>
+              <td class="py-2 px-3 text-slate-500 italic">{{ auto.note || '---' }}</td>
+              <td class="py-2 px-3 text-slate-400">{{ auto.dateAdded | date:'dd/MM/yyyy' }}</td>
+            </tr>
+            <tr *ngIf="!autoNumbers || autoNumbers.length === 0">
+              <td colspan="7" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد أرقام آلية مسجلة</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
   </div>
@@ -1067,7 +1967,8 @@
 
         <div class="flex items-center gap-2 text-xs">
           <label class="font-bold text-gray-700 w-12">المدني :</label>
-          <input type="text" class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
+          <input type="text" [(ngModel)]="searchNumbersForm.civilID" (keyup.enter)="onSearchNumbers()"
+            class="input input-xs input-bordered w-full rounded-none h-6 border-gray-400" />
         </div>
 
         <div class="flex items-center gap-2 text-xs">
@@ -1181,81 +2082,94 @@
       </div>
     </div>
 
-    <!-- 2. منطقة الجدول والإحصائيات (وسط وشمال الشاشة) -->
-    <div class="flex-grow flex flex-col gap-2">
+      <!-- 2. منطقة الجدول والإحصائيات (وسط وشمال الشاشة) -->
+      <div class="flex-grow flex flex-col gap-4">
 
-      <!-- A. الجدول الرئيسي -->
-      <div class="flex-grow overflow-hidden border border-gray-300 rounded-lg shadow-sm">
+        <!-- A. الجدول الرئيسي -->
+        <div class="flex-grow overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
+          <div class="overflow-auto h-full">
+            <table class="premium-table w-full">
+              <thead>
+                <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الرقم</th>
+                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المدني</th>
+                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المستخدم</th>
+                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التصنيف</th>
+                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المصدر</th>
+                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">نوع الخط</th>
+                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ الإضافة</th>
+                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة الرقم</th>
+                </tr>
+              </thead>
+              <tbody class="text-[11px]">
+                <tr *ngFor="let row of numbersSearchResults" class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
+                  <td class="py-2 px-3 font-mono font-bold text-indigo-600">{{ row.number }}</td>
+                  <td class="py-2 px-3 text-slate-500 font-mono">{{ row.civilID }}</td>
+                  <td class="py-2 px-3 text-slate-500">{{ row.user }}</td>
+                  <td class="py-2 px-3 text-slate-500">{{ row.classification }}</td>
+                  <td class="py-2 px-3 text-slate-500">{{ row.source }}</td>
+                  <td class="py-2 px-3 text-slate-500">{{ row.type }}</td>
+                  <td class="py-2 px-3 text-slate-400 font-mono">{{ row.date }}</td>
+                  <td class="py-2 px-3">
+                    <span class="px-2 py-0.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-500">
+                      {{ row.status }}
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="!numbersSearchResults || numbersSearchResults.length === 0">
+                  <td colspan="8" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+                    لا توجد نتائج بحث متاحة
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-        <!-- الجدول -->
-        <div class="overflow-auto h-full">
-          <table class="premium-table">
-            <thead>
-              <tr class="bg-gray-100 text-gray-700 border-b border-gray-300 text-[10px] h-7">
-                <th class="border-r w-1/12 bg-gray-200">الرقم</th>
-                <th class="border-r w-1/12 bg-gray-200">المدني</th>
-                <th class="border-r w-1/12 bg-gray-200">المستخدم</th>
-                <th class="border-r w-1/12 bg-gray-200">التصنيف</th>
-                <th class="border-r w-1/12 bg-gray-200">المصدر</th>
-                <th class="border-r w-1/12 bg-gray-200">نوع الخط</th>
-                <th class="border-r w-1/12 bg-gray-200">تاريخ الإضافة</th>
-                <th class="border-r w-1/12 bg-gray-200">حالة الرقم</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of numbersSearchResults">
-                <td class="border-r font-mono font-bold">{{ row.number }}</td>
-                <td class="border-r">{{ row.civilID }}</td>
-                <td class="border-r">{{ row.user }}</td>
-                <td class="border-r">{{ row.classification }}</td>
-                <td class="border-r">{{ row.source }}</td>
-                <td class="border-r">{{ row.type }}</td>
-                <td class="border-r">{{ row.date }}</td>
-                <td class="border-r">{{ row.status }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- B. الجداول السفلية (3 قوائم) -->
+        <div class="flex gap-4 shrink-0 h-48 mb-2">
+          <!-- الجدول الأيمن -->
+          <div class="flex-1 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
+            <table class="premium-table w-full">
+              <thead>
+                <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                  <th class="py-2 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">العدد</th>
+                  <th class="py-2 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">نوع الخط</th>
+                </tr>
+              </thead>
+              <tbody class="text-[11px]">
+                <tr *ngFor="let row of bottomTable1" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                  <td class="py-2 px-4 font-bold text-indigo-600">{{row.count}}</td>
+                  <td class="py-2 px-4 text-slate-500">{{row.type}}</td>
+                </tr>
+                <tr *ngIf="!bottomTable1 || bottomTable1.length === 0">
+                  <td colspan="2" class="text-center py-6 text-slate-400 italic">لا توجد إحصائيات</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- الجدول الأوسط -->
+          <div class="flex-1 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
+            <table class="premium-table w-full">
+              <thead>
+                <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                  <th class="py-2 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">العدد</th>
+                  <th class="py-2 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المصدر</th>
+                </tr>
+              </thead>
+              <tbody class="text-[11px]">
+                <tr *ngFor="let row of bottomTable2" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                  <td class="py-2 px-4 font-bold text-indigo-600">{{row.count}}</td>
+                  <td class="py-2 px-4 text-slate-500">{{row.source}}</td>
+                </tr>
+                <tr *ngIf="!bottomTable2 || bottomTable2.length === 0">
+                  <td colspan="2" class="text-center py-6 text-slate-400 italic">لا توجد إحصائيات</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-
-      <!-- B. الجداول السفلية (3 قوائم) -->
-      <div class="flex gap-4 shrink-0 h-40">
-        <!-- الجدول الأيمن -->
-        <div class="w-1/2 border border-gray-300 rounded-lg overflow-hidden shadow-sm">
-          <table class="premium-table">
-            <thead>
-              <tr class="bg-gray-100 text-gray-700">
-                <th>العدد</th>
-                <th>نوع الخط</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of bottomTable1">
-                <td>{{row.count}}</td>
-                <td>{{row.type}}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <!-- الجدول الأوسط -->
-        <div class="w-1/2 border border-gray-300 rounded-lg overflow-hidden shadow-sm">
-          <table class="premium-table">
-            <thead>
-              <tr class="bg-gray-100 text-gray-700">
-                <th>العدد</th>
-                <th>المصدر</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of bottomTable2">
-                <td>{{row.count}}</td>
-                <td>{{row.source}}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
 
   </div>
 
@@ -1273,7 +2187,7 @@
     <!-- الاسم بالكامل -->
     <div class="col-span-2 flex items-center gap-4">
       <label class="w-32 font-bold" style="color: var(--text-color);">الاسم بالكامل</label>
-      <input type="text" [(ngModel)]="menuSearchForm.fullName" name="fullName"
+      <input type="text" [(ngModel)]="menuSearchForm.fullName" name="fullName" (keyup.enter)="searchMenu()"
         class="input input-sm w-full rounded-none"
         style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
     </div>
@@ -1284,15 +2198,15 @@
       <label class="w-32 font-bold col-span-2 flex items-center" style="color: var(--text-color);">الاسم</label>
 
       <input type="text" [(ngModel)]="menuSearchForm.firstName" placeholder="الاسم" name="firstName"
-        class="col-span-2 input input-sm rounded-none"
+        (keyup.enter)="searchMenu()" class="col-span-2 input input-sm rounded-none"
         style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
 
       <input type="text" [(ngModel)]="menuSearchForm.middleName" placeholder="الأب" name="middleName"
-        class="col-span-2 input input-sm rounded-none"
+        (keyup.enter)="searchMenu()" class="col-span-2 input input-sm rounded-none"
         style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
 
       <input type="text" [(ngModel)]="menuSearchForm.lastName" placeholder="الجد" name="lastName"
-        class="col-span-2 input input-sm rounded-none"
+        (keyup.enter)="searchMenu()" class="col-span-2 input input-sm rounded-none"
         style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
 
       <label class="font-bold col-span-2 flex items-center" style="color: var(--text-color);">العائلة</label>
@@ -1310,12 +2224,12 @@
     <div class="col-span-2 grid grid-cols-8 gap-4 items-center">
 
       <label class="w-32 font-bold col-span-2" style="color: var(--text-color);">المدني</label>
-      <input type="text" [(ngModel)]="menuSearchForm.civilId" name="civilId"
+      <input type="text" [(ngModel)]="menuSearchForm.civilId" name="civilId" (keyup.enter)="searchMenu()"
         class="col-span-2 input input-sm rounded-none"
         style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
 
       <label class="w-32 font-bold col-span-2" style="color: var(--text-color);">الموحد</label>
-      <input type="text" [(ngModel)]="menuSearchForm.unifiedNumber" name="unifiedNumber"
+      <input type="text" [(ngModel)]="menuSearchForm.unifiedNumber" name="unifiedNumber" (keyup.enter)="searchMenu()"
         class="col-span-2 input input-sm rounded-none"
         style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
     </div>
@@ -1323,14 +2237,16 @@
     <!-- الرقم -->
     <div class="col-span-2 flex items-center gap-4">
       <label class="w-32 font-bold" style="color: var(--text-color);">الرقم</label>
-      <input type="text" [(ngModel)]="menuSearchForm.phone" name="phone" class="input input-sm w-full rounded-none"
+      <input type="text" [(ngModel)]="menuSearchForm.phone" name="phone" (keyup.enter)="searchMenu()"
+        class="input input-sm w-full rounded-none"
         style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
     </div>
 
     <!-- العنوان -->
     <div class="col-span-2 flex items-center gap-4">
       <label class="w-32 font-bold" style="color: var(--text-color);">العنوان</label>
-      <input type="text" [(ngModel)]="menuSearchForm.address" name="address" class="input input-sm w-full rounded-none"
+      <input type="text" [(ngModel)]="menuSearchForm.address" name="address" (keyup.enter)="searchMenu()"
+        class="input input-sm w-full rounded-none"
         style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
     </div>
 
@@ -1384,14 +2300,22 @@
 
       <!-- حقول التاريخ -->
       <div class="flex items-center gap-4 text-xs shrink-0">
+        <div class="flex items-center gap-2 text-xs">
+          <label class="font-bold text-gray-700 w-16" style="color: var(--text-color);">كلمة البحث</label>
+          <input type="text" [(ngModel)]="searchGeneral" (keyup.enter)="searchStatements()"
+            class="input input-xs input-bordered w-full rounded-none h-6"
+            style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
+        </div>
         <div class="flex items-center gap-1">
           <label class="font-bold" style="color: var(--text-color);">من تاريخ</label>
-          <input type="date" [(ngModel)]="fromDate" class="input input-xs input-bordered rounded-none h-6"
+          <input type="date" [(ngModel)]="fromDate" (keyup.enter)="searchStatements()"
+            class="input input-xs input-bordered rounded-none h-6"
             style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
         </div>
         <div class="flex items-center gap-1">
           <label class="font-bold" style="color: var(--text-color);">الى تاريخ</label>
-          <input type="date" [(ngModel)]="toDate" class="input input-xs input-bordered rounded-none h-6"
+          <input type="date" [(ngModel)]="toDate" (keyup.enter)="searchStatements()"
+            class="input input-xs input-bordered rounded-none h-6"
             style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
         </div>
 
@@ -1444,58 +2368,61 @@
     </div>
 
     <!-- 2. الجدول الرئيسي -->
-    <div class="flex-grow overflow-auto rounded-lg shadow-inner"
-      style="border: 1px solid var(--surface-border); background-color: var(--surface-premium-card);">
-
-      <table class="premium-table">
-        <thead>
-          <tr class="border-b text-[10px] h-6"
-            style="background-color: var(--surface-section); color: var(--text-color); border-color: var(--surface-border);">
-            <th class="border-r w-8" style="background-color: var(--surface-ground);">#</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">الاسم</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">تاريخ الإفادة</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">تاريخ المراجعة</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">الإفادة</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">الموظف</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">طريقة التواصل</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">حالة التواصل</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">حالة التعاون</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">الحالة المدنية</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">الحالة الداخلية</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">حالة الإيداع</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">قيمة الإجمالي</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">رقم الإفادة</th>
-            <th class="border-r" style="background-color: var(--surface-ground);">ملاحظات</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of statementRows; let i = index" class="border-b"
-            style="border-color: var(--surface-border);"
-            [style.background-color]="i % 2 === 0 ? 'var(--surface-premium-card)' : 'var(--surface-ground)'">
-            <td class="border-r text-center">{{ i + 1 }}</td>
-            <td class="border-r font-bold" style="color: var(--primary-color);">{{row.name}}</td>
-            <td class="border-r">{{row.date}}</td>
-            <td class="border-r">{{row.reviewDate}}</td>
-            <td class="border-r truncate max-w-[150px]">{{row.efada}}</td>
-            <td class="border-r">{{row.employee}}</td>
-            <td class="border-r">{{row.contactMethod}}</td>
-            <td class="border-r">{{row.contactStatus}}</td>
-            <td class="border-r">{{row.cooperationStatus}}</td>
-            <td class="border-r">{{row.civilStatus}}</td>
-            <td class="border-r">{{row.internalStatus}}</td>
-            <td class="border-r">{{row.depositStatus}}</td>
-            <td class="border-r font-mono">{{row.totalAmount}}</td>
-            <td class="border-r font-mono">{{row.statementNumber}}</td>
-            <td class="border-r truncate max-w-[150px]">{{row.notes}}</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="flex-grow overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
+      <div class="overflow-auto h-full">
+        <table class="premium-table w-full">
+          <thead>
+            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الاسم</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ الإفادة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ المراجعة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الإفادة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الموظف</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">طريقة التواصل</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة التواصل</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة التعاون</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right text-emerald-600">قيمة الإجمالي</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">رقم الإفادة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right w-1/5">ملاحظات</th>
+            </tr>
+          </thead>
+          <tbody class="text-[11px]">
+            <tr *ngFor="let row of statementRows; let i = index" 
+              class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
+              <td class="py-2 px-3 text-slate-400 font-mono text-[10px]">{{ i + 1 }}</td>
+              <td class="py-2 px-3 font-bold text-indigo-700 dark:text-indigo-400">{{ row.name }}</td>
+              <td class="py-2 px-3 text-slate-500 font-mono">{{ row.date }}</td>
+              <td class="py-2 px-3 text-slate-400 font-mono">{{ row.reviewDate }}</td>
+              <td class="py-2 px-3 text-slate-700 dark:text-slate-300">
+                <div class="truncate max-w-[200px]" [title]="row.efada">{{ row.efada }}</div>
+              </td>
+              <td class="py-2 px-3 text-slate-500 font-medium">{{ row.employee }}</td>
+              <td class="py-2 px-3 text-slate-500">{{ row.contactMethod }}</td>
+              <td class="py-2 px-3">
+                <span class="px-2 py-0.5 rounded-lg bg-blue-50 text-blue-600 font-bold text-[10px]">{{ row.contactStatus }}</span>
+              </td>
+              <td class="py-2 px-3 text-slate-500">{{ row.cooperationStatus }}</td>
+              <td class="py-2 px-3 font-black text-emerald-600 font-mono">{{ row.totalAmount }}</td>
+              <td class="py-2 px-3 text-slate-400 font-mono">{{ row.statementNumber }}</td>
+              <td class="py-2 px-3 text-slate-500 italic text-[10px]">{{ row.notes }}</td>
+            </tr>
+            <tr *ngIf="!statementRows || statementRows.length === 0">
+              <td colspan="12" class="text-center py-16 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+                لا توجد إفادات مسجلة للبحث الحالي
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
   </div>
 </div>
 
+
 <!-- searchStatements -->
+
 <div *ngIf="activeMainTab === 'searchStatements'">
   <h2 class="text-xl font-bold">searchStatements</h2>
 </div>
@@ -1508,4 +2435,439 @@
 <div *ngIf="loading" class="flex justify-center my-10">
   <span class="loading loading-spinner loading-lg"></span>
 </div>
+
+<!-- Detailed Payment Modal -->
+<dialog #paymentModal class="modal" dir="rtl">
+  <div
+    class="premium-modal-box bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 border dark:border-slate-800 w-11/12 max-w-4xl relative animate-in fade-in zoom-in duration-300 shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+    <!-- Top Close Button -->
+    <button
+      class="absolute left-6 top-6 w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 dark:text-slate-500"
+      (click)="paymentModal.close()">
+      <span class="text-xl">✕</span>
+    </button>
+
+    <div class="modal-header border-b border-slate-100 dark:border-slate-800 pb-5 mb-5 dark:bg-transparent">
+      <div
+        class="modal-header-icon shadow-lg shadow-emerald-100 dark:shadow-none dark:bg-slate-800 flex items-center justify-center w-14 h-14 rounded-2xl text-2xl">
+        💳</div>
+      <div>
+        <h3 class="font-black text-2xl tracking-tight text-emerald-600 dark:text-emerald-400">تفاصيل السداد</h3>
+        <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-[0.2em]">Payment
+          Transaction Record</p>
+      </div>
+    </div>
+
+    <div *ngIf="selectedPayment" class="space-y-8 p-4">
+      <!-- Financial Summary Section -->
+      <div
+        class="p-6 rounded-3xl bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100/50 dark:border-emerald-800/30 grid grid-cols-1 md:grid-cols-2 gap-6 items-center transition-colors">
+        <div class="flex items-center gap-4">
+          <div
+            class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-xl">
+            💰</div>
+          <div>
+            <label class="text-xs font-bold text-emerald-600/70 dark:text-emerald-400/70 uppercase">مبلغ السداد</label>
+            <div class="text-3xl font-black text-emerald-600 dark:text-emerald-400">{{ selectedPayment.value | number }}
+              <span class="text-sm">د.ك</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 md:border-r border-emerald-100 dark:border-emerald-800/50 md:pr-6">
+          <div
+            class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-xl">
+            📅</div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">تاريخ المعاملة</label>
+            <div class="text-xl font-bold text-slate-700 dark:text-slate-200">{{ selectedPayment.dateAdded |
+              date:'fullDate' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary Info Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">وسيلة الدفع</label>
+          <div class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+            {{ selectedPayment.paymentMethod }}
+          </div>
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">المستخدم المسؤول</label>
+          <div class="font-bold text-slate-800 dark:text-slate-200">{{ selectedPayment.userAddedName }}</div>
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">رقم القيد/السند</label>
+          <div class="font-bold text-primary dark:text-blue-400 font-mono">{{ selectedPayment.jouralEntry || '---' }}
+          </div>
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">مندوب المبيعات</label>
+          <div class="font-bold text-slate-800 dark:text-slate-200">{{ selectedPayment.salesAgent || 'غير مسجل' }}</div>
+        </div>
+
+        <div class="col-span-full mt-4">
+          <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2 block">حالة الملف بعد هذه
+            العملية</label>
+          <div
+            class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 flex items-center justify-between transition-colors">
+            <span class="font-bold text-slate-700 dark:text-slate-300">{{ selectedPayment.fileStatusAfter || 'لا توجد
+              تغييرات' }}</span>
+            <span
+              class="px-3 py-1 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-mono text-slate-400 dark:text-slate-500">REF:
+              {{selectedPayment.id}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end px-4">
+      <form method="dialog">
+        <button
+          class="bg-emerald-500 hover:bg-emerald-600 text-white w-full md:w-auto px-12 h-12 rounded-xl text-sm font-bold shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">فهمت،
+          إغلاق</button>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+<!-- Detailed Debt Modal -->
+<dialog #debtModal class="modal" dir="rtl">
+  <div
+    class="premium-modal-box bg-white dark:bg-slate-900 border dark:border-slate-800 text-slate-800 dark:text-slate-200 w-11/12 max-w-5xl relative animate-in fade-in zoom-in duration-300 shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+    <!-- Top Close Button -->
+    <button
+      class="absolute left-6 top-6 w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 dark:text-slate-500"
+      (click)="debtModal.close(); selectedDebt = null;">
+      <span class="text-xl">✕</span>
+    </button>
+
+    <div class="modal-header border-b border-slate-100 dark:border-slate-800 pb-5 mb-5 dark:bg-transparent">
+      <div
+        class="modal-header-icon shadow-lg shadow-blue-100 dark:shadow-none dark:bg-slate-800 flex flex-center w-14 h-14 rounded-2xl text-2xl items-center justify-center">
+        📂</div>
+      <div>
+        <h3 class="font-black text-2xl tracking-tight text-blue-600 dark:text-blue-400">تفاصيل المديونية</h3>
+        <p class="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-[0.2em]">Comprehensive
+          Debt & Legal Status</p>
+      </div>
+    </div>
+
+    <div *ngIf="selectedDebt" class="space-y-8 p-4">
+      <!-- File ID Badge -->
+      <div class="flex items-center gap-4">
+        <div class="px-6 py-2 rounded-2xl bg-slate-900 text-white dark:bg-slate-800 font-black text-lg shadow-lg">ملف
+          رقم:
+          {{selectedDebt.code}}</div>
+        <div
+          class="px-6 py-2 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100 dark:bg-blue-900/20 dark:border-blue-800/50 dark:text-blue-300 font-bold delay-100 transition-colors">
+          الموكل:
+          {{selectedDebt.client}}</div>
+      </div>
+
+      <!-- Financial Dashboard Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div
+          class="p-6 rounded-3xl bg-amber-50/50 dark:bg-amber-900/10 border border-amber-100/50 dark:border-amber-800/30 transition-colors">
+          <label class="text-xs font-bold text-amber-600/70 dark:text-amber-400/70 uppercase">قيمة المطالبة</label>
+          <div class="text-3xl font-black text-amber-600 dark:text-amber-500 mt-1">{{ selectedDebt.claim | number }}
+            <span class="text-sm">د.ك</span>
+          </div>
+          <div class="h-1 w-full bg-amber-100 dark:bg-amber-950 rounded-full mt-4 overflow-hidden">
+            <div class="h-full bg-amber-500 w-full opacity-30"></div>
+          </div>
+        </div>
+        <div
+          class="p-6 rounded-3xl bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100/50 dark:border-emerald-800/30 transition-colors">
+          <label class="text-xs font-bold text-emerald-600/70 dark:text-emerald-400/70 uppercase">إجمالي المسدد</label>
+          <div class="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{{ selectedDebt.paid | number }}
+            <span class="text-sm">د.ك</span>
+          </div>
+          <div class="h-1 w-full bg-emerald-100 dark:bg-emerald-950 rounded-full mt-4 overflow-hidden">
+            <div class="h-full bg-emerald-500" [style.width]="(selectedDebt.paid / selectedDebt.claim * 100) + '%'">
+            </div>
+          </div>
+        </div>
+        <div
+          class="p-6 rounded-3xl bg-blue-500 dark:bg-blue-600 shadow-xl shadow-blue-200 dark:shadow-none text-white transition-colors">
+          <label class="text-xs font-bold text-blue-100 dark:text-blue-200 uppercase">المبلغ المتبقي</label>
+          <div class="text-3xl font-black mt-1">{{ selectedDebt.remaining | number }} <span class="text-sm">د.ك</span>
+          </div>
+          <p class="text-[10px] mt-4 font-bold opacity-80">صافي المديونية الحالية المستحقة</p>
+        </div>
+      </div>
+
+      <!-- Case Details Section -->
+      <div
+        class="bg-slate-50/50 dark:bg-slate-800/30 rounded-3xl p-8 border border-slate-100 dark:border-slate-700/50 transition-colors">
+        <h4
+          class="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-6 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600"></span> Legal Case Profile
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">المحامى المتابع</label>
+            <div class="font-bold text-slate-700 dark:text-slate-300">{{ selectedDebt.lawyerName || 'غير محدد' }}</div>
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">المحكمة / الجهة</label>
+            <div class="font-bold text-slate-700 dark:text-slate-300">{{ selectedDebt.courtName || 'غير محدد' }}</div>
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">سبب المديونية</label>
+            <div class="font-bold text-slate-700 dark:text-slate-300">{{ selectedDebt.debtReason || 'غير محدد' }}</div>
+          </div>
+          <div class="col-span-full border-t border-slate-100 dark:border-slate-700/50 pt-6 mt-2 space-y-1.5">
+            <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">اسم المدعي القانوني
+              الكامل</label>
+            <div class="font-black text-slate-900 dark:text-white text-xl">{{ selectedDebt.name }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end px-4 mb-2">
+      <form method="dialog">
+        <button
+          class="bg-blue-600 hover:bg-blue-700 text-white w-full md:w-auto px-12 h-12 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
+          (click)="selectedDebt = null">تمت المراجعة، إغلاق</button>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+<!-- Promise to Pay Mini Modal -->
+<dialog id="promiseModal" class="modal" dir="rtl">
+  <div
+    class="modal-box p-0 w-[300px] max-w-[90vw] rounded-2xl shadow-2xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden text-slate-800 dark:text-slate-200">
+
+    <!-- Header -->
+    <div
+      class="bg-slate-50 dark:bg-slate-800 px-4 py-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+      <h3 class="font-bold text-sm tracking-wide flex items-center gap-2 text-slate-800 dark:text-slate-100">
+        <i class="fas fa-handshake text-emerald-500"></i> خيارات الوعد بالسداد
+      </h3>
+      <button
+        class="w-6 h-6 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 flex items-center justify-center transition-colors"
+        onclick="document.getElementById('promiseModal').close()">
+        <i class="fas fa-times text-xs"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-5 space-y-4">
+      <!-- Radio Options -->
+      <div class="flex flex-col gap-3">
+        <label class="flex items-center gap-3 cursor-pointer group">
+          <input type="radio" name="promiseType" value="full" [(ngModel)]="promiseToPayType"
+            class="radio radio-sm radio-success border-slate-300 dark:border-slate-600">
+          <span
+            class="text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">سداد
+            كلي</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer group">
+          <input type="radio" name="promiseType" value="partial" [(ngModel)]="promiseToPayType"
+            class="radio radio-sm radio-primary border-slate-300 dark:border-slate-600">
+          <span
+            class="text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">سداد
+            جزئي</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer group">
+          <input type="radio" name="promiseType" value="none" [(ngModel)]="promiseToPayType"
+            class="radio radio-sm radio-neutral border-slate-300 dark:border-slate-600">
+          <span class="text-sm font-bold text-slate-700 dark:text-slate-300 transition-colors">بدون مبلغ</span>
+        </label>
+      </div>
+
+      <!-- Amount Input -->
+      <div class="mt-2 transition-all duration-300" [class.opacity-50]="promiseToPayType === 'none'"
+        [class.pointer-events-none]="promiseToPayType === 'none'">
+        <div class="relative">
+          <input type="number"
+            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-10 px-3 text-center text-lg font-black text-emerald-600 dark:text-emerald-400 shadow-inner focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+            dir="ltr" [(ngModel)]="promiseToPayAmount" placeholder="0.000" [disabled]="promiseToPayType === 'none'" />
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">د.ك</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="bg-gray-50 dark:bg-slate-800/50 px-4 py-3 border-t border-slate-100 dark:border-slate-700 flex gap-2">
+      <button
+        class="bg-blue-600 hover:bg-blue-700 text-white flex-1 h-9 rounded-lg text-sm font-bold shadow-md active:scale-95 transition-all"
+        (click)="submitPromiseToPay()">موافق</button>
+      <button
+        class="bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-slate-200 dark:border-slate-700 flex-1 h-9 rounded-lg text-sm font-bold active:scale-95 transition-all"
+        onclick="document.getElementById('promiseModal').close()">إلغاء</button>
+    </div>
+
+  </div>
+</dialog>
+
+<app-lookup-modal #lookupModal (itemSelected)="onLookupSelected($event)"></app-lookup-modal>
+
+<!-- Installment Mini Modal -->
+<dialog id="installmentModal" class="modal" dir="rtl">
+  <div
+    class="modal-box p-0 w-[400px] max-w-[90vw] rounded-2xl shadow-2xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden text-slate-800 dark:text-slate-200">
+
+    <!-- Header -->
+    <div
+      class="bg-slate-50 dark:bg-slate-800 px-4 py-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+      <h3 class="font-bold text-sm tracking-wide flex items-center gap-2 text-slate-800 dark:text-slate-100">
+        <i
+          class="fas fa-calendar-alt text-blue-500 border border-blue-500/20 p-1.5 rounded bg-blue-50 dark:bg-blue-900/30"></i>
+        خيارات تقسيط المبلغ
+      </h3>
+      <button
+        class="w-6 h-6 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 flex items-center justify-center transition-colors"
+        onclick="document.getElementById('installmentModal').close()">
+        <i class="fas fa-times text-xs"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-5 space-y-4">
+
+      <!-- Amount Input -->
+      <div class="flex items-center justify-between gap-4">
+        <label class="text-sm font-bold text-slate-700 dark:text-slate-300 w-24">المبلغ</label>
+        <div class="relative flex-1">
+          <input type="number"
+            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-9 px-3 pr-4 text-left text-sm font-black text-emerald-600 dark:text-emerald-400 shadow-inner focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+            dir="ltr" [(ngModel)]="installmentAmount" placeholder="0.000" />
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">د.ك</span>
+        </div>
+      </div>
+
+      <!-- Date Input -->
+      <div class="flex items-center justify-between gap-4">
+        <label class="text-sm font-bold text-slate-700 dark:text-slate-300 w-24">تاريخ القسط</label>
+        <input type="date"
+          class="w-full flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-9 px-3 text-sm font-bold text-slate-700 dark:text-slate-200 shadow-inner focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+          [(ngModel)]="installmentDate" />
+      </div>
+
+    </div>
+
+    <!-- Action Buttons -->
+    <div
+      class="bg-gray-50 dark:bg-slate-800/50 px-4 py-3 border-t border-slate-100 dark:border-slate-700 flex gap-2 justify-center">
+      <button
+        class="bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-slate-200 dark:border-slate-700 w-28 h-9 rounded-lg text-sm font-bold active:scale-95 transition-all shadow-sm"
+        onclick="document.getElementById('installmentModal').close()">إلغاء</button>
+      <button
+        class="bg-blue-600 hover:bg-blue-700 text-white w-28 h-9 rounded-lg text-sm font-bold shadow-md active:scale-95 transition-all"
+        (click)="submitInstallment()">موافق</button>
+    </div>
+
+  </div>
+</dialog>
+
+<!-- Review Mini Modal -->
+<dialog id="reviewModal" class="modal" dir="rtl">
+  <div
+    class="modal-box p-0 w-[500px] max-w-[95vw] rounded-2xl shadow-2xl dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden text-slate-800 dark:text-slate-200">
+
+    <!-- Header -->
+    <div
+      class="bg-slate-50 dark:bg-slate-800 px-5 py-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+      <h3 class="font-bold text-base tracking-wide flex items-center gap-3 text-slate-800 dark:text-slate-100">
+        <i
+          class="fas fa-search-dollar text-purple-500 border border-purple-500/20 p-2 rounded-lg bg-purple-50 dark:bg-purple-900/30"></i>
+        خيارات المراجعة
+      </h3>
+      <button
+        class="w-8 h-8 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 flex items-center justify-center transition-colors"
+        onclick="document.getElementById('reviewModal').close()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-5 space-y-5">
+
+      <!-- Review Options Grid -->
+      <div class="space-y-3">
+
+        <!-- Company Review -->
+        <label
+          class="flex items-start gap-4 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-purple-300 dark:hover:border-purple-600 hover:bg-purple-50/50 dark:hover:bg-purple-900/10 cursor-pointer transition-all group"
+          [class.bg-purple-50]="reviewType === 'company'" [class.border-purple-400]="reviewType === 'company'"
+          [class.dark:bg-purple-900]="reviewType === 'company'" [class.dark:bg-opacity-20]="reviewType === 'company'"
+          [class.dark:border-purple-500]="reviewType === 'company'">
+          <input type="radio" name="reviewType" value="company" [(ngModel)]="reviewType"
+            class="radio radio-sm radio-primary mt-1 border-slate-300 dark:border-slate-600">
+          <div>
+            <div
+              class="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors">
+              مراجعة الشركة</div>
+            <div class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">فى حالة اختيار
+              مراجعة الشركة سيتم ترحيلها الى الإفادات.</div>
+          </div>
+        </label>
+
+        <!-- Admin Review -->
+        <label
+          class="flex items-start gap-4 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-purple-300 dark:hover:border-purple-600 hover:bg-purple-50/50 dark:hover:bg-purple-900/10 cursor-pointer transition-all group"
+          [class.bg-purple-50]="reviewType === 'admin'" [class.border-purple-400]="reviewType === 'admin'"
+          [class.dark:bg-purple-900]="reviewType === 'admin'" [class.dark:bg-opacity-20]="reviewType === 'admin'"
+          [class.dark:border-purple-500]="reviewType === 'admin'">
+          <input type="radio" name="reviewType" value="admin" [(ngModel)]="reviewType"
+            class="radio radio-sm radio-primary mt-1 border-slate-300 dark:border-slate-600">
+          <div>
+            <div
+              class="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors">
+              مراجعة المسئول</div>
+            <div class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">فى حالة اختيار
+              مراجعة المسئول سيتم ترحيلها الى المسئول كإجراء.</div>
+          </div>
+        </label>
+
+        <!-- Management Review -->
+        <label
+          class="flex items-start gap-4 p-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-purple-300 dark:hover:border-purple-600 hover:bg-purple-50/50 dark:hover:bg-purple-900/10 cursor-pointer transition-all group"
+          [class.bg-purple-50]="reviewType === 'management'" [class.border-purple-400]="reviewType === 'management'"
+          [class.dark:bg-purple-900]="reviewType === 'management'"
+          [class.dark:bg-opacity-20]="reviewType === 'management'"
+          [class.dark:border-purple-500]="reviewType === 'management'">
+          <input type="radio" name="reviewType" value="management" [(ngModel)]="reviewType"
+            class="radio radio-sm radio-primary mt-1 border-slate-300 dark:border-slate-600">
+          <div>
+            <div
+              class="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors">
+              مراجعة الإدارة</div>
+            <div class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">فى حالة اختيار
+              مراجعة الإدارة سيتم ترحيلها الى الإدارة فوراً للإجراء الحاسم.</div>
+          </div>
+        </label>
+
+      </div>
+
+      <!-- Notes Input -->
+      <div class="space-y-2 pt-2">
+        <label class="text-xs font-bold text-slate-600 dark:text-slate-400">أي ملاحظات إضافية؟ (اختياري)</label>
+        <textarea
+          class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-inner focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all min-h-[80px] resize-none"
+          [(ngModel)]="reviewNote" placeholder="اكتب ملاحظاتك هنا ليتم إرفاقها بالمراجعة..."></textarea>
+      </div>
+
+    </div>
+
+    <!-- Action Buttons -->
+    <div
+      class="bg-gray-50 dark:bg-slate-800/50 px-5 py-4 border-t border-slate-100 dark:border-slate-700 flex gap-3 justify-center">
+      <button
+        class="bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-slate-200 dark:border-slate-700 w-32 h-10 rounded-lg text-sm font-bold active:scale-95 transition-all shadow-sm"
+        onclick="document.getElementById('reviewModal').close()">إلغاء</button>
+      <button
+        class="bg-purple-600 hover:bg-purple-700 text-white w-32 h-10 rounded-lg text-sm font-bold shadow-md shadow-purple-500/20 active:scale-95 transition-all"
+        (click)="submitReview()">موافق</button>
+    </div>
+
+  </div>
+</dialog>
+
 <app-lookup-modal #lookupModal (itemSelected)="onLookupSelected($event)"></app-lookup-modal>

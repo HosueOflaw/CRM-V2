@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { MainContent } from "./components/main-content/main-content";
@@ -13,9 +13,10 @@ import { NegotiationsService } from '../../services/negotiations.service';
   templateUrl: './client-follow-up.html',
   styleUrl: './client-follow-up.css'
 })
-export class ClientFollowUp {
-
+export class ClientFollowUp implements OnInit {
+  @ViewChild(MainContent) mainContent!: MainContent;
   searchQuery = '';
+  loading = false;
   activeTab = 'main';
 
   sidebarActions = [
@@ -42,19 +43,28 @@ export class ClientFollowUp {
   callcenterStatements: any[] = [];
   classifications: any[] = [];
   statuses: any[] = [];
+  dashboardStats: any = null;
   payments: any[] = [];
+  contacts: any[] = [];
+  notes: any[] = [];
 
   review = { date: '', notes: '' };
   negotiationResult = { status: '' };
   financial = { claimValue: 0, fees: 0, lawFees: 0 };
-  loading = false;
   activeSubTab = 'debts'; // 'debts', 'payments', 'legal', 'attachments', 'history', 'contacts'
+
+  activeReport: 'mandate' | 'fax' | null = null;
+  isPreviewMode = false;
+  reportData: any = null;
 
   constructor(private negotiationsService: NegotiationsService) { }
 
   // البحث عن شخص باستخدام الرقم المدني أو الكود أو الاسم
   handleSearch(term: string) {
     if (!term) return;
+
+    // Reset all data before starting a new search
+    this.onClientSelected(null);
 
     this.loading = true;
     console.log('جاري البحث في قاعدة البيانات عن:', term);
@@ -63,37 +73,33 @@ export class ClientFollowUp {
       next: (results: any[]) => {
         this.loading = false;
         if (results && results.length > 0) {
-          // نأخذ النتيجة الأولى لأن الباك اند يقوم بترتيبها حسب الأولوية (تطابق الكود أولاً)
-          const mainfile = results[0];
-
-          this.onClientSelected(mainfile);
-
-          this.selectedPerson = {
-            id: mainfile.id,
-            clientName: mainfile.name || 'غير معروف',
-            customerName: mainfile.name || 'غير معروف',
-            nationalId: mainfile.cid,
-            status: mainfile.archive ? 'مؤرشف' : 'نشط',
-            nationality: mainfile.nationality || 'غير محدد',
-            classification: '',
-            contract: mainfile.code?.toString() || '',
-            debt: '0',
-            autoNumbers: '',
-            batch: '',
-            address: mainfile.address || 'لا يوجد عنوان',
-            cooperationStatus: '',
-            contactStatus: '',
-            civilStatus: '',
-            internalStatus: '',
-            jobType: mainfile.work || '',
-            incomeNotes: mainfile.note_ || ''
-          };
+          this.onClientSelected(results[0]);
+        } else {
+          import('sweetalert2').then(Swal => {
+            Swal.default.fire({
+              title: 'تنبيه',
+              text: 'لم يتم العثور على أي نتائج للبحث المدخل',
+              icon: 'warning',
+              confirmButtonText: 'حسناً',
+              confirmButtonColor: '#6366f1'
+            });
+          });
         }
       },
       error: (err) => {
         this.loading = false;
         console.error('Search error:', err);
       }
+    });
+  }
+
+  ngOnInit() {
+    this.fetchDashboardStats();
+  }
+
+  fetchDashboardStats() {
+    this.negotiationsService.getDashboardStats().subscribe(stats => {
+      this.dashboardStats = stats;
     });
   }
 
@@ -123,6 +129,8 @@ export class ClientFollowUp {
           debtReason: f.reason || '',
           batch: f.patchNo || '',
           contractNum: f.contractNo || '',
+          dateAdded: f.dateAdded,
+          dateFinished: f.dateFinished,
           nationality: this.selectedPerson.nationality,
           civilId: this.selectedPerson.nationalId,
           claim: f.deptAmount || 0,
@@ -133,7 +141,13 @@ export class ClientFollowUp {
           lawyerName: f.lawyerUserName || 'غير محدد',
           courtName: f.courtUserName || 'غير محدد',
           mdName: f.mdUserName || 'غير محدد',
-          advisorName: f.legalAdvisorUserName || 'غير محدد'
+          advisorName: f.legalAdvisorUserName || 'غير محدد',
+          note1: f.note1 || '',
+          note2: f.note2 || '',
+          note3: f.note3 || '',
+          note4: f.note4 || '',
+          note5: f.note5 || '',
+          note6: f.note6 || ''
         }));
 
         if (details && details.length > 0) {
@@ -149,56 +163,163 @@ export class ClientFollowUp {
       }
     });
 
-    // 2. جلب بقية البيانات المرتبطة بـ fileCode (من المين فايل مباشرة كما طلب العميل)
-    if (fileCode) {
-      this.fetchUniversalCaseData(fileCode);
-    }
+    // 2. جلب بقية البيانات المرتبطة بـ Id المين فايل لضمان الدقة
+    this.fetchUniversalCaseData(mainfileId);
 
-    // 3. جلب إفادات الكول سنتر المرتبطة بـ fileCode
-    if (fileCode) {
-      this.fetchCallcenterStatements(fileCode);
+    // 3. جلب إفادات الكول سنتر المرتبطة بـ Id المين فايل
+    this.fetchCallcenterStatements(mainfileId);
+
+    // 4. جلب الأرقام الخاصة بالعميل (الخصم) باستخدام الرقم المدني
+    this.fetchContactsOnly();
+  }
+
+  fetchContactsOnly() {
+    const civilId = this.selectedPerson?.nationalId || this.selectedPerson?.civilId;
+    if (civilId) {
+      this.negotiationsService.getContacts(civilId).subscribe(data => this.contacts = data);
     }
   }
 
-  // جلب كافة البيانات المرتبطة بالكود البرمجي للملف
-  private fetchUniversalCaseData(fileCode: number) {
-    this.negotiationsService.getAttachments(fileCode).subscribe(data => this.attachments = data);
-    this.negotiationsService.getPayments(fileCode).subscribe(data => this.payments = data);
-    this.negotiationsService.getAdditionalAmounts(fileCode).subscribe(data => this.additionalAmounts = data);
-    this.negotiationsService.getAudits(fileCode).subscribe(data => this.audits = data);
-    this.negotiationsService.getAutoNumbers(fileCode).subscribe(data => this.autoNumbers = data);
-    this.negotiationsService.getClassifications(fileCode).subscribe(data => this.classifications = data);
-    this.negotiationsService.getStatusesHistory(fileCode).subscribe(data => this.statuses = data);
+  // جلب كافة البيانات المرتبطة بالمعرف الداخلي للملف لضمان الدقة
+  private fetchUniversalCaseData(id: number) {
+    this.negotiationsService.getPayments(id).subscribe(data => {
+      this.payments = data;
+      // تحديث المبالغ المسددة في جدول الديون المرتبط بهذا الملف
+      const totalPaidForThisCode = data.reduce((acc, p) => acc + (p.value || 0), 0);
+      this.clientRows = this.clientRows.map(row => {
+        const sortedPayments = [...data].sort((a, b) => new Date(b.dateAdded || 0).getTime() - new Date(a.dateAdded || 0).getTime());
+        const latestPayment = sortedPayments[0];
+        return {
+          ...row,
+          paid: totalPaidForThisCode,
+          remaining: (row.claim || 0) - totalPaidForThisCode,
+          lastPaymentAmount: latestPayment?.value || 0,
+          lastPaymentDate: latestPayment?.dateAdded
+        };
+      });
+
+      // السداد الكلي (مجموع السدادات لكل الديون المعروضة)
+      const totalPaidGlobal = this.clientRows.reduce((acc, row) => acc + (row.paid || 0), 0);
+      this.financial.fees = totalPaidGlobal; 
+      this.financial.lawFees = this.financial.claimValue - totalPaidGlobal;
+    });
+
+    this.negotiationsService.getAttachments(id).subscribe(data => this.attachments = data);
+    this.negotiationsService.getAdditionalAmounts(id).subscribe(data => this.additionalAmounts = data);
+    this.negotiationsService.getAudits(id).subscribe(data => this.audits = data);
+    this.negotiationsService.getAutoNumbers(id).subscribe(data => {
+      this.autoNumbers = data;
+      if (this.selectedPerson && data.length > 0) {
+        this.selectedPerson.autoNumbers = data.map(n => n.autoNumberValue).join(', ');
+      }
+    });
+
+    this.negotiationsService.getClassifications(id).subscribe(data => {
+      this.classifications = data;
+      // If classification data exists and was NOT already set by search, map the latest record
+      if (this.selectedPerson && data && data.length > 0) {
+        this.selectedPerson.classification = {
+          ...data[0],
+          salaryDate: data[0].salaryDate ? data[0].salaryDate.split('T')[0] : null
+        };
+      } else if (this.selectedPerson && !this.selectedPerson.classification) {
+        this.selectedPerson.classification = {
+          clientStatusId: null, claimStatusId: null, paymentStatusId: null,
+          fileStatusId: null, actionStatusId: null, followUpStatusId: null,
+          internalStatusId: null, civilStatusId: null,
+          cooperationStatusId: null, contactStatusId: null,
+          discount: null, acceptance: '', salaryDate: null, incomeNotes: ''
+        };
+      }
+    });
+    this.negotiationsService.getStatusesHistory(id).subscribe(data => this.statuses = data);
+    this.negotiationsService.getNotes(id).subscribe(data => this.notes = data);
   }
 
-  private fetchCallcenterStatements(fileCode: number) {
-    this.negotiationsService.getCallcenterStatements(fileCode).subscribe(data => this.callcenterStatements = data);
+  handleStatusChanged() {
+    if (this.selectedPerson?.id) {
+      this.negotiationsService.getStatusesHistory(this.selectedPerson.id).subscribe(data => this.statuses = data);
+    }
+  }
+
+  private fetchCallcenterStatements(id: number) {
+    this.negotiationsService.getCallcenterStatements(id).subscribe(data => {
+      const sorted = data.sort((a, b) => new Date(b.dateAdded || 0).getTime() - new Date(a.dateAdded || 0).getTime());
+      this.callcenterStatements = sorted;
+
+      if (sorted.length > 0) {
+        this.clientRows = this.clientRows.map(row => ({
+          ...row,
+          lastStatement: sorted[0].notes,
+          lastStatementDate: sorted[0].dateAdded
+        }));
+      }
+    });
   }
   // جلب الإفادات
   // this.negotiationsService.getStatements(fileId).subscribe(statements => { ... });
+
+  saveStatement(eventData: any) {
+    if (!this.selectedPerson?.code) return;
+
+    const payload = {
+      fileCode: this.selectedPerson.code,
+      deptCode: this.selectedPerson.departmentId,
+      contactMethod: eventData.contactMethod,
+      connectedStatus: eventData.connectedStatus,
+      notes: eventData.notes,
+      phoneNumber: eventData.phoneNumber || this.selectedPerson.phone1 || 'لا يوجد رقم',
+      phoneOwner: eventData.phoneOwner,
+      promiseAmount: eventData.promiseAmount,
+      nextDate: eventData.nextDate,
+      nextAction: eventData.nextAction
+    };
+
+    this.loading = true;
+    import('sweetalert2').then(Swal => {
+      this.negotiationsService.addStatement(payload).subscribe({
+        next: () => {
+          this.loading = false;
+          Swal.default.fire('تم الحفظ', 'تم إضافة الإفادة بنجاح', 'success');
+          this.fetchUniversalCaseData(this.selectedPerson.code);
+          this.fetchCallcenterStatements(this.selectedPerson.code);
+        },
+        error: (err) => {
+          this.loading = false;
+          console.error('Error saving statement:', err);
+          Swal.default.fire('خطأ', 'حدث خطأ أثناء حفظ الإفادة', 'error');
+        }
+      });
+    });
+  }
 
   // البحث عن شخص
   onClientSelected(client: any) {
     if (client) {
       this.selectedPerson = {
         id: client.id,
+        code: client.code?.toString() || '',
+        departmentId: client.departmentId,
         clientName: client.name || '',
         customerName: client.name || '',
         nationalId: client.cid || '',
         status: client.archive ? 'مؤرشف' : 'نشط',
         nationality: client.nationality || '',
-        classification: '',
         contract: client.code?.toString() || '',
         debt: '',
         autoNumbers: '',
         batch: '',
         address: client.address || '',
-        cooperationStatus: '',
-        contactStatus: '',
-        civilStatus: '',
-        internalStatus: '',
+        cooperationStatus: client.cooperationStatus || '',
+        contactStatus: client.contactStatus || '',
+        civilStatus: client.civilStatus || '',
+        internalStatus: client.internalStatus || '',
         jobType: client.work || '',
-        incomeNotes: client.note_ || ''
+        incomeNotes: client.note_ || '',
+        classification: client.classification ? {
+          ...client.classification,
+          salaryDate: client.classification.salaryDate ? client.classification.salaryDate.split('T')[0] : null
+        } : null
       };
 
       // Trigger search for related details (stats, file records, etc.)
@@ -206,6 +327,9 @@ export class ClientFollowUp {
       console.log('Client loaded:', client);
     } else {
       this.resetAllData();
+      if (this.mainContent) {
+        this.mainContent.resetAllTables();
+      }
     }
   }
 
@@ -215,8 +339,18 @@ export class ClientFollowUp {
       debt: '', autoNumbers: '', batch: '', address: '', clientStatus: '', claimStatus: '', paymentStatus: '', discount: '', acceptance: '', jobType: '', incomeNotes: '', salaryDate: ''
     };
     this.clientRows = [];
+    this.attachments = [];
+    this.additionalAmounts = [];
+    this.audits = [];
+    this.autoNumbers = [];
+    this.callcenterStatements = [];
+    this.classifications = [];
+    this.statuses = [];
+    this.payments = [];
+    this.contacts = [];
+    this.notes = [];
     this.searchQuery = '';
-    console.log('All fields cleared');
+    console.log('All fields and child tables cleared');
   }
 
   // أزرار Sidebar
@@ -235,6 +369,19 @@ export class ClientFollowUp {
   saveClassification() { console.log('حفظ التصنيف'); }
   saveDiscount() { console.log('حفظ الخصم'); }
   saveIncome() { console.log('حفظ مصدر الدخل'); }
+
+  onPreviewToggle(event: { type: 'mandate' | 'fax' | null, isPreview: boolean, data?: any }) {
+    this.activeReport = event.type;
+    this.isPreviewMode = event.isPreview;
+    if (event.data) {
+      this.reportData = event.data;
+    }
+  }
+
+  closePreview() {
+    this.isPreviewMode = false;
+    this.activeReport = null;
+  }
 
   printPage() { window.print(); }
 }

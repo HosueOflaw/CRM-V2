@@ -1,19 +1,268 @@
+/* Mandate Report Base Styles */
+:host {
+  display: block;
+}
+
+/* Base Print Area Styling */
+.print-area {
+  font-family: 'Times New Roman', serif;
+  background-color: #FFFFFF;
+  position: relative;
+  width: 799px;
+  /* Legacy 1:1 scale */
+  height: 1023px;
+  margin: 0 auto;
+}
+
+/* Background Frame (The full-page layout) */
+.report-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.report-frame img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: fill;
+  /* Force fill the 820x1023 container */
+}
+
+.table-container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0 5px;
+  /* Minimal padding for 1:1 alignment */
+}
+
+/* Preview Mode Styles - ABSOLUTE SCROLL SUPPRESSION */
+.preview-container {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  /* Allow scroll for large content */
+  display: flex !important;
+  justify-content: center !important;
+  /* Center vertically */
+  align-items: center !important;
+  /* Center horizontally */
+  margin: 0 !important;
+}
+
+.preview-mode {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 35px 90px rgba(0, 0, 0, 0.6), 0 20px 40px rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  background-color: white !important;
+  transform: scale(0.8);
+  /* Adjusted to accommodate legacy gaps */
+  transform-origin: center center;
+  flex: 0 0 auto;
+  transition: transform 0.4s ease-out;
+}
+
+.close-btn {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10001;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 32px;
+  color: white;
+  transition: all 0.3s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 50, 50, 0.6);
+  transform: scale(1.1) rotate(90deg);
+}
+
+/* Print Specific Overrides - FORCE 1 PAGE A4 */
 @media print {
-  body * {
-    visibility: hidden;
+  @page {
+    size: A4;
+    margin: 0 !important;
   }
-  .print-area, .print-area * {
-    visibility: visible;
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
-  .print-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-  }
+
   .no-print {
     display: none !important;
   }
+
+  .preview-container {
+    background: none !important;
+    backdrop-filter: none !important;
+    position: relative !important;
+    display: block !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    z-index: auto !important;
+  }
+
+  .preview-mode {
+    transform: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    background: white !important;
+  }
+
+  .print-area {
+    width: 210mm !important;
+    height: 297mm !important;
+    position: relative !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    visibility: visible !important;
+    overflow: hidden !important;
+    background: white !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .report-frame,
+  .report-frame img {
+    width: 210mm !important;
+    height: 297mm !important;
+  }
+
+  .table-container {
+    width: 210mm !important;
+    height: 297mm !important;
+    padding: 10mm 15mm 15mm 15mm !important;
+  }
+}
+
+/* Legacy Table Utility Classes */
+.csFF8EA047 {
+  color: #000000;
+  background-color: #008000;
+  font-family: 'Times New Roman';
+  font-size: 19px;
+  font-weight: bold;
+}
+
+.cs276EA413 {
+  color: #000000;
+  background-color: #D3D3D3;
+  font-family: 'Times New Roman';
+  font-size: 19px;
+  font-weight: bold;
+}
+
+.cs5DB7758A {
+  color: #000000;
+  font-family: Andalus;
+  font-size: 40px;
+  font-weight: bold;
+  padding: 0 2px;
+}
+
+.csDD3E3C2C {
+  color: #000000;
+  font-family: 'Times New Roman';
+  font-size: 13px;
+  font-weight: bold;
+  padding: 0 2px;
+}
+
+.csC4B1EEF5 {
+  color: #000000;
+  font-family: 'Times New Roman';
+  font-size: 15px;
+  font-weight: bold;
+  padding-left: 4px;
+  padding-right: 15px;
+}
+
+.cs74F57C3 {
+  color: #000000;
+  font-family: 'Times New Roman';
+  font-size: 14px;
+  /* Reduced from 16px */
+  font-weight: bold;
+  padding: 0 2px;
+}
+
+.csF6D64693 {
+  color: #000000;
+  font-family: 'Times New Roman';
+  font-size: 19px;
+  font-weight: bold;
+}
+
+.cs7B5F7493 {
+  color: #000000;
+  font-family: 'Times New Roman';
+  font-size: 19px;
+  font-weight: bold;
+  padding-left: 2px;
+}
+
+.csCF5A2652 {
+  color: #000000;
+  font-family: 'Times New Roman';
+  font-size: 18px;
+  /* Reduced from 20px */
+  font-weight: bold;
+  padding-left: 1px;
+}
+
+.csDDCA679E {
+  color: #000000;
+  font-family: 'Times New Roman';
+  font-size: 18px;
+  /* Reduced from 20px */
+  font-weight: bold;
+  padding: 0 1px;
+}
+
+.csA61B7433 {
+  color: #000000;
+  font-family: 'Times New Roman';
+  font-size: 20px;
+  font-weight: bold;
+  text-decoration: underline;
+  /* padding: 0 1px; */
+}
+
+.cs96F53A84 {
+  color: #FFFFFF;
+  background-color: #008000;
+  font-family: 'Microsoft Sans Serif';
+  font-size: 24px;
 }

@@ -230,3 +230,92 @@ select.premium-input option {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(33, 115, 70, 0.3);
 }
+
+/* Modal Styles */
+.premium-modal-box {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 2rem !important;
+    box-shadow: var(--p-shadow-lg) !important;
+    padding: 2.5rem !important;
+    overflow: hidden !important;
+}
+
+[data-theme='dark'] .premium-modal-box {
+    background: rgba(30, 41, 59, 0.7) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.modal-header-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    background: var(--p-primary-soft);
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.modal-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 2rem;
+}
+
+.modal-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.modal-label {
+    font-size: 0.75rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: var(--text-color-secondary) !important;
+    font-weight: 800 !important;
+}
+
+.modal-value {
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: var(--text-color) !important;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--surface-border);
+    transition: border-color 0.2s ease;
+}
+
+.modal-info-item:hover .modal-value {
+    border-color: var(--primary-color);
+}
+
+.divider-premium {
+    grid-column: 1 / -1;
+    height: 1px;
+    background: linear-gradient(to left, var(--surface-border), transparent);
+    margin: 1rem 0;
+}
+
+.badge-premium {
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.75rem !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+}
+
+.modal-action .premium-btn {
+    min-width: 120px;
+}

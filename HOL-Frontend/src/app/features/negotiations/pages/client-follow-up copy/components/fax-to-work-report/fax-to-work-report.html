@@ -1,0 +1,268 @@
+<div [class.preview-container]="isPreview">
+    @if (isPreview) {
+    <button class="close-btn" (click)="close.emit()">×</button>
+    }
+
+    <div class="print-area" [class.preview-mode]="isPreview" style="background-color:transparent; position: relative;">
+
+        <!-- Background Frame -->
+        <div class="report-frame">
+            <img alt="" src="/FAX_TO_WORK_files/head.png"
+                style="width:794px; height:110px; display: block; margin: 0 auto;" />
+            <img alt="" src="/FAX_TO_WORK_files/footer.png"
+                style="width:794px; height:94px; position: absolute; bottom: 0; left: 2px; z-index: -1;" />
+        </div>
+
+        <table cellpadding="0" cellspacing="0" border="0"
+            style="border-width:0px;empty-cells:show;width:798px;height:882px;position:relative;background-color:transparent; z-index: 10;">
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:60px;"></td>
+                <td style="width:4px;"></td>
+                <td style="width:35px;"></td>
+                <td style="width:76px;"></td>
+                <td style="width:200px;"></td>
+                <td style="width:84px;"></td>
+                <td style="width:9px;"></td>
+                <td style="width:204px;"></td>
+                <td style="width:83px;"></td>
+                <td style="width:23px;"></td>
+                <td style="width:76px;"></td>
+                <td style="width:4px;"></td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:60px;"></td>
+                <td colspan="11" style="height:60px;"></td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:40px;"></td>
+                <td colspan="11"></td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:30px;"></td>
+                <td class="cs2D18E911" colspan="5" dir="ltr"
+                    style="width:393px;height:25px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>Final&nbsp;Warning</nobr>
+                </td>
+                <td class="cs1A2EC3B2" colspan="6"
+                    style="width:394px;height:25px;line-height:19px;text-align:center;vertical-align:middle;">
+                    <nobr>انذار&nbsp;نهائى</nobr>
+                </td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:20px;"></td>
+                <td class="cs4AA4ADAA" colspan="3"
+                    style="width:109px;height:25px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>Date&nbsp;:</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="5"
+                    style="width:575px;height:25px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>{{ currentDate }}</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="3"
+                    style="width:98px;height:25px;line-height:19px;text-align:center;vertical-align:middle;">
+                    <nobr>:&nbsp;التاريخ</nobr>
+                </td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:28px;"></td>
+                <td class="cs4AA4ADAA" colspan="3"
+                    style="width:109px;height:25px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>Name&nbsp;:</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="5"
+                    style="width:575px;height:25px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>{{ clientData.clientName }}</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="3"
+                    style="width:98px;height:25px;line-height:19px;text-align:center;vertical-align:middle;">
+                    <nobr>:&nbsp;الاسم</nobr>
+                </td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:28px;"></td>
+                <td class="cs4AA4ADAA" colspan="3"
+                    style="width:109px;height:34px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>Civil&nbsp;ID&nbsp;No:</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="5"
+                    style="width:575px;height:34px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>{{ clientData.caseNumber }}</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="3"
+                    style="width:98px;height:34px;line-height:19px;text-align:center;vertical-align:middle;">
+                    <nobr>:&nbsp;الرقم&nbsp;المدنى</nobr>
+                </td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:28px;"></td>
+                <td class="cs4AA4ADAA" colspan="3"
+                    style="width:109px;height:34px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>Nationality&nbsp;:</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="5"
+                    style="width:575px;height:34px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>{{ clientData.nationality }}</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="3"
+                    style="width:98px;height:34px;line-height:19px;text-align:center;vertical-align:middle;">
+                    <nobr>:&nbsp;الجنسية</nobr>
+                </td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:28px;"></td>
+                <td class="cs4AA4ADAA" colspan="3"
+                    style="width:109px;height:34px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>Employer&nbsp;:</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="5"
+                    style="width:575px;height:34px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>{{ clientData.employer }}</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="3"
+                    style="width:98px;height:34px;line-height:19px;text-align:center;vertical-align:middle;">
+                    <nobr>:&nbsp;جهة&nbsp;العمل</nobr>
+                </td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:28px;"></td>
+                <td class="cs4AA4ADAA" colspan="3"
+                    style="width:109px;height:34px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>The&nbsp;creditor&nbsp;:</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="5"
+                    style="width:575px;height:34px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>{{ clientData.agentName }}</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="3"
+                    style="width:98px;height:34px;line-height:19px;text-align:center;vertical-align:middle;">
+                    <nobr>:&nbsp;الدائن</nobr>
+                </td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:28px;"></td>
+                <td class="cs4AA4ADAA" colspan="3"
+                    style="width:109px;height:34px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>Contract&nbsp;No&nbsp;:</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="5"
+                    style="width:575px;height:34px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>{{ clientData.contractNumber }}</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="3"
+                    style="width:98px;height:34px;line-height:19px;text-align:center;vertical-align:middle;">
+                    <nobr>:&nbsp;رقم&nbsp;العقد</nobr>
+                </td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:28px;"></td>
+                <td class="cs4AA4ADAA" colspan="3"
+                    style="width:109px;height:34px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>Amount&nbsp;:</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="5"
+                    style="width:575px;height:34px;line-height:18px;text-align:center;vertical-align:middle;">
+                    <nobr>{{ (clientData.claimValue ?? 0) | number:'1.3-3' }}</nobr>
+                </td>
+                <td class="cs98ED5121" colspan="3"
+                    style="width:98px;height:34px;line-height:19px;text-align:center;vertical-align:middle;">
+                    <nobr>:&nbsp;المبلغ</nobr>
+                </td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:22px;"></td>
+                <td class="csB1C72DFE" colspan="5" rowspan="2" dir="ltr"
+                    style="width:395px;height:241px;line-height:1.6;text-align:left;vertical-align:top; border-right: none;">
+                    <nobr>
+                        Dear&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Customer
+                    </nobr><br />
+                    <nobr>Because&nbsp;you&nbsp;indebted&nbsp;by&nbsp;the&nbsp;amount&nbsp;shown&nbsp;above&nbsp;and
+                    </nobr><br />
+                    <nobr>
+                        you&nbsp;did&nbsp;not&nbsp;respond&nbsp;to&nbsp;repeated&nbsp;attempts&nbsp;to&nbsp;repay&nbsp;by
+                    </nobr><br />
+                    <nobr>friendly&nbsp;ways.</nobr><br />
+                    <nobr>
+                        We&nbsp;need&nbsp;to&nbsp;warn&nbsp;you&nbsp;to&nbsp;be&nbsp;repaid&nbsp;within&nbsp;five&nbsp;days
+                    </nobr><br />
+                    <nobr>because&nbsp;we&nbsp;are&nbsp;going&nbsp;to&nbsp;obtaining&nbsp;a&nbsp;court&nbsp;judgment
+                    </nobr><br />
+                    <nobr>
+                        against&nbsp;you&nbsp;for&nbsp;forcing&nbsp;you&nbsp;to&nbsp;pay&nbsp;the&nbsp;amount&nbsp;of&nbsp;the&nbsp;debt
+                    </nobr><br />
+                    <nobr>
+                        with&nbsp;the&nbsp;necessary&nbsp;expences&nbsp;and&nbsp;fees&nbsp;in&nbsp;addition&nbsp;to&nbsp;taking
+                    </nobr><br />
+                    <nobr>all&nbsp;legal&nbsp;action&nbsp;against&nbsp;you&nbsp;,&nbsp;which&nbsp;include&nbsp;:</nobr>
+                    <br />
+                    <nobr>
+                        *&nbsp;prevent&nbsp;you&nbsp;from&nbsp;behaving&nbsp;in&nbsp;your&nbsp;car&nbsp;through&nbsp;the
+                    </nobr><br />
+                    <nobr>Ministry&nbsp;of&nbsp;the&nbsp;Interior&nbsp;.</nobr><br />
+                    <nobr>*&nbsp;Travel&nbsp;ban&nbsp;.</nobr><br />
+                    <nobr>*&nbsp;Charging&nbsp;you&nbsp;all&nbsp;judicial&nbsp;fees&nbsp;.</nobr>
+                </td>
+                <td class="csA7107921" colspan="2" style="width:274px;height:22px;"></td>
+                <td class="cs98ED5121" colspan="6" rowspan="2" dir="rtl"
+                    style="width:394px;height:241px;line-height:1.6;text-align:right;vertical-align:top; border-left: none;">
+                    <nobr>:&nbsp;عميلنا&nbsp;العزيز</nobr><br />
+                    <nobr>
+                        بما&nbsp;انكم&nbsp;مدينون&nbsp;بالمبلغ&nbsp;الموضح&nbsp;اعلاه&nbsp;ولم&nbsp;تستجيبوا&nbsp;لمحاولاتنا&nbsp;المتكررة
+                    </nobr><br />
+                    <nobr>
+                        للسداد&nbsp;بالطرق&nbsp;الودية&nbsp;،&nbsp;فإننا&nbsp;ننبهكم&nbsp;الى&nbsp;اننا&nbsp;بصدد&nbsp;استصدار&nbsp;حكم&nbsp;قضائى
+                    </nobr><br />
+                    <nobr>
+                        ضدكم&nbsp;لالزامكم&nbsp;&nbsp;بسداد&nbsp;المبلغ&nbsp;المستحق&nbsp;عليكم&nbsp;مع&nbsp;المصروفات&nbsp;والرسوم
+                    </nobr><br />
+                    <nobr>
+                        اللازمة&nbsp;بالاضافة&nbsp;الى&nbsp;كافة&nbsp;الاجراءات&nbsp;الجبرية&nbsp;ضدكم&nbsp;والتى&nbsp;منها
+                    </nobr><br />
+                    <nobr>الحجز&nbsp;على&nbsp;سياراتكم&nbsp;بالتعاون&nbsp;مع&nbsp;وزارة&nbsp;الداخلية&nbsp;*</nobr>
+                    <br />
+                    <nobr>المنع&nbsp;من&nbsp;السفر&nbsp;*</nobr><br />
+                    <nobr>تحميلكم&nbsp;كافة&nbsp;الرسوم&nbsp;القضائية&nbsp;*</nobr>
+                </td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:220px;"></td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:16px;"></td>
+                <td colspan="11"></td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:24px;"></td>
+                <td class="csCAA7A223" colspan="5"
+                    style="width:395px;height:22px;line-height:17px;text-align:left;vertical-align:middle;">
+                    <nobr>
+                        We&nbsp;apologize&nbsp;for&nbsp;the&nbsp;warning&nbsp;if&nbsp;reached&nbsp;after&nbsp;full&nbsp;payment
+                    </nobr>
+                </td>
+                <td class="cs1A2EC3B2" colspan="6"
+                    style="width:394px;height:22px;line-height:19px;text-align:right;vertical-align:middle;">
+                    <nobr>نعتذر&nbsp;عن&nbsp;هذا&nbsp;الانذار&nbsp;اذا&nbsp;وصلكم&nbsp;عقب&nbsp;السداد</nobr>
+                </td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:61px;"></td>
+                <td colspan="11"></td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:10px;"></td>
+                <td colspan="11" style="height:10px;"></td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:22px;"></td>
+                <td class="cs2F93481E" colspan="2"
+                    style="width:104px;height:22px;line-height:17px;text-align:left;vertical-align:top;">
+                    <nobr>0</nobr>
+                </td>
+                <td></td>
+            </tr>
+            <tr style="vertical-align:top;">
+                <td style="width:0px;height:10px;"></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>

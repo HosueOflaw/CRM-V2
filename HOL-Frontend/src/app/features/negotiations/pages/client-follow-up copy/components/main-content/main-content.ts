@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { forkJoin, of } from 'rxjs';
 import { LookupModal } from "../../../../../../shared/components/lookup-modal/lookup-modal";
 import { NegotiationsService } from '../../../../services/negotiations.service';
 import * as XLSX from 'xlsx'; // استيراد مكتبة الإكسل
@@ -73,6 +74,7 @@ export class MainContent {
   @Input() financialData: any = null;
   @Input() attachments: any[] = [];
   @Input() payments: any[] = [];
+  @Input() notes: any[] = [];
   @Input() additionalAmounts: any[] = [];
   @Input() audits: any[] = [];
   @Input() autoNumbers: any[] = [];
@@ -83,6 +85,8 @@ export class MainContent {
   toDate: string = '2025-12-02';
   statementRows: StatementRow[] = [];
   allStatementRows: StatementRow[] = [];
+  searchGeneral: string = '';
+  selectedFile: any = null;
 
 
 
@@ -103,9 +107,94 @@ export class MainContent {
   activeMainTab: 'clients' | 'main' | 'searchNumbers' | 'menuSearch' | 'FeesAndCollection' | 'notes' | 'preview' | 'newFiles' | 'statements' | 'searchStatements' | 'stats' = 'main';
   loading: boolean = false;
   selectedAction: string = ''; // هذا المتغير سيخزن الإختيار
-  selectedNumber: string = '45612378';
-  selectedRelation: string = 'الام';
+  selectedNumber: string = '';
+  selectedRelation: string = '';
   selectedResult: string = '';
+  promiseToPayType: 'none' | 'full' | 'partial' = 'none';
+  promiseToPayAmount: number | null = null;
+  installmentAmount: number | null = null;
+  installmentDate: string | null = null;
+  reviewType: string = '';
+  reviewNote: string = '';
+
+  statementDetails = {
+    notes: '',
+    phoneNumber: '',
+    phoneOwner: '',
+    nextAction: '',
+    nextDate: ''
+  };
+
+  historyPage: number = 1;
+  historyPageSize: number = 3;
+
+  constructor(private negotiationsService: NegotiationsService) { }
+
+  handleResultClick(result: string) {
+    if (this.selectedNumber) {
+      this.statementDetails.phoneNumber = this.selectedNumber;
+      this.statementDetails.phoneOwner = this.selectedRelation || '';
+    }
+
+    if (result === 'وعد بالسداد') {
+      const modal = document.getElementById('promiseModal') as HTMLDialogElement;
+      if (modal) modal.showModal();
+    } else if (result === 'تقسيط') {
+      const modal = document.getElementById('installmentModal') as HTMLDialogElement;
+      if (modal) modal.showModal();
+    } else if (result === 'مراجعة') {
+      const modal = document.getElementById('reviewModal') as HTMLDialogElement;
+      if (modal) modal.showModal();
+    } else {
+      this.selectedResult = result;
+    }
+  }
+
+  // Lookup selections for dropdowns
+  lookupLists: any = {
+    client: [],
+    claim: [],
+    payment: [],
+    file: [],
+    action: [],
+    followup: [],
+    interior: [],
+    civil: [],
+    contact: [],
+    cooperation: []
+  };
+
+  submitPromiseToPay() {
+    let resultText = 'وعد بالسداد';
+    if (this.promiseToPayType === 'none') {
+      resultText = 'وعد بالسداد';
+    } else if (this.promiseToPayType === 'full') {
+      resultText = `وعد بالسداد كلى مبلغ ${this.promiseToPayAmount} د.ك`;
+    } else {
+      resultText = `وعد بالسداد جزئى مبلغ ${this.promiseToPayAmount} د.ك`;
+    }
+    this.selectedResult = resultText;
+
+    const modal = document.getElementById('promiseModal') as HTMLDialogElement;
+    if (modal) modal.close();
+  }
+
+  submitInstallment() {
+    this.selectedResult = `تقسيط مبلغ ${this.installmentAmount} د.ك بتاريخ ${this.installmentDate}`;
+    const modal = document.getElementById('installmentModal') as HTMLDialogElement;
+    if (modal) modal.close();
+  }
+
+  submitReview() {
+    let reviewTypeName = '';
+    if (this.reviewType === 'company') reviewTypeName = 'مراجعة الشركة';
+    else if (this.reviewType === 'admin') reviewTypeName = 'مراجعة المسؤل';
+    else reviewTypeName = 'مراجعة الادارة';
+
+    this.selectedResult = `${reviewTypeName}${this.reviewNote ? ' - ' + this.reviewNote : ''}`;
+    const modal = document.getElementById('reviewModal') as HTMLDialogElement;
+    if (modal) modal.close();
+  }
   activeSubTabLower: string = 'notes';
   companyLink: string = '';
   officeLink: string = 'https://office-link.com';
@@ -136,11 +225,25 @@ export class MainContent {
   @Input() numbersSearchResults: any[] = [];
   @Input() bottomTable1: any[] = [];
   @Input() bottomTable2: any[] = [];
+
+  // Variables for modals
+  selectedPayment: any = null;
+  selectedDebt: any = null;
+
+  selectPaymentForModal(payment: any) {
+    this.selectedPayment = payment;
+  }
+
+  selectDebtForModal(debt: any) {
+    this.selectedDebt = debt;
+  }
   @Output() saveSearch = new EventEmitter<any>();
+  @Output() statusChanged = new EventEmitter<void>();
+  @Output() onSaveComplete = new EventEmitter<void>();
 
   lookupData: any[] = [];
 
-  constructor(private negotiationsService: NegotiationsService) { }
+
 
   @Input() searchNumbersForm: any = {
     clientCode: '', civilID: '', source: '', classification: '', type: '', number: '',
@@ -212,55 +315,215 @@ export class MainContent {
 
     this.allStatementRows = this.generateMockStatements();
     this.searchStatements(); // البحث الأولي
-
+    this.fetchAllLookups();
   }
 
-  negotiationMethods = [
-    'اتصال', 'رسالة', 'اتصال واتس', 'رسالة واتس',
-    'اتصال فيبر', 'رسالة فيبر', 'اتصال ايمو', 'رسالة ايمو',
-    'فاكس', 'ايميل'
+  fetchAllLookups() {
+    const types = [
+      { key: 'client', type: 'CLIENT_STATUS' },
+      { key: 'claim', type: 'CLAIM_STATUS' },
+      { key: 'payment', type: 'PAYMENT_STATUS' },
+      { key: 'file', type: 'FILE_STATUS' },
+      { key: 'action', type: 'ACTION_STATUS' },
+      { key: 'followup', type: 'FOLLOWUP_STATUS' },
+      { key: 'interior', type: 'INTERNAL' },
+      { key: 'civil', type: 'CIVIL' },
+      { key: 'contact', type: 'CONTACT' },
+      { key: 'cooperation', type: 'COOPERATION' }
+    ];
+
+    types.forEach(item => {
+      if (item.key === 'client') {
+        // Hardcoded 'Customer Status' list as requested by user
+        this.lookupLists.client = [
+          { id: 1, name: 'غير مصنف' },
+          { id: 2, name: 'مدني خطا' },
+          { id: 3, name: 'نشط' },
+          { id: 4, name: 'مسجون' },
+          { id: 5, name: 'وفاه' },
+          { id: 6, name: 'مغادر نهائي' },
+          { id: 7, name: 'سداد المحكمة' },
+          { id: 8, name: 'سداد شركة' },
+          { id: 9, name: 'سداد مندوب مكتب' }
+        ];
+      } else if (item.key === 'claim') {
+        // Hardcoded 'Claim Status' list as requested by user
+        this.lookupLists.claim = [
+          { id: 1, name: 'غير مصنف' },
+          { id: 2, name: 'حفظ' },
+          { id: 3, name: 'حفظ مؤقت في المكتب' },
+          { id: 4, name: 'حفظ مؤقت في الشركة' },
+          { id: 5, name: 'سداد محكمة' },
+          { id: 6, name: 'سحب اداري' },
+          { id: 7, name: 'وقف' },
+          { id: 8, name: 'سداد قبل التحويل' },
+          { id: 9, name: 'سداد بمعرفة الشركة' }
+        ];
+      } else if (item.key === 'file') {
+        // Hardcoded 'File Status' list as requested by user
+        this.lookupLists.file = [
+          { id: 1, name: 'غير مصنف' },
+          { id: 2, name: 'ودي' },
+          { id: 3, name: 'قضائي' }
+        ];
+      } else if (item.key === 'action') {
+        // Hardcoded 'Procedure Status' list as requested by user
+        this.lookupLists.action = [
+          { id: 1, name: 'غير مصنف' },
+          { id: 2, name: 'اونلاين' },
+          { id: 3, name: 'رسوم' },
+          { id: 4, name: 'تنفيذ' },
+          { id: 5, name: 'تنفيذ جديد 1' },
+          { id: 6, name: 'مرفوض مرة' },
+          { id: 7, name: 'مرفوض مرتين' },
+          { id: 8, name: 'مرفوض اكثر من مرتين' },
+          { id: 9, name: 'مرفوض فوق 1000' },
+          { id: 10, name: 'جلسات' },
+          { id: 11, name: 'رفض الدعوى بحالتها' },
+          { id: 12, name: 'تم التسليم للمتداول' },
+          { id: 13, name: 'الغاء الحكم بالتظلم' },
+          { id: 14, name: 'قيد الرفع' },
+          { id: 15, name: 'اعادة الرفع' }
+        ];
+      } else if (item.key === 'interior') {
+        // Hardcoded 'Interior Status' list as requested by user
+        this.lookupLists.interior = [
+          { id: 1, name: 'غير مصنف' },
+          { id: 2, name: 'غير مخالف' },
+          { id: 3, name: 'في قائمة الممنوعين' },
+          { id: 4, name: 'مخالف اقامة' },
+          { id: 5, name: 'هجرة' },
+          { id: 6, name: 'خارج البلاد' }
+        ];
+      } else if (item.key === 'civil') {
+        // Hardcoded 'Civil Status' list as requested by user
+        this.lookupLists.civil = [
+          { id: 1, name: 'غير مصنف' },
+          { id: 2, name: 'صالحة' },
+          { id: 3, name: 'منتهية' },
+          { id: 4, name: 'لاغية' },
+          { id: 5, name: 'يتعذر' },
+          { id: 6, name: 'غير نشط' },
+          { id: 7, name: 'وفاة' }
+        ];
+      } else if (item.key === 'contact') {
+        // Hardcoded 'Contact Status' list as requested by user
+        this.lookupLists.contact = [
+          { id: 1, name: 'غير مصنف' },
+          { id: 2, name: 'مع العميل' },
+          { id: 3, name: 'غير متواصل' },
+          { id: 4, name: 'لا يمكن التواصل' },
+          { id: 5, name: 'مع اخر' },
+          { id: 6, name: 'مع العميل واخر' }
+        ];
+      } else if (item.key === 'cooperation') {
+        // Hardcoded 'Cooperation Status' list as requested by user
+        this.lookupLists.cooperation = [
+          { id: 1, name: 'غير مصنف' },
+          { id: 2, name: 'وعد بالسداد' },
+          { id: 3, name: 'تقسيط' },
+          { id: 4, name: 'متعاون' },
+          { id: 5, name: 'غير متعاون' },
+          { id: 6, name: 'مماطل' },
+          { id: 7, name: 'متردد' },
+          { id: 8, name: 'غير قادر' },
+          { id: 9, name: 'وعد ضعيف' },
+          { id: 10, name: 'وعد قوي' },
+          { id: 11, name: 'رافض السداد' },
+          { id: 12, name: 'لم نصل اليه' }
+        ];
+      } else {
+        (this.negotiationsService as any).getLookups(item.type).subscribe({
+          next: (data: any[]) => {
+            this.lookupLists[item.key] = data;
+          }
+        });
+      }
+    });
+  }
+
+  negotiationMethodsRows = [
+    { left: 'اتصال', right: 'رسالة' },
+    { left: 'اتصال واتس', right: 'رسالة واتس' },
+    { left: 'اتصال فايبر', right: 'رسالة فايبر' },
+    { left: 'اتصال ايمو', right: 'رسالة ايمو' },
+    { left: 'فاكس', right: 'ايميل' }
   ];
 
-  negotiationResults = [
-    'وعد بالسداد', 'تقسيط', 'طلب مهلة', 'فتح و إغلاق',
-    'مراجعة', 'شكوى', 'رفض السداد', 'غير معترف',
-    'أنكر نفسه', 'مغلق', 'لا يرد', 'مفصول',
-    'لا يوجد رقم', 'مطلوب رقم 2', 'رقم خطأ',
-    'مطلوب إجراء', 'تأجيل متابعة', 'رفع الإجراءات', 'خصم'
-  ];
+  @Output() statementSaved = new EventEmitter<any>();
+
+  triggerSaveStatement() {
+    if (!this.selectedAction || !this.selectedResult) {
+      Swal.fire('تنبيه', 'الرجاء اختيار وسيلة التفاوض ونتيجة التفاوض أولاً', 'warning');
+      return;
+    }
+    this.statementSaved.emit({
+      contactMethod: this.selectedAction,
+      connectedStatus: this.selectedResult,
+      notes: this.statementDetails.notes || this.reviewNote || `تم التفاوض عن طريق ${this.selectedAction} والنتيجة ${this.selectedResult}`,
+      promiseAmount: this.selectedResult.includes('تقسيط') ? this.installmentAmount : (this.selectedResult.includes('وعد بالسداد') && this.promiseToPayType !== 'none' ? this.promiseToPayAmount : null),
+      nextDate: this.statementDetails.nextDate || (this.selectedResult.includes('تقسيط') ? this.installmentDate : null),
+      phoneNumber: this.statementDetails.phoneNumber,
+      phoneOwner: this.statementDetails.phoneOwner,
+      nextAction: this.statementDetails.nextAction
+    });
+
+    // Reset local details after emitting
+    this.statementDetails = {
+      notes: '',
+      phoneNumber: '',
+      phoneOwner: '',
+      nextAction: '',
+      nextDate: ''
+    };
+    this.reviewNote = '';
+  }
+
 
   activeTab: 'numbers' | 'add' = 'numbers';
 
-  activeSubTab = 'main';
+  activeSubTab: 'main' | 'files' | 'payments' | 'legal' | 'attachments' | 'history' | 'callcenter' | 'classification' = 'main';
 
-  numbers = [
-    { number: '10234', user: 'أحمد', status: 'نشط' },
-    { number: '55433', user: 'منى', status: 'مغلق' },
-  ];
+  @Input() numbers: any[] = [];
 
   addForm = {
-    user: '',
-    source: ''
+    phone: '',
+    relation: '',
+    source: '',
+    status: 'نشط'
   };
 
+  @Output() contactAdded = new EventEmitter<void>();
+
   saveNumber() {
-    if (!this.addForm.user || !this.addForm.source) {
-      alert("من فضلك ادخل البيانات كاملة");
+    if (!this.addForm.phone) {
+      Swal.fire('تنبيه', 'يرجى إدخال رقم الهاتف', 'warning');
       return;
     }
 
-    this.numbers.push({
-      number: Math.floor(10000 + Math.random() * 90000).toString(),
-      user: this.addForm.user,
-      status: 'جديد'
+    const cid = this.selectedPerson?.nationalId || this.selectedPerson?.civilId;
+    if (!cid) {
+      Swal.fire('خطأ', 'لا يوجد معرف للعميل (رقم مدني)', 'error');
+      return;
+    }
+
+    this.loading = true;
+    this.negotiationsService.addContact(cid, this.addForm).subscribe({
+      next: () => {
+        this.loading = false;
+        Swal.fire('تم الحفظ', 'تم إضافة الرقم بنجاح', 'success');
+        this.activeTab = 'numbers';
+        this.addForm = { phone: '', relation: '', source: '', status: 'نشط' };
+        this.contactAdded.emit();
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Error adding contact:', err);
+        Swal.fire('خطأ', 'فشل في حفظ الرقم', 'error');
+      }
     });
-
-    // Reset form
-    this.addForm = { user: '', source: '' };
-
-    // رجع للتاب الأول
-    this.activeTab = 'numbers';
   }
+
 
   // تغيير التابات
   setMainTab(tab: 'clients' | 'main' | 'searchNumbers' | 'menuSearch' | 'FeesAndCollection' | 'notes' | 'preview' | 'newFiles' | 'statements' | 'stats' | 'searchStatements') {
@@ -288,13 +551,59 @@ export class MainContent {
     }, 800);
   }
 
-  // مثال زر حفظ
-  saveClassification() {
-    this.loading = true;
-    setTimeout(() => {
-      alert("تم الحفظ بنجاح");
-      this.loading = false;
-    }, 700);
+  // تحديث حقل واحد تلقائياً (Auto-save)
+  updateField(field: string, value: any) {
+    if (!this.selectedPerson?.id) return;
+    this.ensureClassification();
+
+    // Convert date or numeric values if needed
+    let valStr = value?.toString();
+    if (field === 'salarydate' && value) {
+      // Ensure YYYY-MM-DD format for backend
+      valStr = new Date(value).toISOString().split('T')[0];
+    }
+
+    this.negotiationsService.updateClientStatus(this.selectedPerson.id, field, undefined, valStr).subscribe({
+      next: () => {
+        this.statusChanged.emit(); // Refresh history
+        Swal.fire({
+          title: 'تم التحديث',
+          text: `تم حفظ ${this.getFriendlyFieldName(field)}`,
+          icon: 'success',
+          toast: true,
+          position: 'top-end',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      },
+      error: (err) => {
+        console.error(`Error updating ${field}:`, err);
+        Swal.fire('خطأ', 'فشل في حفظ التعديلات', 'error');
+      }
+    });
+  }
+
+  private getFriendlyFieldName(field: string): string {
+    switch (field.toLowerCase()) {
+      case 'discount': return 'الخصم';
+      case 'acceptance': return 'حالة القبول';
+      case 'work': return 'الوظيفة';
+      case 'salarydate': return 'تاريخ الراتب';
+      case 'incomenotes': return 'ملاحظات الدخل';
+      default: return field;
+    }
+  }
+
+  private ensureClassification() {
+    if (this.selectedPerson && !this.selectedPerson.classification) {
+      this.selectedPerson.classification = {
+        clientStatusId: null, claimStatusId: null, paymentStatusId: null,
+        fileStatusId: null, actionStatusId: null, followUpStatusId: null,
+        internalStatusId: null, civilStatusId: null,
+        cooperationStatusId: null, contactStatusId: null,
+        discount: null, acceptance: '', salaryDate: null, incomeNotes: ''
+      };
+    }
   }
 
   changeTab(tab: typeof this.activeSubTab) {
@@ -337,7 +646,13 @@ export class MainContent {
       case 'contact': type = 'CONTACT'; break;
       case 'civil': type = 'CIVIL'; break;
       case 'interior': type = 'INTERNAL'; break;
-      case 'court': type = 'COURT'; break; // Assuming Court might be a lookup too later
+      case 'court': type = 'COURT'; break;
+      case 'client': type = 'CLIENT_STATUS'; break;
+      case 'claim': type = 'CLAIM_STATUS'; break;
+      case 'payment': type = 'PAYMENT_STATUS'; break;
+      case 'file': type = 'FILE_STATUS'; break;
+      case 'action': type = 'ACTION_STATUS'; break;
+      case 'followup': type = 'FOLLOWUP_STATUS'; break;
       default: return;
     }
 
@@ -355,39 +670,188 @@ export class MainContent {
     });
   }
 
-  onLookupSelected(item: any) {
+  onLookupSelected(item: any, fieldOverwrite?: string) {
     if (!this.selectedPerson?.id) {
       Swal.fire('تنبيه', 'الرجاء اختيار عميل أولاً', 'warning');
       return;
     }
 
-    if (this.currentField === 'work') {
-      // Handle free text for work if needed, but lookup usually returns IDs
-      return;
-    }
+    this.ensureClassification();
+    const field = fieldOverwrite || this.currentField;
 
     this.loading = true;
     this.negotiationsService.updateClientStatus(
       this.selectedPerson.id,
-      this.currentField,
+      field,
       item.id
     ).subscribe({
       next: (res: any) => {
         this.loading = false;
-        // Update local state
-        const fieldKey = this.currentField.toLowerCase();
-        if (fieldKey === 'cooperation') this.selectedPerson.cooperationStatus = item.name;
-        if (fieldKey === 'contact') this.selectedPerson.contactStatus = item.name;
-        if (fieldKey === 'civil') this.selectedPerson.civilStatus = item.name;
-        if (fieldKey === 'interior') this.selectedPerson.internalStatus = item.name;
+        this.statusChanged.emit(); // Notify parent to refresh history
+        
+        // Update local state display names if available
+        const fieldKey = field.toLowerCase();
 
-        Swal.fire('تم التحديث', `تم تغيير ${this.currentField} إلى ${item.name}`, 'success');
+        // Find name from lookup list if it was a select change (item.name might be empty)
+        let name = item.name;
+        if (!name && item.id) {
+          const listKey = this.getLookupKeyFromField(fieldKey);
+          const found = this.lookupLists[listKey]?.find((x: any) => x.id === item.id);
+          if (found) name = found.name;
+        }
+
+        if (fieldKey === 'cooperation') this.selectedPerson.cooperationStatus = name;
+        if (fieldKey === 'contact') this.selectedPerson.contactStatus = name;
+        if (fieldKey === 'civil') this.selectedPerson.civilStatus = name;
+        if (fieldKey === 'internal' || fieldKey === 'interior') this.selectedPerson.internalStatus = name;
+        if (fieldKey === 'client') this.selectedPerson.clientStatus = name;
+        if (fieldKey === 'claim') this.selectedPerson.claimStatus = name;
+        if (fieldKey === 'payment') this.selectedPerson.paymentStatus = name;
+        if (fieldKey === 'file') this.selectedPerson.fileStatus = name;
+        if (fieldKey === 'action') this.selectedPerson.actionStatus = name;
+        if (fieldKey === 'followup') this.selectedPerson.followUpStatus = name;
+
+        Swal.fire({
+          title: 'تم التحديث',
+          text: `تم تغيير التصنيف بنجاح`,
+          icon: 'success',
+          toast: true,
+          position: 'top-end',
+          timer: 2000,
+          showConfirmButton: false
+        });
       },
       error: (err: any) => {
         this.loading = false;
         Swal.fire('خطأ', err.message, 'error');
       }
     });
+  }
+
+  saveAllClassifications() {
+    if (!this.selectedPerson?.id) {
+      Swal.fire('تنبيه', 'يرجى اختيار عميل أولاً', 'warning');
+      return;
+    }
+
+    this.ensureClassification();
+    this.loading = true;
+
+    const c = this.selectedPerson.classification;
+    const updates: any[] = [];
+
+    // Map of classification object fields to service parameter 'field' names
+    // These keys match the expected parameter names in the backend updateClientStatus method
+    const fieldMap: any = {
+      clientStatusId: 'client',
+      claimStatusId: 'claim',
+      paymentStatusId: 'payment',
+      fileStatusId: 'file',
+      actionStatusId: 'action',
+      internalStatusId: 'internal',
+      civilStatusId: 'civil',
+      cooperationStatusId: 'cooperation',
+      contactStatusId: 'contact',
+      followUpStatusId: 'followup',
+      discount: 'discount',
+      acceptance: 'acceptance',
+      work: 'work',
+      salaryDate: 'salarydate',
+      incomeNotes: 'incomenotes'
+    };
+
+    // Build the array of update observables for status fields
+    Object.keys(fieldMap).forEach(key => {
+      const fieldName = fieldMap[key];
+      const val = c[key];
+
+      if (val !== undefined && val !== null) {
+        let valStr = val?.toString();
+        let valId: number | undefined = undefined;
+
+        // If it's a "StatusId" field, pass it as the valueId parameter
+        if (key.toLowerCase().endsWith('statusid')) {
+          valId = val;
+          valStr = undefined;
+        }
+
+        updates.push(this.negotiationsService.updateClientStatus(this.selectedPerson.id, fieldName, valId, valStr));
+      }
+    });
+
+    // Add metadata/linking fields explicitly to ensure they are NOT NULL in DB
+    if (this.selectedPerson.code) {
+      updates.push(this.negotiationsService.updateClientStatus(this.selectedPerson.id, 'code', undefined, this.selectedPerson.code));
+      updates.push(this.negotiationsService.updateClientStatus(this.selectedPerson.id, 'file_code', undefined, this.selectedPerson.code));
+    }
+    if (this.selectedPerson.departmentId) {
+      updates.push(this.negotiationsService.updateClientStatus(this.selectedPerson.id, 'dept_code', undefined, this.selectedPerson.departmentId.toString()));
+    }
+    // Also send the main classification text if available
+    const mainClass = this.selectedPerson.classification?.classification || this.selectedPerson.classification?.classificationText;
+    if (mainClass) {
+      updates.push(this.negotiationsService.updateClientStatus(this.selectedPerson.id, 'classification', undefined, mainClass.toString()));
+    }
+
+    // Explicitly add 'Work' and 'IncomeNotes' from the selectedPerson root (where UI is bound)
+    if (this.selectedPerson.jobType) {
+      updates.push(this.negotiationsService.updateClientStatus(this.selectedPerson.id, 'work', undefined, this.selectedPerson.jobType));
+    }
+    if (this.selectedPerson.incomeNotes) {
+      updates.push(this.negotiationsService.updateClientStatus(this.selectedPerson.id, 'incomenotes', undefined, this.selectedPerson.incomeNotes));
+    }
+
+    if (updates.length === 0) {
+      this.loading = false;
+      return;
+    }
+
+    forkJoin(updates).subscribe({
+      next: () => {
+        this.loading = false;
+        this.statusChanged.emit(); // Refresh history
+        Swal.fire({
+          title: 'تم الحفظ',
+          text: 'تم حفظ جميع تصفنيات الملف بنجاح (مزامنة كاملة)',
+          icon: 'success',
+          timer: 3000,
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false
+        });
+      },
+      error: (err: any) => {
+        this.loading = false;
+        console.error('Error saving classifications:', err);
+        Swal.fire('خطأ', 'فشل في مزامنة بعض الحالات لقاعدة البيانات', 'error');
+      }
+    });
+  }
+
+  nextHistoryPage() {
+    if (this.historyPage * this.historyPageSize < (this.statuses?.length || 0)) {
+      this.historyPage++;
+    }
+  }
+
+  prevHistoryPage() {
+    if (this.historyPage > 1) {
+      this.historyPage--;
+    }
+  }
+
+  splitStatus(status: string): { type: string, value: string } {
+    if (!status) return { type: '---', value: '---' };
+    const parts = status.split(' | ');
+    if (parts.length >= 2) {
+      return { type: parts[0], value: parts[1] };
+    }
+    return { type: '---', value: status };
+  }
+
+  private getLookupKeyFromField(field: string): string {
+    if (field === 'internal' || field === 'interior') return 'interior';
+    return field;
   }
 
   notesData = [
@@ -509,7 +973,58 @@ export class MainContent {
 
 
   searchMenu() {
-    console.log('Searching menu for:', this.menuSearchForm);
+    const term = this.menuSearchForm.fullName || this.menuSearchForm.firstName || this.menuSearchForm.civilId || this.menuSearchForm.phone;
+    if (!term) return;
+
+    this.negotiationsService.search(term).subscribe({
+      next: (results: any[]) => {
+        if (results && results.length > 0) {
+          // If we found results, we can either select the first one or show a list
+          // For now, let's emit the first one to the parent like the sidebar does
+          // Or handle it locally. The user just asked for the alert if NOT found.
+          console.log('Search results:', results);
+          // Optional: this.onClientSelected(results[0]); 
+        } else {
+          Swal.fire({
+            title: 'تنبيه',
+            text: 'لم يتم العثور على أي نتائج للبحث المدخل',
+            icon: 'warning',
+            confirmButtonText: 'حسناً',
+            confirmButtonColor: '#6366f1'
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Search error:', err);
+        Swal.fire('خطأ', 'حدث خطأ أثناء البحث', 'error');
+      }
+    });
+  }
+
+  onSearchNumbers() {
+    const term = this.searchNumbersForm.civilID || this.searchNumbersForm.number;
+    if (!term) return;
+
+    this.negotiationsService.search(term).subscribe({
+      next: (results: any[]) => {
+        if (results && results.length > 0) {
+          // Found results
+          console.log('Numbers search results:', results);
+        } else {
+          Swal.fire({
+            title: 'تنبيه',
+            text: 'لم يتم العثور على أي نتائج للرقم المدني المدخل',
+            icon: 'warning',
+            confirmButtonText: 'حسناً',
+            confirmButtonColor: '#6366f1'
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Search error:', err);
+        Swal.fire('خطأ', 'حدث خطأ أثناء البحث', 'error');
+      }
+    });
   }
 
   resetMenuSearch() {
@@ -525,6 +1040,22 @@ export class MainContent {
       address: ''
     };
     console.log('Form reset.');
+  }
+
+  resetAllTables() {
+    this.clientRows = [];
+    this.attachments = [];
+    this.payments = [];
+    this.notes = [];
+    this.additionalAmounts = [];
+    this.audits = [];
+    this.autoNumbers = [];
+    this.callcenterStatements = [];
+    this.classifications = [];
+    this.statuses = [];
+    this.statementRows = [];
+    this.allStatementRows = [];
+    console.log('All tables reset.');
   }
 
   addEntry() {
@@ -704,4 +1235,16 @@ export class MainContent {
     this.searchStatements();
   }
 
+  selectFile(row: any) {
+    this.selectedFile = row;
+    this.activeSubTab = 'main'; // Switch to main tab to see details
+    console.log('Selected file:', row);
+  }
+
+  ngOnChanges() {
+    // If clientRows changes and we don't have a selected file, select the first one
+    if (this.clientRows && this.clientRows.length > 0 && !this.selectedFile) {
+      this.selectedFile = this.clientRows[0];
+    }
+  }
 }

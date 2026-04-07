@@ -61,18 +61,6 @@ export class NegotiationsService {
         );
     }
 
-    /**
-     * Add a new statement (History Insert)
-     * @param statement The statement data
-     */
-    addStatement(statement: any): Observable<any> {
-        return this.http.post<any>(`${this.apiUrl}/CallCenterStatements`, statement).pipe(
-            catchError(error => {
-                console.error('Error adding statement:', error);
-                return throwError(() => new Error('فشل حفظ الإفادة'));
-            })
-        );
-    }
 
     /**
      * Get lookup values by type (COOPERATION, CONTACT, CIVIL, INTERNAL)
@@ -135,14 +123,29 @@ export class NegotiationsService {
     }
 
     /**
+     * Get client notes
+     */
+    getNotes(fileCode: number): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/DataView/mainfiles/${fileCode}/notes`);
+    }
+
+    /**
      * Get client contacts
      */
     getContacts(cid: string): Observable<any[]> {
         return this.http.get<any[]>(`${this.apiUrl}/DataView/files/${cid}/contacts`);
     }
 
+    addContact(cid: string, payload: any): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/DataView/files/${cid}/contacts`, payload);
+    }
+
     getCallcenterStatements(fileCode: number): Observable<any[]> {
         return this.http.get<any[]>(`${this.apiUrl}/DataView/files/${fileCode}/callcenter-statements`);
+    }
+
+    addStatement(payload: any): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/DataView/files/callcenter-statements`, payload);
     }
 
     /**
@@ -157,5 +160,9 @@ export class NegotiationsService {
      */
     getStatusesHistory(fileCode: number): Observable<any[]> {
         return this.http.get<any[]>(`${this.apiUrl}/DataView/files/${fileCode}/statuses`);
+    }
+
+    getDashboardStats(): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/DataView/dashboard-stats`);
     }
 }
