@@ -58,5 +58,11 @@ public class ApplicationDbContext : DbContext
     // Performance Indexes
     modelBuilder.Entity<LoginHistory>().HasIndex(x => x.LoginTime);
     modelBuilder.Entity<LoginHistory>().HasIndex(x => x.UserId);
+
+    // Relationships
+    modelBuilder.Entity<ClientContact>()
+        .HasOne(c => c.Client)
+        .WithMany(cl => cl.ClientContacts)
+        .HasForeignKey(c => c.ClientId);
   }
 }

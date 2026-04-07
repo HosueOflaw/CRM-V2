@@ -61,21 +61,36 @@ public class Mainfile
   [Column("added_by")]
   public int? AddedBy { get; set; }
 
-  [Column("cooperation_status_id")]
-  public int? CooperationStatusId { get; set; }
-
-  [Column("contact_status_id")]
-  public int? ContactStatusId { get; set; }
-
-  [Column("civil_status_id")]
-  public int? CivilStatusId { get; set; }
-
-  [Column("internal_status_id")]
-  public int? InternalStatusId { get; set; }
-
   [Column("import_job_id")]
   public int? ImportJobId { get; set; }
 
   [ForeignKey("ImportJobId")]
   public virtual ImportJob ImportJob { get; set; }
+
+  // Status Names for joined display (NotMapped to DB)
+  [NotMapped]
+  public string InternalStatus { get; set; }
+  [NotMapped]
+  public string CivilStatus { get; set; }
+  [NotMapped]
+  public string CooperationStatus { get; set; }
+  [NotMapped]
+  public string ContactStatus { get; set; }
+
+  [NotMapped]
+  public string ClientStatus { get; set; }
+  [NotMapped]
+  public string ClaimStatus { get; set; }
+  [NotMapped]
+  public string PaymentStatus { get; set; }
+  [NotMapped]
+  public string FileStatus { get; set; }
+  [NotMapped]
+  public string ActionStatus { get; set; }
+  [NotMapped]
+  public string FollowUpStatus { get; set; }
+
+  // New Navigation Property
+  [NotMapped]
+  public virtual FileClassification Classification { get; set; }
 }

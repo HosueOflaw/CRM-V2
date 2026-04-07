@@ -23,6 +23,23 @@ public class MainfileDto
   public string RegisterType { get; set; }
   public int? AddedBy { get; set; }
   public int? ImportJobId { get; set; }
+
+  // Status Names (Joins)
+  public string InternalStatus { get; set; }
+  public string CivilStatus { get; set; }
+  public string CooperationStatus { get; set; }
+  public string ContactStatus { get; set; }
+
+  public string ClientStatus { get; set; }
+  public string ClaimStatus { get; set; }
+  public string PaymentStatus { get; set; }
+  public string FileStatus { get; set; }
+  public string ActionStatus { get; set; }
+  public string FollowUpStatus { get; set; }
+  public decimal? Discount { get; set; }
+  public string Acceptance { get; set; }
+  public DateTime? SalaryDate { get; set; }
+  public string IncomeNotes { get; set; }
 }
 
 // DTO لعرض FileDetail بكل التفاصيل
@@ -48,6 +65,12 @@ public class FileDetailDto
   public int? LegalAdvisorUser { get; set; }
   public string LegalAdvisorUserName { get; set; }
   public int? ImportJobId { get; set; }
+  public string Note1 { get; set; }
+  public string Note2 { get; set; }
+  public string Note3 { get; set; }
+  public string Note4 { get; set; }
+  public string Note5 { get; set; }
+  public string Note6 { get; set; }
 }
 
 // DTO لعرض AutoNumber بكل التفاصيل
@@ -76,6 +99,10 @@ public class PaymentDisplayDto
     public DateTime? DateAdded { get; set; }
     public string PaymentMethod { get; set; }
     public string UserAddedName { get; set; }
+    public string SalesAgent { get; set; }
+    public string JouralEntry { get; set; }
+    public string FileStatusAfter { get; set; }
+    public long? DeptCode { get; set; }
 }
 
 // DTO للمرفقات
@@ -119,6 +146,16 @@ public class ClientContactDisplayDto
     public int Id { get; set; }
     public string Phone { get; set; }
     public string Relation { get; set; }
+    public string Source { get; set; }
+    public string Status { get; set; }
+}
+
+public class ClientContactCreateDto
+{
+    public string Phone { get; set; }
+    public string Relation { get; set; }
+    public string Source { get; set; }
+    public string Status { get; set; }
 }
 
 // DTO لتصنيفات الملف
@@ -140,6 +177,7 @@ public class FileStatusDto
     public long? FileCode { get; set; }
     public int? DeptCode { get; set; }
     public string Status { get; set; } = string.Empty;
+    public string UserName { get; set; }
     public DateTime? DateAdded { get; set; }
 }
 
@@ -149,13 +187,21 @@ public class CallcenterStatementDto
     public long? FileCode { get; set; }
     public long? DeptCode { get; set; }
     public DateTime? DateAdded { get; set; }
-    public string? Notes { get; set; } = string.Empty;
-    public string? ContactMethod { get; set; } = string.Empty;
-    public string? ConnectedStatus { get; set; } = string.Empty;
-    public string? PhoneNumber { get; set; } = string.Empty;
-    public string? PhoneOwner { get; set; } = string.Empty;
-    public string? NextAction { get; set; } = string.Empty;
+    public string Notes { get; set; } = string.Empty;
+    public string ContactMethod { get; set; } = string.Empty;
+    public string ConnectedStatus { get; set; } = string.Empty;
+    public string PhoneNumber { get; set; } = string.Empty;
+    public string PhoneOwner { get; set; } = string.Empty;
+    public string NextAction { get; set; } = string.Empty;
     public DateTime? NextDate { get; set; }
     public decimal? PromiseAmount { get; set; }
-    public string? UserAddedName { get; set; } = string.Empty;
+    public string UserAddedName { get; set; } = string.Empty;
+}
+
+public class DashboardStatsDto
+{
+    public int TotalClients { get; set; }
+    public int TotalStatements { get; set; }
+    public int TodayStatements { get; set; }
+    public int MonthStatements { get; set; }
 }

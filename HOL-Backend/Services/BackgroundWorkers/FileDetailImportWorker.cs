@@ -183,6 +183,12 @@ public class FileDetailImportWorker : BackgroundService
                             CourtUser = GetInt("المحكمة"),
                             MdUser = GetInt("MD"),
                             LegalAdvisorUser = GetInt("المستشار القانوني"),
+                            Note1 = GetStr("الملاحظة 1"),
+                            Note2 = GetStr("الملاحظة 2"),
+                            Note3 = GetStr("الملاحظة 3"),
+                            Note4 = GetStr("الملاحظة 4"),
+                            Note5 = GetStr("الملاحظة 5"),
+                            Note6 = GetStr("الملاحظة 6"),
                             DateAdded = DateTime.UtcNow,
                             ImportJobId = job.Id
                         };

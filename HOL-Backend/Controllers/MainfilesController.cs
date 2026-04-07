@@ -1,4 +1,10 @@
 
+using House_of_law_api.Data;
+using House_of_law_api.Interfaces;
+using House_of_law_api.Modules;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace House_of_law_api.Controllers;
 
@@ -183,30 +189,75 @@ public class MainfilesController : ControllerBase
 
         var currentUser = await _context.Users.FindAsync(userId);
 
+        // Get or Create Classification Record
+        var classification = await _context.FileClassifications.FirstOrDefaultAsync(fc => fc.MainfileId == existing.Id);
+        if (classification == null)
+        {
+            classification = new FileClassification 
+            { 
+                MainfileId = existing.Id,
+                Code = existing.Code.ToString(),
+                FileCode = (long)existing.Code,
+                DateAdded = DateTime.UtcNow,
+                UserAdded = userId
+            };
+            _context.FileClassifications.Add(classification);
+        }
+
         object previousValue = null;
         object newValue = null;
         string fieldName = request.Field.ToLower();
 
         switch (fieldName)
         {
-            case "cooperation":
-                previousValue = existing.CooperationStatusId;
-                existing.CooperationStatusId = request.NewValueId;
+            case "client":
+                previousValue = classification.ClientStatusId;
+                classification.ClientStatusId = request.NewValueId;
                 newValue = request.NewValueId;
                 break;
-            case "contact":
-                previousValue = existing.ContactStatusId;
-                existing.ContactStatusId = request.NewValueId;
+            case "claim":
+                previousValue = classification.ClaimStatusId;
+                classification.ClaimStatusId = request.NewValueId;
                 newValue = request.NewValueId;
                 break;
-            case "civil":
-                previousValue = existing.CivilStatusId;
-                existing.CivilStatusId = request.NewValueId;
+            case "payment":
+                previousValue = classification.PaymentStatusId;
+                classification.PaymentStatusId = request.NewValueId;
+                newValue = request.NewValueId;
+                break;
+            case "file":
+                previousValue = classification.FileStatusId;
+                classification.FileStatusId = request.NewValueId;
+                newValue = request.NewValueId;
+                break;
+            case "action":
+                previousValue = classification.ActionStatusId;
+                classification.ActionStatusId = request.NewValueId;
+                newValue = request.NewValueId;
+                break;
+            case "followup":
+                previousValue = classification.FollowUpStatusId;
+                classification.FollowUpStatusId = request.NewValueId;
                 newValue = request.NewValueId;
                 break;
             case "internal":
-                previousValue = existing.InternalStatusId;
-                existing.InternalStatusId = request.NewValueId;
+                previousValue = classification.InternalStatusId;
+                classification.InternalStatusId = request.NewValueId;
+                newValue = request.NewValueId;
+                break;
+            case "civil":
+                previousValue = classification.CivilStatusId;
+                classification.CivilStatusId = request.NewValueId;
+                newValue = request.NewValueId;
+                break;
+            case "contact":
+                previousValue = classification.ContactStatusId;
+                classification.ContactStatusId = request.NewValueId;
+                newValue = request.NewValueId;
+                break;
+            case "cooperation":
+                previousValue = classification.CooperationStatusId;
+                classification.CooperationStatusId = request.NewValueId;
                 newValue = request.NewValueId;
                 break;
             case "work":
@@ -214,16 +265,97 @@ public class MainfilesController : ControllerBase
                 existing.Work = request.NewValueText;
                 newValue = request.NewValueText;
                 break;
+            case "discount":
+                previousValue = classification.Discount;
+                if (decimal.TryParse(request.NewValueText, out decimal d)) { classification.Discount = d; newValue = d; }
+                break;
+            case "acceptance":
+                previousValue = classification.Acceptance;
+                classification.Acceptance = request.NewValueText;
+                newValue = request.NewValueText;
+                break;
+            case "salarydate":
+                previousValue = classification.SalaryDate;
+                if (DateTime.TryParse(request.NewValueText, out DateTime dt)) { classification.SalaryDate = dt; newValue = dt; }
+                break;
+            case "incomenotes":
+                previousValue = classification.IncomeNotes;
+                classification.IncomeNotes = request.NewValueText;
+                newValue = request.NewValueText;
+                break;
+            case "code":
+                previousValue = classification.Code;
+                classification.Code = request.NewValueText;
+                newValue = request.NewValueText;
+                break;
+            case "file_code":
+                previousValue = classification.FileCode;
+                if (long.TryParse(request.NewValueText, out long fc)) { classification.FileCode = fc; newValue = fc; }
+                break;
+            case "dept_code":
+                previousValue = classification.DeptCode;
+                if (long.TryParse(request.NewValueText, out long dc)) { classification.DeptCode = dc; newValue = dc; }
+                break;
+            case "classification":
+                previousValue = classification.Classification;
+                classification.Classification = request.NewValueText;
+                newValue = request.NewValueText;
+                break;
             default:
-                return BadRequest("Invalid status field");
+                return BadRequest("Invalid status field: " + request.Field);
         }
 
-        await _repository.UpdateAsync(existing);
+        // Get current user
+        string currentUserName = currentUser?.FullName ?? "موظف النظام";
+
+        // Label Mapping
+        string fieldLabel = request.Field switch {
+            "client" => "حالة العميل",
+            "claim" => "حالة المطالبة",
+            "payment" => "حالة السداد",
+            "file" => "حالة الملف",
+            "action" => "حالة الإجراءات",
+            "followup" => "حالة المتابعة",
+            "internal" => "حالة داخلية",
+            "civil" => "حالة مدنية",
+            "contact" => "حالة تواصل",
+            "cooperation" => "حالة تعاون",
+            "discount" => "الخصم",
+            "acceptance" => "القبول",
+            "salarydate" => "تاريخ الراتب",
+            "work" => "الدوام",
+            "incomenotes" => "ملاحظات الدخل",
+            "classification" => "التصنيف",
+            _ => request.Field
+        };
+
+        // UI-Friendly Value (Fallback)
+        string newValueDisplay = request.NewValueText ?? newValue?.ToString() ?? "---";
 
         // Audit Log
-        string description = $"تعديل حالة {request.Field}: من {previousValue ?? "N/A"} إلى {newValue ?? "N/A"}";
+        string description = $"تعديل حالة {fieldLabel}: من {previousValue ?? "N/A"} إلى {newValueDisplay}";
         await _auditService.LogActionAsync(existing.Code, null, "UPDATE_STATUS", description, previousValue, "Mainfile", existing.Id.ToString(), existing.DateAdded, DateTime.UtcNow, userId);
 
-        return Ok(new { message = "Status updated successfully", field = request.Field, newValue });
+        // Formatted Status for History Table (Type | NewValue)
+        string historyStatus = $"{fieldLabel} | {newValueDisplay}";
+
+        // Insert into FileStatuses History Table
+        var historyEntry = new FileStatus
+        {
+            FileCode = existing.Id,
+            Status = historyStatus,
+            DateAdded = DateTime.UtcNow
+        };
+        _context.FileStatuses.Add(historyEntry);
+
+        try {
+            await _repository.UpdateAsync(existing);
+            await _context.SaveChangesAsync();
+        } catch (Exception ex) {
+            _logger.LogError(ex, "Error updating status for file {Id}", id);
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+
+        return Ok(new { message = "Status updated successfully", field = request.Field, newValue = newValueDisplay });
     }
 }

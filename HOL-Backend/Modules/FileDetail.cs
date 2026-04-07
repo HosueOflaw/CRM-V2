@@ -54,4 +54,22 @@ public class FileDetail
 
   [ForeignKey("ImportJobId")]
   public virtual ImportJob ImportJob { get; set; }
+
+  [Column("note1")]
+  public string Note1 { get; set; }
+
+  [Column("note2")]
+  public string Note2 { get; set; }
+
+  [Column("note3")]
+  public string Note3 { get; set; }
+
+  [Column("note4")]
+  public string Note4 { get; set; }
+
+  [Column("note5")]
+  public string Note5 { get; set; }
+
+  [Column("note6")]
+  public string Note6 { get; set; }
 }

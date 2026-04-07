@@ -23,4 +23,10 @@ public class ClientContact
 
     [Column("relation")]
     public string Relation { get; set; }
+
+    [Column("source")]
+    public string Source { get; set; }
+
+    [Column("status")]
+    public string Status { get; set; }
 }

@@ -15,6 +15,12 @@ public class FileStatus
   [Column("status")]
   public string Status { get; set; }
 
+  [Column("user_id")]
+  public int? UserId { get; set; }
+
+  [Column("user_name")]
+  public string UserName { get; set; }
+
   [Column("date_added")]
   public DateTime? DateAdded { get; set; }
 }

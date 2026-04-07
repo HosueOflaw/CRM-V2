@@ -22,6 +22,24 @@ public class DataViewController : ControllerBase
     _auditService = auditService;
   }
 
+  // GET: api/DataView/dashboard-stats
+  [HttpGet("dashboard-stats")]
+  public async Task<IActionResult> GetDashboardStats()
+  {
+    var today = DateTime.UtcNow.Date;
+    var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
+
+    var stats = new DashboardStatsDto
+    {
+      TotalClients = await _context.Mainfiles.CountAsync(),
+      TotalStatements = await _context.CallcenterStatements.CountAsync(),
+      TodayStatements = await _context.CallcenterStatements.CountAsync(s => s.DateAdded >= today),
+      MonthStatements = await _context.CallcenterStatements.CountAsync(s => s.DateAdded >= firstDayOfMonth)
+    };
+
+    return Ok(stats);
+  }
+
   // GET: api/DataView/mainfiles
   [HttpGet("mainfiles")]
   public async Task<IActionResult> GetAllMainfiles(
@@ -362,7 +380,13 @@ public class DataViewController : ControllerBase
                            MdUserName = m != null ? m.FullName : null,
                            LegalAdvisorUser = f.LegalAdvisorUser,
                            LegalAdvisorUserName = a != null ? a.FullName : null,
-                           ImportJobId = f.ImportJobId
+                           ImportJobId = f.ImportJobId,
+                           Note1 = f.Note1,
+                           Note2 = f.Note2,
+                           Note3 = f.Note3,
+                           Note4 = f.Note4,
+                           Note5 = f.Note5,
+                           Note6 = f.Note6
                          }).ToListAsync();
 
     return Ok(details);
@@ -402,7 +426,11 @@ public class DataViewController : ControllerBase
                             Value = p.Value,
                             DateAdded = p.DateAdded,
                             PaymentMethod = p.PaymentMethod,
-                            UserAddedName = u != null ? u.FullName : "System"
+                            UserAddedName = u != null ? u.FullName : "System",
+                            SalesAgent = p.SalesAgent,
+                            JouralEntry = p.JouralEntry,
+                            FileStatusAfter = p.FileStatusAfter,
+                            DeptCode = p.DeptCode
                           }).ToListAsync();
     return Ok(payments);
   }
@@ -471,27 +499,127 @@ public class DataViewController : ControllerBase
   [HttpGet("files/{cid}/contacts")]
   public async Task<IActionResult> GetContacts(string cid)
   {
-    // Find client ID by Cid
-    var client = await _context.Clients.AsNoTracking().FirstOrDefaultAsync(c => c.Cid == cid);
-    if (client == null) return Ok(new List<ClientContactDisplayDto>());
+    // 1. Find all Client Identities and Mainfile Identities associated with this Cid
+    var clients = await _context.Clients.AsNoTracking()
+        .Where(c => c.Cid == cid)
+        .ToListAsync();
 
-    var contacts = await _context.ClientContacts.AsNoTracking()
-        .Where(c => c.ClientId == client.Id)
+    var mainfileIds = await _context.Mainfiles.AsNoTracking()
+        .Where(m => m.Cid == cid)
+        .Select(m => m.Id)
+        .ToListAsync();
+
+    var allTargetIds = clients.Select(c => c.Id).Concat(mainfileIds).Distinct().ToList();
+
+    // 2. Start building our consolidated contact list
+    var consolidatedContacts = new List<ClientContactDisplayDto>();
+
+    // 3. Extract numbers from legacy Phone1/Phone2 columns in the Clients table
+    foreach (var client in clients)
+    {
+      if (!string.IsNullOrWhiteSpace(client.Phone1))
+      {
+        consolidatedContacts.Add(new ClientContactDisplayDto
+        {
+          Id = 0, // Virtual ID for legacy data
+          Phone = client.Phone1,
+          Relation = client.Phone1Owner ?? "أساسي (عميل)",
+          Source = "جدول العملاء",
+          Status = "نشط"
+        });
+      }
+      if (!string.IsNullOrWhiteSpace(client.Phone2))
+      {
+        consolidatedContacts.Add(new ClientContactDisplayDto
+        {
+          Id = 0,
+          Phone = client.Phone2,
+          Relation = client.Phone2Owner ?? "إضافي (عميل)",
+          Source = "جدول العملاء",
+          Status = "نشط"
+        });
+      }
+    }
+
+    // 4. Fetch all records from the ClientContacts table linked to those identities
+    var tableContacts = await _context.ClientContacts.AsNoTracking()
+        .Where(c => allTargetIds.Contains(c.ClientId))
         .Select(c => new ClientContactDisplayDto
         {
           Id = c.Id,
           Phone = c.Phone,
-          Relation = c.Relation
+          Relation = c.Relation,
+          Source = c.Source ?? "جهات اتصال",
+          Status = c.Status
         }).ToListAsync();
-    return Ok(contacts);
+
+    consolidatedContacts.AddRange(tableContacts);
+
+    // 5. Remove duplicates based on phone number
+    var uniqueContacts = consolidatedContacts
+        .GroupBy(c => c.Phone)
+        .Select(g => g.First())
+        .ToList();
+
+    return Ok(uniqueContacts);
   }
 
-  // GET: api/DataView/files/{fileCode}/classifications
+  // POST: api/DataView/files/{cid}/contacts
+  [HttpPost("files/{cid}/contacts")]
+  public async Task<IActionResult> AddContact(string cid, [FromBody] ClientContactCreateDto dto)
+  {
+    try
+    {
+      // 1. Try to find an existing Client record
+      var client = await _context.Clients.FirstOrDefaultAsync(c => c.Cid == cid);
+
+      if (client == null)
+      {
+        // 2. If not found, try to find a Mainfile record to "promote" to a client identity
+        var mainfile = await _context.Mainfiles.AsNoTracking().FirstOrDefaultAsync(m => m.Cid == cid);
+        if (mainfile == null) return NotFound("No Client or Mainfile found for this Cid.");
+
+        // 3. Create a new Client record based on Mainfile info
+        client = new Client
+        {
+          Cid = mainfile.Cid,
+          Name = mainfile.Name,
+          Address = mainfile.Address,
+          Nationality = mainfile.Nationality,
+          Code = mainfile.Code,
+          DateAdded = DateTime.Now
+        };
+        _context.Clients.Add(client);
+        await _context.SaveChangesAsync();
+      }
+
+      // 4. Save the contact linked to the Client Id
+      var contact = new ClientContact
+      {
+        ClientId = client.Id,
+        Phone = dto.Phone,
+        Relation = dto.Relation,
+        Source = dto.Source,
+        Status = dto.Status
+      };
+
+      _context.ClientContacts.Add(contact);
+      await _context.SaveChangesAsync();
+
+      return Ok(new { message = "Contact added successfully", id = contact.Id, clientId = client.Id });
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error in AddContact: {ex.Message}");
+      return StatusCode(500, new { error = ex.Message, detail = ex.InnerException?.Message });
+    }
+  }
+
   [HttpGet("files/{fileCode}/classifications")]
   public async Task<IActionResult> GetClassifications(long fileCode)
   {
     var list = await _context.FileClassifications.AsNoTracking()
-        .Where(c => c.FileCode == fileCode)
+        .Where(c => c.MainfileId == fileCode)
         .Select(c => new FileClassificationDto
         {
           Id = c.Id,
@@ -531,7 +659,23 @@ public class DataViewController : ControllerBase
     return Ok(statements);
   }
 
-  // GET: api/DataView/files/{fileCode}/statuses
+  // POST: api/DataView/files/callcenter-statements
+  [HttpPost("files/callcenter-statements")]
+  public async Task<IActionResult> AddCallcenterStatement([FromBody] CallcenterStatement statement)
+  {
+    if (statement == null || statement.FileCode == null)
+    {
+      return BadRequest("بيانات الإفادة غير صالحة");
+    }
+
+    statement.DateAdded = DateTime.UtcNow;
+    
+    _context.Set<CallcenterStatement>().Add(statement);
+    await _context.SaveChangesAsync();
+
+    return Ok(new { message = "تم حفظ الإفادة بنجاح", id = statement.Id });
+  }
+
   [HttpGet("files/{fileCode}/statuses")]
   public async Task<IActionResult> GetStatuses(long fileCode)
   {

@@ -519,14 +519,17 @@ namespace House_of_law_api.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AttachCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("attach_code");
 
                     b.Property<string>("AttachType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("attach_type");
 
                     b.Property<string>("AutoNumberCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("auto_number_code");
 
@@ -559,6 +562,7 @@ namespace House_of_law_api.Migrations
                         .HasColumnName("import_job_id");
 
                     b.Property<string>("Notes")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("notes");
 
@@ -571,6 +575,7 @@ namespace House_of_law_api.Migrations
                         .HasColumnName("user_updated");
 
                     b.Property<string>("Value")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("value");
 
@@ -838,6 +843,10 @@ namespace House_of_law_api.Migrations
                         .HasColumnType("decimal(18,3)")
                         .HasColumnName("amount");
 
+                    b.Property<string>("CivilId")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("civil_id");
+
                     b.Property<string>("ClientName")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("client_name");
@@ -866,6 +875,14 @@ namespace House_of_law_api.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("company_or_office");
 
+                    b.Property<string>("ContractNo")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("contract_no");
+
+                    b.Property<string>("Court")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("court");
+
                     b.Property<DateTime?>("DateAdded")
                         .HasColumnType("datetime2")
                         .HasColumnName("date_added");
@@ -885,6 +902,14 @@ namespace House_of_law_api.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("notes");
+
+                    b.Property<string>("PersonName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("person_name");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("phone_number");
 
                     b.Property<bool>("ReceiveAcc")
                         .HasColumnType("bit")
@@ -921,6 +946,47 @@ namespace House_of_law_api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("custody_statements");
+                });
+
+            modelBuilder.Entity("House_of_law_api.Modules.LookupValue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("code");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("lookup_values");
                 });
 
             modelBuilder.Entity("House_of_law_api.Modules.Mail", b =>
@@ -1156,6 +1222,10 @@ namespace House_of_law_api.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("cid");
 
+                    b.Property<int?>("CivilStatusId")
+                        .HasColumnType("int")
+                        .HasColumnName("civil_status_id");
+
                     b.Property<int>("Code")
                         .HasColumnType("int")
                         .HasColumnName("code");
@@ -1172,6 +1242,14 @@ namespace House_of_law_api.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("company_register");
 
+                    b.Property<int?>("ContactStatusId")
+                        .HasColumnType("int")
+                        .HasColumnName("contact_status_id");
+
+                    b.Property<int?>("CooperationStatusId")
+                        .HasColumnType("int")
+                        .HasColumnName("cooperation_status_id");
+
                     b.Property<DateTime?>("DateAdded")
                         .HasColumnType("datetime2")
                         .HasColumnName("date_added");
@@ -1179,6 +1257,10 @@ namespace House_of_law_api.Migrations
                     b.Property<int?>("ImportJobId")
                         .HasColumnType("int")
                         .HasColumnName("import_job_id");
+
+                    b.Property<int?>("InternalStatusId")
+                        .HasColumnType("int")
+                        .HasColumnName("internal_status_id");
 
                     b.Property<string>("Membership")
                         .HasColumnType("nvarchar(max)")
