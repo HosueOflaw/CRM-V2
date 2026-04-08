@@ -96,15 +96,19 @@ export class AppSidebar {
   }
 
   updateClientData(client: any) {
+    const id = client.id || client.Id;
+    const code = client.code || client.Code;
+    const cid = client.cid || client.Cid;
+
     this.clientData = {
-      clientName: client.name || '',
-      agentName: client.nationality || 'شركة الاتصالات الكويتية - stc',
-      contractNumber: client.code?.toString() || '',
+      clientName: client.name || client.Name || '',
+      agentName: client.nationality || client.Nationality || 'شركة الاتصالات الكويتية - stc',
+      contractNumber: code?.toString() || '',
       claimValue: 0,
-      caseNumber: client.cid || '',
-      address: client.address || '',
-      nationality: client.nationality || '',
-      employer: client.work || ''
+      caseNumber: cid || '',
+      address: client.address || client.Address || '',
+      nationality: client.nationality || client.Nationality || '',
+      employer: client.work || client.Work || ''
     };
   }
 
@@ -137,10 +141,11 @@ export class AppSidebar {
   }
 
   fetchFinancialDetails(callback?: () => void) {
-    if (!this.selectedClient) return;
+    const id = this.selectedClient.id || this.selectedClient.Id;
+    const code = this.selectedClient.code || this.selectedClient.Code;
 
-    this.dataViewService.getMainfileDetails(this.selectedClient.id).subscribe(details => {
-      this.dataViewService.getMainfilePaymentsByFileCode(this.selectedClient.code).subscribe(payments => {
+    this.dataViewService.getMainfileDetails(id).subscribe(details => {
+      this.dataViewService.getMainfilePaymentsByFileCode(code).subscribe(payments => {
         const totalDebt = details.reduce((sum, d) => sum + (d.deptAmount || 0), 0);
         const totalPaid = (payments || []).reduce((sum, p) => sum + (p.amount || 0), 0);
         const netDebt = totalDebt - totalPaid;

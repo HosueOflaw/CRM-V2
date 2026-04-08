@@ -42,10 +42,12 @@
 
 <!-- clients -->
 <div *ngIf="activeMainTab === 'clients'" class="page-content">
-  <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+  <div
+    class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
     <table class="premium-table w-full">
       <thead>
-        <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+        <tr
+          class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
           <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
           <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الكود</th>
           <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الاسم</th>
@@ -88,7 +90,8 @@
           <td class="py-2 px-3 text-slate-500">{{row.mdName}}</td>
           <td class="py-2 px-3 text-slate-500">{{row.advisorName}}</td>
           <td class="py-2 px-3">
-             <span class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{{row.fileStatus}}</span>
+            <span
+              class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{{row.fileStatus}}</span>
           </td>
           <td class="py-2 px-3 text-slate-500">{{row.debtReason}}</td>
           <td class="py-2 px-3 text-slate-500">{{row.batch}}</td>
@@ -108,17 +111,18 @@
           <td class="py-2 px-3 italic">{{row.internalStatus}}</td>
           <td class="py-2 px-3 text-emerald-500 font-bold">{{row.lastPaymentAmount | number}}</td>
           <td class="py-2 px-3 text-slate-400">{{row.lastPaymentDate}}</td>
-          <td class="py-2 px-3 text-slate-400 truncate max-w-[150px]" [title]="row.lastStatement">{{row.lastStatement}}</td>
+          <td class="py-2 px-3 text-slate-400 truncate max-w-[150px]" [title]="row.lastStatement">{{row.lastStatement}}
+          </td>
           <td class="py-2 px-3 text-slate-400">{{row.lastStatementDate}}</td>
           <td class="py-2 px-3 text-slate-400">{{row.reviewDate}}</td>
         </tr>
         <tr *ngIf="!clientRows || clientRows.length === 0">
-           <td colspan="29" class="text-center py-20 bg-slate-50/20 dark:bg-slate-900/10">
-             <div class="flex flex-col items-center gap-3">
-               <span class="text-4xl grayscale opacity-50">🔍</span>
-               <span class="text-slate-400 italic">لا توجد سجلات مطابقة للبحث</span>
-             </div>
-           </td>
+          <td colspan="29" class="text-center py-20 bg-slate-50/20 dark:bg-slate-900/10">
+            <div class="flex flex-col items-center gap-3">
+              <span class="text-4xl grayscale opacity-50">🔍</span>
+              <span class="text-slate-400 italic">لا توجد سجلات مطابقة للبحث</span>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -156,7 +160,8 @@
             </div>
             <div class="form-field">
               <label class="form-label">التصنيف</label>
-              <input type="text" class="form-input" [value]="selectedPerson?.classification?.classification || 'غير موجود'" readonly />
+              <input type="text" class="form-input"
+                [value]="selectedPerson?.classification?.classification || 'غير موجود'" readonly />
             </div>
             <div class="form-field">
               <label class="form-label">العقد</label>
@@ -395,13 +400,16 @@
 
           </div>
           <div *ngIf="activeSubTab === 'files'" class="p-2">
-            <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+            <div
+              class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
               <table class="premium-table w-full">
                 <thead>
-                  <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                  <tr
+                    class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
                     <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الكود</th>
                     <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الموكل</th>
-                    <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">سبب المديونية</th>
+                    <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">سبب المديونية
+                    </th>
                     <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المطالبة</th>
                     <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المسدد</th>
                     <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المتبقي</th>
@@ -423,9 +431,9 @@
                     <td class="py-2 px-3 text-slate-500">{{row.courtName}}</td>
                   </tr>
                   <tr *ngIf="!clientRows || clientRows.length === 0">
-                     <td colspan="8" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
-                       لا توجد ديون مسجلة لهذه الفئة
-                     </td>
+                    <td colspan="8" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+                      لا توجد ديون مسجلة لهذه الفئة
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -439,17 +447,22 @@
                 <span class="w-1.5 h-4 bg-emerald-500 rounded-full"></span>
                 <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">سجل الدفعات</h4>
               </div>
-              <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+              <div
+                class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
                 <table class="premium-table w-full">
                   <thead>
-                    <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                    <tr
+                      class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
                       <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ</th>
                       <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المبلغ</th>
                       <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الوسيلة</th>
                       <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">بواسطة</th>
-                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">مندوب المبيعات</th>
-                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">رقم السند</th>
-                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة الملف بعد السداد</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">مندوب
+                        المبيعات</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">رقم السند
+                      </th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة الملف
+                        بعد السداد</th>
                     </tr>
                   </thead>
                   <tbody class="text-[11px]">
@@ -462,13 +475,15 @@
                       <td class="py-2 px-3 text-slate-400">{{p.salesAgent || '-'}}</td>
                       <td class="py-2 px-3 text-slate-400 font-mono">{{p.jouralEntry || '-'}}</td>
                       <td class="py-2 px-3">
-                        <span class="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 text-[10px] font-bold">
+                        <span
+                          class="px-2 py-0.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 text-[10px] font-bold">
                           {{p.fileStatusAfter || '-'}}
                         </span>
                       </td>
                     </tr>
                     <tr *ngIf="!payments || payments.length === 0">
-                      <td colspan="7" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+                      <td colspan="7"
+                        class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
                         لا توجد دفعات مسجلة لهذا الملف
                       </td>
                     </tr>
@@ -482,10 +497,12 @@
                 <span class="w-1.5 h-4 bg-amber-500 rounded-full"></span>
                 <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">المبالغ الإضافية</h4>
               </div>
-              <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+              <div
+                class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
                 <table class="premium-table w-full">
                   <thead>
-                    <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                    <tr
+                      class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
                       <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ</th>
                       <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المبلغ</th>
                       <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">النوع</th>
@@ -499,7 +516,8 @@
                       <td class="py-2 px-3 text-slate-500 font-medium">{{a.amountType}}</td>
                     </tr>
                     <tr *ngIf="!additionalAmounts || additionalAmounts.length === 0">
-                      <td colspan="3" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+                      <td colspan="3"
+                        class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
                         لا توجد مبالغ إضافية مسجلة
                       </td>
                     </tr>
@@ -516,10 +534,12 @@
                 <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
                 <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">الأرقام الآلية والمراجع</h4>
               </div>
-              <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+              <div
+                class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
                 <table class="premium-table w-full">
                   <thead>
-                    <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                    <tr
+                      class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
                       <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الرقم</th>
                       <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">النوع</th>
                       <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المرجع</th>
@@ -528,7 +548,8 @@
                     </tr>
                   </thead>
                   <tbody class="text-[11px]">
-                    <tr *ngFor="let n of autoNumbers" class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
+                    <tr *ngFor="let n of autoNumbers"
+                      class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
                       <td class="py-2 px-3 font-bold text-indigo-600">{{n.autoNumberValue}}</td>
                       <td class="py-2 px-3 text-slate-500">{{n.type}}</td>
                       <td class="py-2 px-3 text-slate-400 font-mono text-[10px]">{{n.caseRef}}</td>
@@ -536,7 +557,8 @@
                       <td class="py-2 px-3 text-slate-400 italic">{{n.note}}</td>
                     </tr>
                     <tr *ngIf="!autoNumbers || autoNumbers.length === 0">
-                      <td colspan="5" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+                      <td colspan="5"
+                        class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
                         لا توجد أرقام آلية مسجلة
                       </td>
                     </tr>
@@ -553,7 +575,8 @@
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div *ngFor="let c of classifications"
                   class="p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 transition-all hover:border-indigo-200">
-                  <div class="text-[9px] uppercase text-slate-400 dark:text-slate-500 font-bold mb-1">{{c.department}}</div>
+                  <div class="text-[9px] uppercase text-slate-400 dark:text-slate-500 font-bold mb-1">{{c.department}}
+                  </div>
                   <div class="text-sm font-bold text-slate-700 dark:text-slate-300">{{c.classification}}</div>
                 </div>
               </div>
@@ -576,7 +599,8 @@
                 </div>
                 <button class="premium-btn premium-btn-outline text-xs" (click)="openAttachment(file)">فتح</button>
               </div>
-              <div *ngIf="!attachments || attachments.length === 0" class="col-span-2 text-center p-12 bg-slate-50/20 dark:bg-slate-900/10 rounded-2xl text-slate-400 italic">
+              <div *ngIf="!attachments || attachments.length === 0"
+                class="col-span-2 text-center p-12 bg-slate-50/20 dark:bg-slate-900/10 rounded-2xl text-slate-400 italic">
                 لا توجد مرفقات لهذا الملف
               </div>
             </div>
@@ -589,19 +613,24 @@
                 <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
                 <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">سجل التعديلات (Audit)</h4>
               </div>
-              <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+              <div
+                class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
                 <table class="premium-table w-full">
                   <thead>
-                    <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                    <tr
+                      class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
                       <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ</th>
                       <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الإجراء</th>
                       <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الوصف</th>
-                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المستخدم</th>
+                      <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المستخدم
+                      </th>
                     </tr>
                   </thead>
                   <tbody class="text-[11px]">
-                    <tr *ngFor="let a of audits" class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
-                      <td class="py-2 px-3 text-slate-400 text-[10px] font-mono">{{a.actionDate | date:'yyyy-MM-dd HH:mm'}}</td>
+                    <tr *ngFor="let a of audits"
+                      class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
+                      <td class="py-2 px-3 text-slate-400 text-[10px] font-mono">{{a.actionDate | date:'yyyy-MM-dd
+                        HH:mm'}}</td>
                       <td class="py-2 px-3">
                         <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-tighter" [ngClass]="{
                           'bg-emerald-100 text-emerald-700': a.action === 'ADD' || a.action === 'INSERT',
@@ -613,13 +642,16 @@
                       <td class="py-2 px-3 text-slate-600 dark:text-slate-400 text-xs">{{a.description}}</td>
                       <td class="py-2 px-3">
                         <div class="flex items-center gap-2">
-                          <span class="w-5 h-5 rounded-full bg-indigo-50 flex items-center justify-center text-[9px] font-bold text-indigo-600 border border-indigo-100">{{a.userName?.charAt(0) || 'U'}}</span>
+                          <span
+                            class="w-5 h-5 rounded-full bg-indigo-50 flex items-center justify-center text-[9px] font-bold text-indigo-600 border border-indigo-100">{{a.userName?.charAt(0)
+                            || 'U'}}</span>
                           <span class="font-medium text-slate-500">{{a.userName}}</span>
                         </div>
                       </td>
                     </tr>
                     <tr *ngIf="!audits || audits.length === 0">
-                      <td colspan="4" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+                      <td colspan="4"
+                        class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
                         لا توجد سجلات تدقيق متاحة
                       </td>
                     </tr>
@@ -1048,80 +1080,6 @@
               </div>
             </div>
 
-            <!-- Status History Table (New Section) -->
-            <div class="mt-8">
-              <div class="premium-card p-6 border-b-4 border-b-primary shadow-lg bg-white/80 backdrop-blur-sm">
-                <div class="flex items-center justify-between mb-6">
-                  <div class="flex items-center gap-3">
-                    <div
-                      class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
-                      📋
-                    </div>
-                    <div>
-                      <h3 class="text-lg font-black text-slate-800 tracking-tight font-sans">سجل تحديثات الحالات</h3>
-                      <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Linked by File_code
-                        Audit Trail</p>
-                    </div>
-                  </div>
-                  <div
-                    class="px-4 py-1.5 rounded-full bg-slate-50 border border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
-                    {{ statuses.length || 0 }} Entries
-                  </div>
-                </div>
-
-                <div class="overflow-x-auto rounded-2xl border border-slate-100 shadow-sm">
-                  <table class="premium-table w-full text-right border-collapse">
-                    <thead>
-                      <tr
-                        class="bg-slate-50/50 text-[11px] uppercase font-bold text-slate-500 border-b border-slate-100">
-                        <th class="py-4 px-6 text-right">التاريخ</th>
-                        <th class="py-4 px-6 text-right">الموظف</th>
-                        <th class="py-4 px-6 text-right">نوع الحالة</th>
-                        <th class="py-4 px-6 text-right">الحالة الجديدة</th>
-                      </tr>
-                    </thead>
-                    <tbody class="text-xs">
-                      <tr *ngFor="let status of statuses"
-                        class="group border-b border-slate-50 hover:bg-primary/[0.02] transition-all">
-                        <td
-                          class="py-4 px-6 font-mono text-slate-400 font-bold group-hover:text-primary transition-colors">
-                          {{ status.dateAdded | date:'dd/MM/yyyy HH:mm' }}
-                        </td>
-                        <td class="py-4 px-6">
-                          <div class="flex items-center gap-2">
-                            <div
-                              class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500 shadow-sm">
-                              {{ status.userName?.substring(0,2) || 'S' }}
-                            </div>
-                            <span class="font-bold text-slate-600 truncate max-w-[120px]">{{ status.userName || 'System'
-                              }}</span>
-                          </div>
-                        </td>
-                        <td class="py-4 px-6 font-black text-slate-500 uppercase tracking-tighter italic">
-                          {{ status.statusType || '---' }}
-                        </td>
-                        <td class="py-4 px-6">
-                          <span
-                            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 font-black text-[11px] shadow-sm">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            {{ status.statusName || '---' }}
-                          </span>
-                        </td>
-                      </tr>
-                      <tr *ngIf="!statuses || statuses.length === 0">
-                        <td colspan="4" class="py-12 text-center">
-                          <div class="flex flex-col items-center gap-3 opacity-30 grayscale">
-                            <div class="text-4xl">📭</div>
-                            <p class="text-sm italic font-bold text-slate-400">لا يوجد سجل تحديثات متاح لهذا الملف
-                              حالياً</p>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
 
           </div>
         </div>
@@ -1550,27 +1508,48 @@
 
     <!-- الملاحظات -->
     <div *ngIf="activeSubTabLower === 'notes'" class="mt-4">
-      <div class="flex items-center gap-2 mb-3">
-        <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
-        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">الملاحظات</h4>
+      <div
+        class="flex items-center justify-between mb-3 bg-indigo-50/50 dark:bg-indigo-900/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
+          <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">الملاحظات</h4>
+        </div>
+        <div class="flex items-center gap-2">
+          <button (click)="prevNotesPage()" [disabled]="notesPage === 1"
+            class="premium-btn premium-btn-outline px-3 py-1 text-[10px] flex items-center gap-1">
+            <span>◀️</span> السابق
+          </button>
+          <div
+            class="px-2 py-1 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-600 dark:text-slate-300 shadow-sm">
+            صفحة {{ notesPage }} من {{ Math.ceil(notesTotal / notesPageSize) || 1 }}
+          </div>
+          <button (click)="nextNotesPage()" [disabled]="notesPage * notesPageSize >= notesTotal"
+            class="premium-btn premium-btn-outline px-3 py-1 text-[10px] flex items-center gap-1">
+            التالي <span>▶️</span>
+          </button>
+        </div>
       </div>
-      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+      <div
+        class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
         <table class="premium-table w-full">
           <thead>
-            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+            <tr
+              class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الكود</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الملاحظات</th>
             </tr>
           </thead>
           <tbody class="text-[11px]">
-            <tr *ngFor="let note of notes" class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
+            <tr *ngFor="let note of notes"
+              class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
               <td class="py-2 px-3 font-mono text-slate-400">{{ note.id }}</td>
               <td class="py-2 px-3 text-slate-500" dir="ltr">{{ note.dateAdded | date:'yyyy-MM-dd HH:mm' }}</td>
               <td class="py-2 px-3 text-slate-700 dark:text-slate-300">{{ note.noteText }}</td>
             </tr>
             <tr *ngIf="!notes || notes.length === 0">
-              <td colspan="3" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد ملاحظات مسجلة</td>
+              <td colspan="3" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا
+                توجد ملاحظات مسجلة</td>
             </tr>
           </tbody>
         </table>
@@ -1579,14 +1558,33 @@
 
     <!-- الإفادة -->
     <div *ngIf="activeSubTabLower === 'efada'" class="mt-4">
-      <div class="flex items-center gap-2 mb-3">
-        <span class="w-1.5 h-4 bg-emerald-500 rounded-full"></span>
-        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">الإفادة</h4>
+      <div
+        class="flex items-center justify-between mb-3 bg-emerald-50/50 dark:bg-emerald-900/10 p-3 rounded-xl border border-emerald-100 dark:border-emerald-800/30">
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-4 bg-emerald-500 rounded-full"></span>
+          <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">الإفادة</h4>
+        </div>
+        <div class="flex items-center gap-2">
+          <button (click)="prevStatementsPage()" [disabled]="statementsPage === 1"
+            class="premium-btn premium-btn-outline px-3 py-1 text-[10px] flex items-center gap-1">
+            <span>◀️</span> السابق
+          </button>
+          <div
+            class="px-2 py-1 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-600 dark:text-slate-300 shadow-sm">
+            صفحة {{ statementsPage }} من {{ Math.ceil(statementsTotal / statementsPageSize) || 1 }}
+          </div>
+          <button (click)="nextStatementsPage()" [disabled]="statementsPage * statementsPageSize >= statementsTotal"
+            class="premium-btn premium-btn-outline px-3 py-1 text-[10px] flex items-center gap-1">
+            التالي <span>▶️</span>
+          </button>
+        </div>
       </div>
-      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+      <div
+        class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
         <table class="premium-table w-full">
           <thead>
-            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+            <tr
+              class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ الإفادة</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">النتيجة</th>
@@ -1604,9 +1602,11 @@
             <tr *ngFor="let ef of callcenterStatements; let i = index"
               class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
               <td class="py-2 px-3 font-mono text-slate-400">{{ i + 1 }}</td>
-              <td class="py-2 px-3 font-bold text-slate-700 dark:text-slate-200">{{ ef.dateAdded | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="py-2 px-3 font-bold text-slate-700 dark:text-slate-200">{{ ef.dateAdded | date:'dd/MM/yyyy
+                HH:mm' }}</td>
               <td class="py-2 px-3">
-                <span class="px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 font-bold border border-blue-100 dark:border-blue-800/50 text-[10px]">
+                <span
+                  class="px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 font-bold border border-blue-100 dark:border-blue-800/50 text-[10px]">
                   {{ ef.connectedStatus }}
                 </span>
               </td>
@@ -1619,13 +1619,16 @@
               <td class="py-2 px-3 text-slate-500 italic">"{{ ef.notes || 'بدون ملاحظات' }}"</td>
               <td class="py-2 px-3">
                 <div class="flex items-center gap-1">
-                  <span class="w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-500 border border-slate-200">{{ ef.userAddedName?.charAt(0) }}</span>
+                  <span
+                    class="w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-500 border border-slate-200">{{
+                    ef.userAddedName?.charAt(0) }}</span>
                   <span class="font-medium text-slate-500">{{ ef.userAddedName }}</span>
                 </div>
               </td>
             </tr>
             <tr *ngIf="!callcenterStatements || callcenterStatements.length === 0">
-              <td colspan="11" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد إفادات مسجلة</td>
+              <td colspan="11" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا
+                توجد إفادات مسجلة</td>
             </tr>
           </tbody>
         </table>
@@ -1634,7 +1637,24 @@
 
     <!-- السجل (Audit History) -->
     <div *ngIf="activeSubTabLower === 'record'" class="mt-4">
-      <h3 class="font-bold mb-2">سجل العمليات</h3>
+      <div
+        class="flex items-center justify-between mb-3 bg-slate-50/50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+        <h3 class="font-bold text-sm">سجل العمليات</h3>
+        <div class="flex items-center gap-2">
+          <button (click)="prevAuditsPage()" [disabled]="auditsPage === 1"
+            class="premium-btn premium-btn-outline px-3 py-1 text-[10px] flex items-center gap-1">
+            <span>◀️</span> السابق
+          </button>
+          <div
+            class="px-2 py-1 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-600 dark:text-slate-300 shadow-sm">
+            صفحة {{ auditsPage }} من {{ Math.ceil(auditsTotal / auditsPageSize) || 1 }}
+          </div>
+          <button (click)="nextAuditsPage()" [disabled]="auditsPage * auditsPageSize >= auditsTotal"
+            class="premium-btn premium-btn-outline px-3 py-1 text-[10px] flex items-center gap-1">
+            التالي <span>▶️</span>
+          </button>
+        </div>
+      </div>
       <table class="premium-table">
         <thead>
           <tr class="bg-slate-50 dark:bg-slate-800/50 text-[10px] uppercase font-bold text-slate-500">
@@ -1661,7 +1681,8 @@
 
     <!-- سجل تحديثات الحالات (Status History) -->
     <div *ngIf="activeSubTabLower === 'statusHistory'" class="mt-4">
-      <div class="flex items-center justify-between mb-4 bg-indigo-50/50 dark:bg-indigo-900/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
+      <div
+        class="flex items-center justify-between mb-4 bg-indigo-50/50 dark:bg-indigo-900/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-lg">
             📜
@@ -1673,19 +1694,22 @@
             class="premium-btn premium-btn-outline px-3 py-1.5 text-xs flex items-center gap-1">
             <span>◀️</span> السابق
           </button>
-          <div class="px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 shadow-sm">
-            صفحة {{ historyPage }}
+          <div
+            class="px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 shadow-sm">
+            صفحة {{ historyPage }} من {{ Math.ceil(statusesTotal / historyPageSize) || 1 }}
           </div>
-          <button (click)="nextHistoryPage()" [disabled]="historyPage * historyPageSize >= (statuses.length || 0)"
+          <button (click)="nextHistoryPage()" [disabled]="historyPage * historyPageSize >= statusesTotal"
             class="premium-btn premium-btn-outline px-3 py-1.5 text-xs flex items-center gap-1">
             التالي <span>▶️</span>
           </button>
         </div>
       </div>
-      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
+      <div
+        class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
         <table class="premium-table w-full">
           <thead>
-            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+            <tr
+              class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ والوقت</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الموظف</th>
@@ -1694,25 +1718,29 @@
             </tr>
           </thead>
           <tbody class="text-[11px]">
-            <tr *ngFor="let s of statuses | slice:(historyPage-1)*historyPageSize:historyPage*historyPageSize; let i = index" 
-                class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
+            <tr *ngFor="let s of statuses; let i = index"
+              class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
               <td class="py-3 px-4 font-mono text-slate-400">{{ (historyPage-1)*historyPageSize + i + 1 }}</td>
-              <td class="py-3 px-4 font-bold text-slate-700 dark:text-slate-200">{{ s.dateAdded | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+              <td class="py-3 px-4 font-bold text-slate-700 dark:text-slate-200">{{ s.dateAdded | date:'dd/MM/yyyy
+                HH:mm:ss' }}</td>
               <td class="py-3 px-4">
                 <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[10px] text-slate-500 font-bold border border-slate-200 dark:border-slate-600">
+                  <div
+                    class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[10px] text-slate-500 font-bold border border-slate-200 dark:border-slate-600">
                     {{ s.userName?.charAt(0) || 'U' }}
                   </div>
                   <span class="font-medium text-slate-600 dark:text-slate-400">{{ s.userName || 'موظف النظام' }}</span>
                 </div>
               </td>
               <td class="py-3 px-4">
-                <span class="px-2 py-0.5 rounded text-[10px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/50 font-bold">
+                <span
+                  class="px-2 py-0.5 rounded text-[10px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/50 font-bold">
                   {{ splitStatus(s.status).type }}
                 </span>
               </td>
               <td class="py-3 px-4">
-                <span class="px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-100 dark:border-emerald-800/50 shadow-sm">
+                <span
+                  class="px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-100 dark:border-emerald-800/50 shadow-sm">
                   {{ splitStatus(s.status).value }}
                 </span>
               </td>
@@ -1736,23 +1764,27 @@
         <span class="w-1.5 h-4 bg-rose-500 rounded-full"></span>
         <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">تنفيذات</h4>
       </div>
-      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+      <div
+        class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
         <table class="premium-table w-full">
           <thead>
-            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+            <tr
+              class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">آخر إجراء</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ آخر إجراء</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الإجراء القادم</th>
-              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ الإجراء القادم</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ الإجراء القادم
+              </th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">مكان الملف</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right w-1/4">ملاحظات</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المستخدم</th>
             </tr>
           </thead>
           <tbody class="text-[11px]">
-            <tr *ngFor="let exec of executionsData; let i = index" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+            <tr *ngFor="let exec of executionsData; let i = index"
+              class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
               <td class="py-2 px-3 text-slate-400">{{ i + 1 }}</td>
               <td class="py-2 px-3 text-slate-500">{{ exec.date }}</td>
               <td class="py-2 px-3 font-bold text-rose-600">{{ exec.lastAction }}</td>
@@ -1764,7 +1796,8 @@
               <td class="py-2 px-3 font-medium text-slate-600">{{ exec.user }}</td>
             </tr>
             <tr *ngIf="!executionsData || executionsData.length === 0">
-              <td colspan="9" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد بيانات تنفيذ متاحة</td>
+              <td colspan="9" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا
+                توجد بيانات تنفيذ متاحة</td>
             </tr>
           </tbody>
         </table>
@@ -1778,10 +1811,12 @@
         <span class="w-1.5 h-4 bg-amber-500 rounded-full"></span>
         <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">جلسات المتداول</h4>
       </div>
-      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+      <div
+        class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
         <table class="premium-table w-full">
           <thead>
-            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+            <tr
+              class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ الإفادة</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">نوع الجلسة</th>
@@ -1792,7 +1827,8 @@
             </tr>
           </thead>
           <tbody class="text-[11px]">
-            <tr *ngFor="let session of traderData; let i = index" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+            <tr *ngFor="let session of traderData; let i = index"
+              class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
               <td class="py-2 px-3 text-slate-400">{{ i + 1 }}</td>
               <td class="py-2 px-3 text-slate-500">{{ session.efadaDate }}</td>
               <td class="py-2 px-3 font-bold text-amber-600">{{ session.sessionType }}</td>
@@ -1802,7 +1838,8 @@
               <td class="py-2 px-3 text-slate-500 italic">{{ session.notes }}</td>
             </tr>
             <tr *ngIf="!traderData || traderData.length === 0">
-              <td colspan="7" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد جلسات مسجلة</td>
+              <td colspan="7" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا
+                توجد جلسات مسجلة</td>
             </tr>
           </tbody>
         </table>
@@ -1821,10 +1858,12 @@
         <span class="w-1.5 h-4 bg-blue-500 rounded-full"></span>
         <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">ملفات المديونية</h4>
       </div>
-      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+      <div
+        class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
         <table class="premium-table w-full">
           <thead>
-            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+            <tr
+              class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الكود</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">سبب المديونية</th>
@@ -1845,7 +1884,8 @@
               <td class="py-2 px-3 font-bold text-indigo-600">{{ file.code }}</td>
               <td class="py-2 px-3 text-slate-500">{{ file.debtReason }}</td>
               <td class="py-2 px-3">
-                <span class="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-bold">
+                <span
+                  class="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-bold">
                   {{ file.fileStatus }}
                 </span>
               </td>
@@ -1858,7 +1898,8 @@
               <td class="py-2 px-3 text-slate-500">{{ file.lawyerName }}</td>
             </tr>
             <tr *ngIf="!clientRows || clientRows.length === 0">
-              <td colspan="11" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد ملفات مديونية متاحة</td>
+              <td colspan="11" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا
+                توجد ملفات مديونية متاحة</td>
             </tr>
           </tbody>
         </table>
@@ -1878,10 +1919,12 @@
         <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
         <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">السكرتارية</h4>
       </div>
-      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+      <div
+        class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
         <table class="premium-table w-full">
           <thead>
-            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+            <tr
+              class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التاريخ</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الملاحظة</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الموظف</th>
@@ -1892,14 +1935,17 @@
               <td class="py-2 px-3 font-mono text-slate-400">{{ sec.dateAdded | date:'dd/MM/yyyy HH:mm' }}</td>
               <td class="py-2 px-3 text-slate-700 dark:text-slate-300 leading-relaxed">{{ sec.noteText }}</td>
               <td class="py-2 px-3">
-                 <div class="flex items-center gap-1">
-                   <span class="w-4 h-4 rounded-full bg-indigo-50 flex items-center justify-center text-[8px] font-bold text-indigo-600 border border-indigo-100">{{ sec.userName?.charAt(0) || 'S' }}</span>
-                   <span class="font-medium text-slate-500">{{ sec.userName || 'System' }}</span>
-                 </div>
+                <div class="flex items-center gap-1">
+                  <span
+                    class="w-4 h-4 rounded-full bg-indigo-50 flex items-center justify-center text-[8px] font-bold text-indigo-600 border border-indigo-100">{{
+                    sec.userName?.charAt(0) || 'S' }}</span>
+                  <span class="font-medium text-slate-500">{{ sec.userName || 'System' }}</span>
+                </div>
               </td>
             </tr>
             <tr *ngIf="!notes || notes.length === 0">
-              <td colspan="3" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد ملاحظات سكرتارية</td>
+              <td colspan="3" class="text-center py-10 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا
+                توجد ملاحظات سكرتارية</td>
             </tr>
           </tbody>
         </table>
@@ -1913,10 +1959,12 @@
         <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
         <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider">أرقام آلية</h4>
       </div>
-      <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
+      <div
+        class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
         <table class="premium-table w-full">
           <thead>
-            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+            <tr
+              class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الرقم</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">النوع</th>
@@ -1938,7 +1986,8 @@
               <td class="py-2 px-3 text-slate-400">{{ auto.dateAdded | date:'dd/MM/yyyy' }}</td>
             </tr>
             <tr *ngIf="!autoNumbers || autoNumbers.length === 0">
-              <td colspan="7" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا توجد أرقام آلية مسجلة</td>
+              <td colspan="7" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">لا
+                توجد أرقام آلية مسجلة</td>
             </tr>
           </tbody>
         </table>
@@ -2082,94 +2131,104 @@
       </div>
     </div>
 
-      <!-- 2. منطقة الجدول والإحصائيات (وسط وشمال الشاشة) -->
-      <div class="flex-grow flex flex-col gap-4">
+    <!-- 2. منطقة الجدول والإحصائيات (وسط وشمال الشاشة) -->
+    <div class="flex-grow flex flex-col gap-4">
 
-        <!-- A. الجدول الرئيسي -->
-        <div class="flex-grow overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
-          <div class="overflow-auto h-full">
-            <table class="premium-table w-full">
-              <thead>
-                <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
-                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الرقم</th>
-                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المدني</th>
-                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المستخدم</th>
-                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التصنيف</th>
-                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المصدر</th>
-                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">نوع الخط</th>
-                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ الإضافة</th>
-                  <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة الرقم</th>
-                </tr>
-              </thead>
-              <tbody class="text-[11px]">
-                <tr *ngFor="let row of numbersSearchResults" class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
-                  <td class="py-2 px-3 font-mono font-bold text-indigo-600">{{ row.number }}</td>
-                  <td class="py-2 px-3 text-slate-500 font-mono">{{ row.civilID }}</td>
-                  <td class="py-2 px-3 text-slate-500">{{ row.user }}</td>
-                  <td class="py-2 px-3 text-slate-500">{{ row.classification }}</td>
-                  <td class="py-2 px-3 text-slate-500">{{ row.source }}</td>
-                  <td class="py-2 px-3 text-slate-500">{{ row.type }}</td>
-                  <td class="py-2 px-3 text-slate-400 font-mono">{{ row.date }}</td>
-                  <td class="py-2 px-3">
-                    <span class="px-2 py-0.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-500">
-                      {{ row.status }}
-                    </span>
-                  </td>
-                </tr>
-                <tr *ngIf="!numbersSearchResults || numbersSearchResults.length === 0">
-                  <td colspan="8" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
-                    لا توجد نتائج بحث متاحة
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- B. الجداول السفلية (3 قوائم) -->
-        <div class="flex gap-4 shrink-0 h-48 mb-2">
-          <!-- الجدول الأيمن -->
-          <div class="flex-1 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
-            <table class="premium-table w-full">
-              <thead>
-                <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
-                  <th class="py-2 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">العدد</th>
-                  <th class="py-2 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">نوع الخط</th>
-                </tr>
-              </thead>
-              <tbody class="text-[11px]">
-                <tr *ngFor="let row of bottomTable1" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
-                  <td class="py-2 px-4 font-bold text-indigo-600">{{row.count}}</td>
-                  <td class="py-2 px-4 text-slate-500">{{row.type}}</td>
-                </tr>
-                <tr *ngIf="!bottomTable1 || bottomTable1.length === 0">
-                  <td colspan="2" class="text-center py-6 text-slate-400 italic">لا توجد إحصائيات</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <!-- الجدول الأوسط -->
-          <div class="flex-1 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
-            <table class="premium-table w-full">
-              <thead>
-                <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
-                  <th class="py-2 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">العدد</th>
-                  <th class="py-2 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المصدر</th>
-                </tr>
-              </thead>
-              <tbody class="text-[11px]">
-                <tr *ngFor="let row of bottomTable2" class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
-                  <td class="py-2 px-4 font-bold text-indigo-600">{{row.count}}</td>
-                  <td class="py-2 px-4 text-slate-500">{{row.source}}</td>
-                </tr>
-                <tr *ngIf="!bottomTable2 || bottomTable2.length === 0">
-                  <td colspan="2" class="text-center py-6 text-slate-400 italic">لا توجد إحصائيات</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      <!-- A. الجدول الرئيسي -->
+      <div
+        class="flex-grow overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
+        <div class="overflow-auto h-full">
+          <table class="premium-table w-full">
+            <thead>
+              <tr
+                class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الرقم</th>
+                <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المدني</th>
+                <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المستخدم</th>
+                <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">التصنيف</th>
+                <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المصدر</th>
+                <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">نوع الخط</th>
+                <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ الإضافة</th>
+                <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة الرقم</th>
+              </tr>
+            </thead>
+            <tbody class="text-[11px]">
+              <tr *ngFor="let row of numbersSearchResults"
+                class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
+                <td class="py-2 px-3 font-mono font-bold text-indigo-600">{{ row.number }}</td>
+                <td class="py-2 px-3 text-slate-500 font-mono">{{ row.civilID }}</td>
+                <td class="py-2 px-3 text-slate-500">{{ row.user }}</td>
+                <td class="py-2 px-3 text-slate-500">{{ row.classification }}</td>
+                <td class="py-2 px-3 text-slate-500">{{ row.source }}</td>
+                <td class="py-2 px-3 text-slate-500">{{ row.type }}</td>
+                <td class="py-2 px-3 text-slate-400 font-mono">{{ row.date }}</td>
+                <td class="py-2 px-3">
+                  <span
+                    class="px-2 py-0.5 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-500">
+                    {{ row.status }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="!numbersSearchResults || numbersSearchResults.length === 0">
+                <td colspan="8" class="text-center py-12 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+                  لا توجد نتائج بحث متاحة
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
+
+      <!-- B. الجداول السفلية (3 قوائم) -->
+      <div class="flex gap-4 shrink-0 h-48 mb-2">
+        <!-- الجدول الأيمن -->
+        <div
+          class="flex-1 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
+          <table class="premium-table w-full">
+            <thead>
+              <tr
+                class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                <th class="py-2 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">العدد</th>
+                <th class="py-2 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">نوع الخط</th>
+              </tr>
+            </thead>
+            <tbody class="text-[11px]">
+              <tr *ngFor="let row of bottomTable1"
+                class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                <td class="py-2 px-4 font-bold text-indigo-600">{{row.count}}</td>
+                <td class="py-2 px-4 text-slate-500">{{row.type}}</td>
+              </tr>
+              <tr *ngIf="!bottomTable1 || bottomTable1.length === 0">
+                <td colspan="2" class="text-center py-6 text-slate-400 italic">لا توجد إحصائيات</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- الجدول الأوسط -->
+        <div
+          class="flex-1 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
+          <table class="premium-table w-full">
+            <thead>
+              <tr
+                class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                <th class="py-2 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">العدد</th>
+                <th class="py-2 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المصدر</th>
+              </tr>
+            </thead>
+            <tbody class="text-[11px]">
+              <tr *ngFor="let row of bottomTable2"
+                class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                <td class="py-2 px-4 font-bold text-indigo-600">{{row.count}}</td>
+                <td class="py-2 px-4 text-slate-500">{{row.source}}</td>
+              </tr>
+              <tr *ngIf="!bottomTable2 || bottomTable2.length === 0">
+                <td colspan="2" class="text-center py-6 text-slate-400 italic">لا توجد إحصائيات</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
   </div>
 
@@ -2301,28 +2360,27 @@
       <!-- حقول التاريخ -->
       <div class="flex items-center gap-4 text-xs shrink-0">
         <div class="flex items-center gap-2 text-xs">
-          <label class="font-bold text-gray-700 w-16" style="color: var(--text-color);">كلمة البحث</label>
-          <input type="text" [(ngModel)]="searchGeneral" (keyup.enter)="searchStatements()"
+          <label class="font-bold text-gray-700 w-16" style="color: var(--text-color);">المدني / الاسم</label>
+          <input type="text" [(ngModel)]="searchStatementsForm.name" (keyup.enter)="searchStatements()"
             class="input input-xs input-bordered w-full rounded-none h-6"
             style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
         </div>
         <div class="flex items-center gap-1">
           <label class="font-bold" style="color: var(--text-color);">من تاريخ</label>
-          <input type="date" [(ngModel)]="fromDate" (keyup.enter)="searchStatements()"
+          <input type="date" [(ngModel)]="searchStatementsForm.fromDate" (keyup.enter)="searchStatements()"
             class="input input-xs input-bordered rounded-none h-6"
             style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
         </div>
         <div class="flex items-center gap-1">
           <label class="font-bold" style="color: var(--text-color);">الى تاريخ</label>
-          <input type="date" [(ngModel)]="toDate" (keyup.enter)="searchStatements()"
+          <input type="date" [(ngModel)]="searchStatementsForm.toDate" (keyup.enter)="searchStatements()"
             class="input input-xs input-bordered rounded-none h-6"
             style="border-color: var(--surface-border); background-color: var(--surface-premium-card); color: var(--text-color);" />
         </div>
 
         <!-- زر البحث العام -->
-        <button class="btn btn-xs rounded-none h-6 min-h-0 px-4"
-          style="background-color: var(--surface-hover); color: var(--text-color); border-color: var(--surface-border);"
-          (click)="searchStatements()">بحث عام</button>
+        <button class="btn btn-xs premium-btn-primary rounded-none h-6 min-h-0 px-4" (click)="searchStatements()">بحث
+          عام</button>
       </div>
 
       <!-- أزرار الفلترة السريعة -->
@@ -2368,47 +2426,46 @@
     </div>
 
     <!-- 2. الجدول الرئيسي -->
-    <div class="flex-grow overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
+    <div
+      class="flex-grow overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
       <div class="overflow-auto h-full">
         <table class="premium-table w-full">
           <thead>
-            <tr class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+            <tr
+              class="bg-indigo-50 dark:bg-indigo-900/20 text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الاسم</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ الإفادة</th>
-              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ المراجعة</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الإفادة</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الموظف</th>
-              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">طريقة التواصل</th>
-              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة التواصل</th>
-              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة التعاون</th>
-              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right text-emerald-600">قيمة الإجمالي</th>
-              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">رقم الإفادة</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right text-emerald-600">
+                قيمة الإجمالي</th>
               <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right w-1/5">ملاحظات</th>
+              <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-center">إجراءات</th>
             </tr>
           </thead>
           <tbody class="text-[11px]">
-            <tr *ngFor="let row of statementRows; let i = index" 
+            <tr *ngFor="let row of statementRows; let i = index"
               class="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
               <td class="py-2 px-3 text-slate-400 font-mono text-[10px]">{{ i + 1 }}</td>
               <td class="py-2 px-3 font-bold text-indigo-700 dark:text-indigo-400">{{ row.name }}</td>
-              <td class="py-2 px-3 text-slate-500 font-mono">{{ row.date }}</td>
-              <td class="py-2 px-3 text-slate-400 font-mono">{{ row.reviewDate }}</td>
+              <td class="py-2 px-3 text-slate-500 font-mono">{{ row.date | date:'dd/MM/yyyy' }}</td>
               <td class="py-2 px-3 text-slate-700 dark:text-slate-300">
                 <div class="truncate max-w-[200px]" [title]="row.efada">{{ row.efada }}</div>
               </td>
               <td class="py-2 px-3 text-slate-500 font-medium">{{ row.employee }}</td>
-              <td class="py-2 px-3 text-slate-500">{{ row.contactMethod }}</td>
-              <td class="py-2 px-3">
-                <span class="px-2 py-0.5 rounded-lg bg-blue-50 text-blue-600 font-bold text-[10px]">{{ row.contactStatus }}</span>
-              </td>
-              <td class="py-2 px-3 text-slate-500">{{ row.cooperationStatus }}</td>
               <td class="py-2 px-3 font-black text-emerald-600 font-mono">{{ row.totalAmount }}</td>
-              <td class="py-2 px-3 text-slate-400 font-mono">{{ row.statementNumber }}</td>
               <td class="py-2 px-3 text-slate-500 italic text-[10px]">{{ row.notes }}</td>
+              <td class="py-2 px-3 text-center">
+                <button (click)="loadClientProfile(row)"
+                  class="premium-btn premium-btn-secondary px-3 py-1 text-[10px] flex items-center gap-1 mx-auto shadow-sm"
+                  title="فتح ملف العميل الكامل">
+                  <span>📂</span> فتح الملف
+                </button>
+              </td>
             </tr>
             <tr *ngIf="!statementRows || statementRows.length === 0">
-              <td colspan="12" class="text-center py-16 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
+              <td colspan="8" class="text-center py-16 text-slate-400 italic bg-slate-50/20 dark:bg-slate-900/10">
                 لا توجد إفادات مسجلة للبحث الحالي
               </td>
             </tr>
@@ -2417,14 +2474,30 @@
       </div>
     </div>
 
+    <!-- 3. Pagination for Search -->
+    <div
+      class="flex items-center justify-between mt-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+      <div class="text-[10px] font-bold text-slate-500">
+        إجمالي النتائج: {{ searchStatementsTotal }} إفادة
+      </div>
+      <div class="flex items-center gap-2">
+        <button (click)="prevSearchStatementsPage()" [disabled]="searchStatementsPage === 1"
+          class="premium-btn premium-btn-outline px-4 py-1.5 text-xs flex items-center gap-1">
+          <span>◀️</span> السابق
+        </button>
+        <div
+          class="px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 shadow-sm">
+          صفحة {{ searchStatementsPage }} من {{ Math.ceil(searchStatementsTotal / searchStatementsPageSize) || 1 }}
+        </div>
+        <button (click)="nextSearchStatementsPage()"
+          [disabled]="searchStatementsPage * searchStatementsPageSize >= searchStatementsTotal"
+          class="premium-btn premium-btn-outline px-4 py-1.5 text-xs flex items-center gap-1">
+          التالي <span>▶️</span>
+        </button>
+      </div>
+    </div>
+
   </div>
-</div>
-
-
-<!-- searchStatements -->
-
-<div *ngIf="activeMainTab === 'searchStatements'">
-  <h2 class="text-xl font-bold">searchStatements</h2>
 </div>
 
 <!-- stats -->

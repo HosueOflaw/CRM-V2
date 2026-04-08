@@ -95,10 +95,10 @@ export class NegotiationsService {
     }
 
     /**
-     * Get file audit history
+     * Get file audit history with pagination
      */
-    getAudits(fileCode: number): Observable<any[]> {
-        return this.http.get<any[]>(`${this.apiUrl}/DataView/files/${fileCode}/audits`);
+    getAudits(fileCode: number, page: number = 1, pageSize: number = 5): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/DataView/files/${fileCode}/audits?page=${page}&pageSize=${pageSize}`);
     }
 
     /**
@@ -125,8 +125,8 @@ export class NegotiationsService {
     /**
      * Get client notes
      */
-    getNotes(fileCode: number): Observable<any[]> {
-        return this.http.get<any[]>(`${this.apiUrl}/DataView/mainfiles/${fileCode}/notes`);
+    getNotes(fileCode: number, page: number = 1, pageSize: number = 5): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/DataView/mainfiles/${fileCode}/notes?page=${page}&pageSize=${pageSize}`);
     }
 
     /**
@@ -140,8 +140,24 @@ export class NegotiationsService {
         return this.http.post<any>(`${this.apiUrl}/DataView/files/${cid}/contacts`, payload);
     }
 
-    getCallcenterStatements(fileCode: number): Observable<any[]> {
-        return this.http.get<any[]>(`${this.apiUrl}/DataView/files/${fileCode}/callcenter-statements`);
+    /**
+     * Get call center statements with pagination
+     */
+    getCallcenterStatements(fileCode: number, page: number = 1, pageSize: number = 5): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/DataView/files/${fileCode}/callcenter-statements?page=${page}&pageSize=${pageSize}`);
+    }
+
+    /**
+     * Search call center statements across all files
+     */
+    searchCallcenterStatements(params: { cid?: string, name?: string, fromDate?: string, toDate?: string, page: number, pageSize: number }): Observable<any> {
+        let query = `page=${params.page}&pageSize=${params.pageSize}`;
+        if (params.cid) query += `&cid=${params.cid}`;
+        if (params.name) query += `&name=${params.name}`;
+        if (params.fromDate) query += `&fromDate=${params.fromDate}`;
+        if (params.toDate) query += `&toDate=${params.toDate}`;
+        
+        return this.http.get<any>(`${this.apiUrl}/DataView/callcenter-statements/search?${query}`);
     }
 
     addStatement(payload: any): Observable<any> {
@@ -158,8 +174,8 @@ export class NegotiationsService {
     /**
      * Get file statuses
      */
-    getStatusesHistory(fileCode: number): Observable<any[]> {
-        return this.http.get<any[]>(`${this.apiUrl}/DataView/files/${fileCode}/statuses`);
+    getStatusesHistory(fileCode: number, page: number = 1, pageSize: number = 5): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/DataView/files/${fileCode}/statuses?page=${page}&pageSize=${pageSize}`);
     }
 
     getDashboardStats(): Observable<any> {

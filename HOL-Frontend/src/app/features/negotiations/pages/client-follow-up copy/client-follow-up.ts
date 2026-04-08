@@ -47,6 +47,15 @@ export class ClientFollowUp implements OnInit {
   payments: any[] = [];
   contacts: any[] = [];
   notes: any[] = [];
+  
+  auditsTotal = 0;
+  statementsTotal = 0;
+  notesTotal = 0;
+  statusesTotal = 0;
+  currentAuditsPage = 1;
+  currentStatementsPage = 1;
+  currentNotesPage = 1;
+  currentStatusesPage = 1;
 
   review = { date: '', notes: '' };
   negotiationResult = { status: '' };
@@ -109,11 +118,12 @@ export class ClientFollowUp implements OnInit {
    * ونستخدم code لجلب بقية البيانات المرتبطة (Payments, Attachments, etc.)
    */
   private fetchAdditionalData(mainfile: any) {
-    if (!mainfile || !mainfile.id) return;
+    const id = mainfile.id || mainfile.Id;
+    if (!mainfile || !id) return;
     this.loading = true;
 
-    const mainfileId = mainfile.id;
-    const fileCode = mainfile.code;
+    const mainfileId = mainfile.id || mainfile.Id;
+    const fileCode = mainfile.code || mainfile.Code;
 
     console.log(`جاري جلب البيانات المرتبطة للكود: ${fileCode} والمعرف: ${mainfileId}`);
 
@@ -163,11 +173,11 @@ export class ClientFollowUp implements OnInit {
       }
     });
 
-    // 2. جلب بقية البيانات المرتبطة بـ Id المين فايل لضمان الدقة
-    this.fetchUniversalCaseData(mainfileId);
+    // 2. جلب بقية البيانات المرتبطة بـ كود الملف (FileCode) لضمان الدقة وتوافق السجلات التاريخية
+    this.fetchUniversalCaseData(mainfileId, fileCode);
 
-    // 3. جلب إفادات الكول سنتر المرتبطة بـ Id المين فايل
-    this.fetchCallcenterStatements(mainfileId);
+    // 3. جلب إفادات الكول سنتر المرتبطة بـ كود الملف (FileCode)
+    this.fetchCallcenterStatements(fileCode, 1);
 
     // 4. جلب الأرقام الخاصة بالعميل (الخصم) باستخدام الرقم المدني
     this.fetchContactsOnly();
@@ -180,9 +190,9 @@ export class ClientFollowUp implements OnInit {
     }
   }
 
-  // جلب كافة البيانات المرتبطة بالمعرف الداخلي للملف لضمان الدقة
-  private fetchUniversalCaseData(id: number) {
-    this.negotiationsService.getPayments(id).subscribe(data => {
+  // جلب كافة البيانات المرتبطة برمز الملف (FileCode) لضمان توافقها مع السجلات التاريخية
+  private fetchUniversalCaseData(id: number, fileCode: number) {
+    this.negotiationsService.getPayments(fileCode).subscribe(data => {
       this.payments = data;
       // تحديث المبالغ المسددة في جدول الديون المرتبط بهذا الملف
       const totalPaidForThisCode = data.reduce((acc, p) => acc + (p.value || 0), 0);
@@ -204,17 +214,17 @@ export class ClientFollowUp implements OnInit {
       this.financial.lawFees = this.financial.claimValue - totalPaidGlobal;
     });
 
-    this.negotiationsService.getAttachments(id).subscribe(data => this.attachments = data);
-    this.negotiationsService.getAdditionalAmounts(id).subscribe(data => this.additionalAmounts = data);
-    this.negotiationsService.getAudits(id).subscribe(data => this.audits = data);
-    this.negotiationsService.getAutoNumbers(id).subscribe(data => {
+    this.negotiationsService.getAttachments(fileCode).subscribe(data => this.attachments = data);
+    this.negotiationsService.getAdditionalAmounts(fileCode).subscribe(data => this.additionalAmounts = data);
+    this.fetchAudits(fileCode, 1);
+    this.negotiationsService.getAutoNumbers(fileCode).subscribe(data => {
       this.autoNumbers = data;
       if (this.selectedPerson && data.length > 0) {
-        this.selectedPerson.autoNumbers = data.map(n => n.autoNumberValue).join(', ');
+        this.selectedPerson.autoNumbers = data.map((n: any) => n.autoNumberValue).join(', ');
       }
     });
 
-    this.negotiationsService.getClassifications(id).subscribe(data => {
+    this.negotiationsService.getClassifications(fileCode).subscribe(data => {
       this.classifications = data;
       // If classification data exists and was NOT already set by search, map the latest record
       if (this.selectedPerson && data && data.length > 0) {
@@ -232,22 +242,43 @@ export class ClientFollowUp implements OnInit {
         };
       }
     });
-    this.negotiationsService.getStatusesHistory(id).subscribe(data => this.statuses = data);
-    this.negotiationsService.getNotes(id).subscribe(data => this.notes = data);
+    this.fetchStatusesHistory(id, 1);
+    this.fetchNotes(id, 1); // Notes also uses ID
+  }
+
+  private fetchStatusesHistory(fileCode: number, page: number = 1) {
+    this.currentStatusesPage = page;
+    this.negotiationsService.getStatusesHistory(fileCode, page, 5).subscribe(res => {
+      this.statuses = res.items;
+      this.statusesTotal = res.total;
+    });
+  }
+
+  private fetchNotes(fileCode: number, page: number = 1) {
+    this.currentNotesPage = page;
+    this.negotiationsService.getNotes(fileCode, page, 5).subscribe(res => {
+      this.notes = res.items;
+      this.notesTotal = res.total;
+    });
+
   }
 
   handleStatusChanged() {
-    if (this.selectedPerson?.id) {
-      this.negotiationsService.getStatusesHistory(this.selectedPerson.id).subscribe(data => this.statuses = data);
+    if (this.selectedPerson?.code) {
+      this.fetchStatusesHistory(Number(this.selectedPerson.code), 1);
     }
   }
 
-  private fetchCallcenterStatements(id: number) {
-    this.negotiationsService.getCallcenterStatements(id).subscribe(data => {
-      const sorted = data.sort((a, b) => new Date(b.dateAdded || 0).getTime() - new Date(a.dateAdded || 0).getTime());
+  private fetchCallcenterStatements(id: number, page: number = 1) {
+    this.currentStatementsPage = page;
+    this.negotiationsService.getCallcenterStatements(id, page, 5).subscribe(res => {
+      const data = res.items;
+      this.statementsTotal = res.total;
+      
+      const sorted = data.sort((a: any, b: any) => new Date(b.dateAdded || 0).getTime() - new Date(a.dateAdded || 0).getTime());
       this.callcenterStatements = sorted;
 
-      if (sorted.length > 0) {
+      if (sorted.length > 0 && page === 1) {
         this.clientRows = this.clientRows.map(row => ({
           ...row,
           lastStatement: sorted[0].notes,
@@ -255,6 +286,29 @@ export class ClientFollowUp implements OnInit {
         }));
       }
     });
+  }
+
+  private fetchAudits(id: number, page: number = 1) {
+    this.currentAuditsPage = page;
+    this.negotiationsService.getAudits(id, page, 5).subscribe(res => {
+      this.audits = res.items;
+      this.auditsTotal = res.total;
+    });
+  }
+
+  handlePageChange(event: { type: 'audits' | 'statements' | 'notes' | 'statuses', page: number }) {
+    if (!this.selectedPerson?.code) return;
+    const code = Number(this.selectedPerson.code);
+    
+    if (event.type === 'audits') {
+      this.fetchAudits(code, event.page);
+    } else if (event.type === 'statements') {
+      this.fetchCallcenterStatements(code, event.page);
+    } else if (event.type === 'notes') {
+      this.fetchNotes(code, event.page);
+    } else if (event.type === 'statuses') {
+      this.fetchStatusesHistory(code, event.page);
+    }
   }
   // جلب الإفادات
   // this.negotiationsService.getStatements(fileId).subscribe(statements => { ... });
@@ -281,7 +335,7 @@ export class ClientFollowUp implements OnInit {
         next: () => {
           this.loading = false;
           Swal.default.fire('تم الحفظ', 'تم إضافة الإفادة بنجاح', 'success');
-          this.fetchUniversalCaseData(this.selectedPerson.code);
+          this.fetchUniversalCaseData(this.selectedPerson.id, this.selectedPerson.code);
           this.fetchCallcenterStatements(this.selectedPerson.code);
         },
         error: (err) => {
@@ -296,26 +350,30 @@ export class ClientFollowUp implements OnInit {
   // البحث عن شخص
   onClientSelected(client: any) {
     if (client) {
+      const id = client.id || client.Id;
+      const code = client.code || client.Code;
+      const cid = client.cid || client.Cid || client.nationalId;
+
       this.selectedPerson = {
-        id: client.id,
-        code: client.code?.toString() || '',
+        id: id,
+        code: code?.toString() || '',
         departmentId: client.departmentId,
-        clientName: client.name || '',
-        customerName: client.name || '',
-        nationalId: client.cid || '',
+        clientName: client.name || client.Name || '',
+        customerName: client.name || client.Name || '',
+        nationalId: cid || '',
         status: client.archive ? 'مؤرشف' : 'نشط',
-        nationality: client.nationality || '',
-        contract: client.code?.toString() || '',
+        nationality: client.nationality || client.Nationality || '',
+        contract: code?.toString() || '',
         debt: '',
         autoNumbers: '',
         batch: '',
-        address: client.address || '',
+        address: client.address || client.Address || '',
         cooperationStatus: client.cooperationStatus || '',
         contactStatus: client.contactStatus || '',
         civilStatus: client.civilStatus || '',
         internalStatus: client.internalStatus || '',
-        jobType: client.work || '',
-        incomeNotes: client.note_ || '',
+        jobType: client.work || client.Work || '',
+        incomeNotes: client.note_ || client.Note_ || '',
         classification: client.classification ? {
           ...client.classification,
           salaryDate: client.classification.salaryDate ? client.classification.salaryDate.split('T')[0] : null
@@ -324,6 +382,11 @@ export class ClientFollowUp implements OnInit {
 
       // Trigger search for related details (stats, file records, etc.)
       this.fetchAdditionalData(client);
+      
+      // Switch back to main tab to show results
+      if (this.mainContent) {
+        this.mainContent.setMainTab('main');
+      }
       console.log('Client loaded:', client);
     } else {
       this.resetAllData();

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild, SimpleChanges, OnChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, of } from 'rxjs';
 import { LookupModal } from "../../../../../../shared/components/lookup-modal/lookup-modal";
@@ -56,6 +56,7 @@ interface StatementRow {
   statementNumber: string;
   lastStatementDate: string;
   notes: string;
+  civilId?: string; // إضافة الرقم المدني للربط
   // إضافة حقل الفلتر
   filterStatus: 'statements' | 'review' | 'paid' | 'group_paid' | 'general';
 }
@@ -85,6 +86,7 @@ export class MainContent {
   toDate: string = '2025-12-02';
   statementRows: StatementRow[] = [];
   allStatementRows: StatementRow[] = [];
+  Math = Math;
   searchGeneral: string = '';
   selectedFile: any = null;
 
@@ -102,6 +104,14 @@ export class MainContent {
     address: ''
   };
 
+  // Search Statements Form
+  searchStatementsForm = {
+    civilId: '',
+    name: '',
+    fromDate: '2025-11-08',
+    toDate: '2025-12-02'
+  };
+
   familyList: string[] = [];
 
   activeMainTab: 'clients' | 'main' | 'searchNumbers' | 'menuSearch' | 'FeesAndCollection' | 'notes' | 'preview' | 'newFiles' | 'statements' | 'searchStatements' | 'stats' = 'main';
@@ -116,8 +126,7 @@ export class MainContent {
   installmentDate: string | null = null;
   reviewType: string = '';
   reviewNote: string = '';
-
-  statementDetails = {
+  statementDetails: any = {
     notes: '',
     phoneNumber: '',
     phoneOwner: '',
@@ -125,8 +134,32 @@ export class MainContent {
     nextDate: ''
   };
 
+  // Pagination for Audits
+  auditsPage: number = 1;
+  auditsPageSize: number = 5;
+  @Input() auditsTotal: number = 0;
+
+  // Pagination for Call Center Statements (File Specific)
+  statementsPage: number = 1;
+  statementsPageSize: number = 5;
+  @Input() statementsTotal: number = 0;
+
+  // Pagination for Notes
+  notesPage: number = 1;
+  notesPageSize: number = 5;
+  @Input() notesTotal: number = 0;
+
+  // Pagination for Statuses
   historyPage: number = 1;
-  historyPageSize: number = 3;
+  historyPageSize: number = 5;
+  @Input() statusesTotal: number = 0;
+
+  // Pagination for Search Statements Tab
+  searchStatementsPage: number = 1;
+  searchStatementsPageSize: number = 20;
+  searchStatementsTotal: number = 0;
+  @Output() pageChange = new EventEmitter<{ type: 'audits' | 'statements' | 'notes' | 'statuses', page: number }>();
+  @Output() loadClientRequest = new EventEmitter<any>(); // حدث جديد لتحميل ملف العميل المباشر
 
   constructor(private negotiationsService: NegotiationsService) { }
 
@@ -828,18 +861,6 @@ export class MainContent {
     });
   }
 
-  nextHistoryPage() {
-    if (this.historyPage * this.historyPageSize < (this.statuses?.length || 0)) {
-      this.historyPage++;
-    }
-  }
-
-  prevHistoryPage() {
-    if (this.historyPage > 1) {
-      this.historyPage--;
-    }
-  }
-
   splitStatus(status: string): { type: string, value: string } {
     if (!status) return { type: '---', value: '---' };
     const parts = status.split(' | ');
@@ -1051,10 +1072,9 @@ export class MainContent {
     this.audits = [];
     this.autoNumbers = [];
     this.callcenterStatements = [];
-    this.classifications = [];
-    this.statuses = [];
     this.statementRows = [];
     this.allStatementRows = [];
+    this.searchStatementsTotal = 0;
     console.log('All tables reset.');
   }
 
@@ -1089,30 +1109,169 @@ export class MainContent {
   }
 
   /**
-   * دالة عامة للبحث والفلترة
-   * تطبق الفلتر المحدد والتاريخ على البيانات
+   * دالة عامة للبحث والفلترة - الآن تتصل بالخدمة الحقيقية
    */
-  searchStatements() {
-    console.log(`Searching for: ${this.activeFilter} from ${this.fromDate} to ${this.toDate}`);
+  searchStatements(page: number = 1) {
+    this.searchStatementsPage = page;
+    this.loading = true;
+    
+    const params = {
+      cid: this.searchStatementsForm.civilId,
+      name: this.searchStatementsForm.name,
+      fromDate: this.searchStatementsForm.fromDate,
+      toDate: this.searchStatementsForm.toDate,
+      page: this.searchStatementsPage,
+      pageSize: this.searchStatementsPageSize
+    };
 
-    let filtered = this.allStatementRows;
+    console.log('Searching statements with params:', params);
 
-    // 1. فلترة حسب الحالة (التي تم تعيينها بواسطة الأزرار)
-    if (this.activeFilter !== 'general') {
-      filtered = filtered.filter(row => row.filterStatus === this.activeFilter);
-    }
-
-    // 2. فلترة حسب التاريخ (يمكنك توسيع هذا المنطق ليتعامل مع التواريخ)
-    const startDate = new Date(this.fromDate).getTime();
-    const endDate = new Date(this.toDate).getTime();
-
-    filtered = filtered.filter(row => {
-      const rowDate = new Date(row.date).getTime();
-      // منطق فلترة التاريخ الفعلي يجب أن يكون هنا
-      return rowDate >= startDate && rowDate <= endDate;
+    this.negotiationsService.searchCallcenterStatements(params).subscribe({
+      next: (res: any) => {
+        this.loading = false;
+        this.statementRows = (res.items || []).map((s: any) => ({
+          name: s.clientName || 'غير معروف',
+          date: s.dateAdded,
+          reviewDate: s.nextDate,
+          efada: s.connectedStatus,
+          employee: s.userAddedName,
+          contactMethod: s.contactMethod,
+          contactStatus: s.connectedStatus,
+          cooperationStatus: '',
+          civilStatus: '',
+          internalStatus: '',
+          depositStatus: '',
+          totalAmount: s.promiseAmount ? s.promiseAmount.toString() : '0',
+          statementNumber: s.id?.toString() || s.Id?.toString() || '',
+          lastStatementDate: s.dateAdded || s.DateAdded,
+          notes: s.notes || s.Notes,
+          civilId: s.civilID || s.civilId || s.CivilId || s.CivilID || '',
+          filterStatus: 'general'
+        }));
+        this.searchStatementsTotal = res.totalCount || res.total || 0;
+        
+        if (this.statementRows.length === 0) {
+          Swal.fire({
+            title: 'تنبيه',
+            text: 'لم يتم العثور على أي نتائج للبحث المدخل',
+            icon: 'warning',
+            confirmButtonText: 'حسناً'
+          });
+        }
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Error searching statements:', err);
+        Swal.fire('خطأ', 'فشل البحث في الإفادات', 'error');
+      }
     });
+  }
 
-    this.statementRows = filtered;
+  onAuditPageChange(page: number) {
+    this.auditsPage = page;
+    this.pageChange.emit({ type: 'audits', page: this.auditsPage });
+  }
+
+  prevAuditsPage() {
+    if (this.auditsPage > 1) {
+      this.onAuditPageChange(this.auditsPage - 1);
+    }
+  }
+
+  nextAuditsPage() {
+    if (this.auditsPage * this.auditsPageSize < this.auditsTotal) {
+      this.onAuditPageChange(this.auditsPage + 1);
+    }
+  }
+
+  onStatementPageChange(page: number) {
+    this.statementsPage = page;
+    this.pageChange.emit({ type: 'statements', page: this.statementsPage });
+  }
+
+  prevStatementsPage() {
+    if (this.statementsPage > 1) {
+      this.onStatementPageChange(this.statementsPage - 1);
+    }
+  }
+
+  nextStatementsPage() {
+    if (this.statementsPage * this.statementsPageSize < this.statementsTotal) {
+      this.onStatementPageChange(this.statementsPage + 1);
+    }
+  }
+  prevSearchStatementsPage() {
+    if (this.searchStatementsPage > 1) {
+      this.searchStatements(this.searchStatementsPage - 1);
+    }
+  }
+
+  nextSearchStatementsPage() {
+    if (this.searchStatementsPage * this.searchStatementsPageSize < this.searchStatementsTotal) {
+      this.searchStatements(this.searchStatementsPage + 1);
+    }
+  }
+
+  prevNotesPage() {
+    if (this.notesPage > 1) {
+      this.notesPage--;
+      this.pageChange.emit({ type: 'notes', page: this.notesPage });
+    }
+  }
+
+  nextNotesPage() {
+    if (this.notesPage * this.notesPageSize < this.notesTotal) {
+      this.notesPage++;
+      this.pageChange.emit({ type: 'notes', page: this.notesPage });
+    }
+  }
+
+  prevHistoryPage() {
+    if (this.historyPage > 1) {
+      this.historyPage--;
+      this.pageChange.emit({ type: 'statuses', page: this.historyPage });
+    }
+  }
+
+  nextHistoryPage() {
+    if (this.historyPage * this.historyPageSize < this.statusesTotal) {
+      this.historyPage++;
+      this.pageChange.emit({ type: 'statuses', page: this.historyPage });
+    }
+  }
+
+  /**
+   * تحميل ملف العميل بالكامل من خلال الرقم المدني الموجود في الإفادة
+   */
+  loadClientProfile(row: StatementRow) {
+    if (!row.civilId) {
+      Swal.fire('خطأ', 'لا يوجد رقم مدني مرتبط بهذه الإفادة', 'error');
+      return;
+    }
+    this.loading = true;
+    this.negotiationsService.search(row.civilId).subscribe({
+      next: (results: any[]) => {
+        this.loading = false;
+        if (results && results.length > 0) {
+          // نطلب من المكون الأب تحميل هذا العميل
+          this.loadClientRequest.emit(results[0]);
+          Swal.fire({
+            title: 'تم التحميل',
+            text: `تم تحميل ملف: ${row.name} بنجاح`,
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        } else {
+          Swal.fire('تنبيه', 'لم يتم العثور على الملف الرئيسي لهذا المدني', 'warning');
+        }
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Error loading client profile:', err);
+        Swal.fire('خطأ', 'فشل تحميل الملف', 'error');
+      }
+    });
   }
 
   /**
@@ -1241,10 +1400,19 @@ export class MainContent {
     console.log('Selected file:', row);
   }
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
     // If clientRows changes and we don't have a selected file, select the first one
-    if (this.clientRows && this.clientRows.length > 0 && !this.selectedFile) {
-      this.selectedFile = this.clientRows[0];
+    if (changes['clientRows'] && this.clientRows && this.clientRows.length > 0) {
+      if (!this.selectedFile || !this.clientRows.find(x => x.id === this.selectedFile.id)) {
+        this.selectedFile = this.clientRows[0];
+      }
+    }
+
+    // Reset internal selection if selectedPerson changes (meaning a new client was loaded)
+    if (changes['selectedPerson'] && changes['selectedPerson'].currentValue) {
+      this.selectedFile = null;
+      // Optionally reset tabs to first tab
+      // this.activeSubTab = 'main';
     }
   }
 }
