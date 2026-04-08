@@ -82,7 +82,7 @@ public class MainfileRepository : BaseRepository<Mainfile>, IMainfileRepository
     public async Task<IEnumerable<Mainfile>> SearchAsync(string searchTerm)
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
-            return await GetMainfilesWithStatuses().ToListAsync();
+            return Enumerable.Empty<Mainfile>();
 
         bool isNumeric = int.TryParse(searchTerm, out int searchCode);
 
@@ -92,6 +92,7 @@ public class MainfileRepository : BaseRepository<Mainfile>, IMainfileRepository
                         (isNumeric && m.Code == searchCode))
             .OrderByDescending(m => isNumeric && m.Code == searchCode)
             .ThenByDescending(m => m.Cid == searchTerm)
+            .Take(50)
             .ToListAsync();
     }
     public async Task<IEnumerable<ClientDto>> GetAllClientsOptimizedAsync()

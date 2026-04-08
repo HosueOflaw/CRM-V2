@@ -15,10 +15,10 @@ public class FileStatus
   [Column("status")]
   public string Status { get; set; }
 
-  [Column("user_id")]
+  [NotMapped]
   public int? UserId { get; set; }
 
-  [Column("user_name")]
+  [NotMapped]
   public string UserName { get; set; }
 
   [Column("date_added")]

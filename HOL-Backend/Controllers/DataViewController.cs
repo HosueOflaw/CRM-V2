@@ -454,25 +454,29 @@ public class DataViewController : ControllerBase
 
   // GET: api/DataView/files/{fileCode}/audits
   [HttpGet("files/{fileCode}/audits")]
-  public async Task<IActionResult> GetAudits(long fileCode)
+  public async Task<IActionResult> GetAudits(long fileCode, [FromQuery] int page = 1, [FromQuery] int pageSize = 5)
   {
-    var audits = await (from a in _context.AuditsFiles.AsNoTracking()
-                        where a.FileCode == fileCode
-                        join u in _context.Users.AsNoTracking() on a.UserId equals u.Id into uJoin
-                        from u in uJoin.DefaultIfEmpty()
-                        orderby a.ActionDate descending
-                        select new AuditsFileDto
-                        {
-                          Id = a.Id,
-                          FileCode = a.FileCode,
-                          Action = a.Action,
-                          Description = a.Description,
-                          PreviousState = a.PreviousState,
-                          CurrentState = a.CurrentState,
-                          UserName = u != null ? u.FullName : a.UserCode,
-                          ActionDate = a.ActionDate
-                        }).ToListAsync();
-    return Ok(audits);
+    var query = from a in _context.AuditsFiles.AsNoTracking()
+                where a.FileCode == fileCode
+                join u in _context.Users.AsNoTracking() on a.UserId equals u.Id into uJoin
+                from u in uJoin.DefaultIfEmpty()
+                orderby a.ActionDate descending
+                select new AuditsFileDto
+                {
+                  Id = a.Id,
+                  FileCode = a.FileCode,
+                  Action = a.Action,
+                  Description = a.Description,
+                  PreviousState = a.PreviousState,
+                  CurrentState = a.CurrentState,
+                  UserName = u != null ? u.FullName : a.UserCode,
+                  ActionDate = a.ActionDate
+                };
+
+    var total = await query.CountAsync();
+    var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+    return Ok(new { total, items, page, pageSize });
   }
 
   // GET: api/DataView/files/{fileCode}/auto-numbers
@@ -633,30 +637,106 @@ public class DataViewController : ControllerBase
 
   // GET: api/DataView/files/{fileCode}/callcenter-statements
   [HttpGet("files/{fileCode}/callcenter-statements")]
-  public async Task<IActionResult> GetCallcenterStatements(long fileCode)
+  public async Task<IActionResult> GetCallcenterStatements(long fileCode, [FromQuery] int page = 1, [FromQuery] int pageSize = 5)
   {
-    var statements = await (from s in _context.Set<CallcenterStatement>().AsNoTracking()
-                            where s.FileCode == fileCode
-                            join u in _context.Users.AsNoTracking() on s.UserAdded equals u.Id into uJoin
-                            from u in uJoin.DefaultIfEmpty()
-                            orderby s.DateAdded descending
-                            select new CallcenterStatementDto
-                            {
-                              Id = s.Id,
-                              FileCode = s.FileCode,
-                              DeptCode = s.DeptCode,
-                              DateAdded = s.DateAdded,
-                              Notes = s.Notes,
-                              ContactMethod = s.ContactMethod,
-                              ConnectedStatus = s.ConnectedStatus,
-                              PhoneNumber = s.PhoneNumber,
-                              PhoneOwner = s.PhoneOwner,
-                              NextAction = s.NextAction,
-                              NextDate = s.NextDate,
-                              PromiseAmount = s.PromiseAmount,
-                              UserAddedName = u != null ? u.FullName : "System"
-                            }).ToListAsync();
-    return Ok(statements);
+    var query = from s in _context.Set<CallcenterStatement>().AsNoTracking()
+                where s.FileCode == fileCode
+                join u in _context.Users.AsNoTracking() on s.UserAdded equals u.Id into uJoin
+                from u in uJoin.DefaultIfEmpty()
+                orderby s.DateAdded descending
+                select new CallcenterStatementDto
+                {
+                  Id = s.Id,
+                  FileCode = s.FileCode,
+                  DeptCode = s.DeptCode,
+                  DateAdded = s.DateAdded,
+                  Notes = s.Notes,
+                  ContactMethod = s.ContactMethod,
+                  ConnectedStatus = s.ConnectedStatus,
+                  PhoneNumber = s.PhoneNumber,
+                  PhoneOwner = s.PhoneOwner,
+                  NextAction = s.NextAction,
+                  NextDate = s.NextDate,
+                  PromiseAmount = s.PromiseAmount,
+                  UserAddedName = u != null ? u.FullName : "System"
+                };
+
+    var total = await query.CountAsync();
+    var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+    return Ok(new { total, items, page, pageSize });
+  }
+
+  [HttpGet("callcenter-statements/search")]
+  public async Task<IActionResult> SearchCallcenterStatements(
+    [FromQuery] string cid,
+    [FromQuery] string name,
+    [FromQuery] DateTime? fromDate,
+    [FromQuery] DateTime? toDate,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 20)
+  {
+    var query = from s in _context.Set<CallcenterStatement>().AsNoTracking()
+                join m in _context.Mainfiles.AsNoTracking() on s.FileCode equals m.Id into mJoin
+                from m in mJoin.DefaultIfEmpty()
+                join c in _context.Clients.AsNoTracking() on (m != null ? m.Cid : null) equals c.Cid into cJoin
+                from c in cJoin.DefaultIfEmpty()
+                join u in _context.Users.AsNoTracking() on s.UserAdded equals u.Id into uJoin
+                from u in uJoin.DefaultIfEmpty()
+                select new
+                {
+                  Statement = s,
+                  ClientName = m != null ? m.Name : (c != null ? c.Name : "غير معروف"),
+                  CivilId = m != null ? m.Cid : (c != null ? c.Cid : null),
+                  UserName = u != null ? u.FullName : "System"
+                };
+
+    if (!string.IsNullOrEmpty(cid))
+    {
+      query = query.Where(x => x.CivilId == cid || x.Statement.FileCode.ToString() == cid);
+    }
+
+    if (!string.IsNullOrEmpty(name))
+    {
+      query = query.Where(x => x.ClientName.Contains(name));
+    }
+
+    if (fromDate.HasValue)
+    {
+      query = query.Where(x => x.Statement.DateAdded >= fromDate.Value);
+    }
+
+    if (toDate.HasValue)
+    {
+      query = query.Where(x => x.Statement.DateAdded <= toDate.Value);
+    }
+
+    var total = await query.CountAsync();
+    var items = await query
+      .OrderByDescending(x => x.Statement.DateAdded)
+      .Skip((page - 1) * pageSize)
+      .Take(pageSize)
+      .Select(x => new CallcenterStatementDto
+      {
+        Id = x.Statement.Id,
+        FileCode = x.Statement.FileCode,
+        DeptCode = x.Statement.DeptCode,
+        DateAdded = x.Statement.DateAdded,
+        Notes = x.Statement.Notes,
+        ContactMethod = x.Statement.ContactMethod,
+        ConnectedStatus = x.Statement.ConnectedStatus,
+        PhoneNumber = x.Statement.PhoneNumber,
+        PhoneOwner = x.Statement.PhoneOwner,
+        NextAction = x.Statement.NextAction,
+        NextDate = x.Statement.NextDate,
+        PromiseAmount = x.Statement.PromiseAmount,
+        UserAddedName = x.UserName,
+        ClientName = x.ClientName,
+        CivilID = x.CivilId ?? ""
+      })
+      .ToListAsync();
+
+    return Ok(new { total, items, page, pageSize });
   }
 
   // POST: api/DataView/files/callcenter-statements
@@ -677,17 +757,24 @@ public class DataViewController : ControllerBase
   }
 
   [HttpGet("files/{fileCode}/statuses")]
-  public async Task<IActionResult> GetStatuses(long fileCode)
+  public async Task<IActionResult> GetStatuses(long fileCode, [FromQuery] int page = 1, [FromQuery] int pageSize = 5)
   {
-    var list = await _context.FileStatuses.AsNoTracking()
-        .Where(c => c.FileCode == fileCode)
+    var query = _context.FileStatuses.AsNoTracking()
+        .Where(c => c.FileCode == fileCode);
+
+    var total = await query.CountAsync();
+    var items = await query
+        .OrderByDescending(c => c.DateAdded)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
         .Select(c => new FileStatusDto
         {
           Id = c.Id,
           Status = c.Status,
           DateAdded = c.DateAdded
         }).ToListAsync();
-    return Ok(list);
+
+    return Ok(new { total, items, page, pageSize });
   }
 
   // GET: api/DataView/mainfiles/{id}/autonumbers
@@ -1291,15 +1378,20 @@ public class DataViewController : ControllerBase
 
   // GET: api/DataView/mainfiles/{id}/notes
   [HttpGet("mainfiles/{id}/notes")]
-  public async Task<IActionResult> GetMainfileNotes(long id)
+  public async Task<IActionResult> GetMainfileNotes(long id, [FromQuery] int page = 1, [FromQuery] int pageSize = 5)
   {
-    var notes = await _context.Notes
+    var query = _context.Notes
         .AsNoTracking()
-        .Where(n => n.FileCode == id)
+        .Where(n => n.FileCode == id);
+
+    var total = await query.CountAsync();
+    var items = await query
         .OrderByDescending(n => n.DateAdded)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
         .ToListAsync();
 
-    return Ok(notes);
+    return Ok(new { total, items, page, pageSize });
   }
 
   // GET: api/DataView/notes/{id}

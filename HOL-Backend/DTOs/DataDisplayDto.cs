@@ -196,6 +196,8 @@ public class CallcenterStatementDto
     public DateTime? NextDate { get; set; }
     public decimal? PromiseAmount { get; set; }
     public string UserAddedName { get; set; } = string.Empty;
+    public string ClientName { get; set; } = string.Empty;
+    public string CivilID { get; set; } = string.Empty;
 }
 
 public class DashboardStatsDto

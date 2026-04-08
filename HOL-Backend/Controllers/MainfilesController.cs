@@ -38,13 +38,14 @@ public class MainfilesController : ControllerBase
         var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
         _logger.LogInformation("GetMainfiles called from IP: {Ip}", clientIp);
 
-        if (!string.IsNullOrEmpty(search))
+        if (!string.IsNullOrWhiteSpace(search))
         {
             var results = await _repository.SearchAsync(search);
             return Ok(results);
         }
 
-        var mainfiles = await _repository.GetAllAsync();
+        // Return empty list or limited recent files to avoid fetching the entire database
+        var mainfiles = (await _repository.GetAllAsync()).OrderByDescending(m => m.Id).Take(20);
         return Ok(mainfiles);
     }
 
