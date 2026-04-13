@@ -74,4 +74,10 @@ public class FileClassification
 
   [Column("income_notes")]
   public string IncomeNotes { get; set; }
+
+  [Column("communication_language_id")]
+  public int? CommunicationLanguageId { get; set; }
+
+  [Column("gender_id")]
+  public int? GenderId { get; set; }
 }

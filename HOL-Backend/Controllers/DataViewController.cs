@@ -804,7 +804,39 @@ public class DataViewController : ControllerBase
     return Ok(autonumbers);
   }
 
-  // PUT: api/DataView/mainfiles/{id}
+  // GET: api/DataView/files/{fileCode}/dashboard-stats
+  [HttpGet("files/{fileCode}/dashboard-stats")]
+  public async Task<IActionResult> GetFileDashboardStats(long fileCode)
+  {
+    // Get total clients related to this file code/id
+    // Normally, mainfile details count represents the clients (debtors/plaintiffs)
+    var clientsCount = await _context.FileDetails.CountAsync(d => d.FileCode == fileCode);
+
+    // If FileDetails is 0, we can fallback to checking by ID if they differ (in older tables FileCode holds the PK Id)
+    if (clientsCount == 0 && int.TryParse(fileCode.ToString(), out int id)) {
+       clientsCount = await _context.FileDetails.CountAsync(d => d.FileCode == id);
+    }
+    
+    // Fallback: at least 1 if the main file exists
+    if (clientsCount == 0) clientsCount = 1;
+
+    var today = DateTime.UtcNow.Date;
+    var startOfMonth = new DateTime(today.Year, today.Month, 1);
+
+    var statementsQuery = _context.CallcenterStatements.Where(s => s.FileCode == fileCode);
+    
+    var totalStatements = await statementsQuery.CountAsync();
+    var todayStatements = await statementsQuery.CountAsync(s => s.DateAdded != null && s.DateAdded.Value.Date == today);
+    var monthStatements = await statementsQuery.CountAsync(s => s.DateAdded != null && s.DateAdded.Value.Date >= startOfMonth);
+
+    return Ok(new
+    {
+      totalClients = clientsCount,
+      totalStatements = totalStatements,
+      todayStatements = todayStatements,
+      monthStatements = monthStatements
+    });
+  }
   [HttpPut("mainfiles/{id}")]
   public async Task<IActionResult> UpdateMainfile(long id, [FromBody] MainfileDto dto)
   {

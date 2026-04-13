@@ -90,6 +90,11 @@ public class Mainfile
   [NotMapped]
   public string FollowUpStatus { get; set; }
 
+  [NotMapped]
+  public string CommunicationLanguage { get; set; }
+  [NotMapped]
+  public string Gender { get; set; }
+
   // New Navigation Property
   [NotMapped]
   public virtual FileClassification Classification { get; set; }

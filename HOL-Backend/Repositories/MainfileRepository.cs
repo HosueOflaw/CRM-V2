@@ -20,6 +20,8 @@ public class MainfileRepository : BaseRepository<Mainfile>, IMainfileRepository
                join fls in _context.LookupValues on (fc != null ? fc.FileStatusId : null) equals fls.Id into flsJoin from fls in flsJoin.DefaultIfEmpty()
                join act in _context.LookupValues on (fc != null ? fc.ActionStatusId : null) equals act.Id into actJoin from act in actJoin.DefaultIfEmpty()
                join fup in _context.LookupValues on (fc != null ? fc.FollowUpStatusId : null) equals fup.Id into fupJoin from fup in fupJoin.DefaultIfEmpty()
+               join lang in _context.LookupValues on (fc != null ? fc.CommunicationLanguageId : null) equals lang.Id into langJoin from lang in langJoin.DefaultIfEmpty()
+               join gen in _context.LookupValues on (fc != null ? fc.GenderId : null) equals gen.Id into genJoin from gen in genJoin.DefaultIfEmpty()
                select new Mainfile
                {
                    Id = m.Id,
@@ -54,6 +56,8 @@ public class MainfileRepository : BaseRepository<Mainfile>, IMainfileRepository
                    FileStatus = fls != null ? fls.Name : null,
                    ActionStatus = act != null ? act.Name : null,
                    FollowUpStatus = fup != null ? fup.Name : null,
+                   CommunicationLanguage = lang != null ? lang.Name : null,
+                   Gender = gen != null ? gen.Name : null,
 
                    Classification = fc
                };

@@ -236,6 +236,16 @@ public class MainfilesController : ControllerBase
                 classification.ActionStatusId = request.NewValueId;
                 newValue = request.NewValueId;
                 break;
+            case "comms_lang":
+                previousValue = classification.CommunicationLanguageId;
+                classification.CommunicationLanguageId = request.NewValueId;
+                newValue = request.NewValueId;
+                break;
+            case "gender":
+                previousValue = classification.GenderId;
+                classification.GenderId = request.NewValueId;
+                newValue = request.NewValueId;
+                break;
             case "followup":
                 previousValue = classification.FollowUpStatusId;
                 classification.FollowUpStatusId = request.NewValueId;
@@ -321,6 +331,8 @@ public class MainfilesController : ControllerBase
             "civil" => "حالة مدنية",
             "contact" => "حالة تواصل",
             "cooperation" => "حالة تعاون",
+            "comms_lang" => "لغة التواصل",
+            "gender" => "النوع",
             "discount" => "الخصم",
             "acceptance" => "القبول",
             "salarydate" => "تاريخ الراتب",
@@ -331,23 +343,39 @@ public class MainfilesController : ControllerBase
         };
 
         // UI-Friendly Value (Fallback)
-        string newValueDisplay = request.NewValueText ?? newValue?.ToString() ?? "---";
+        string newValueDisplay = request.NewValueText ?? newValue?.ToString() ?? "غير محدد";
+        string previousValueDisplay = previousValue?.ToString() ?? "غير محدد";
 
-        // Audit Log
-        string description = $"تعديل حالة {fieldLabel}: من {previousValue ?? "N/A"} إلى {newValueDisplay}";
-        await _auditService.LogActionAsync(existing.Code, null, "UPDATE_STATUS", description, previousValue, "Mainfile", existing.Id.ToString(), existing.DateAdded, DateTime.UtcNow, userId);
-
-        // Formatted Status for History Table (Type | NewValue)
-        string historyStatus = $"{fieldLabel} | {newValueDisplay}";
-
-        // Insert into FileStatuses History Table
-        var historyEntry = new FileStatus
+        // Use the resolved pristine names to bypass corrupted Database LookupValues mojibake
+        var lookupFields = new[] { "client", "claim", "payment", "file", "action", "followup", "internal", "civil", "contact", "cooperation", "comms_lang", "gender" };
+        if (lookupFields.Contains(fieldName))
         {
-            FileCode = existing.Id,
-            Status = historyStatus,
-            DateAdded = DateTime.UtcNow
-        };
-        _context.FileStatuses.Add(historyEntry);
+            if (previousValue is int prevId)
+                previousValueDisplay = GetLookupTranslation(fieldName, prevId);
+            
+            if (newValue is int newId)
+                newValueDisplay = GetLookupTranslation(fieldName, newId);
+        }
+
+        // Only log if the value actually changed (avoids spam from unmodified 'code' or 'file_code')
+        if (previousValue == null || newValue == null || !previousValue.Equals(newValue))
+        {
+            // Audit Log
+            string description = $"تعديل حالة {fieldLabel}: من {previousValueDisplay} إلى {newValueDisplay}";
+            await _auditService.LogActionAsync(existing.Code, null, "UPDATE_STATUS", description, previousValueDisplay, "Mainfile", existing.Id.ToString(), existing.DateAdded, DateTime.UtcNow, userId);
+
+            // Formatted Status for History Table (Type | NewValue)
+            string historyStatus = $"{fieldLabel} | {newValueDisplay}";
+
+            // Insert into FileStatuses History Table
+            var historyEntry = new FileStatus
+            {
+                FileCode = existing.Id,
+                Status = historyStatus,
+                DateAdded = DateTime.UtcNow
+            };
+            _context.FileStatuses.Add(historyEntry);
+        }
 
         try {
             await _repository.UpdateAsync(existing);
@@ -358,5 +386,24 @@ public class MainfilesController : ControllerBase
         }
 
         return Ok(new { message = "Status updated successfully", field = request.Field, newValue = newValueDisplay });
+    }
+
+    private string GetLookupTranslation(string fieldName, int id)
+    {
+        return fieldName switch
+        {
+            "client" => id switch { 1 => "غير مصنف", 2 => "مدني خطا", 3 => "نشط", 4 => "مسجون", 5 => "وفاه", 6 => "مغادر نهائي", 7 => "سداد المحكمة", 8 => "سداد شركة", 9 => "سداد مندوب مكتب", _ => id.ToString() },
+            "claim" => id switch { 1 => "غير مصنف", 2 => "حفظ", 3 => "حفظ مؤقت في المكتب", 4 => "حفظ مؤقت في الشركة", 5 => "سداد محكمة", 6 => "سحب اداري", 7 => "وقف", 8 => "سداد قبل التحويل", 9 => "سداد بمعرفة الشركة", _ => id.ToString() },
+            "file" => id switch { 1 => "غير مصنف", 2 => "ودي", 3 => "قضائي", _ => id.ToString() },
+            "action" => id switch { 1 => "غير مصنف", 2 => "اونلاين", 3 => "رسوم", 4 => "تنفيذ", 5 => "تنفيذ جديد 1", 6 => "مرفوض مرة", 7 => "مرفوض مرتين", 8 => "مرفوض اكثر من مرتين", 9 => "مرفوض فوق 1000", 10 => "جلسات", 11 => "رفض الدعوى بحالتها", 12 => "تم التسليم للمتداول", 13 => "الغاء الحكم بالتظلم", 14 => "قيد الرفع", 15 => "اعادة الرفع", _ => id.ToString() },
+            "interior" => id switch { 1 => "غير مصنف", 2 => "غير مخالف", 3 => "في قائمة الممنوعين", 4 => "مخالف اقامة", 5 => "هجرة", 6 => "خارج البلاد", _ => id.ToString() },
+            "internal" => id switch { 1 => "غير مصنف", 2 => "غير مخالف", 3 => "في قائمة الممنوعين", 4 => "مخالف اقامة", 5 => "هجرة", 6 => "خارج البلاد", _ => id.ToString() },
+            "civil" => id switch { 1 => "غير مصنف", 2 => "صالحة", 3 => "منتهية", 4 => "لاغية", 5 => "يتعذر", 6 => "غير نشط", 7 => "وفاة", _ => id.ToString() },
+            "contact" => id switch { 1 => "غير مصنف", 2 => "مع العميل", 3 => "غير متواصل", 4 => "لا يمكن التواصل", 5 => "مع اخر", 6 => "مع العميل واخر", _ => id.ToString() },
+            "cooperation" => id switch { 1 => "غير مصنف", 2 => "وعد بالسداد", 3 => "تقسيط", 4 => "متعاون", 5 => "غير متعاون", 6 => "مماطل", 7 => "متردد", 8 => "غير قادر", 9 => "وعد ضعيف", 10 => "وعد قوي", 11 => "رافض السداد", 12 => "لم نصل اليه", _ => id.ToString() },
+            "comms_lang" => id switch { 1 => "غير مصنف", 2 => "عربي", 3 => "إنجليزي", 4 => "أوردو", 5 => "هندي", 6 => "تاغالوغ", _ => id.ToString() },
+            "gender" => id switch { 1 => "غير مصنف", 2 => "ذكر", 3 => "أنثى", _ => id.ToString() },
+            _ => id.ToString()
+        };
     }
 }
