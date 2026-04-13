@@ -14,10 +14,11 @@
     <app-main-content [selectedPerson]="selectedPerson" [financialData]="financial" [clientRows]="clientRows"
       [attachments]="attachments" [payments]="payments" [additionalAmounts]="additionalAmounts" [audits]="audits"
       [autoNumbers]="autoNumbers" [callcenterStatements]="callcenterStatements" [classifications]="classifications"
-      [statuses]="statuses" [numbers]="contacts" [notes]="notes"
-      [notesTotal]="notesTotal" [statusesTotal]="statusesTotal" [auditsTotal]="auditsTotal" [statementsTotal]="statementsTotal"
-      (contactAdded)="fetchContactsOnly()" (statementSaved)="saveStatement($event)" (statusChanged)="handleStatusChanged()"
-      (loadClientRequest)="onClientSelected($event)" (pageChange)="handlePageChange($event)">
+      [statuses]="statuses" [numbers]="contacts" [notes]="notes" [notesTotal]="notesTotal"
+      [statusesTotal]="statusesTotal" [auditsTotal]="auditsTotal" [statementsTotal]="statementsTotal"
+      (contactAdded)="fetchContactsOnly()" (statementSaved)="saveStatement($event)"
+      (statusChanged)="handleStatusChanged()" (loadClientRequest)="onClientSelected($event)"
+      (pageChange)="handlePageChange($event)">
     </app-main-content>
   </div>
 </div>

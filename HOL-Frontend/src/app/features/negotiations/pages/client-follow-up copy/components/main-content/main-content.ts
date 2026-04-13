@@ -194,8 +194,11 @@ export class MainContent {
     interior: [],
     civil: [],
     contact: [],
-    cooperation: []
+    cooperation: [],
+    comms_lang: [],
+    gender: []
   };
+
 
   submitPromiseToPay() {
     let resultText = 'وعد بالسداد';
@@ -229,9 +232,19 @@ export class MainContent {
     if (modal) modal.close();
   }
   activeSubTabLower: string = 'notes';
+  paymentForm = {
+    code: '',
+    name: '',
+    amount: 0,
+    civilId: '',
+    phone: '',
+    claimant: '',
+    whatsapp: '',
+    message: '',
+    language: 'arabic' as 'arabic' | 'english',
+    type: 'company' as 'company' | 'office'
+  };
   companyLink: string = '';
-  officeLink: string = 'https://office-link.com';
-  defaultCompanyLink: string = 'https://company-link.com';
   whatsAppNumber: string = '';
   activeNoteTab = 1;
 
@@ -289,32 +302,67 @@ export class MainContent {
   }
 
   setOfficeLink() {
-    this.companyLink = this.officeLink;
+    this.populatePaymentForm('office');
   }
 
   setCompanyLink() {
-    this.companyLink = this.defaultCompanyLink;
+    this.populatePaymentForm('company');
   }
 
-  saveSearchNumber() { console.log('Saving search entry:', this.searchNumbersForm); }
+  populatePaymentForm(type: 'company' | 'office') {
+    this.paymentForm.type = type;
+    this.paymentForm.code = this.selectedFile?.code || '';
+    this.paymentForm.name = this.selectedPerson?.customerName || '';
+    this.paymentForm.civilId = this.selectedPerson?.nationalId || '';
+    this.paymentForm.phone = this.selectedPerson?.phone || '';
+    this.paymentForm.claimant = this.selectedFile?.client || '';
+    this.paymentForm.amount = this.selectedFile?.remaining || 0;
+    this.paymentForm.whatsapp = this.selectedPerson?.phone || '';
+    
+    this.generateLink();
+    this.activeSubTab = 'companyLink';
+  }
 
+  generateLink() {
+    const baseUrl = this.paymentForm.type === 'office' 
+      ? 'https://pay.houseoflaw.com/office' 
+      : 'https://pay.houseoflaw.com/company';
+    
+    const langParam = this.paymentForm.language === 'english' ? '&lang=en' : '';
+    const amountParam = this.paymentForm.amount > 0 ? `&amount=${this.paymentForm.amount}` : '';
+    
+    this.companyLink = `${baseUrl}?code=${this.paymentForm.code}${amountParam}${langParam}`;
+    this.updatePaymentMessage();
+  }
+
+  updatePaymentMessage() {
+    const lang = this.paymentForm.language;
+    if (lang === 'arabic') {
+      this.paymentForm.message = `السادة المحترمين، يرجى سداد مبلغ (${this.paymentForm.amount}) د.ك المتبقي على ملفكم رقم ${this.paymentForm.code} من خلال الرابط التالي: ${this.companyLink}`;
+    } else {
+      this.paymentForm.message = `Dear customer, please pay the remaining amount (${this.paymentForm.amount}) KWD for your file #${this.paymentForm.code} via the following link: ${this.companyLink}`;
+    }
+  }
 
   copyLink() {
     navigator.clipboard.writeText(this.companyLink).then(() => {
-      alert('تم نسخ الرابط');
+      Swal.fire({
+        title: 'تم النسخ',
+        text: 'تم نسخ الرابط بنجاح',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
     });
   }
 
   sendWhatsApp() {
-    if (!this.whatsAppNumber || !this.companyLink) {
-      alert('الرجاء إدخال الرقم والرابط');
+    if (!this.paymentForm.whatsapp || !this.companyLink) {
+      Swal.fire('تنبيه', 'الرجاء التأكد من رقم الواتساب والرابط', 'warning');
       return;
     }
 
-    const url =
-      `https://wa.me/${this.whatsAppNumber}?text=` +
-      encodeURIComponent(`رابط الدفع: ${this.companyLink}`);
-
+    const url = `https://wa.me/${this.paymentForm.whatsapp}?text=${encodeURIComponent(this.paymentForm.message)}`;
     window.open(url, '_blank');
   }
 
@@ -347,7 +395,7 @@ export class MainContent {
     ];
 
     this.allStatementRows = this.generateMockStatements();
-    this.searchStatements(); // البحث الأولي
+    this.searchStatements(1, false); // البحث الأولي بدون عرض تنبيه الانعدام
     this.fetchAllLookups();
   }
 
@@ -362,7 +410,9 @@ export class MainContent {
       { key: 'interior', type: 'INTERNAL' },
       { key: 'civil', type: 'CIVIL' },
       { key: 'contact', type: 'CONTACT' },
-      { key: 'cooperation', type: 'COOPERATION' }
+      { key: 'cooperation', type: 'COOPERATION' },
+      { key: 'comms_lang', type: 'COMMS_LANG' },
+      { key: 'gender', type: 'GENDER' }
     ];
 
     types.forEach(item => {
@@ -465,6 +515,21 @@ export class MainContent {
           { id: 11, name: 'رافض السداد' },
           { id: 12, name: 'لم نصل اليه' }
         ];
+      } else if (item.key === 'comms_lang') {
+        this.lookupLists.comms_lang = [
+          { id: 1, name: 'غير مصنف' },
+          { id: 2, name: 'عربي' },
+          { id: 3, name: 'إنجليزي' },
+          { id: 4, name: 'أوردو' },
+          { id: 5, name: 'هندي' },
+          { id: 6, name: 'تاغالوغ' }
+        ];
+      } else if (item.key === 'gender') {
+        this.lookupLists.gender = [
+          { id: 1, name: 'غير مصنف' },
+          { id: 2, name: 'ذكر' },
+          { id: 3, name: 'أنثى' }
+        ];
       } else {
         (this.negotiationsService as any).getLookups(item.type).subscribe({
           next: (data: any[]) => {
@@ -515,7 +580,10 @@ export class MainContent {
 
   activeTab: 'numbers' | 'add' = 'numbers';
 
-  activeSubTab: 'main' | 'files' | 'payments' | 'legal' | 'attachments' | 'history' | 'callcenter' | 'classification' = 'main';
+  activeSubTab: 'main' | 'files' | 'payments' | 'legal' | 'attachments' | 'history' | 'callcenter' | 'classification' | 'totalFiles' | 'companyLink' | 'checks' = 'main';
+
+
+
 
   @Input() numbers: any[] = [];
 
@@ -634,10 +702,12 @@ export class MainContent {
         fileStatusId: null, actionStatusId: null, followUpStatusId: null,
         internalStatusId: null, civilStatusId: null,
         cooperationStatusId: null, contactStatusId: null,
+        communicationLanguageId: null, genderId: null,
         discount: null, acceptance: '', salaryDate: null, incomeNotes: ''
       };
     }
   }
+
 
   changeTab(tab: typeof this.activeSubTab) {
     this.activeSubTab = tab;
@@ -686,6 +756,8 @@ export class MainContent {
       case 'file': type = 'FILE_STATUS'; break;
       case 'action': type = 'ACTION_STATUS'; break;
       case 'followup': type = 'FOLLOWUP_STATUS'; break;
+      case 'comms_lang': type = 'COMMS_LANG'; break;
+      case 'gender': type = 'GENDER'; break;
       default: return;
     }
 
@@ -721,7 +793,7 @@ export class MainContent {
       next: (res: any) => {
         this.loading = false;
         this.statusChanged.emit(); // Notify parent to refresh history
-        
+
         // Update local state display names if available
         const fieldKey = field.toLowerCase();
 
@@ -743,6 +815,33 @@ export class MainContent {
         if (fieldKey === 'file') this.selectedPerson.fileStatus = name;
         if (fieldKey === 'action') this.selectedPerson.actionStatus = name;
         if (fieldKey === 'followup') this.selectedPerson.followUpStatus = name;
+        if (fieldKey === 'comms_lang') this.selectedPerson.communicationLanguage = name;
+        if (fieldKey === 'gender') this.selectedPerson.gender = name;
+
+        // Sync change with clientRows for the "Clients" tab table
+        if (this.clientRows && this.clientRows.length > 0) {
+          this.clientRows = this.clientRows.map(row => ({
+            ...row,
+            cooperationStatus: this.selectedPerson.cooperationStatus,
+            contactStatus: this.selectedPerson.contactStatus,
+            civilStatus: this.selectedPerson.civilStatus,
+            internalStatus: this.selectedPerson.internalStatus,
+            clientStatus: this.selectedPerson.clientStatus,
+            followUpStatus: this.selectedPerson.followUpStatus,
+            fileStatus: this.selectedPerson.fileStatus
+          }));
+        }
+
+
+        // Update secondary classification object IDs
+        if (this.selectedPerson.classification) {
+          const map: any = {
+            'comms_lang': 'communicationLanguageId',
+            'gender': 'genderId'
+          };
+          if (map[fieldKey]) this.selectedPerson.classification[map[fieldKey]] = item.id;
+        }
+
 
         Swal.fire({
           title: 'تم التحديث',
@@ -1111,10 +1210,10 @@ export class MainContent {
   /**
    * دالة عامة للبحث والفلترة - الآن تتصل بالخدمة الحقيقية
    */
-  searchStatements(page: number = 1) {
+  searchStatements(page: number = 1, showWarningIfEmpty: boolean = true) {
     this.searchStatementsPage = page;
     this.loading = true;
-    
+
     const params = {
       cid: this.searchStatementsForm.civilId,
       name: this.searchStatementsForm.name,
@@ -1149,8 +1248,8 @@ export class MainContent {
           filterStatus: 'general'
         }));
         this.searchStatementsTotal = res.totalCount || res.total || 0;
-        
-        if (this.statementRows.length === 0) {
+
+        if (this.statementRows.length === 0 && showWarningIfEmpty) {
           Swal.fire({
             title: 'تنبيه',
             text: 'لم يتم العثور على أي نتائج للبحث المدخل',
@@ -1415,4 +1514,17 @@ export class MainContent {
       // this.activeSubTab = 'main';
     }
   }
+
+  // Getters for Total Files Summary
+  get totals() {
+    return {
+      claimAll: this.clientRows.reduce((sum, r) => sum + (r.claim || 0), 0),
+      paidAll: this.clientRows.reduce((sum, r) => sum + (r.paid || 0), 0),
+      remainingAll: this.clientRows.reduce((sum, r) => sum + (r.remaining || 0), 0),
+      feesAll: (this.financialData?.fees || 0) + (this.financialData?.lawFees || 0),
+      proceduresAll: this.auditsTotal || 0
+    };
+  }
 }
+
+

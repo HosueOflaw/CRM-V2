@@ -47,7 +47,7 @@ export class ClientFollowUp implements OnInit {
   payments: any[] = [];
   contacts: any[] = [];
   notes: any[] = [];
-  
+
   auditsTotal = 0;
   statementsTotal = 0;
   notesTotal = 0;
@@ -103,11 +103,11 @@ export class ClientFollowUp implements OnInit {
   }
 
   ngOnInit() {
-    this.fetchDashboardStats();
+    // Stats are now fetched dynamically per-client
   }
 
-  fetchDashboardStats() {
-    this.negotiationsService.getDashboardStats().subscribe(stats => {
+  fetchDashboardStats(fileCode: number) {
+    this.negotiationsService.getDashboardStats(fileCode).subscribe(stats => {
       this.dashboardStats = stats;
     });
   }
@@ -124,20 +124,31 @@ export class ClientFollowUp implements OnInit {
 
     const mainfileId = mainfile.id || mainfile.Id;
     const fileCode = mainfile.code || mainfile.Code;
+    const classificationName = mainfile.classification?.classification || '';
 
     console.log(`جاري جلب البيانات المرتبطة للكود: ${fileCode} والمعرف: ${mainfileId}`);
+
+    // Fetch Dashboard Stats specifically for this file
+    this.fetchDashboardStats(fileCode);
 
     // 1. جلب تفاصيل المديونيات (بحث عن طريق معرف المين فايل)
     this.negotiationsService.getFileDetails(mainfileId).subscribe({
       next: (details: any[]) => {
         this.loading = false;
+
+        // Set the primary batch for the details card from the first file detail
+        if (details && details.length > 0) {
+          this.selectedPerson.batch = details[0].patchNo || '';
+        }
+
         this.clientRows = details.map((f, i) => ({
           id: f.id,
           code: f.fileCode?.toString() || f.id.toString(),
           name: f.legalPlaintiff || 'غير معروف',
-          fileStatus: 'نشط',
+          fileStatus: this.selectedPerson.fileStatus || 'نشط',
           debtReason: f.reason || '',
           batch: f.patchNo || '',
+          classificationName: classificationName,
           contractNum: f.contractNo || '',
           dateAdded: f.dateAdded,
           dateFinished: f.dateFinished,
@@ -147,11 +158,17 @@ export class ClientFollowUp implements OnInit {
           paid: 0,
           remaining: f.deptAmount || 0,
           address: this.selectedPerson.address,
-          client: f.client || '',
+          client: f.client || this.selectedPerson.customerName,
           lawyerName: f.lawyerUserName || 'غير محدد',
           courtName: f.courtUserName || 'غير محدد',
           mdName: f.mdUserName || 'غير محدد',
           advisorName: f.legalAdvisorUserName || 'غير محدد',
+          followUpStatus: this.selectedPerson.followUpStatus || '',
+          clientStatus: this.selectedPerson.clientStatus || '',
+          contactStatus: this.selectedPerson.contactStatus || '',
+          cooperationStatus: this.selectedPerson.cooperationStatus || '',
+          civilStatus: this.selectedPerson.civilStatus || '',
+          internalStatus: this.selectedPerson.internalStatus || '',
           note1: f.note1 || '',
           note2: f.note2 || '',
           note3: f.note3 || '',
@@ -159,6 +176,8 @@ export class ClientFollowUp implements OnInit {
           note5: f.note5 || '',
           note6: f.note6 || ''
         }));
+
+
 
         if (details && details.length > 0) {
           this.financial.claimValue = details.reduce((acc, curr) => acc + (curr.deptAmount || 0), 0);
@@ -210,7 +229,7 @@ export class ClientFollowUp implements OnInit {
 
       // السداد الكلي (مجموع السدادات لكل الديون المعروضة)
       const totalPaidGlobal = this.clientRows.reduce((acc, row) => acc + (row.paid || 0), 0);
-      this.financial.fees = totalPaidGlobal; 
+      this.financial.fees = totalPaidGlobal;
       this.financial.lawFees = this.financial.claimValue - totalPaidGlobal;
     });
 
@@ -274,7 +293,7 @@ export class ClientFollowUp implements OnInit {
     this.negotiationsService.getCallcenterStatements(id, page, 5).subscribe(res => {
       const data = res.items;
       this.statementsTotal = res.total;
-      
+
       const sorted = data.sort((a: any, b: any) => new Date(b.dateAdded || 0).getTime() - new Date(a.dateAdded || 0).getTime());
       this.callcenterStatements = sorted;
 
@@ -299,7 +318,7 @@ export class ClientFollowUp implements OnInit {
   handlePageChange(event: { type: 'audits' | 'statements' | 'notes' | 'statuses', page: number }) {
     if (!this.selectedPerson?.code) return;
     const code = Number(this.selectedPerson.code);
-    
+
     if (event.type === 'audits') {
       this.fetchAudits(code, event.page);
     } else if (event.type === 'statements') {
@@ -354,6 +373,8 @@ export class ClientFollowUp implements OnInit {
       const code = client.code || client.Code;
       const cid = client.cid || client.Cid || client.nationalId;
 
+      const classification = client.classification || {};
+      
       this.selectedPerson = {
         id: id,
         code: code?.toString() || '',
@@ -368,21 +389,29 @@ export class ClientFollowUp implements OnInit {
         autoNumbers: '',
         batch: '',
         address: client.address || client.Address || '',
-        cooperationStatus: client.cooperationStatus || '',
-        contactStatus: client.contactStatus || '',
-        civilStatus: client.civilStatus || '',
-        internalStatus: client.internalStatus || '',
+        // Use helper to ensure correct Arabic encoding
+        cooperationStatus: this.getLookupName('cooperation', classification.cooperationStatusId) || client.cooperationStatus || '',
+        contactStatus: this.getLookupName('contact', classification.contactStatusId) || client.contactStatus || '',
+        civilStatus: this.getLookupName('civil', classification.civilStatusId) || client.civilStatus || '',
+        internalStatus: this.getLookupName('internal', classification.internalStatusId) || client.internalStatus || '',
+        followUpStatus: this.getLookupName('followup', classification.followUpStatusId) || client.followUpStatus || '',
+        clientStatus: this.getLookupName('client', classification.clientStatusId) || client.clientStatus || '',
+        fileStatus: this.getLookupName('file', classification.fileStatusId) || client.fileStatus || 'نشط',
         jobType: client.work || client.Work || '',
-        incomeNotes: client.note_ || client.Note_ || '',
+        gender: this.getLookupName('gender', classification.genderId) || client.gender || '',
+        communicationLanguage: this.getLookupName('comms_lang', classification.communicationLanguageId) || client.communicationLanguage || '',
+        incomeNotes: classification.incomeNotes || '',
         classification: client.classification ? {
           ...client.classification,
           salaryDate: client.classification.salaryDate ? client.classification.salaryDate.split('T')[0] : null
         } : null
       };
 
+
+
       // Trigger search for related details (stats, file records, etc.)
       this.fetchAdditionalData(client);
-      
+
       // Switch back to main tab to show results
       if (this.mainContent) {
         this.mainContent.setMainTab('main');
@@ -401,6 +430,8 @@ export class ClientFollowUp implements OnInit {
       clientName: '', customerName: '', nationalId: '', status: '', nationality: '', classification: '', contract: '',
       debt: '', autoNumbers: '', batch: '', address: '', clientStatus: '', claimStatus: '', paymentStatus: '', discount: '', acceptance: '', jobType: '', incomeNotes: '', salaryDate: ''
     };
+    this.financial = { claimValue: 0, fees: 0, lawFees: 0 };
+    this.dashboardStats = { totalClients: 0, totalStatements: 0, todayStatements: 0, monthStatements: 0 };
     this.clientRows = [];
     this.attachments = [];
     this.additionalAmounts = [];
@@ -413,6 +444,13 @@ export class ClientFollowUp implements OnInit {
     this.contacts = [];
     this.notes = [];
     this.searchQuery = '';
+
+    // Reset pagination totals
+    this.auditsTotal = 0;
+    this.statementsTotal = 0;
+    this.notesTotal = 0;
+    this.statusesTotal = 0;
+
     console.log('All fields and child tables cleared');
   }
 
@@ -447,4 +485,60 @@ export class ClientFollowUp implements OnInit {
   }
 
   printPage() { window.print(); }
+
+  /**
+   * Helper to translate status IDs into correct Arabic names, 
+   * bypassing database encoding issues.
+   */
+  getLookupName(type: string, id: number | null | undefined): string {
+    if (!id || id === 1) return 'غير مصنف';
+    
+    const idNum = Number(id);
+    switch (type.toLowerCase()) {
+      case 'cooperation':
+        return {
+          2: 'وعد بالسداد', 3: 'تقسيط', 4: 'متعاون', 5: 'غير متعاون',
+          6: 'مماطل', 7: 'متردد', 8: 'غير قادر', 9: 'وعد ضعيف',
+          10: 'وعد قوي', 11: 'رافض السداد', 12: 'لم نصل اليه'
+        }[idNum] || id.toString();
+        
+      case 'contact':
+        return {
+          2: 'مع العميل', 3: 'غير متواصل', 4: 'لا يمكن التواصل',
+          5: 'مع اخر', 6: 'مع العميل واخر'
+        }[idNum] || id.toString();
+        
+      case 'civil':
+        return {
+          2: 'صالحة', 3: 'منتهية', 4: 'لاغية', 5: 'يتعذر',
+          6: 'غير نشط', 7: 'وفاة'
+        }[idNum] || id.toString();
+        
+      case 'internal':
+      case 'interior':
+        return {
+          2: 'غير مخالف', 3: 'في قائمة الممنوعين', 4: 'مخالف اقامة',
+          5: 'هجرة', 6: 'خارج البلاد'
+        }[idNum] || id.toString();
+        
+      case 'client':
+        return {
+          2: 'مدني خطا', 3: 'نشط', 4: 'مسجون', 5: 'وفاه',
+          6: 'مغادر نهائي', 7: 'سداد المحكمة', 8: 'سداد شركة', 9: 'سداد مندوب مكتب'
+        }[idNum] || id.toString();
+        
+      case 'file':
+        return { 2: 'ودي', 3: 'قضائي' }[idNum] || id.toString();
+        
+      case 'comms_lang':
+        return { 2: 'عربي', 3: 'إنجليزي', 4: 'أوردو', 5: 'هندي', 6: 'تاغالوغ' }[idNum] || id.toString();
+        
+      case 'gender':
+        return { 2: 'ذكر', 3: 'أنثى' }[idNum] || id.toString();
+        
+      default:
+        return id.toString();
+    }
+  }
 }
+

@@ -319,3 +319,56 @@ select.premium-input option {
 .modal-action .premium-btn {
     min-width: 120px;
 }
+
+/* Premium Radio Group (Segmented Control) */
+.premium-radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.4rem;
+    border-radius: 1rem;
+    border: 1px solid var(--surface-border);
+    backdrop-filter: blur(8px);
+}
+
+.premium-radio-item {
+    position: relative;
+    flex: 1;
+    min-width: 80px;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-color-secondary);
+    user-select: none;
+    border: 1px solid transparent;
+}
+
+.premium-radio-item:hover {
+    background: var(--surface-hover);
+    color: var(--text-color);
+}
+
+.premium-radio-item.active {
+    background: var(--primary-color);
+    color: var(--primary-color-text) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.premium-radio-item input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+[data-theme='dark'] .premium-radio-group {
+    background: rgba(15, 23, 42, 0.3);
+}

@@ -178,7 +178,10 @@ export class NegotiationsService {
         return this.http.get<any>(`${this.apiUrl}/DataView/files/${fileCode}/statuses?page=${page}&pageSize=${pageSize}`);
     }
 
-    getDashboardStats(): Observable<any> {
-        return this.http.get<any>(`${this.apiUrl}/DataView/dashboard-stats`);
+    /**
+     * Get file-specific dashboard stats
+     */
+    getDashboardStats(fileCode: number): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/DataView/files/${fileCode}/dashboard-stats`);
     }
 }

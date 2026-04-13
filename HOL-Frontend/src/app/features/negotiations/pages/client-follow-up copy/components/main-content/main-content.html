@@ -51,20 +51,6 @@
           <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">#</th>
           <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الكود</th>
           <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الاسم</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المحامي</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المحكمة</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المسؤول (MD)</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المستشار</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة الملف</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">سبب المديونية</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">رقم الباتش</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">رقم العقد</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الجنسية</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الرقم المدني</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المدفوع</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">قيمة المطالبة</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">المتبقي</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">العنوان</th>
           <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">الموكل</th>
           <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة المتابعة</th>
           <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">حالة العميل</th>
@@ -76,7 +62,6 @@
           <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ اخر سداد</th>
           <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">اخر افادة</th>
           <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ اخر افادة</th>
-          <th class="py-3 px-4 border-b border-indigo-100 dark:border-indigo-800/50 text-right">تاريخ المراجعة</th>
         </tr>
       </thead>
       <tbody class="text-[11px]">
@@ -85,23 +70,6 @@
           <td class="py-2 px-3 text-center text-slate-400 font-mono">{{ i + 1 }}</td>
           <td class="py-2 px-3 font-medium text-slate-600 dark:text-slate-400">{{row.code}}</td>
           <td class="py-2 px-3 font-bold text-indigo-600 dark:text-indigo-400">{{row.name}}</td>
-          <td class="py-2 px-3 text-slate-500">{{row.lawyerName}}</td>
-          <td class="py-2 px-3 text-slate-500">{{row.courtName}}</td>
-          <td class="py-2 px-3 text-slate-500">{{row.mdName}}</td>
-          <td class="py-2 px-3 text-slate-500">{{row.advisorName}}</td>
-          <td class="py-2 px-3">
-            <span
-              class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{{row.fileStatus}}</span>
-          </td>
-          <td class="py-2 px-3 text-slate-500">{{row.debtReason}}</td>
-          <td class="py-2 px-3 text-slate-500">{{row.batch}}</td>
-          <td class="py-2 px-3 text-slate-500">{{row.contractNum}}</td>
-          <td class="py-2 px-3 text-slate-500">{{row.nationality}}</td>
-          <td class="py-2 px-3 text-slate-500">{{row.civilId}}</td>
-          <td class="py-2 px-3 font-bold text-emerald-600">{{row.paid | number}}</td>
-          <td class="py-2 px-3 font-bold text-rose-600">{{row.claim | number}}</td>
-          <td class="py-2 px-3 font-bold text-amber-600">{{row.remaining | number}}</td>
-          <td class="py-2 px-3 text-slate-400 max-w-[150px] truncate" [title]="row.address">{{row.address}}</td>
           <td class="py-2 px-3 text-slate-400 max-w-[100px] truncate" [title]="row.client">{{row.client}}</td>
           <td class="py-2 px-3 italic">{{row.followUpStatus}}</td>
           <td class="py-2 px-3 italic">{{row.clientStatus}}</td>
@@ -111,11 +79,10 @@
           <td class="py-2 px-3 italic">{{row.internalStatus}}</td>
           <td class="py-2 px-3 text-emerald-500 font-bold">{{row.lastPaymentAmount | number}}</td>
           <td class="py-2 px-3 text-slate-400">{{row.lastPaymentDate}}</td>
-          <td class="py-2 px-3 text-slate-400 truncate max-w-[150px]" [title]="row.lastStatement">{{row.lastStatement}}
-          </td>
+          <td class="py-2 px-3 text-slate-400 truncate max-w-[150px]" [title]="row.lastStatement">{{row.lastStatement}}</td>
           <td class="py-2 px-3 text-slate-400">{{row.lastStatementDate}}</td>
-          <td class="py-2 px-3 text-slate-400">{{row.reviewDate}}</td>
         </tr>
+
         <tr *ngIf="!clientRows || clientRows.length === 0">
           <td colspan="29" class="text-center py-20 bg-slate-50/20 dark:bg-slate-900/10">
             <div class="flex flex-col items-center gap-3">
@@ -179,14 +146,13 @@
               <label class="form-label">الباتش</label>
               <input type="text" class="form-input" [value]="selectedPerson?.batch || 'غير موجود'" readonly />
             </div>
-            <div class="form-field form-field-full">
-              <label class="form-label">العنوان</label>
-              <input type="text" class="form-input" [value]="selectedPerson?.address || 'غير موجود'" readonly />
-            </div>
+          </div>
+          <div class="form-field form-field-full">
+            <label class="form-label">العنوان</label>
+            <input type="text" class="form-input" [value]="selectedPerson?.address || 'غير موجود'" readonly />
           </div>
         </div>
       </div>
-
       <!-- Main Content Card -->
       <div class="col-span-8 premium-card">
         <div class="card-body">
@@ -199,21 +165,31 @@
               (click)="changeTab('classification')">
               تصنيف
             </a>
-            <a class="premium-tab" [class.active]="activeSubTab === 'files'" (click)="changeTab('files')">
-              الديون
+            <a class="premium-tab" [class.active]="activeSubTab === 'totalFiles'"
+              (click)="changeTab('totalFiles')">
+              اجمالي الملفات
             </a>
-            <a class="premium-tab" [class.active]="activeSubTab === 'payments'" (click)="changeTab('payments')">
-              الدفعات والمبالغ
+            <a class="premium-tab" [class.active]="activeSubTab === 'companyLink'"
+              (click)="changeTab('companyLink')">
+              رابط الشركة
             </a>
+
             <a class="premium-tab" [class.active]="activeSubTab === 'legal'" (click)="changeTab('legal')">
-              البيانات القانونية
+              الرسوم
+            </a>
+            <a class="premium-tab" [class.active]="activeSubTab === 'files'" (click)="changeTab('files')">
+              تفاصيل المطالبة
+            </a>
+            <a class="premium-tab" [class.active]="activeSubTab === 'checks'" (click)="changeTab('checks')">
+              الشيكات
             </a>
             <a class="premium-tab" [class.active]="activeSubTab === 'attachments'" (click)="changeTab('attachments')">
               المرفقات
             </a>
             <a class="premium-tab" [class.active]="activeSubTab === 'history'" (click)="changeTab('history')">
-              تاريخ الملف
+              التصنيفات
             </a>
+
             <a class="premium-tab" [class.active]="activeSubTab === 'callcenter'" (click)="changeTab('callcenter')">
               إفادات الكول سنتر
             </a>
@@ -327,14 +303,13 @@
                     <div class="premium-card p-4" style="margin-bottom: 0 !important;">
                       <div class="card-body p-0">
                         <label class="form-label mb-3">لغة التواصل</label>
-                        <div class="flex gap-4">
-                          <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="lang" class="radio radio-primary" />
-                            <span class="text-sm font-bold text-slate-600">عربي</span>
-                          </label>
-                          <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="lang" class="radio radio-primary" />
-                            <span class="text-sm font-bold text-slate-600">إنجليزي</span>
+                        <div class="premium-radio-group">
+                          <label *ngFor="let item of lookupLists.comms_lang" class="premium-radio-item"
+                            [class.active]="selectedPerson?.classification?.communicationLanguageId === item.id"
+                            (click)="onLookupSelected(item, 'comms_lang')">
+                            <input type="radio" name="comms_lang" [value]="item.id"
+                              [checked]="selectedPerson?.classification?.communicationLanguageId === item.id">
+                            <span>{{item.name}}</span>
                           </label>
                         </div>
                       </div>
@@ -343,19 +318,19 @@
                     <div class="premium-card p-4" style="margin-bottom: 0 !important;">
                       <div class="card-body p-0">
                         <label class="form-label mb-3">النوع</label>
-                        <div class="flex gap-4">
-                          <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="gender" class="radio radio-primary" />
-                            <span class="text-sm font-bold text-slate-600">ذكر</span>
-                          </label>
-                          <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="gender" class="radio radio-primary" />
-                            <span class="text-sm font-bold text-slate-600">أنثى</span>
+                        <div class="premium-radio-group">
+                          <label *ngFor="let item of lookupLists.gender" class="premium-radio-item"
+                            [class.active]="selectedPerson?.classification?.genderId === item.id"
+                            (click)="onLookupSelected(item, 'gender')">
+                            <input type="radio" name="gender" [value]="item.id"
+                              [checked]="selectedPerson?.classification?.genderId === item.id">
+                            <span>{{item.name}}</span>
                           </label>
                         </div>
                       </div>
                     </div>
                   </div>
+
                 </div>
 
               </div>
@@ -399,6 +374,222 @@
 
 
           </div>
+
+          <!-- (NEW) اجمالي الملفات -->
+          <div *ngIf="activeSubTab === 'totalFiles'" class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4" dir="rtl">
+              
+              <!-- Column 1: All Files -->
+              <div class="space-y-4">
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-indigo-600 bg-slate-50/50" [value]="totals.claimAll | number:'1.3-3'" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المطالبة لكل الملفات</label>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-emerald-600 bg-slate-50/50" [value]="totals.paidAll | number:'1.3-3'" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المسدد لكل الملفات</label>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-rose-600 bg-slate-50/50" [value]="totals.remainingAll | number:'1.3-3'" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي لكل الملفات</label>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-slate-600 bg-slate-50/50" [value]="totals.feesAll | number:'1.3-3'" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">الرسوم لكل الملفات</label>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-indigo-800 bg-slate-50/50" [value]="(totals.remainingAll + totals.feesAll) | number:'1.3-3'" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي شامل الرسوم</label>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-slate-500 bg-slate-50/50" [value]="totals.proceduresAll" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">الاجراءات لكل الملفات</label>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-rose-800 bg-slate-50/50" [value]="totals.remainingAll | number:'1.3-3'" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي لكل الملفات</label>
+                </div>
+              </div>
+
+              <!-- Column 2: Current Company -->
+              <div class="space-y-4">
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-indigo-600 bg-slate-50/50" [value]="(selectedFile?.claim || 0) | number:'1.3-3'" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المطالبة للشركة الحالية</label>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-emerald-600 bg-slate-50/50" [value]="(selectedFile?.paid || 0) | number:'1.3-3'" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المسدد للشركة الحالية</label>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-rose-600 bg-slate-50/50" [value]="(selectedFile?.remaining || 0) | number:'1.3-3'" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي للشركة الحالية</label>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-slate-600 bg-slate-50/50" [value]="(selectedFile?.fees || 0) | number:'1.3-3'" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">الرسوم للشركة الحالية</label>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-indigo-800 bg-slate-50/50" [value]="((selectedFile?.remaining || 0) + (selectedFile?.fees || 0)) | number:'1.3-3'" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي شامل الرسوم</label>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-slate-500 bg-slate-50/50" [value]="0" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">الاجراءات للشركة الحالية</label>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <input type="text" class="premium-input text-center font-bold text-rose-800 bg-slate-50/50" [value]="(selectedFile?.remaining || 0) | number:'1.3-3'" readonly />
+                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي للشركة الحالية</label>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- (NEW) رابط الشركة -->
+          <div *ngIf="activeSubTab === 'companyLink'" class="p-6 space-y-6" dir="rtl">
+            <!-- Header Section -->
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-indigo-50 rounded-xl">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.826c.001-.001 0-1.101 0-1.101m0 0l4-4a4 4 0 015.656 5.656l-1.1 1.1" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-slate-800">توليد رابط الدفع</h3>
+                  <p class="text-xs text-slate-500">قم بإعداد وتجهيز رابط الدفع لإرساله للعميل</p>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button 
+                  class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all"
+                  [class.bg-indigo-600]="paymentForm.type === 'company'"
+                  [class.text-white]="paymentForm.type === 'company'"
+                  [class.bg-slate-100]="paymentForm.type !== 'company'"
+                  [class.text-slate-600]="paymentForm.type !== 'company'"
+                  (click)="paymentForm.type = 'company'; generateLink()">
+                  رابط الشركة
+                </button>
+                <button 
+                  class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all"
+                  [class.bg-indigo-600]="paymentForm.type === 'office'"
+                  [class.text-white]="paymentForm.type === 'office'"
+                  [class.bg-slate-100]="paymentForm.type !== 'office'"
+                  [class.text-slate-600]="paymentForm.type !== 'office'"
+                  (click)="paymentForm.type = 'office'; generateLink()">
+                  رابط المكتب
+                </button>
+              </div>
+            </div>
+
+            <!-- Main Form Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <!-- Left: Client & Amount Info -->
+              <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="space-y-1">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">كود الملف</label>
+                    <input type="text" class="premium-input bg-slate-50 font-bold" [value]="paymentForm.code" readonly />
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">الرقم المدني</label>
+                    <input type="text" class="premium-input bg-slate-50 font-mono" [value]="paymentForm.civilId" readonly />
+                  </div>
+                </div>
+
+                <div class="space-y-1">
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">الاسم</label>
+                  <input type="text" class="premium-input bg-slate-50 font-bold" [value]="paymentForm.name" readonly />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="space-y-1">
+                    <label class="text-[10px] font-black text-indigo-500 uppercase tracking-widest">المبلغ (د.ك)</label>
+                    <input type="number" class="premium-input bg-indigo-50/50 border-indigo-200 text-indigo-700 font-black text-lg" 
+                      [(ngModel)]="paymentForm.amount" (ngModelChange)="generateLink()" />
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">المستفيد</label>
+                    <input type="text" class="premium-input bg-slate-50" [value]="paymentForm.claimant" readonly />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Config & Output -->
+              <div class="space-y-4">
+                <div class="space-y-1">
+                  <label class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">رقم الواتساب</label>
+                  <div class="relative">
+                    <input type="text" class="premium-input pl-10 bg-emerald-50/30 border-emerald-100 text-emerald-700 font-bold" 
+                      [(ngModel)]="paymentForm.whatsapp" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 absolute left-3 top-2.5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.44-9.89 9.886-.001 2.15.614 3.735 1.648 5.41l-.999 3.647 3.841-.986zm11.387-5.477c-.31-.156-1.834-.905-2.112-1.006-.277-.101-.48-.151-.68.151-.202.303-.778 1.006-.955 1.208-.177.202-.355.226-.665.071-1.297-.648-2.13-1.153-2.969-2.585-.23-.393-.23-.393.103-.79.314-.374.68-.813.882-1.006l.325-.494c.156-.303.078-.567-.039-.79-.117-.224-.68-1.641-.933-2.25-.246-.591-.497-.504-.68-.514l-.578-.01c-.202 0-.528.077-.803.376-.276.301-1.054 1.03-1.054 2.513 0 1.485 1.079 2.918 1.229 3.12.151.201 2.126 3.245 5.15 4.549 3.023 1.305 3.023.87 3.578.82.555-.05 1.833-.749 2.091-1.478.257-.73.257-1.359.18-1.484-.076-.126-.28-.203-.591-.359z"/>
+                    </svg>
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">اللغة</label>
+                  <div class="flex gap-2">
+                    <button class="flex-1 py-2 rounded-lg text-sm font-bold border transition-all"
+                      [class.bg-slate-800]="paymentForm.language === 'arabic'"
+                      [class.border-slate-800]="paymentForm.language === 'arabic'"
+                      [class.text-white]="paymentForm.language === 'arabic'"
+                      [class.bg-white]="paymentForm.language !== 'arabic'"
+                      (click)="paymentForm.language = 'arabic'; generateLink()">
+                      العربية
+                    </button>
+                    <button class="flex-1 py-2 rounded-lg text-sm font-bold border transition-all"
+                      [class.bg-slate-800]="paymentForm.language === 'english'"
+                      [class.border-slate-800]="paymentForm.language === 'english'"
+                      [class.text-white]="paymentForm.language === 'english'"
+                      [class.bg-white]="paymentForm.language !== 'english'"
+                      (click)="paymentForm.language = 'english'; generateLink()">
+                      English
+                    </button>
+                  </div>
+                </div>
+
+                <div class="space-y-1 pt-2">
+                  <label class="text-[10px] font-black text-indigo-500 uppercase tracking-widest">الرابط المولد</label>
+                  <div class="flex gap-2">
+                    <input type="text" class="premium-input bg-slate-50 text-xs font-mono text-indigo-600 flex-1" 
+                      [value]="companyLink" readonly />
+                    <button class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors" (click)="copyLink()" title="نسخ الرابط">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 00 2 2h10a2 2 0 00 2-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message Area -->
+            <div class="space-y-2">
+              <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">نص الرسالة</label>
+              <textarea 
+                class="premium-input w-full min-h-[120px] bg-slate-50 text-sm leading-relaxed" 
+                [(ngModel)]="paymentForm.message"></textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end gap-3 pt-4">
+              <button 
+                class="premium-btn bg-emerald-600 hover:bg-emerald-700 text-white border-none py-3 px-10 shadow-lg shadow-emerald-200"
+                (click)="sendWhatsApp()">
+                <div class="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.44-9.89 9.886-.001 2.15.614 3.735 1.648 5.41l-.999 3.647 3.841-.986zm11.387-5.477c-.31-.156-1.834-.905-2.112-1.006-.277-.101-.48-.151-.68.151-.202.303-.778 1.006-.955 1.208-.177.202-.355.226-.665.071-1.297-.648-2.13-1.153-2.969-2.585-.23-.393-.23-.393.103-.79.314-.374.68-.813.882-1.006l.325-.494c.156-.303.078-.567-.039-.79-.117-.224-.68-1.641-.933-2.25-.246-.591-.497-.504-.68-.514l-.578-.01c-.202 0-.528.077-.803.376-.276.301-1.054 1.03-1.054 2.513 0 1.485 1.079 2.918 1.229 3.12.151.201 2.126 3.245 5.15 4.549 3.023 1.305 3.023.87 3.578.82.555-.05 1.833-.749 2.091-1.478.257-.73.257-1.359.18-1.484-.076-.126-.28-.203-.591-.359z"/>
+                  </svg>
+                  <span>إرسال عبر واتساب</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+
           <div *ngIf="activeSubTab === 'files'" class="p-2">
             <div
               class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800 overflow-x-auto">
@@ -582,6 +773,12 @@
               </div>
             </div>
           </div>
+
+          <!-- (NEW) الشيكات -->
+          <div *ngIf="activeSubTab === 'checks'" class="p-8 text-center text-slate-400 italic">
+            لا توجد شيكات مسجلة حالياً
+          </div>
+
 
           <!-- (5) المرفقات (Already modernized) -->
           <div *ngIf="activeSubTab === 'attachments'" class="p-2">
@@ -955,490 +1152,481 @@
         </div>
 
       </div>
-
     </div>
 
 
-    <!-- ===================================== -->
-    <!--  Middle Section: Negotiation          -->
-    <!-- ===================================== -->
-    <div class="grid grid-cols-12 gap-6 mt-4">
+  </div>
 
-      <!-- Sidebar Actions -->
-      <div class="col-span-12 lg:col-span-3">
-        <div class="premium-card h-full p-4">
-          <h3 class="text-sm font-bold mb-4 flex items-center gap-2">
-            <span class="w-2 h-6 bg-primary rounded-full"></span>
-            إجراءات سريعة
-          </h3>
 
-          <div class="flex flex-col gap-3">
-            <button class="premium-btn premium-btn-primary w-full" routerLink="/report/add-number">
-              <span class="text-lg">➕</span> اضافة كشف
-            </button>
-            <button class="premium-btn premium-btn-secondary w-full" routerLink="/report/numbers">
-              <span class="text-lg">🔍</span> بحث أرقام
-            </button>
+  <!-- ===================================== -->
+  <!--  Middle Section: Negotiation          -->
+  <!-- ===================================== -->
+  <div class="grid grid-cols-12 gap-6 mt-4">
 
-            <div class="mt-4 pt-4 border-t border-dashed border-slate-200">
-              <label class="form-label text-[11px] uppercase tracking-wider">بحث سريع</label>
-              <div class="relative">
-                <input type="text" class="premium-input pr-10" placeholder="ادخل رقم الكشف..." />
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
-              </div>
+    <!-- Sidebar Actions -->
+    <div class="col-span-12 lg:col-span-3">
+      <div class="premium-card h-full p-4">
+        <h3 class="text-sm font-bold mb-4 flex items-center gap-2">
+          <span class="w-2 h-6 bg-primary rounded-full"></span>
+          إجراءات سريعة
+        </h3>
+
+        <div class="flex flex-col gap-3">
+          <button class="premium-btn premium-btn-primary w-full" routerLink="/report/add-number">
+            <span class="text-lg">➕</span> اضافة كشف
+          </button>
+          <button class="premium-btn premium-btn-secondary w-full" routerLink="/report/numbers">
+            <span class="text-lg">🔍</span> بحث أرقام
+          </button>
+
+          <div class="mt-4 pt-4 border-t border-dashed border-slate-200">
+            <label class="form-label text-[11px] uppercase tracking-wider">بحث سريع</label>
+            <div class="relative">
+              <input type="text" class="premium-input pr-10" placeholder="ادخل رقم الكشف..." />
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Main Content Area -->
-      <div class="col-span-12 lg:col-span-9">
-        <div class="premium-tabs-container mb-4">
-          <a class="premium-tab" [class.active]="activeTab === 'numbers'" (click)="activeTab = 'numbers'">
-            الرقم
-          </a>
-          <a class="premium-tab" [class.active]="activeTab === 'add'" (click)="activeTab = 'add'">
-            إضافة رقم جديد
-          </a>
-        </div>
+    <!-- Main Content Area -->
+    <div class="col-span-12 lg:col-span-9">
+      <div class="premium-tabs-container mb-4">
+        <a class="premium-tab" [class.active]="activeTab === 'numbers'" (click)="activeTab = 'numbers'">
+          الرقم
+        </a>
+        <a class="premium-tab" [class.active]="activeTab === 'add'" (click)="activeTab = 'add'">
+          إضافة رقم جديد
+        </a>
+      </div>
 
-        <!-- Tab Content Card -->
-        <div class="premium-card p-0 overflow-hidden">
-          <div class="card-body p-0">
+      <!-- Tab Content Card -->
+      <div class="premium-card p-0 overflow-hidden">
+        <div class="card-body p-0">
 
-            <!-- TAB (1) الرقم Table -->
-            <div *ngIf="activeTab === 'numbers'" class="animate-in fade-in duration-300">
-              <div class="overflow-x-auto">
-                <table class="premium-table">
-                  <thead>
-                    <tr>
-                      <th class="text-center w-16">#</th>
-                      <th>الرقم</th>
-                      <th>العلاقة</th>
-                      <th>المصدر</th>
-                      <th class="text-center">الحالة</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let row of numbers; let i = index">
-                      <td class="text-center text-slate-400 font-mono text-xs">{{ i + 1 }}</td>
-                      <td class="font-bold text-slate-700">{{ row.phone }}</td>
-                      <td>{{ row.relation }}</td>
-                      <td>{{ row.source }}</td>
-                      <td class="text-center">
-                        <span class="px-2 py-1 rounded-full text-[10px] font-bold" [ngClass]="{
+          <!-- TAB (1) الرقم Table -->
+          <div *ngIf="activeTab === 'numbers'" class="animate-in fade-in duration-300">
+            <div class="overflow-x-auto">
+              <table class="premium-table">
+                <thead>
+                  <tr>
+                    <th class="text-center w-16">#</th>
+                    <th>الرقم</th>
+                    <th>العلاقة</th>
+                    <th>المصدر</th>
+                    <th class="text-center">الحالة</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of numbers; let i = index">
+                    <td class="text-center text-slate-400 font-mono text-xs">{{ i + 1 }}</td>
+                    <td class="font-bold text-slate-700">{{ row.phone }}</td>
+                    <td>{{ row.relation }}</td>
+                    <td>{{ row.source }}</td>
+                    <td class="text-center">
+                      <span class="px-2 py-1 rounded-full text-[10px] font-bold" [ngClass]="{
                                 'bg-emerald-100 text-emerald-700': row.status === 'نشط',
                                 'bg-slate-100 text-slate-600': row.status !== 'نشط'
                               }">
-                          {{ row.status }}
-                        </span>
-                      </td>
-                    </tr>
-                    <tr *ngIf="!numbers || numbers.length === 0">
-                      <td colspan="5" class="text-center py-4 text-slate-500">لا توجد أرقام مسجلة</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+                        {{ row.status }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="!numbers || numbers.length === 0">
+                    <td colspan="5" class="text-center py-4 text-slate-500">لا توجد أرقام مسجلة</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-
-            <!-- TAB (2) إضافة رقم Form -->
-            <div *ngIf="activeTab === 'add'" class="p-6 animate-in slide-in-from-bottom-2 duration-300">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
-                <div class="form-field">
-                  <label class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">رقم
-                    الهاتف</label>
-                  <input type="text" class="premium-input" [(ngModel)]="addForm.phone" name="phone"
-                    placeholder="أدخل الرقم..." />
-                </div>
-                <div class="form-field">
-                  <label
-                    class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">العلاقة</label>
-                  <input type="text" class="premium-input" [(ngModel)]="addForm.relation" name="relation"
-                    placeholder="مثل: صاحب الرقم، أخ، أب..." />
-                </div>
-                <div class="form-field">
-                  <label
-                    class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">المصدر</label>
-                  <input type="text" class="premium-input" [(ngModel)]="addForm.source" name="source"
-                    placeholder="تحديد المصدر..." />
-                </div>
-                <div class="form-field">
-                  <label
-                    class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">الحالة</label>
-                  <select [(ngModel)]="addForm.status" name="status"
-                    class="premium-input bg-white cursor-pointer hover:bg-slate-50 transition-colors">
-                    <option value="نشط">نشط</option>
-                    <option value="غير نشط">غير نشط</option>
-                    <option value="مغلق">مغلق</option>
-                  </select>
-                </div>
-                <div class="md:col-span-2 flex justify-end gap-3 mt-4">
-                  <button class="premium-btn premium-btn-secondary px-8" (click)="activeTab = 'numbers'">إلغاء</button>
-                  <button class="premium-btn premium-btn-primary px-8" (click)="saveNumber()">💾 حفظ الرقم</button>
-                </div>
-              </div>
-            </div>
-
-
           </div>
+
+          <!-- TAB (2) إضافة رقم Form -->
+          <div *ngIf="activeTab === 'add'" class="p-6 animate-in slide-in-from-bottom-2 duration-300">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+              <div class="form-field">
+                <label class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">رقم
+                  الهاتف</label>
+                <input type="text" class="premium-input" [(ngModel)]="addForm.phone" name="phone"
+                  placeholder="أدخل الرقم..." />
+              </div>
+              <div class="form-field">
+                <label class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">العلاقة</label>
+                <input type="text" class="premium-input" [(ngModel)]="addForm.relation" name="relation"
+                  placeholder="مثل: صاحب الرقم، أخ، أب..." />
+              </div>
+              <div class="form-field">
+                <label class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">المصدر</label>
+                <input type="text" class="premium-input" [(ngModel)]="addForm.source" name="source"
+                  placeholder="تحديد المصدر..." />
+              </div>
+              <div class="form-field">
+                <label class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">الحالة</label>
+                <select [(ngModel)]="addForm.status" name="status"
+                  class="premium-input bg-white cursor-pointer hover:bg-slate-50 transition-colors">
+                  <option value="نشط">نشط</option>
+                  <option value="غير نشط">غير نشط</option>
+                  <option value="مغلق">مغلق</option>
+                </select>
+              </div>
+              <div class="md:col-span-2 flex justify-end gap-3 mt-4">
+                <button class="premium-btn premium-btn-secondary px-8" (click)="activeTab = 'numbers'">إلغاء</button>
+                <button class="premium-btn premium-btn-primary px-8" (click)="saveNumber()">💾 حفظ الرقم</button>
+              </div>
+            </div>
+          </div>
+
+
         </div>
       </div>
-    </div>
-
-    <!-- Negotiation Row -->
-    <div class="grid grid-cols-12 gap-4 mt-6">
-
-      <!-- Negotiation Method & Review -->
-      <div class="col-span-12 lg:col-span-4 premium-card p-0">
-        <div class="card-header py-2 px-3">
-          <h3 class="text-sm font-bold">وسيلة التفاوض</h3>
-        </div>
-        <div class="card-body p-3">
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <ng-container *ngFor="let row of negotiationMethodsRows">
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 shadow-sm"
-                [class.bg-primary]="selectedAction === row.left" [class.border-primary]="selectedAction === row.left"
-                [class.text-white]="selectedAction === row.left" [class.bg-white]="selectedAction !== row.left"
-                [class.dark:bg-slate-800]="selectedAction !== row.left"
-                [class.border-slate-200]="selectedAction !== row.left"
-                [class.dark:border-slate-700]="selectedAction !== row.left"
-                [class.text-slate-700]="selectedAction !== row.left"
-                [class.dark:text-slate-300]="selectedAction !== row.left" (click)="selectAction(row.left)">
-                {{ row.left }}
-              </button>
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 shadow-sm"
-                [class.bg-primary]="selectedAction === row.right" [class.border-primary]="selectedAction === row.right"
-                [class.text-white]="selectedAction === row.right" [class.bg-white]="selectedAction !== row.right"
-                [class.dark:bg-slate-800]="selectedAction !== row.right"
-                [class.border-slate-200]="selectedAction !== row.right"
-                [class.dark:border-slate-700]="selectedAction !== row.right"
-                [class.text-slate-700]="selectedAction !== row.right"
-                [class.dark:text-slate-300]="selectedAction !== row.right" (click)="selectAction(row.right)">
-                {{ row.right }}
-              </button>
-            </ng-container>
-          </div>
-          <div class="mt-2 text-center">
-            <button class="premium-btn premium-btn-outline w-full py-1.5 text-xs">تحليل الإفادات</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Negotiation Outcome -->
-      <div class="col-span-12 lg:col-span-8 premium-card p-0">
-        <div class="card-header py-2 px-3">
-          <h3 class="text-sm font-bold w-full text-center">نتيجة التفاوض</h3>
-        </div>
-        <div class="card-body p-3">
-          <div class="flex flex-col gap-2.5">
-            <!-- Row 1: Key Positive Outcomes (Emerald Theme) -->
-            <div class="grid grid-cols-3 gap-2">
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-emerald-600]="selectedResult === 'طلب مهلة'"
-                [class.border-emerald-600]="selectedResult === 'طلب مهلة'"
-                [class.text-white]="selectedResult === 'طلب مهلة'" [class.scale-[1.02]]="selectedResult === 'طلب مهلة'"
-                [class.bg-white]="selectedResult !== 'طلب مهلة'"
-                [class.dark:bg-slate-800]="selectedResult !== 'طلب مهلة'"
-                [class.border-emerald-100]="selectedResult !== 'طلب مهلة'"
-                [class.dark:border-emerald-900/30]="selectedResult !== 'طلب مهلة'"
-                [class.text-emerald-700]="selectedResult !== 'طلب مهلة'"
-                [class.dark:text-emerald-400]="selectedResult !== 'طلب مهلة'"
-                (click)="handleResultClick('طلب مهلة')">طلب مهلة</button>
-
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-emerald-600]="selectedResult.includes('تقسيط')"
-                [class.border-emerald-600]="selectedResult.includes('تقسيط')"
-                [class.text-white]="selectedResult.includes('تقسيط')"
-                [class.scale-[1.02]]="selectedResult.includes('تقسيط')"
-                [class.bg-white]="selectedResult.includes('تقسيط') === false"
-                [class.dark:bg-slate-800]="selectedResult.includes('تقسيط') === false"
-                [class.border-emerald-100]="selectedResult.includes('تقسيط') === false"
-                [class.dark:border-emerald-900/30]="selectedResult.includes('تقسيط') === false"
-                [class.text-emerald-700]="selectedResult.includes('تقسيط') === false"
-                [class.dark:text-emerald-400]="selectedResult.includes('تقسيط') === false"
-                (click)="handleResultClick('تقسيط')">تقسيط</button>
-
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-emerald-600]="selectedResult.includes('وعد بالسداد')"
-                [class.border-emerald-600]="selectedResult.includes('وعد بالسداد')"
-                [class.text-white]="selectedResult.includes('وعد بالسداد')"
-                [class.scale-[1.02]]="selectedResult.includes('وعد بالسداد')"
-                [class.bg-white]="selectedResult.includes('وعد بالسداد') === false"
-                [class.dark:bg-slate-800]="selectedResult.includes('وعد بالسداد') === false"
-                [class.border-emerald-100]="selectedResult.includes('وعد بالسداد') === false"
-                [class.dark:border-emerald-900/30]="selectedResult.includes('وعد بالسداد') === false"
-                [class.text-emerald-700]="selectedResult.includes('وعد بالسداد') === false"
-                [class.dark:text-emerald-400]="selectedResult.includes('وعد بالسداد') === false"
-                (click)="handleResultClick('وعد بالسداد')">وعد بالسداد</button>
-            </div>
-
-            <!-- Row 2: Operational/Review (Blue Theme) -->
-            <div class="grid grid-cols-3 gap-2">
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-blue-600]="selectedResult === 'شكوى'" [class.border-blue-600]="selectedResult === 'شكوى'"
-                [class.text-white]="selectedResult === 'شكوى'" [class.bg-white]="selectedResult !== 'شكوى'"
-                [class.dark:bg-slate-800]="selectedResult !== 'شكوى'"
-                [class.border-blue-100]="selectedResult !== 'شكوى'"
-                [class.dark:border-blue-900/30]="selectedResult !== 'شكوى'"
-                [class.text-blue-700]="selectedResult !== 'شكوى'" [class.dark:text-blue-400]="selectedResult !== 'شكوى'"
-                (click)="handleResultClick('شكوى')">شكوى</button>
-
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-indigo-600]="selectedResult.includes('مراجعة')"
-                [class.border-indigo-600]="selectedResult.includes('مراجعة')"
-                [class.text-white]="selectedResult.includes('مراجعة')"
-                [class.bg-white]="selectedResult.includes('مراجعة') === false"
-                [class.dark:bg-slate-800]="selectedResult.includes('مراجعة') === false"
-                [class.border-indigo-100]="selectedResult.includes('مراجعة') === false"
-                [class.dark:border-indigo-900/30]="selectedResult.includes('مراجعة') === false"
-                [class.text-indigo-700]="selectedResult.includes('مراجعة') === false"
-                [class.dark:text-indigo-400]="selectedResult.includes('مراجعة') === false"
-                (click)="handleResultClick('مراجعة')">مراجعة</button>
-
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-blue-600]="selectedResult === 'فتح و إغلاق'"
-                [class.border-blue-600]="selectedResult === 'فتح و إغلاق'"
-                [class.text-white]="selectedResult === 'فتح و إغلاق'"
-                [class.bg-white]="selectedResult !== 'فتح و إغلاق'"
-                [class.dark:bg-slate-800]="selectedResult !== 'فتح و إغلاق'"
-                [class.border-blue-100]="selectedResult !== 'فتح و إغلاق'"
-                [class.dark:border-blue-900/30]="selectedResult !== 'فتح و إغلاق'"
-                [class.text-blue-700]="selectedResult !== 'فتح و إغلاق'"
-                [class.dark:text-blue-400]="selectedResult !== 'فتح و إغلاق'"
-                (click)="handleResultClick('فتح و إغلاق')">فتح و إغلاق</button>
-            </div>
-
-            <!-- Row 3: Denials (Rose Theme) -->
-            <div class="grid grid-cols-3 gap-2">
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-rose-600]="selectedResult === 'أنكر نفسه'"
-                [class.border-rose-600]="selectedResult === 'أنكر نفسه'"
-                [class.text-white]="selectedResult === 'أنكر نفسه'" [class.bg-white]="selectedResult !== 'أنكر نفسه'"
-                [class.dark:bg-slate-800]="selectedResult !== 'أنكر نفسه'"
-                [class.border-rose-100]="selectedResult !== 'أنكر نفسه'"
-                [class.dark:border-rose-900/30]="selectedResult !== 'أنكر نفسه'"
-                [class.text-rose-700]="selectedResult !== 'أنكر نفسه'"
-                [class.dark:text-rose-400]="selectedResult !== 'أنكر نفسه'"
-                (click)="handleResultClick('أنكر نفسه')">أنكر نفسه</button>
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-rose-600]="selectedResult === 'غير معترف'"
-                [class.border-rose-600]="selectedResult === 'غير معترف'"
-                [class.text-white]="selectedResult === 'غير معترف'" [class.bg-white]="selectedResult !== 'غير معترف'"
-                [class.dark:bg-slate-800]="selectedResult !== 'غير معترف'"
-                [class.border-rose-100]="selectedResult !== 'غير معترف'"
-                [class.dark:border-rose-900/30]="selectedResult !== 'غير معترف'"
-                [class.text-rose-700]="selectedResult !== 'غير معترف'"
-                [class.dark:text-rose-400]="selectedResult !== 'غير معترف'" (click)="handleResultClick('غير معترف')">غير
-                معترف</button>
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-emerald-600]="selectedResult === 'خصم'" [class.border-emerald-600]="selectedResult === 'خصم'"
-                [class.text-white]="selectedResult === 'خصم'" [class.bg-white]="selectedResult !== 'خصم'"
-                [class.dark:bg-slate-800]="selectedResult !== 'خصم'"
-                [class.border-emerald-100]="selectedResult !== 'خصم'"
-                [class.dark:border-emerald-900/30]="selectedResult !== 'خصم'"
-                [class.text-emerald-700]="selectedResult !== 'خصم'"
-                [class.dark:text-emerald-400]="selectedResult !== 'خصم'" (click)="handleResultClick('خصم')">خصم</button>
-            </div>
-
-            <!-- Row 4: Statuses (Amber Theme) -->
-            <div class="grid grid-cols-3 gap-2">
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-amber-600]="selectedResult === 'مفصول'" [class.border-amber-600]="selectedResult === 'مفصول'"
-                [class.text-white]="selectedResult === 'مفصول'" [class.bg-white]="selectedResult !== 'مفصول'"
-                [class.dark:bg-slate-800]="selectedResult !== 'مفصول'"
-                [class.border-amber-100]="selectedResult !== 'مفصول'"
-                [class.dark:border-amber-900/30]="selectedResult !== 'مفصول'"
-                [class.text-amber-700]="selectedResult !== 'مفصول'"
-                [class.dark:text-amber-400]="selectedResult !== 'مفصول'"
-                (click)="handleResultClick('مفصول')">مفصول</button>
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-amber-600]="selectedResult === 'لا يرد'"
-                [class.border-amber-600]="selectedResult === 'لا يرد'" [class.text-white]="selectedResult === 'لا يرد'"
-                [class.bg-white]="selectedResult !== 'لا يرد'" [class.dark:bg-slate-800]="selectedResult !== 'لا يرد'"
-                [class.border-amber-100]="selectedResult !== 'لا يرد'"
-                [class.dark:border-amber-900/30]="selectedResult !== 'لا يرد'"
-                [class.text-amber-700]="selectedResult !== 'لا يرد'"
-                [class.dark:text-amber-400]="selectedResult !== 'لا يرد'" (click)="handleResultClick('لا يرد')">لا
-                يرد</button>
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-amber-600]="selectedResult === 'مغلق'" [class.border-amber-600]="selectedResult === 'مغلق'"
-                [class.text-white]="selectedResult === 'مغلق'" [class.bg-white]="selectedResult !== 'مغلق'"
-                [class.dark:bg-slate-800]="selectedResult !== 'مغلق'"
-                [class.border-amber-100]="selectedResult !== 'مغلق'"
-                [class.dark:border-amber-900/30]="selectedResult !== 'مغلق'"
-                [class.text-amber-700]="selectedResult !== 'مغلق'"
-                [class.dark:text-amber-400]="selectedResult !== 'مغلق'"
-                (click)="handleResultClick('مغلق')">مغلق</button>
-            </div>
-
-            <!-- Row 5: Errors (Rose Theme) -->
-            <div class="grid grid-cols-3 gap-2">
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-rose-600]="selectedResult === 'رفض السداد'"
-                [class.border-rose-600]="selectedResult === 'رفض السداد'"
-                [class.text-white]="selectedResult === 'رفض السداد'" [class.bg-white]="selectedResult !== 'رفض السداد'"
-                [class.dark:bg-slate-800]="selectedResult !== 'رفض السداد'"
-                [class.border-rose-100]="selectedResult !== 'رفض السداد'"
-                [class.dark:border-rose-900/30]="selectedResult !== 'رفض السداد'"
-                [class.text-rose-700]="selectedResult !== 'رفض السداد'"
-                [class.dark:text-rose-400]="selectedResult !== 'رفض السداد'"
-                (click)="handleResultClick('رفض السداد')">رفض السداد</button>
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-rose-600]="selectedResult === 'رقم خطأ'"
-                [class.border-rose-600]="selectedResult === 'رقم خطأ'" [class.text-white]="selectedResult === 'رقم خطأ'"
-                [class.bg-white]="selectedResult !== 'رقم خطأ'" [class.dark:bg-slate-800]="selectedResult !== 'رقم خطأ'"
-                [class.border-rose-100]="selectedResult !== 'رقم خطأ'"
-                [class.dark:border-rose-900/30]="selectedResult !== 'رقم خطأ'"
-                [class.text-rose-700]="selectedResult !== 'رقم خطأ'"
-                [class.dark:text-rose-400]="selectedResult !== 'رقم خطأ'" (click)="handleResultClick('رقم خطأ')">رقم
-                خطأ</button>
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-rose-600]="selectedResult === 'لا يوجد رقم'"
-                [class.border-rose-600]="selectedResult === 'لا يوجد رقم'"
-                [class.text-white]="selectedResult === 'لا يوجد رقم'"
-                [class.bg-white]="selectedResult !== 'لا يوجد رقم'"
-                [class.dark:bg-slate-800]="selectedResult !== 'لا يوجد رقم'"
-                [class.border-rose-100]="selectedResult !== 'لا يوجد رقم'"
-                [class.dark:border-rose-900/30]="selectedResult !== 'لا يوجد رقم'"
-                [class.text-rose-700]="selectedResult !== 'لا يوجد رقم'"
-                [class.dark:text-rose-400]="selectedResult !== 'لا يوجد رقم'"
-                (click)="handleResultClick('لا يوجد رقم')">لا يوجد رقم</button>
-            </div>
-
-            <!-- Row 6: Actions (Slate Theme) -->
-            <div class="grid grid-cols-3 gap-2">
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-slate-600]="selectedResult === 'رفع الإجراءات'"
-                [class.border-slate-600]="selectedResult === 'رفع الإجراءات'"
-                [class.text-white]="selectedResult === 'رفع الإجراءات'"
-                [class.bg-slate-50]="selectedResult !== 'رفع الإجراءات'"
-                [class.dark:bg-slate-800]="selectedResult !== 'رفع الإجراءات'"
-                [class.border-slate-200]="selectedResult !== 'رفع الإجراءات'"
-                [class.dark:border-slate-700]="selectedResult !== 'رفع الإجراءات'"
-                [class.text-slate-600]="selectedResult !== 'رفع الإجراءات'"
-                [class.dark:text-slate-400]="selectedResult !== 'رفع الإجراءات'"
-                (click)="handleResultClick('رفع الإجراءات')">رفع الإجراءات</button>
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-slate-600]="selectedResult === 'تأجيل متابعة'"
-                [class.border-slate-600]="selectedResult === 'تأجيل متابعة'"
-                [class.text-white]="selectedResult === 'تأجيل متابعة'"
-                [class.bg-slate-50]="selectedResult !== 'تأجيل متابعة'"
-                [class.dark:bg-slate-800]="selectedResult !== 'تأجيل متابعة'"
-                [class.border-slate-200]="selectedResult !== 'تأجيل متابعة'"
-                [class.dark:border-slate-700]="selectedResult !== 'تأجيل متابعة'"
-                [class.text-slate-600]="selectedResult !== 'تأجيل متابعة'"
-                [class.dark:text-slate-400]="selectedResult !== 'تأجيل متابعة'"
-                (click)="handleResultClick('تأجيل متابعة')">تأجيل متابعة</button>
-              <button
-                class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
-                [class.bg-slate-600]="selectedResult === 'مطلوب إجراء'"
-                [class.border-slate-600]="selectedResult === 'مطلوب إجراء'"
-                [class.text-white]="selectedResult === 'مطلوب إجراء'"
-                [class.bg-slate-50]="selectedResult !== 'مطلوب إجراء'"
-                [class.dark:bg-slate-800]="selectedResult !== 'مطلوب إجراء'"
-                [class.border-slate-200]="selectedResult !== 'مطلوب إجراء'"
-                [class.dark:border-slate-700]="selectedResult !== 'مطلوب إجراء'"
-                [class.text-slate-600]="selectedResult !== 'مطلوب إجراء'"
-                [class.dark:text-slate-400]="selectedResult !== 'مطلوب إجراء'"
-                (click)="handleResultClick('مطلوب إجراء')">مطلوب إجراء</button>
-            </div>
-          </div>
-
-          <!-- Advanced Statement Details (New Request) -->
-          <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
-            <h5
-              class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 flex items-center gap-2 mb-2">
-              <i class="fas fa-edit"></i> تفاصيل إضافية للإفادة
-            </h5>
-
-            <div class="grid grid-cols-2 gap-3">
-              <!-- Phone & Owner -->
-              <div class="space-y-1.5">
-                <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">رقم الهاتف المتواصل
-                  معه</label>
-                <div class="relative">
-                  <input type="text" [(ngModel)]="statementDetails.phoneNumber"
-                    class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-8 px-2 text-xs font-bold text-blue-600 dark:text-blue-400 focus:outline-none focus:border-blue-500 transition-all"
-                    placeholder="رقم الهاتف...">
-                </div>
-              </div>
-              <div class="space-y-1.5">
-                <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">صاحب الهاتف</label>
-                <input type="text" [(ngModel)]="statementDetails.phoneOwner"
-                  class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-8 px-2 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-blue-500 transition-all"
-                  placeholder="الموكل، الاب، الخ...">
-              </div>
-
-              <!-- Next Action & Date -->
-              <div class="space-y-1.5">
-                <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">الإجراء القادم</label>
-                <input type="text" [(ngModel)]="statementDetails.nextAction"
-                  class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-8 px-2 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-blue-500 transition-all"
-                  placeholder="إعادة اتصال، رفع إجراء...">
-              </div>
-              <div class="space-y-1.5">
-                <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">تاريخ المتابعة</label>
-                <input type="date" [(ngModel)]="statementDetails.nextDate"
-                  class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-8 px-2 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-blue-500 transition-all">
-              </div>
-            </div>
-
-            <!-- Full-width Notes -->
-            <div class="space-y-1.5">
-              <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">الملاحظات
-                (Notes)</label>
-              <textarea [(ngModel)]="statementDetails.notes"
-                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-2 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-inner focus:outline-none focus:border-blue-500 min-h-[50px] resize-none transition-all"
-                placeholder="اكتب تفاصيل المكالمة أو أي ملاحظات أخرى هنا..."></textarea>
-            </div>
-          </div>
-
-          <div
-            class="bg-slate-50/80 dark:bg-slate-800/80 mt-4 rounded-xl p-3 border border-slate-100 dark:border-slate-700 transition-all flex items-center justify-between shadow-inner">
-            <div class="flex items-center gap-3 text-[11px]">
-              <span class="font-bold text-slate-700 dark:text-slate-300">الملخص:</span>
-              <span
-                class="text-slate-500 dark:text-slate-400 font-medium px-2 py-1 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 shadow-sm min-w-24 text-center">{{
-                selectedAction ? selectedAction : 'اختر وسيلة' }}</span>
-              <span class="text-slate-400">—</span>
-              <span
-                class="text-slate-500 dark:text-slate-400 font-medium px-2 py-1 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 shadow-sm min-w-32 text-center text-primary dark:text-primary">{{
-                selectedResult ? selectedResult : 'النتيجة' }}</span>
-            </div>
-
-            <button
-              class="premium-btn premium-btn-primary py-1 px-4 text-xs font-bold shadow-md hover:shadow-lg transition-all"
-              (click)="triggerSaveStatement()">
-              <span class="ml-1 text-sm">💾</span> حفظ
-            </button>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 
+  <!-- Negotiation Row -->
+  <div class="grid grid-cols-12 gap-4 mt-6">
+
+    <!-- Negotiation Method & Review -->
+    <div class="col-span-12 lg:col-span-4 premium-card p-0">
+      <div class="card-header py-2 px-3">
+        <h3 class="text-sm font-bold">وسيلة التفاوض</h3>
+      </div>
+      <div class="card-body p-3">
+        <div class="grid grid-cols-2 gap-2 mb-2">
+          <ng-container *ngFor="let row of negotiationMethodsRows">
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 shadow-sm"
+              [class.bg-primary]="selectedAction === row.left" [class.border-primary]="selectedAction === row.left"
+              [class.text-white]="selectedAction === row.left" [class.bg-white]="selectedAction !== row.left"
+              [class.dark:bg-slate-800]="selectedAction !== row.left"
+              [class.border-slate-200]="selectedAction !== row.left"
+              [class.dark:border-slate-700]="selectedAction !== row.left"
+              [class.text-slate-700]="selectedAction !== row.left"
+              [class.dark:text-slate-300]="selectedAction !== row.left" (click)="selectAction(row.left)">
+              {{ row.left }}
+            </button>
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 shadow-sm"
+              [class.bg-primary]="selectedAction === row.right" [class.border-primary]="selectedAction === row.right"
+              [class.text-white]="selectedAction === row.right" [class.bg-white]="selectedAction !== row.right"
+              [class.dark:bg-slate-800]="selectedAction !== row.right"
+              [class.border-slate-200]="selectedAction !== row.right"
+              [class.dark:border-slate-700]="selectedAction !== row.right"
+              [class.text-slate-700]="selectedAction !== row.right"
+              [class.dark:text-slate-300]="selectedAction !== row.right" (click)="selectAction(row.right)">
+              {{ row.right }}
+            </button>
+          </ng-container>
+        </div>
+        <div class="mt-2 text-center">
+          <button class="premium-btn premium-btn-outline w-full py-1.5 text-xs">تحليل الإفادات</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Negotiation Outcome -->
+    <div class="col-span-12 lg:col-span-8 premium-card p-0">
+      <div class="card-header py-2 px-3">
+        <h3 class="text-sm font-bold w-full text-center">نتيجة التفاوض</h3>
+      </div>
+      <div class="card-body p-3">
+        <div class="flex flex-col gap-2.5">
+          <!-- Row 1: Key Positive Outcomes (Emerald Theme) -->
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-emerald-600]="selectedResult === 'طلب مهلة'"
+              [class.border-emerald-600]="selectedResult === 'طلب مهلة'"
+              [class.text-white]="selectedResult === 'طلب مهلة'" [class.scale-[1.02]]="selectedResult === 'طلب مهلة'"
+              [class.bg-white]="selectedResult !== 'طلب مهلة'" [class.dark:bg-slate-800]="selectedResult !== 'طلب مهلة'"
+              [class.border-emerald-100]="selectedResult !== 'طلب مهلة'"
+              [class.dark:border-emerald-900/30]="selectedResult !== 'طلب مهلة'"
+              [class.text-emerald-700]="selectedResult !== 'طلب مهلة'"
+              [class.dark:text-emerald-400]="selectedResult !== 'طلب مهلة'" (click)="handleResultClick('طلب مهلة')">طلب
+              مهلة</button>
+
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-emerald-600]="selectedResult.includes('تقسيط')"
+              [class.border-emerald-600]="selectedResult.includes('تقسيط')"
+              [class.text-white]="selectedResult.includes('تقسيط')"
+              [class.scale-[1.02]]="selectedResult.includes('تقسيط')"
+              [class.bg-white]="selectedResult.includes('تقسيط') === false"
+              [class.dark:bg-slate-800]="selectedResult.includes('تقسيط') === false"
+              [class.border-emerald-100]="selectedResult.includes('تقسيط') === false"
+              [class.dark:border-emerald-900/30]="selectedResult.includes('تقسيط') === false"
+              [class.text-emerald-700]="selectedResult.includes('تقسيط') === false"
+              [class.dark:text-emerald-400]="selectedResult.includes('تقسيط') === false"
+              (click)="handleResultClick('تقسيط')">تقسيط</button>
+
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-emerald-600]="selectedResult.includes('وعد بالسداد')"
+              [class.border-emerald-600]="selectedResult.includes('وعد بالسداد')"
+              [class.text-white]="selectedResult.includes('وعد بالسداد')"
+              [class.scale-[1.02]]="selectedResult.includes('وعد بالسداد')"
+              [class.bg-white]="selectedResult.includes('وعد بالسداد') === false"
+              [class.dark:bg-slate-800]="selectedResult.includes('وعد بالسداد') === false"
+              [class.border-emerald-100]="selectedResult.includes('وعد بالسداد') === false"
+              [class.dark:border-emerald-900/30]="selectedResult.includes('وعد بالسداد') === false"
+              [class.text-emerald-700]="selectedResult.includes('وعد بالسداد') === false"
+              [class.dark:text-emerald-400]="selectedResult.includes('وعد بالسداد') === false"
+              (click)="handleResultClick('وعد بالسداد')">وعد بالسداد</button>
+          </div>
+
+          <!-- Row 2: Operational/Review (Blue Theme) -->
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-blue-600]="selectedResult === 'شكوى'" [class.border-blue-600]="selectedResult === 'شكوى'"
+              [class.text-white]="selectedResult === 'شكوى'" [class.bg-white]="selectedResult !== 'شكوى'"
+              [class.dark:bg-slate-800]="selectedResult !== 'شكوى'" [class.border-blue-100]="selectedResult !== 'شكوى'"
+              [class.dark:border-blue-900/30]="selectedResult !== 'شكوى'"
+              [class.text-blue-700]="selectedResult !== 'شكوى'" [class.dark:text-blue-400]="selectedResult !== 'شكوى'"
+              (click)="handleResultClick('شكوى')">شكوى</button>
+
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-indigo-600]="selectedResult.includes('مراجعة')"
+              [class.border-indigo-600]="selectedResult.includes('مراجعة')"
+              [class.text-white]="selectedResult.includes('مراجعة')"
+              [class.bg-white]="selectedResult.includes('مراجعة') === false"
+              [class.dark:bg-slate-800]="selectedResult.includes('مراجعة') === false"
+              [class.border-indigo-100]="selectedResult.includes('مراجعة') === false"
+              [class.dark:border-indigo-900/30]="selectedResult.includes('مراجعة') === false"
+              [class.text-indigo-700]="selectedResult.includes('مراجعة') === false"
+              [class.dark:text-indigo-400]="selectedResult.includes('مراجعة') === false"
+              (click)="handleResultClick('مراجعة')">مراجعة</button>
+
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-blue-600]="selectedResult === 'فتح و إغلاق'"
+              [class.border-blue-600]="selectedResult === 'فتح و إغلاق'"
+              [class.text-white]="selectedResult === 'فتح و إغلاق'" [class.bg-white]="selectedResult !== 'فتح و إغلاق'"
+              [class.dark:bg-slate-800]="selectedResult !== 'فتح و إغلاق'"
+              [class.border-blue-100]="selectedResult !== 'فتح و إغلاق'"
+              [class.dark:border-blue-900/30]="selectedResult !== 'فتح و إغلاق'"
+              [class.text-blue-700]="selectedResult !== 'فتح و إغلاق'"
+              [class.dark:text-blue-400]="selectedResult !== 'فتح و إغلاق'"
+              (click)="handleResultClick('فتح و إغلاق')">فتح و إغلاق</button>
+          </div>
+
+          <!-- Row 3: Denials (Rose Theme) -->
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-rose-600]="selectedResult === 'أنكر نفسه'"
+              [class.border-rose-600]="selectedResult === 'أنكر نفسه'"
+              [class.text-white]="selectedResult === 'أنكر نفسه'" [class.bg-white]="selectedResult !== 'أنكر نفسه'"
+              [class.dark:bg-slate-800]="selectedResult !== 'أنكر نفسه'"
+              [class.border-rose-100]="selectedResult !== 'أنكر نفسه'"
+              [class.dark:border-rose-900/30]="selectedResult !== 'أنكر نفسه'"
+              [class.text-rose-700]="selectedResult !== 'أنكر نفسه'"
+              [class.dark:text-rose-400]="selectedResult !== 'أنكر نفسه'" (click)="handleResultClick('أنكر نفسه')">أنكر
+              نفسه</button>
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-rose-600]="selectedResult === 'غير معترف'"
+              [class.border-rose-600]="selectedResult === 'غير معترف'"
+              [class.text-white]="selectedResult === 'غير معترف'" [class.bg-white]="selectedResult !== 'غير معترف'"
+              [class.dark:bg-slate-800]="selectedResult !== 'غير معترف'"
+              [class.border-rose-100]="selectedResult !== 'غير معترف'"
+              [class.dark:border-rose-900/30]="selectedResult !== 'غير معترف'"
+              [class.text-rose-700]="selectedResult !== 'غير معترف'"
+              [class.dark:text-rose-400]="selectedResult !== 'غير معترف'" (click)="handleResultClick('غير معترف')">غير
+              معترف</button>
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-emerald-600]="selectedResult === 'خصم'" [class.border-emerald-600]="selectedResult === 'خصم'"
+              [class.text-white]="selectedResult === 'خصم'" [class.bg-white]="selectedResult !== 'خصم'"
+              [class.dark:bg-slate-800]="selectedResult !== 'خصم'" [class.border-emerald-100]="selectedResult !== 'خصم'"
+              [class.dark:border-emerald-900/30]="selectedResult !== 'خصم'"
+              [class.text-emerald-700]="selectedResult !== 'خصم'"
+              [class.dark:text-emerald-400]="selectedResult !== 'خصم'" (click)="handleResultClick('خصم')">خصم</button>
+          </div>
+
+          <!-- Row 4: Statuses (Amber Theme) -->
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-amber-600]="selectedResult === 'مفصول'" [class.border-amber-600]="selectedResult === 'مفصول'"
+              [class.text-white]="selectedResult === 'مفصول'" [class.bg-white]="selectedResult !== 'مفصول'"
+              [class.dark:bg-slate-800]="selectedResult !== 'مفصول'"
+              [class.border-amber-100]="selectedResult !== 'مفصول'"
+              [class.dark:border-amber-900/30]="selectedResult !== 'مفصول'"
+              [class.text-amber-700]="selectedResult !== 'مفصول'"
+              [class.dark:text-amber-400]="selectedResult !== 'مفصول'"
+              (click)="handleResultClick('مفصول')">مفصول</button>
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-amber-600]="selectedResult === 'لا يرد'" [class.border-amber-600]="selectedResult === 'لا يرد'"
+              [class.text-white]="selectedResult === 'لا يرد'" [class.bg-white]="selectedResult !== 'لا يرد'"
+              [class.dark:bg-slate-800]="selectedResult !== 'لا يرد'"
+              [class.border-amber-100]="selectedResult !== 'لا يرد'"
+              [class.dark:border-amber-900/30]="selectedResult !== 'لا يرد'"
+              [class.text-amber-700]="selectedResult !== 'لا يرد'"
+              [class.dark:text-amber-400]="selectedResult !== 'لا يرد'" (click)="handleResultClick('لا يرد')">لا
+              يرد</button>
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-amber-600]="selectedResult === 'مغلق'" [class.border-amber-600]="selectedResult === 'مغلق'"
+              [class.text-white]="selectedResult === 'مغلق'" [class.bg-white]="selectedResult !== 'مغلق'"
+              [class.dark:bg-slate-800]="selectedResult !== 'مغلق'" [class.border-amber-100]="selectedResult !== 'مغلق'"
+              [class.dark:border-amber-900/30]="selectedResult !== 'مغلق'"
+              [class.text-amber-700]="selectedResult !== 'مغلق'" [class.dark:text-amber-400]="selectedResult !== 'مغلق'"
+              (click)="handleResultClick('مغلق')">مغلق</button>
+          </div>
+
+          <!-- Row 5: Errors (Rose Theme) -->
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-rose-600]="selectedResult === 'رفض السداد'"
+              [class.border-rose-600]="selectedResult === 'رفض السداد'"
+              [class.text-white]="selectedResult === 'رفض السداد'" [class.bg-white]="selectedResult !== 'رفض السداد'"
+              [class.dark:bg-slate-800]="selectedResult !== 'رفض السداد'"
+              [class.border-rose-100]="selectedResult !== 'رفض السداد'"
+              [class.dark:border-rose-900/30]="selectedResult !== 'رفض السداد'"
+              [class.text-rose-700]="selectedResult !== 'رفض السداد'"
+              [class.dark:text-rose-400]="selectedResult !== 'رفض السداد'" (click)="handleResultClick('رفض السداد')">رفض
+              السداد</button>
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-rose-600]="selectedResult === 'رقم خطأ'" [class.border-rose-600]="selectedResult === 'رقم خطأ'"
+              [class.text-white]="selectedResult === 'رقم خطأ'" [class.bg-white]="selectedResult !== 'رقم خطأ'"
+              [class.dark:bg-slate-800]="selectedResult !== 'رقم خطأ'"
+              [class.border-rose-100]="selectedResult !== 'رقم خطأ'"
+              [class.dark:border-rose-900/30]="selectedResult !== 'رقم خطأ'"
+              [class.text-rose-700]="selectedResult !== 'رقم خطأ'"
+              [class.dark:text-rose-400]="selectedResult !== 'رقم خطأ'" (click)="handleResultClick('رقم خطأ')">رقم
+              خطأ</button>
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-rose-600]="selectedResult === 'لا يوجد رقم'"
+              [class.border-rose-600]="selectedResult === 'لا يوجد رقم'"
+              [class.text-white]="selectedResult === 'لا يوجد رقم'" [class.bg-white]="selectedResult !== 'لا يوجد رقم'"
+              [class.dark:bg-slate-800]="selectedResult !== 'لا يوجد رقم'"
+              [class.border-rose-100]="selectedResult !== 'لا يوجد رقم'"
+              [class.dark:border-rose-900/30]="selectedResult !== 'لا يوجد رقم'"
+              [class.text-rose-700]="selectedResult !== 'لا يوجد رقم'"
+              [class.dark:text-rose-400]="selectedResult !== 'لا يوجد رقم'"
+              (click)="handleResultClick('لا يوجد رقم')">لا يوجد رقم</button>
+          </div>
+
+          <!-- Row 6: Actions (Slate Theme) -->
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-slate-600]="selectedResult === 'رفع الإجراءات'"
+              [class.border-slate-600]="selectedResult === 'رفع الإجراءات'"
+              [class.text-white]="selectedResult === 'رفع الإجراءات'"
+              [class.bg-slate-50]="selectedResult !== 'رفع الإجراءات'"
+              [class.dark:bg-slate-800]="selectedResult !== 'رفع الإجراءات'"
+              [class.border-slate-200]="selectedResult !== 'رفع الإجراءات'"
+              [class.dark:border-slate-700]="selectedResult !== 'رفع الإجراءات'"
+              [class.text-slate-600]="selectedResult !== 'رفع الإجراءات'"
+              [class.dark:text-slate-400]="selectedResult !== 'رفع الإجراءات'"
+              (click)="handleResultClick('رفع الإجراءات')">رفع الإجراءات</button>
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-slate-600]="selectedResult === 'تأجيل متابعة'"
+              [class.border-slate-600]="selectedResult === 'تأجيل متابعة'"
+              [class.text-white]="selectedResult === 'تأجيل متابعة'"
+              [class.bg-slate-50]="selectedResult !== 'تأجيل متابعة'"
+              [class.dark:bg-slate-800]="selectedResult !== 'تأجيل متابعة'"
+              [class.border-slate-200]="selectedResult !== 'تأجيل متابعة'"
+              [class.dark:border-slate-700]="selectedResult !== 'تأجيل متابعة'"
+              [class.text-slate-600]="selectedResult !== 'تأجيل متابعة'"
+              [class.dark:text-slate-400]="selectedResult !== 'تأجيل متابعة'"
+              (click)="handleResultClick('تأجيل متابعة')">تأجيل متابعة</button>
+            <button
+              class="premium-btn py-2 px-1 text-[11px] font-bold rounded-lg border transition-all duration-200 w-full shadow-sm"
+              [class.bg-slate-600]="selectedResult === 'مطلوب إجراء'"
+              [class.border-slate-600]="selectedResult === 'مطلوب إجراء'"
+              [class.text-white]="selectedResult === 'مطلوب إجراء'"
+              [class.bg-slate-50]="selectedResult !== 'مطلوب إجراء'"
+              [class.dark:bg-slate-800]="selectedResult !== 'مطلوب إجراء'"
+              [class.border-slate-200]="selectedResult !== 'مطلوب إجراء'"
+              [class.dark:border-slate-700]="selectedResult !== 'مطلوب إجراء'"
+              [class.text-slate-600]="selectedResult !== 'مطلوب إجراء'"
+              [class.dark:text-slate-400]="selectedResult !== 'مطلوب إجراء'"
+              (click)="handleResultClick('مطلوب إجراء')">مطلوب إجراء</button>
+          </div>
+        </div>
+
+        <!-- Advanced Statement Details (New Request) -->
+        <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
+          <h5
+            class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 flex items-center gap-2 mb-2">
+            <i class="fas fa-edit"></i> تفاصيل إضافية للإفادة
+          </h5>
+
+          <div class="grid grid-cols-2 gap-3">
+            <!-- Phone & Owner -->
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">رقم الهاتف المتواصل
+                معه</label>
+              <div class="relative">
+                <input type="text" [(ngModel)]="statementDetails.phoneNumber"
+                  class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-8 px-2 text-xs font-bold text-blue-600 dark:text-blue-400 focus:outline-none focus:border-blue-500 transition-all"
+                  placeholder="رقم الهاتف...">
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">صاحب الهاتف</label>
+              <input type="text" [(ngModel)]="statementDetails.phoneOwner"
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-8 px-2 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-blue-500 transition-all"
+                placeholder="الموكل، الاب، الخ...">
+            </div>
+
+            <!-- Next Action & Date -->
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">الإجراء القادم</label>
+              <input type="text" [(ngModel)]="statementDetails.nextAction"
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-8 px-2 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-blue-500 transition-all"
+                placeholder="إعادة اتصال، رفع إجراء...">
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">تاريخ المتابعة</label>
+              <input type="date" [(ngModel)]="statementDetails.nextDate"
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg h-8 px-2 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-blue-500 transition-all">
+            </div>
+          </div>
+
+          <!-- Full-width Notes -->
+          <div class="space-y-1.5">
+            <label class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">الملاحظات
+              (Notes)</label>
+            <textarea [(ngModel)]="statementDetails.notes"
+              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-2 text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-inner focus:outline-none focus:border-blue-500 min-h-[50px] resize-none transition-all"
+              placeholder="اكتب تفاصيل المكالمة أو أي ملاحظات أخرى هنا..."></textarea>
+          </div>
+        </div>
+
+        <div
+          class="bg-slate-50/80 dark:bg-slate-800/80 mt-4 rounded-xl p-3 border border-slate-100 dark:border-slate-700 transition-all flex items-center justify-between shadow-inner">
+          <div class="flex items-center gap-3 text-[11px]">
+            <span class="font-bold text-slate-700 dark:text-slate-300">الملخص:</span>
+            <span
+              class="text-slate-500 dark:text-slate-400 font-medium px-2 py-1 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 shadow-sm min-w-24 text-center">{{
+              selectedAction ? selectedAction : 'اختر وسيلة' }}</span>
+            <span class="text-slate-400">—</span>
+            <span
+              class="text-slate-500 dark:text-slate-400 font-medium px-2 py-1 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 shadow-sm min-w-32 text-center text-primary dark:text-primary">{{
+              selectedResult ? selectedResult : 'النتيجة' }}</span>
+          </div>
+
+          <button
+            class="premium-btn premium-btn-primary py-1 px-4 text-xs font-bold shadow-md hover:shadow-lg transition-all"
+            (click)="triggerSaveStatement()">
+            <span class="ml-1 text-sm">💾</span> حفظ
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
+
 
 
 
@@ -1994,11 +2182,13 @@
       </div>
     </div>
 
+    </div>
   </div>
-</div>
 
 
 <!-- searchNumbers -->
+
+
 <div *ngIf="activeMainTab === 'searchNumbers'">
   <div class="flex h-full gap-4 p-2">
 
@@ -2779,7 +2969,7 @@
   </div>
 </dialog>
 
-<app-lookup-modal #lookupModal (itemSelected)="onLookupSelected($event)"></app-lookup-modal>
+
 
 <!-- Installment Mini Modal -->
 <dialog id="installmentModal" class="modal" dir="rtl">
