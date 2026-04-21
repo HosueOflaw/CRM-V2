@@ -4,6 +4,7 @@ using House_of_law_api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace House_of_law_api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260413100229_AddStatusHistoryTables")]
+    partial class AddStatusHistoryTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -545,44 +548,6 @@ namespace House_of_law_api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("file_statuses");
-                });
-
-            modelBuilder.Entity("House_of_law_api.Modules.AcceptanceHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("date_added");
-
-                    b.Property<long>("FileCode")
-                        .HasColumnType("bigint")
-                        .HasColumnName("file_code");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("int")
-                        .HasColumnName("status_id");
-
-                    b.Property<string>("StatusName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("status_name");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("user_name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("acceptance_history");
                 });
 
             modelBuilder.Entity("House_of_law_api.Modules.ActionStatusHistory", b =>
@@ -1314,44 +1279,6 @@ namespace House_of_law_api.Migrations
                     b.ToTable("custody_statements");
                 });
 
-            modelBuilder.Entity("House_of_law_api.Modules.DiscountHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("date_added");
-
-                    b.Property<long>("FileCode")
-                        .HasColumnType("bigint")
-                        .HasColumnName("file_code");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("int")
-                        .HasColumnName("status_id");
-
-                    b.Property<string>("StatusName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("status_name");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("user_name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("discount_history");
-                });
-
             modelBuilder.Entity("House_of_law_api.Modules.FileStatusHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -1464,44 +1391,6 @@ namespace House_of_law_api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("internal_status_history");
-                });
-
-            modelBuilder.Entity("House_of_law_api.Modules.JobHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("date_added");
-
-                    b.Property<long>("FileCode")
-                        .HasColumnType("bigint")
-                        .HasColumnName("file_code");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("int")
-                        .HasColumnName("status_id");
-
-                    b.Property<string>("StatusName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("status_name");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("user_name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("job_history");
                 });
 
             modelBuilder.Entity("House_of_law_api.Modules.LookupValue", b =>
@@ -1673,44 +1562,6 @@ namespace House_of_law_api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("payment_status_history");
-                });
-
-            modelBuilder.Entity("House_of_law_api.Modules.SalaryHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("date_added");
-
-                    b.Property<long>("FileCode")
-                        .HasColumnType("bigint")
-                        .HasColumnName("file_code");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("int")
-                        .HasColumnName("status_id");
-
-                    b.Property<string>("StatusName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("status_name");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("user_name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("salary_history");
                 });
 
             modelBuilder.Entity("ImportJob", b =>

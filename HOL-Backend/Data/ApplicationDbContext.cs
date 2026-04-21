@@ -33,6 +33,22 @@ public class ApplicationDbContext : DbContext
   public DbSet<CustodyStatement> CustodyStatements => Set<CustodyStatement>();
   public DbSet<LookupValue> LookupValues => Set<LookupValue>();
 
+  // Status History Tables
+  public DbSet<House_of_law_api.Modules.ClientStatusHistory> ClientStatusHistories { get; set; }
+  public DbSet<House_of_law_api.Modules.ClaimStatusHistory> ClaimStatusHistories { get; set; }
+  public DbSet<House_of_law_api.Modules.PaymentStatusHistory> PaymentStatusHistories { get; set; }
+  public DbSet<House_of_law_api.Modules.FileStatusHistory> FileStatusHistories { get; set; }
+  public DbSet<House_of_law_api.Modules.ActionStatusHistory> ActionStatusHistories { get; set; }
+  public DbSet<House_of_law_api.Modules.FollowUpStatusHistory> FollowUpStatusHistories { get; set; }
+  public DbSet<House_of_law_api.Modules.InternalStatusHistory> InternalStatusHistories { get; set; }
+  public DbSet<House_of_law_api.Modules.CivilStatusHistory> CivilStatusHistories { get; set; }
+  public DbSet<House_of_law_api.Modules.ContactStatusHistory> ContactStatusHistories { get; set; }
+  public DbSet<House_of_law_api.Modules.CooperationStatusHistory> CooperationStatusHistories { get; set; }
+  public DbSet<House_of_law_api.Modules.DiscountHistory> DiscountHistories { get; set; }
+  public DbSet<House_of_law_api.Modules.AcceptanceHistory> AcceptanceHistories { get; set; }
+  public DbSet<House_of_law_api.Modules.JobHistory> JobHistories { get; set; }
+  public DbSet<House_of_law_api.Modules.SalaryHistory> SalaryHistories { get; set; }
+
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     base.OnModelCreating(modelBuilder);

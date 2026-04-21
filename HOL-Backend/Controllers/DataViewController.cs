@@ -1852,4 +1852,63 @@ public class DataViewController : ControllerBase
 
     return Ok(payments);
   }
+
+  // GET: api/DataView/files/{id}/category-history/{category}
+  [HttpGet("files/{id}/category-history/{category}")]
+  public async Task<IActionResult> GetCategoryHistory(long id, string category)
+  {
+    category = category?.ToLower();
+    object history = null;
+
+    switch (category)
+    {
+      case "client":
+        history = await _context.ClientStatusHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      case "claim":
+        history = await _context.ClaimStatusHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      case "payment":
+        history = await _context.PaymentStatusHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      case "file":
+        history = await _context.FileStatusHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      case "action":
+        history = await _context.ActionStatusHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      case "followup":
+        history = await _context.FollowUpStatusHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      case "internal":
+        history = await _context.InternalStatusHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      case "civil":
+        history = await _context.CivilStatusHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      case "contact":
+        history = await _context.ContactStatusHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      case "cooperation":
+        history = await _context.CooperationStatusHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      case "discount":
+        history = await _context.DiscountHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      case "acceptance":
+        history = await _context.AcceptanceHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      case "work":
+        history = await _context.JobHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      case "salarydate":
+      case "incomenotes":
+        history = await _context.SalaryHistories.AsNoTracking().Where(h => h.FileCode == id).OrderByDescending(h => h.DateAdded).ToListAsync();
+        break;
+      default:
+        return BadRequest($"Unknown category: {category}");
+    }
+
+    return Ok(history);
+  }
 }
