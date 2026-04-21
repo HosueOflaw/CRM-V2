@@ -82,7 +82,7 @@ export class ClientFollowUp implements OnInit {
       next: (results: any[]) => {
         this.loading = false;
         if (results && results.length > 0) {
-          this.onClientSelected(results[0]);
+          this.onClientSelected(results);
         } else {
           import('sweetalert2').then(Swal => {
             Swal.default.fire({
@@ -117,88 +117,89 @@ export class ClientFollowUp implements OnInit {
    * نستخدم id لجلب FileDetails (المديونيات)
    * ونستخدم code لجلب بقية البيانات المرتبطة (Payments, Attachments, etc.)
    */
-  private fetchAdditionalData(mainfile: any) {
-    const id = mainfile.id || mainfile.Id;
-    if (!mainfile || !id) return;
-    this.loading = true;
+  fetchAdditionalData(mainfile: any) {
+    // Use the first file for primary stats and header info
+    const primaryFile = Array.isArray(mainfile) ? mainfile[0] : mainfile;
+    const mainfileId = primaryFile.id || primaryFile.Id;
+    const fileCode = primaryFile.code || primaryFile.Code;
+    const classificationName = primaryFile.classification?.classification || '';
 
-    const mainfileId = mainfile.id || mainfile.Id;
-    const fileCode = mainfile.code || mainfile.Code;
-    const classificationName = mainfile.classification?.classification || '';
+    console.log(`جاري جلب البيانات المرتبطة... عدد الملفات المستهدفة: ${Array.isArray(mainfile) ? mainfile.length : 1}`);
 
-    console.log(`جاري جلب البيانات المرتبطة للكود: ${fileCode} والمعرف: ${mainfileId}`);
-
-    // Fetch Dashboard Stats specifically for this file
+    // Fetch Dashboard Stats for the primary file
     this.fetchDashboardStats(fileCode);
 
-    // 1. جلب تفاصيل المديونيات (بحث عن طريق معرف المين فايل)
-    this.negotiationsService.getFileDetails(mainfileId).subscribe({
-      next: (details: any[]) => {
-        this.loading = false;
+    // Prepare to aggregate details from all selected files
+    const allFiles = Array.isArray(mainfile) ? mainfile : [mainfile];
+    this.clientRows = [];
+    let processedCount = 0;
 
-        // Set the primary batch for the details card from the first file detail
-        if (details && details.length > 0) {
-          this.selectedPerson.batch = details[0].patchNo || '';
-        }
+    allFiles.forEach(f => {
+      const fId = f.id || f.Id;
+      const fCode = f.code || f.Code;
+      
+      this.negotiationsService.getFileDetails(fId).subscribe({
+        next: (details: any[]) => {
+          const mappedDetails = details.map(fd => ({
+            id: fd.id,
+            code: fd.fileCode?.toString() || fd.id.toString(),
+            name: fd.legalPlaintiff || 'غير معروف',
+            fileStatus: f.fileStatus || 'نشط',
+            debtReason: fd.reason || '',
+            batch: fd.patchNo || '',
+            classificationName: f.classification?.classification || '',
+            contractNum: fd.contractNo || '',
+            dateAdded: fd.dateAdded,
+            dateFinished: fd.dateFinished,
+            nationality: f.nationality || primaryFile.nationality,
+            civilId: f.nationalId || primaryFile.nationalId,
+            claim: fd.deptAmount || 0,
+            paid: 0,
+            remaining: fd.deptAmount || 0,
+            address: f.address || primaryFile.address,
+            client: fd.client || f.name || primaryFile.customerName,
+            lawyerName: fd.lawyerUserName || 'غير محدد',
+            courtName: fd.courtUserName || 'غير محدد',
+            mdName: fd.mdUserName || 'غير محدد',
+            advisorName: fd.legalAdvisorUserName || 'غير محدد',
+            followUpStatus: f.followUpStatus || '',
+            clientStatus: f.clientStatus || '',
+            contactStatus: f.contactStatus || '',
+            cooperationStatus: f.cooperationStatus || '',
+            civilStatus: f.civilStatus || '',
+            internalStatus: f.internalStatus || '',
+            note1: fd.note1 || '',
+            note2: fd.note2 || '',
+            note3: fd.note3 || '',
+            note4: fd.note4 || '',
+            note5: fd.note5 || '',
+            note6: fd.note6 || ''
+          }));
 
-        this.clientRows = details.map((f, i) => ({
-          id: f.id,
-          code: f.fileCode?.toString() || f.id.toString(),
-          name: f.legalPlaintiff || 'غير معروف',
-          fileStatus: this.selectedPerson.fileStatus || 'نشط',
-          debtReason: f.reason || '',
-          batch: f.patchNo || '',
-          classificationName: classificationName,
-          contractNum: f.contractNo || '',
-          dateAdded: f.dateAdded,
-          dateFinished: f.dateFinished,
-          nationality: this.selectedPerson.nationality,
-          civilId: this.selectedPerson.nationalId,
-          claim: f.deptAmount || 0,
-          paid: 0,
-          remaining: f.deptAmount || 0,
-          address: this.selectedPerson.address,
-          client: f.client || this.selectedPerson.customerName,
-          lawyerName: f.lawyerUserName || 'غير محدد',
-          courtName: f.courtUserName || 'غير محدد',
-          mdName: f.mdUserName || 'غير محدد',
-          advisorName: f.legalAdvisorUserName || 'غير محدد',
-          followUpStatus: this.selectedPerson.followUpStatus || '',
-          clientStatus: this.selectedPerson.clientStatus || '',
-          contactStatus: this.selectedPerson.contactStatus || '',
-          cooperationStatus: this.selectedPerson.cooperationStatus || '',
-          civilStatus: this.selectedPerson.civilStatus || '',
-          internalStatus: this.selectedPerson.internalStatus || '',
-          note1: f.note1 || '',
-          note2: f.note2 || '',
-          note3: f.note3 || '',
-          note4: f.note4 || '',
-          note5: f.note5 || '',
-          note6: f.note6 || ''
-        }));
-
-
-
-        if (details && details.length > 0) {
-          this.financial.claimValue = details.reduce((acc, curr) => acc + (curr.deptAmount || 0), 0);
-          this.selectedPerson.customerName = details[0].legalPlaintiff || this.selectedPerson.customerName;
-          this.selectedPerson.contract = details[0].contractNo || this.selectedPerson.contract;
+          this.clientRows = [...this.clientRows, ...mappedDetails];
+          this.financial.claimValue = this.clientRows.reduce((acc, curr) => acc + (curr.claim || 0), 0);
           this.selectedPerson.debt = this.financial.claimValue.toLocaleString() || '0';
+          
+          processedCount++;
+          if (processedCount === allFiles.length) {
+            this.loading = false;
+          }
+        },
+        error: (err: any) => {
+          console.error(`Error fetching details for file ${fId}:`, err);
+          processedCount++;
+          if (processedCount === allFiles.length) this.loading = false;
         }
-      },
-      error: (err) => {
-        this.loading = false;
-        console.error('Error fetching details:', err);
-      }
+      });
+
+      // Fetch specific case data for each file code
+      this.fetchUniversalCaseData(fId, fCode);
     });
 
-    // 2. جلب بقية البيانات المرتبطة بـ كود الملف (FileCode) لضمان الدقة وتوافق السجلات التاريخية
-    this.fetchUniversalCaseData(mainfileId, fileCode);
-
-    // 3. جلب إفادات الكول سنتر المرتبطة بـ كود الملف (FileCode)
+    // 3. جلب إفادات الكول سنتر المرتبطة بـ كود الملف الرئيسي (لأغراض العرض العام)
     this.fetchCallcenterStatements(fileCode, 1);
 
-    // 4. جلب الأرقام الخاصة بالعميل (الخصم) باستخدام الرقم المدني
+    // 4. جلب الأرقام الخاصة بالعميل باستخدام الرقم المدني
     this.fetchContactsOnly();
   }
 
@@ -369,60 +370,67 @@ export class ClientFollowUp implements OnInit {
   // البحث عن شخص
   onClientSelected(client: any) {
     if (client) {
-      const id = client.id || client.Id;
-      const code = client.code || client.Code;
-      const cid = client.cid || client.Cid || client.nationalId;
+      if (Array.isArray(client)) {
+        // Multi-file selection (e.g. searching by Civil ID)
+        const primary = client[0];
+        this.setupPersonFromClient(primary);
+        this.fetchAdditionalData(client);
+      } else {
+        // Individual file selection
+        this.setupPersonFromClient(client);
+        this.fetchAdditionalData(client);
+      }
 
-      const classification = client.classification || {};
-      
-      this.selectedPerson = {
-        id: id,
-        code: code?.toString() || '',
-        departmentId: client.departmentId,
-        clientName: client.name || client.Name || '',
-        customerName: client.name || client.Name || '',
-        nationalId: cid || '',
-        status: client.archive ? 'مؤرشف' : 'نشط',
-        nationality: client.nationality || client.Nationality || '',
-        contract: code?.toString() || '',
-        debt: '',
-        autoNumbers: '',
-        batch: '',
-        address: client.address || client.Address || '',
-        // Use helper to ensure correct Arabic encoding
-        cooperationStatus: this.getLookupName('cooperation', classification.cooperationStatusId) || client.cooperationStatus || '',
-        contactStatus: this.getLookupName('contact', classification.contactStatusId) || client.contactStatus || '',
-        civilStatus: this.getLookupName('civil', classification.civilStatusId) || client.civilStatus || '',
-        internalStatus: this.getLookupName('internal', classification.internalStatusId) || client.internalStatus || '',
-        followUpStatus: this.getLookupName('followup', classification.followUpStatusId) || client.followUpStatus || '',
-        clientStatus: this.getLookupName('client', classification.clientStatusId) || client.clientStatus || '',
-        fileStatus: this.getLookupName('file', classification.fileStatusId) || client.fileStatus || 'نشط',
-        jobType: client.work || client.Work || '',
-        gender: this.getLookupName('gender', classification.genderId) || client.gender || '',
-        communicationLanguage: this.getLookupName('comms_lang', classification.communicationLanguageId) || client.communicationLanguage || '',
-        incomeNotes: classification.incomeNotes || '',
-        classification: client.classification ? {
-          ...client.classification,
-          salaryDate: client.classification.salaryDate ? client.classification.salaryDate.split('T')[0] : null
-        } : null
-      };
-
-
-
-      // Trigger search for related details (stats, file records, etc.)
-      this.fetchAdditionalData(client);
-
-      // Switch back to main tab to show results
+      // Switch back to main tab
       if (this.mainContent) {
         this.mainContent.setMainTab('main');
       }
-      console.log('Client loaded:', client);
     } else {
       this.resetAllData();
       if (this.mainContent) {
         this.mainContent.resetAllTables();
       }
     }
+  }
+
+  private setupPersonFromClient(client: any) {
+    const id = client.id || client.Id;
+    const code = client.code || client.Code;
+    const cid = client.cid || client.Cid || client.nationalId;
+    const classification = client.classification || {};
+
+    this.selectedPerson = {
+      id: id,
+      code: code?.toString() || '',
+      departmentId: client.departmentId,
+      clientName: client.name || client.Name || '',
+      customerName: client.name || client.Name || '',
+      nationalId: cid || '',
+      status: client.archive ? 'مؤرشف' : 'نشط',
+      nationality: client.nationality || client.Nationality || '',
+      contract: code?.toString() || '',
+      debt: '',
+      autoNumbers: '',
+      batch: '',
+      address: client.address || client.Address || '',
+      cooperationStatus: this.getLookupName('cooperation', classification.cooperationStatusId) || client.cooperationStatus || '',
+      contactStatus: this.getLookupName('contact', classification.contactStatusId) || client.contactStatus || '',
+      civilStatus: this.getLookupName('civil', classification.civilStatusId) || client.civilStatus || '',
+      internalStatus: this.getLookupName('internal', classification.internalStatusId) || client.internalStatus || '',
+      followUpStatus: this.getLookupName('followup', classification.followUpStatusId) || client.followUpStatus || '',
+      clientStatus: this.getLookupName('client', classification.clientStatusId) || client.clientStatus || '',
+      fileStatus: this.getLookupName('file', classification.fileStatusId) || client.fileStatus || 'نشط',
+      jobType: client.work || client.Work || '',
+      gender: this.getLookupName('gender', classification.genderId) || client.gender || '',
+      communicationLanguage: this.getLookupName('comms_lang', classification.communicationLanguageId) || client.communicationLanguage || '',
+      incomeNotes: classification.incomeNotes || '',
+      classification: client.classification ? {
+        ...client.classification,
+        salaryDate: client.classification.salaryDate ? client.classification.salaryDate.split('T')[0] : null
+      } : null
+    };
+
+    console.log('Client base data setup:', this.selectedPerson.customerName);
   }
 
   resetAllData() {

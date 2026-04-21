@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -156,7 +156,7 @@ export class NegotiationsService {
         if (params.name) query += `&name=${params.name}`;
         if (params.fromDate) query += `&fromDate=${params.fromDate}`;
         if (params.toDate) query += `&toDate=${params.toDate}`;
-        
+
         return this.http.get<any>(`${this.apiUrl}/DataView/callcenter-statements/search?${query}`);
     }
 
@@ -183,5 +183,31 @@ export class NegotiationsService {
      */
     getDashboardStats(fileCode: number): Observable<any> {
         return this.http.get<any>(`${this.apiUrl}/DataView/files/${fileCode}/dashboard-stats`);
+    }
+
+    /**
+     * Get field-specific history by searching audit logs for keywords (up to 200 records).
+     */
+    getFieldHistory(fileCode: number, keywords: string[]): Observable<any[]> {
+        return this.getAudits(fileCode, 1, 200).pipe(
+            map(res => {
+                const items = res.items || [];
+                const searchTerms = keywords.map(k => k.toLowerCase());
+                
+                return items.filter((a: any) => {
+                    const desc = (a.description || '').toLowerCase();
+                    const action = (a.action || '').toLowerCase();
+                    return searchTerms.some(term => desc.includes(term) || action.includes(term));
+                });
+            }),
+            catchError(() => throwError(() => new Error(`فشل جلب سجلات التدقيق للمجال المختار`)))
+        );
+    }
+
+    /**
+     * Get category-specific history from dedicated history tables.
+     */
+    getCategoryHistory(fileCode: number, category: string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/DataView/files/${fileCode}/category-history/${category}`);
     }
 }

@@ -71,7 +71,34 @@ interface StatementRow {
 export class MainContent {
   @ViewChild('lookupModal') lookupModal: any;
   @Input() clientRows: any[] = [];
-  @Input() selectedPerson: any = null;
+
+  // UI Toggles for History Expansion (15+ categories)
+  showAllClientMode: boolean = false;
+  showAllClaimMode: boolean = false;
+  showAllFileMode: boolean = false;
+  showAllActionMode: boolean = false;
+  showAllFollowupMode: boolean = false;
+  showAllInternalMode: boolean = false;
+  showAllCivilMode: boolean = false;
+  showAllContactMode: boolean = false;
+  showAllCooperationMode: boolean = false;
+  showAllDiscountMode: boolean = false;
+  showAllAcceptanceMode: boolean = false;
+  showAllJobMode: boolean = false;
+  showAllSalarydateMode: boolean = false;
+  showAllIncomenotesMode: boolean = false;
+  showAllComms_langMode: boolean = false;
+
+  private _selectedPerson: any = null;
+  @Input() set selectedPerson(val: any) {
+    this._selectedPerson = val;
+    if (val && (val.id || val.Id)) {
+      this.ensureClassification();
+      // History loading is now consolidated in ngOnChanges to prevent flicker
+    }
+  }
+  get selectedPerson() { return this._selectedPerson; }
+
   @Input() financialData: any = null;
   @Input() attachments: any[] = [];
   @Input() payments: any[] = [];
@@ -89,6 +116,7 @@ export class MainContent {
   Math = Math;
   searchGeneral: string = '';
   selectedFile: any = null;
+  private lastLoadedFileId: number | null = null;
 
 
 
@@ -114,8 +142,16 @@ export class MainContent {
 
   familyList: string[] = [];
 
-  activeMainTab: 'clients' | 'main' | 'searchNumbers' | 'menuSearch' | 'FeesAndCollection' | 'notes' | 'preview' | 'newFiles' | 'statements' | 'searchStatements' | 'stats' = 'main';
+  activeMainTab: any = 'main';
   loading: boolean = false;
+  
+  // Independent loading states for Classification Cards
+  loadingDiscount: boolean = false;
+  loadingJob: boolean = false;
+  loadingIncome: boolean = false;
+  
+  // Track loading state per category field
+  fieldLoading: { [key: string]: boolean } = {};
   selectedAction: string = ''; // هذا المتغير سيخزن الإختيار
   selectedNumber: string = '';
   selectedRelation: string = '';
@@ -124,6 +160,7 @@ export class MainContent {
   promiseToPayAmount: number | null = null;
   installmentAmount: number | null = null;
   installmentDate: string | null = null;
+  acceptanceOptions: string[] = ['تم القبول', 'مرفوض', 'قيد المراجعة', 'موافقة مشروطة', 'مبلغ مقطوع'];
   reviewType: string = '';
   reviewNote: string = '';
   statementDetails: any = {
@@ -195,9 +232,39 @@ export class MainContent {
     civil: [],
     contact: [],
     cooperation: [],
-    comms_lang: [],
-    gender: []
+    comms_lang: [{ id: 1, name: 'العربية' }, { id: 2, name: 'English' }],
+    gender: [{ id: 1, name: 'ذكر' }, { id: 2, name: 'أنثى' }]
   };
+
+  // Category-specific history storage
+  categoryHistories: { [key: string]: any[] } = {
+    client: [],
+    claim: [],
+    payment: [],
+    file: [],
+    action: [],
+    followup: [],
+    internal: [],
+    civil: [],
+    contact: [],
+    cooperation: [],
+    discount: [],
+    acceptance: [],
+    work: [],
+    salarydate: [],
+    incomenotes: []
+  };
+
+  // History Modal State
+  historyModalVisible: boolean = false;
+  selectedHistoryTitle: string = '';
+  selectedHistoryItems: any[] = [];
+
+  openFullHistory(title: string, data: any[]) {
+    this.selectedHistoryTitle = title;
+    this.selectedHistoryItems = data || [];
+    this.historyModalVisible = true;
+  }
 
 
   submitPromiseToPay() {
@@ -318,19 +385,19 @@ export class MainContent {
     this.paymentForm.claimant = this.selectedFile?.client || '';
     this.paymentForm.amount = this.selectedFile?.remaining || 0;
     this.paymentForm.whatsapp = this.selectedPerson?.phone || '';
-    
+
     this.generateLink();
     this.activeSubTab = 'companyLink';
   }
 
   generateLink() {
-    const baseUrl = this.paymentForm.type === 'office' 
-      ? 'https://pay.houseoflaw.com/office' 
+    const baseUrl = this.paymentForm.type === 'office'
+      ? 'https://pay.houseoflaw.com/office'
       : 'https://pay.houseoflaw.com/company';
-    
+
     const langParam = this.paymentForm.language === 'english' ? '&lang=en' : '';
     const amountParam = this.paymentForm.amount > 0 ? `&amount=${this.paymentForm.amount}` : '';
-    
+
     this.companyLink = `${baseUrl}?code=${this.paymentForm.code}${amountParam}${langParam}`;
     this.updatePaymentMessage();
   }
@@ -400,6 +467,7 @@ export class MainContent {
   }
 
   fetchAllLookups() {
+    console.log('MainContent: Fetching all lookups...');
     const types = [
       { key: 'client', type: 'CLIENT_STATUS' },
       { key: 'claim', type: 'CLAIM_STATUS' },
@@ -416,128 +484,111 @@ export class MainContent {
     ];
 
     types.forEach(item => {
-      if (item.key === 'client') {
-        // Hardcoded 'Customer Status' list as requested by user
-        this.lookupLists.client = [
-          { id: 1, name: 'غير مصنف' },
-          { id: 2, name: 'مدني خطا' },
-          { id: 3, name: 'نشط' },
-          { id: 4, name: 'مسجون' },
-          { id: 5, name: 'وفاه' },
-          { id: 6, name: 'مغادر نهائي' },
-          { id: 7, name: 'سداد المحكمة' },
-          { id: 8, name: 'سداد شركة' },
-          { id: 9, name: 'سداد مندوب مكتب' }
-        ];
-      } else if (item.key === 'claim') {
-        // Hardcoded 'Claim Status' list as requested by user
-        this.lookupLists.claim = [
-          { id: 1, name: 'غير مصنف' },
-          { id: 2, name: 'حفظ' },
-          { id: 3, name: 'حفظ مؤقت في المكتب' },
-          { id: 4, name: 'حفظ مؤقت في الشركة' },
-          { id: 5, name: 'سداد محكمة' },
-          { id: 6, name: 'سحب اداري' },
-          { id: 7, name: 'وقف' },
-          { id: 8, name: 'سداد قبل التحويل' },
-          { id: 9, name: 'سداد بمعرفة الشركة' }
-        ];
-      } else if (item.key === 'file') {
-        // Hardcoded 'File Status' list as requested by user
-        this.lookupLists.file = [
-          { id: 1, name: 'غير مصنف' },
-          { id: 2, name: 'ودي' },
-          { id: 3, name: 'قضائي' }
-        ];
-      } else if (item.key === 'action') {
-        // Hardcoded 'Procedure Status' list as requested by user
-        this.lookupLists.action = [
-          { id: 1, name: 'غير مصنف' },
-          { id: 2, name: 'اونلاين' },
-          { id: 3, name: 'رسوم' },
-          { id: 4, name: 'تنفيذ' },
-          { id: 5, name: 'تنفيذ جديد 1' },
-          { id: 6, name: 'مرفوض مرة' },
-          { id: 7, name: 'مرفوض مرتين' },
-          { id: 8, name: 'مرفوض اكثر من مرتين' },
-          { id: 9, name: 'مرفوض فوق 1000' },
-          { id: 10, name: 'جلسات' },
-          { id: 11, name: 'رفض الدعوى بحالتها' },
-          { id: 12, name: 'تم التسليم للمتداول' },
-          { id: 13, name: 'الغاء الحكم بالتظلم' },
-          { id: 14, name: 'قيد الرفع' },
-          { id: 15, name: 'اعادة الرفع' }
-        ];
-      } else if (item.key === 'interior') {
-        // Hardcoded 'Interior Status' list as requested by user
-        this.lookupLists.interior = [
-          { id: 1, name: 'غير مصنف' },
-          { id: 2, name: 'غير مخالف' },
-          { id: 3, name: 'في قائمة الممنوعين' },
-          { id: 4, name: 'مخالف اقامة' },
-          { id: 5, name: 'هجرة' },
-          { id: 6, name: 'خارج البلاد' }
-        ];
-      } else if (item.key === 'civil') {
-        // Hardcoded 'Civil Status' list as requested by user
-        this.lookupLists.civil = [
-          { id: 1, name: 'غير مصنف' },
-          { id: 2, name: 'صالحة' },
-          { id: 3, name: 'منتهية' },
-          { id: 4, name: 'لاغية' },
-          { id: 5, name: 'يتعذر' },
-          { id: 6, name: 'غير نشط' },
-          { id: 7, name: 'وفاة' }
-        ];
-      } else if (item.key === 'contact') {
-        // Hardcoded 'Contact Status' list as requested by user
-        this.lookupLists.contact = [
-          { id: 1, name: 'غير مصنف' },
-          { id: 2, name: 'مع العميل' },
-          { id: 3, name: 'غير متواصل' },
-          { id: 4, name: 'لا يمكن التواصل' },
-          { id: 5, name: 'مع اخر' },
-          { id: 6, name: 'مع العميل واخر' }
-        ];
-      } else if (item.key === 'cooperation') {
-        // Hardcoded 'Cooperation Status' list as requested by user
-        this.lookupLists.cooperation = [
-          { id: 1, name: 'غير مصنف' },
-          { id: 2, name: 'وعد بالسداد' },
-          { id: 3, name: 'تقسيط' },
-          { id: 4, name: 'متعاون' },
-          { id: 5, name: 'غير متعاون' },
-          { id: 6, name: 'مماطل' },
-          { id: 7, name: 'متردد' },
-          { id: 8, name: 'غير قادر' },
-          { id: 9, name: 'وعد ضعيف' },
-          { id: 10, name: 'وعد قوي' },
-          { id: 11, name: 'رافض السداد' },
-          { id: 12, name: 'لم نصل اليه' }
-        ];
-      } else if (item.key === 'comms_lang') {
-        this.lookupLists.comms_lang = [
-          { id: 1, name: 'غير مصنف' },
-          { id: 2, name: 'عربي' },
-          { id: 3, name: 'إنجليزي' },
-          { id: 4, name: 'أوردو' },
-          { id: 5, name: 'هندي' },
-          { id: 6, name: 'تاغالوغ' }
-        ];
-      } else if (item.key === 'gender') {
-        this.lookupLists.gender = [
-          { id: 1, name: 'غير مصنف' },
-          { id: 2, name: 'ذكر' },
-          { id: 3, name: 'أنثى' }
-        ];
-      } else {
-        (this.negotiationsService as any).getLookups(item.type).subscribe({
-          next: (data: any[]) => {
-            this.lookupLists[item.key] = data;
-          }
-        });
-      }
+      this.negotiationsService.getLookups(item.type).subscribe({
+        next: (data: any[]) => {
+          console.log(`MainContent: Loaded lookup [${item.key}]:`, data?.length || 0, 'items');
+          if (data && data.length > 0) this.lookupLists[item.key] = data;
+        },
+        error: (err) => {
+          console.error(`Error loading lookup ${item.type}:`, err);
+        }
+      });
     });
+  }
+
+  /**
+   * Helper to get a stable ID regardless of property casing (id vs Id)
+   */
+  private getNormalizedId(obj: any): number | null {
+    if (!obj) return null;
+    const id = obj.id !== undefined ? obj.id : obj.Id;
+    return id ? Number(id) : null;
+  }
+
+  loadCategoryHistory(fileCode: number, category: string) {
+    if (!fileCode) return;
+
+    const dedicatedCategories = [
+      'client', 'claim', 'payment', 'file', 'action', 'followup',
+      'internal', 'civil', 'contact', 'cooperation',
+      'discount', 'acceptance', 'work', 'salarydate', 'incomenotes'
+    ];
+
+    const mapAudits = (data: any[]) => {
+      return data.map(audit => {
+        let name = audit.statusName || audit.StatusName || audit.description || audit.action || 'بدون تفاصيل';
+        if (/^\d+$/.test(name) || (name.includes(':') && /^\d+$/.test(name.split(':').pop()?.trim() || ''))) {
+          const valToFind = name.includes(':') ? name.split(':').pop()?.trim() : name;
+          const listKey = this.getLookupKeyFromField(category);
+          const found = this.lookupLists[listKey]?.find((x: any) => x.id === parseInt(valToFind || ''));
+          if (found) {
+            name = name.includes(':') ? `${name.split(':')[0]}: ${found.name}` : found.name;
+          }
+        }
+        return {
+          ...audit,
+          dateAdded: audit.actionDate || audit.dateAdded || audit.DateAdded,
+          userName: audit.userName || audit.user || audit.UserName,
+          statusName: name
+        };
+      });
+    };
+
+    const keywordMap: { [key: string]: string[] } = {
+      discount: ['discount', 'الخصم'],
+      acceptance: ['accept', 'قبول', 'القبول', 'اعتماد', 'الاعتماد'],
+      work: ['work', 'job', 'وظيفة', 'عمل', 'جهة'],
+      salarydate: ['salary', 'راتب', 'الراتب', 'تاريخ'],
+      incomenotes: ['income', 'دخل', 'الدخل', 'مصدر', 'ملاحظات']
+    };
+    const keywords = keywordMap[category] || [category];
+
+    // Dual-fetch Strategy: Pull from dedicated history AND general audit logs
+    const streams: any = {
+      audit: this.negotiationsService.getFieldHistory(fileCode, keywords)
+    };
+    if (dedicatedCategories.includes(category)) {
+      streams.dedicated = this.negotiationsService.getCategoryHistory(fileCode, category);
+    }
+
+    forkJoin(streams).subscribe({
+      next: (res: any) => {
+        const combined = [...(res.dedicated || []), ...(res.audit || [])];
+        // Deduplicate by date and status name if they are identical
+        const unique = combined.reduce((acc: any[], current: any) => {
+          const dateStr = new Date(current.actionDate || current.dateAdded || current.DateAdded).toISOString();
+          const isDup = acc.some(item => 
+            new Date(item.actionDate || item.dateAdded || item.DateAdded).toISOString() === dateStr &&
+            (item.statusName || item.StatusName) === (current.statusName || current.StatusName)
+          );
+          if (!isDup) acc.push(current);
+          return acc;
+        }, []);
+
+        this.categoryHistories[category] = mapAudits(unique).sort((a, b) => 
+          new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime()
+        );
+      },
+      error: (err) => console.error(`Error loading history for ${category}:`, err)
+    });
+  }
+
+  loadAllCategoryHistories(fileCode: number, force: boolean = false) {
+    if (!fileCode) return;
+
+    // Guard against redundant loading of the same file ID
+    if (!force && this.lastLoadedFileId === fileCode) {
+      return;
+    }
+
+    this.lastLoadedFileId = fileCode;
+
+    const categories = [
+      'client', 'claim', 'payment', 'file', 'action', 'followup',
+      'internal', 'civil', 'contact', 'cooperation',
+      'discount', 'acceptance', 'work', 'salarydate', 'incomenotes'
+    ];
+    categories.forEach(cat => this.loadCategoryHistory(fileCode, cat));
   }
 
   negotiationMethodsRows = [
@@ -655,6 +706,7 @@ export class MainContent {
   // تحديث حقل واحد تلقائياً (Auto-save)
   updateField(field: string, value: any) {
     if (!this.selectedPerson?.id) return;
+    this.fieldLoading[field] = true;
     this.ensureClassification();
 
     // Convert date or numeric values if needed
@@ -666,7 +718,11 @@ export class MainContent {
 
     this.negotiationsService.updateClientStatus(this.selectedPerson.id, field, undefined, valStr).subscribe({
       next: () => {
-        this.statusChanged.emit(); // Refresh history
+        const currentFileCode = this.selectedFile?.code ? Number(this.selectedFile.code) : (this.selectedPerson?.code ? Number(this.selectedPerson.code) : 0);
+        if (currentFileCode) this.loadCategoryHistory(currentFileCode, field);
+        this.statusChanged.emit();
+        this.fieldLoading[field] = false;
+
         Swal.fire({
           title: 'تم التحديث',
           text: `تم حفظ ${this.getFriendlyFieldName(field)}`,
@@ -678,6 +734,7 @@ export class MainContent {
         });
       },
       error: (err) => {
+        this.fieldLoading[field] = false;
         console.error(`Error updating ${field}:`, err);
         Swal.fire('خطأ', 'فشل في حفظ التعديلات', 'error');
       }
@@ -784,7 +841,6 @@ export class MainContent {
     this.ensureClassification();
     const field = fieldOverwrite || this.currentField;
 
-    this.loading = true;
     this.negotiationsService.updateClientStatus(
       this.selectedPerson.id,
       field,
@@ -794,10 +850,16 @@ export class MainContent {
         this.loading = false;
         this.statusChanged.emit(); // Notify parent to refresh history
 
-        // Update local state display names if available
         const fieldKey = field.toLowerCase();
+        const displayKey = fieldKey === 'internal' || fieldKey === 'interior' ? 'internal' : fieldKey;
 
-        // Find name from lookup list if it was a select change (item.name might be empty)
+        // Reload specific history for this category
+        if (this.selectedFile?.code) {
+          const fileCode = typeof this.selectedFile.code === 'string' ? parseInt(this.selectedFile.code) : this.selectedFile.code;
+          this.loadCategoryHistory(fileCode, displayKey);
+        }
+
+        // Update local state display names if available
         let name = item.name;
         if (!name && item.id) {
           const listKey = this.getLookupKeyFromField(fieldKey);
@@ -818,22 +880,9 @@ export class MainContent {
         if (fieldKey === 'comms_lang') this.selectedPerson.communicationLanguage = name;
         if (fieldKey === 'gender') this.selectedPerson.gender = name;
 
-        // Sync change with clientRows for the "Clients" tab table
-        if (this.clientRows && this.clientRows.length > 0) {
-          this.clientRows = this.clientRows.map(row => ({
-            ...row,
-            cooperationStatus: this.selectedPerson.cooperationStatus,
-            contactStatus: this.selectedPerson.contactStatus,
-            civilStatus: this.selectedPerson.civilStatus,
-            internalStatus: this.selectedPerson.internalStatus,
-            clientStatus: this.selectedPerson.clientStatus,
-            followUpStatus: this.selectedPerson.followUpStatus,
-            fileStatus: this.selectedPerson.fileStatus
-          }));
-        }
+        // Sync change with clientRows
+        this.syncLocalStatusDisplay();
 
-
-        // Update secondary classification object IDs
         if (this.selectedPerson.classification) {
           const map: any = {
             'comms_lang': 'communicationLanguageId',
@@ -841,7 +890,6 @@ export class MainContent {
           };
           if (map[fieldKey]) this.selectedPerson.classification[map[fieldKey]] = item.id;
         }
-
 
         Swal.fire({
           title: 'تم التحديث',
@@ -858,6 +906,33 @@ export class MainContent {
         Swal.fire('خطأ', err.message, 'error');
       }
     });
+  }
+
+  /**
+   * Synchronizes local data structures after a classification change
+   * to ensure the UI reflects the new state immediately.
+   */
+  private syncLocalStatusDisplay() {
+    if (!this.selectedPerson) return;
+
+    // Update the parent's table data (clientRows)
+    if (this.clientRows && this.clientRows.length > 0) {
+      this.clientRows = this.clientRows.map(row => ({
+        ...row,
+        clientStatus: this.selectedPerson.clientStatus,
+        claimStatus: this.selectedPerson.claimStatus,
+        paymentStatus: this.selectedPerson.paymentStatus,
+        fileStatus: this.selectedPerson.fileStatus,
+        followUpStatus: this.selectedPerson.followUpStatus,
+        cooperationStatus: this.selectedPerson.cooperationStatus,
+        contactStatus: this.selectedPerson.contactStatus,
+        civilStatus: this.selectedPerson.civilStatus,
+        internalStatus: this.selectedPerson.internalStatus,
+        work: this.selectedPerson.jobType || this.selectedPerson.work,
+        discount: this.selectedPerson.classification?.discount,
+        acceptance: this.selectedPerson.classification?.acceptance
+      }));
+    }
   }
 
   saveAllClassifications() {
@@ -940,11 +1015,14 @@ export class MainContent {
 
     forkJoin(updates).subscribe({
       next: () => {
+        const currentFileCode = this.selectedFile?.code ? Number(this.selectedFile.code) : (this.selectedPerson?.code ? Number(this.selectedPerson.code) : 0);
+        if (currentFileCode) this.loadAllCategoryHistories(currentFileCode, true);
         this.loading = false;
+        this.syncLocalStatusDisplay();
         this.statusChanged.emit(); // Refresh history
         Swal.fire({
           title: 'تم الحفظ',
-          text: 'تم حفظ جميع تصفنيات الملف بنجاح (مزامنة كاملة)',
+          text: 'تم حفظ جميع تصنيفات الملف بنجاح (مزامنة كاملة)',
           icon: 'success',
           timer: 3000,
           toast: true,
@@ -958,6 +1036,125 @@ export class MainContent {
         Swal.fire('خطأ', 'فشل في مزامنة بعض الحالات لقاعدة البيانات', 'error');
       }
     });
+  }
+
+  saveDiscountAcceptance() {
+    if (!this.selectedPerson?.id) return;
+    this.loadingDiscount = true;
+    const c = this.selectedPerson.classification;
+
+    // Formatting status detail: [Option] - نسبة خصم [X]%
+    const formattedAcceptance = c.acceptance ? `${c.acceptance}${c.discount ? ' - نسبة خصم ' + c.discount + '%' : ''}` : '';
+
+    const updates = [
+      this.negotiationsService.updateClientStatus(this.selectedPerson.id, 'discount', undefined, c.discount?.toString()),
+      this.negotiationsService.updateClientStatus(this.selectedPerson.id, 'acceptance', undefined, formattedAcceptance)
+    ];
+
+    forkJoin(updates).subscribe({
+      next: () => {
+        const fileCode = this.selectedFile?.code ? Number(this.selectedFile.code) : (this.selectedPerson?.code ? Number(this.selectedPerson.code) : 0);
+        if (fileCode) {
+          this.loadCategoryHistory(fileCode, 'discount');
+          this.loadCategoryHistory(fileCode, 'acceptance');
+        }
+        
+        this.loadingDiscount = false;
+        this.syncLocalStatusDisplay();
+        this.statusChanged.emit();
+        Swal.fire({
+          title: 'تم الحفظ',
+          text: 'تم حفظ بيانات الخصم والقبول بنجاح',
+          icon: 'success',
+          timer: 2000,
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false
+        });
+      },
+      error: (err: any) => {
+        this.loadingDiscount = false;
+        Swal.fire('خطأ', 'فشل حفظ بيانات الخصم والقبول', 'error');
+      }
+    });
+  }
+
+  saveJobInfo() {
+    if (!this.selectedPerson?.id) return;
+    this.loadingJob = true;
+
+    this.negotiationsService.updateClientStatus(this.selectedPerson.id, 'work', undefined, this.selectedPerson.work).subscribe({
+      next: () => {
+        const currentFileCode = this.selectedFile?.code ? Number(this.selectedFile.code) : (this.selectedPerson?.code ? Number(this.selectedPerson.code) : 0);
+        if (currentFileCode) this.loadCategoryHistory(currentFileCode, 'work');
+
+        this.loadingJob = false;
+        this.selectedPerson.jobType = this.selectedPerson.work;
+        this.syncLocalStatusDisplay();
+        this.statusChanged.emit();
+        Swal.fire({
+          title: 'تم الحفظ',
+          text: 'تم حفظ بيانات الوظيفة بنجاح',
+          icon: 'success',
+          timer: 2000,
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false
+        });
+      },
+      error: (err: any) => {
+        this.loadingJob = false;
+        Swal.fire('خطأ', 'فشل حفظ بيانات الوظيفة', 'error');
+      }
+    });
+  }
+
+  saveIncomeSalary() {
+    if (!this.selectedPerson?.id) return;
+    this.loadingIncome = true;
+
+    const c = this.selectedPerson.classification;
+    const formattedDate = c.salaryDate ? new Date(c.salaryDate).toLocaleDateString('ar-EG', { day: '2-digit', month: '2-digit' }) : '';
+    const mergedNotes = `راتب بتاريخ: ${formattedDate}${c.incomeNotes ? ' | ملاحظات: ' + c.incomeNotes : ''}`;
+
+    const updates = [
+      this.negotiationsService.updateClientStatus(this.selectedPerson.id, 'salarydate', undefined,
+        c.salaryDate ? new Date(c.salaryDate).toISOString().split('T')[0] : undefined),
+      this.negotiationsService.updateClientStatus(this.selectedPerson.id, 'incomenotes', undefined, mergedNotes)
+    ];
+
+    forkJoin(updates).subscribe({
+      next: () => {
+        const fileCode = this.selectedFile?.code ? Number(this.selectedFile.code) : (this.selectedPerson?.code ? Number(this.selectedPerson.code) : 0);
+        if (fileCode) {
+          this.loadCategoryHistory(fileCode, 'salarydate');
+          this.loadCategoryHistory(fileCode, 'incomenotes');
+        }
+
+        this.loadingIncome = false;
+        this.syncLocalStatusDisplay();
+        this.statusChanged.emit();
+        Swal.fire({
+          title: 'تم الحفظ',
+          text: 'تم حفظ بيانات الدخل والراتب بنجاح',
+          icon: 'success',
+          timer: 2000,
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false
+        });
+      },
+      error: (err: any) => {
+        this.loadingIncome = false;
+        Swal.fire('خطأ', 'فشل حفظ بيانات الدخل والراتب', 'error');
+      }
+    });
+  }
+
+  saveHousingIncome() {
+    // Legacy mapping support
+    this.saveJobInfo();
+    this.saveIncomeSalary();
   }
 
   splitStatus(status: string): { type: string, value: string } {
@@ -1093,17 +1290,22 @@ export class MainContent {
 
 
   searchMenu() {
-    const term = this.menuSearchForm.fullName || this.menuSearchForm.firstName || this.menuSearchForm.civilId || this.menuSearchForm.phone;
+    const term = this.menuSearchForm.civilId || this.menuSearchForm.fullName || this.menuSearchForm.firstName || this.menuSearchForm.phone;
     if (!term) return;
 
+    this.loading = true;
     this.negotiationsService.search(term).subscribe({
       next: (results: any[]) => {
+        this.loading = false;
         if (results && results.length > 0) {
-          // If we found results, we can either select the first one or show a list
-          // For now, let's emit the first one to the parent like the sidebar does
-          // Or handle it locally. The user just asked for the alert if NOT found.
-          console.log('Search results:', results);
-          // Optional: this.onClientSelected(results[0]); 
+          // If searching by Civil ID (12 digits), handle specialized history loading
+          if (term.length === 12 && !isNaN(Number(term))) {
+            this.handleCidSearchResult(results);
+          } else {
+            console.log('Search results:', results);
+            // Optionally select the first one if we want auto-selection for generic search too
+            // this.onClientSelected(results[0]);
+          }
         } else {
           Swal.fire({
             title: 'تنبيه',
@@ -1115,6 +1317,7 @@ export class MainContent {
         }
       },
       error: (err) => {
+        this.loading = false;
         console.error('Search error:', err);
         Swal.fire('خطأ', 'حدث خطأ أثناء البحث', 'error');
       }
@@ -1125,11 +1328,17 @@ export class MainContent {
     const term = this.searchNumbersForm.civilID || this.searchNumbersForm.number;
     if (!term) return;
 
+    this.loading = true;
     this.negotiationsService.search(term).subscribe({
       next: (results: any[]) => {
+        this.loading = false;
         if (results && results.length > 0) {
-          // Found results
-          console.log('Numbers search results:', results);
+          // If searching by Civil ID (12 digits), handle specialized history loading
+          if (term.length === 12 && !isNaN(Number(term))) {
+            this.handleCidSearchResult(results);
+          } else {
+            console.log('Numbers search results:', results);
+          }
         } else {
           Swal.fire({
             title: 'تنبيه',
@@ -1141,9 +1350,35 @@ export class MainContent {
         }
       },
       error: (err) => {
+        this.loading = false;
         console.error('Search error:', err);
         Swal.fire('خطأ', 'حدث خطأ أثناء البحث', 'error');
       }
+    });
+  }
+
+  private handleCidSearchResult(results: any[]) {
+    // Select the first file found (or most relevant)
+    const file = results[0];
+    this.selectedFile = file;
+    this.loadClientRequest.emit(file); // Notify parent to load person details
+
+    // Switch to Classification tab as requested
+    this.activeSubTab = 'classification';
+
+    if (file.code) {
+      const fileCode = typeof file.code === 'string' ? parseInt(file.code) : file.code;
+      this.loadAllCategoryHistories(fileCode, true);
+    }
+
+    Swal.fire({
+      title: 'تم العثور على الملف',
+      text: `تم تحميل بيانات الملف كود: ${file.code}`,
+      icon: 'success',
+      toast: true,
+      position: 'top-end',
+      timer: 3000,
+      showConfirmButton: false
     });
   }
 
@@ -1497,21 +1732,48 @@ export class MainContent {
     this.selectedFile = row;
     this.activeSubTab = 'main'; // Switch to main tab to see details
     console.log('Selected file:', row);
+    if (row && row.code) {
+      const fileCode = typeof row.code === 'string' ? parseInt(row.code) : row.code;
+      this.loadAllCategoryHistories(fileCode);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    // Detect if a new primary person record was actually selected/changed
+    const isNewPerson = changes['selectedPerson'] &&
+      changes['selectedPerson'].currentValue?.id !== changes['selectedPerson'].previousValue?.id;
+
+    if (isNewPerson) {
+      if (!this.selectedPerson?.id) {
+        // Totally cleared (no person) - reset everything
+        this.selectedFile = null;
+        this.categoryHistories = {
+          client: [], claim: [], payment: [], file: [], action: [], followup: [],
+          internal: [], civil: [], contact: [], cooperation: [],
+          discount: [], acceptance: [], work: [], salarydate: [], incomenotes: []
+        };
+        this.lastLoadedFileId = 0;
+      } else {
+        // New person loaded - clear selection, will be auto-set by clientRows logic
+        this.selectedFile = null;
+      }
+    }
+
     // If clientRows changes and we don't have a selected file, select the first one
     if (changes['clientRows'] && this.clientRows && this.clientRows.length > 0) {
       if (!this.selectedFile || !this.clientRows.find(x => x.id === this.selectedFile.id)) {
         this.selectedFile = this.clientRows[0];
+        if (this.selectedFile?.code) {
+          const fileCode = typeof this.selectedFile.code === 'string' ? parseInt(this.selectedFile.code) : this.selectedFile.code;
+          this.loadAllCategoryHistories(fileCode);
+        }
+      } else {
+        // Even if file is already selected, if clientRows changed (e.g. fresh search finish), refresh histories
+        if (this.selectedFile?.code) {
+          const fileCode = typeof this.selectedFile.code === 'string' ? parseInt(this.selectedFile.code) : this.selectedFile.code;
+          this.loadAllCategoryHistories(fileCode);
+        }
       }
-    }
-
-    // Reset internal selection if selectedPerson changes (meaning a new client was loaded)
-    if (changes['selectedPerson'] && changes['selectedPerson'].currentValue) {
-      this.selectedFile = null;
-      // Optionally reset tabs to first tab
-      // this.activeSubTab = 'main';
     }
   }
 
@@ -1525,6 +1787,92 @@ export class MainContent {
       proceduresAll: this.auditsTotal || 0
     };
   }
+
+  get discountAcceptanceHistory() {
+    const disc = this.categoryHistories['discount'] || [];
+    const acc = this.categoryHistories['acceptance'] || [];
+    const combined = [...disc, ...acc];
+
+    // Priority Deduplication: If a record is just a number (discount), 
+    // hide it if there's a detailed text record at the same time mentioning that number.
+    return combined.sort((a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime())
+      .filter((item, index, self) => {
+        const statusText = (item.statusName || '').toString().trim();
+        // Check if status is numeric (e.g., "70")
+        if (/^\d+(\.\d+)?$/.test(statusText)) {
+          return !self.some(s => 
+            s !== item && 
+            Math.abs(new Date(s.dateAdded).getTime() - new Date(item.dateAdded).getTime()) < 2000 && // Within 2 seconds
+            s.statusName.includes(statusText) &&
+            s.statusName.length > statusText.length
+          );
+        }
+        return true;
+      });
+  }
+
+  get jobInfoHistory() {
+    return (this.categoryHistories['work'] || [])
+      .sort((a, b) => new Date(b.dateAdded || b.DateAdded).getTime() - new Date(a.dateAdded || a.DateAdded).getTime());
+  }
+
+  get incomeSalaryHistory() {
+    const dates = this.categoryHistories['salarydate'] || [];
+    const notes = this.categoryHistories['incomenotes'] || [];
+    const combined = [...dates, ...notes];
+
+    // 1. Sort by date descending
+    // 2. Filter out raw date strings (Deduplication part A)
+    // 3. Strict Deduplication (Deduplication part B): Hide identical content at the same time
+    return combined.sort((a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime())
+      .filter((item, index, self) => {
+        const text = (item.statusName || '').toString().trim();
+        
+        // Hide raw ISO date strings if a merged descriptive note exists
+        if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+          const hasMerged = self.some(s => 
+            s !== item && 
+            Math.abs(new Date(s.dateAdded).getTime() - new Date(item.dateAdded).getTime()) < 2000 && 
+            s.statusName.includes('راتب بتاريخ')
+          );
+          if (hasMerged) return false;
+        }
+
+        // Strict: If there's another record with IDENTICAL content, user and time (+/- 2s), keep only one
+        const duplicateIndex = self.findIndex(s => 
+           s !== item && 
+           s.statusName === item.statusName && 
+           s.userName === item.userName &&
+           Math.abs(new Date(s.dateAdded).getTime() - new Date(item.dateAdded).getTime()) < 2000
+        );
+        
+        if (duplicateIndex !== -1 && duplicateIndex < index) {
+          return false; // Skip this one, we already kept the first occurrence
+        }
+
+        return true;
+      });
+  }
+
+  get housingIncomeHistory() {
+    return [
+      ...this.jobInfoHistory,
+      ...this.incomeSalaryHistory
+    ].sort((a, b) => new Date(b.dateAdded || b.DateAdded).getTime() - new Date(a.dateAdded || a.DateAdded).getTime());
+  }
+
+  // Calculated Getters for UI Display
+  get calculatedDiscountValue(): number {
+    if (!this.selectedPerson?.classification?.discount || !this.selectedFile?.claim) return 0;
+    return (this.selectedPerson.classification.discount / 100) * this.selectedFile.claim;
+  }
+
+  get remainingAfterDiscount(): number {
+    if (!this.selectedFile?.claim) return 0;
+    return this.selectedFile.claim - this.calculatedDiscountValue;
+  }
 }
+
+
 
 

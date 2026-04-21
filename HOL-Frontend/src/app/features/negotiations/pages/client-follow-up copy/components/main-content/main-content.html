@@ -79,7 +79,8 @@
           <td class="py-2 px-3 italic">{{row.internalStatus}}</td>
           <td class="py-2 px-3 text-emerald-500 font-bold">{{row.lastPaymentAmount | number}}</td>
           <td class="py-2 px-3 text-slate-400">{{row.lastPaymentDate}}</td>
-          <td class="py-2 px-3 text-slate-400 truncate max-w-[150px]" [title]="row.lastStatement">{{row.lastStatement}}</td>
+          <td class="py-2 px-3 text-slate-400 truncate max-w-[150px]" [title]="row.lastStatement">{{row.lastStatement}}
+          </td>
           <td class="py-2 px-3 text-slate-400">{{row.lastStatementDate}}</td>
         </tr>
 
@@ -102,7 +103,7 @@
     <!-- Top Section: Client Info & Financial -->
     <div class="grid grid-cols-12 gap-4">
       <!-- Client Details Card -->
-      <div class="col-span-4 premium-card">
+      <div class="col-span-3 premium-card">
         <div class="card-body">
           <div class="form-grid">
             <div class="form-field">
@@ -154,31 +155,31 @@
         </div>
       </div>
       <!-- Main Content Card -->
-      <div class="col-span-8 premium-card">
+      <div class="col-span-9 premium-card">
         <div class="card-body">
-
           <div class="premium-tabs-container w-full overflow-x-auto">
             <a class="premium-tab" [class.active]="activeSubTab === 'main'" (click)="changeTab('main')">
               الرئيسية
             </a>
             <a class="premium-tab" [class.active]="activeSubTab === 'classification'"
               (click)="changeTab('classification')">
-              تصنيف
+              التصنيف
             </a>
-            <a class="premium-tab" [class.active]="activeSubTab === 'totalFiles'"
-              (click)="changeTab('totalFiles')">
+            <a class="premium-tab" [class.active]="activeSubTab === 'totalFiles'" (click)="changeTab('totalFiles')">
               اجمالي الملفات
             </a>
-            <a class="premium-tab" [class.active]="activeSubTab === 'companyLink'"
-              (click)="changeTab('companyLink')">
-              رابط الشركة
+            <a class="premium-tab" [class.active]="activeSubTab === 'companyLink'" (click)="changeTab('companyLink')">
+              ربط الشركة
             </a>
 
             <a class="premium-tab" [class.active]="activeSubTab === 'legal'" (click)="changeTab('legal')">
-              الرسوم
+              القانونيه
             </a>
             <a class="premium-tab" [class.active]="activeSubTab === 'files'" (click)="changeTab('files')">
-              تفاصيل المطالبة
+              مديونين الملفات
+            </a>
+            <a class="premium-tab" [class.active]="activeSubTab === 'payments'" (click)="changeTab('payments')">
+              المصاريف
             </a>
             <a class="premium-tab" [class.active]="activeSubTab === 'checks'" (click)="changeTab('checks')">
               الشيكات
@@ -187,15 +188,16 @@
               المرفقات
             </a>
             <a class="premium-tab" [class.active]="activeSubTab === 'history'" (click)="changeTab('history')">
-              التصنيفات
+              التاريخيات
             </a>
 
             <a class="premium-tab" [class.active]="activeSubTab === 'callcenter'" (click)="changeTab('callcenter')">
-              إفادات الكول سنتر
+              تواصل الكول سنتر
             </a>
 
             <!-- Excel Export Button -->
-            <button class="btn-excel" (click)="exportActiveTabToExcel()" title="تصدير البيانات الحالية إلى ملف إكسل">
+            <button class="btn-excel" (click)="exportActiveTabToExcel()"
+              title="تصدير بيانات التبويب الحالي إلى ملف إكسل">
               <span>تصدير إكسل</span>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -207,6 +209,774 @@
               </svg>
             </button>
           </div>
+
+
+
+          <div *ngIf="activeSubTab === 'classification'"
+            class="p-6 animate-in fade-in duration-1000 min-h-[600px] overflow-x-hidden" dir="rtl">
+
+            <!-- Action Header -->
+            <div
+              class="flex items-center justify-between mb-8 bg-white p-6 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
+              <div class="flex items-center gap-5">
+                <div
+                  class="w-16 h-16 rounded-3xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 ring-4 ring-indigo-50">
+                  <span class="text-2xl">🏆</span>
+                </div>
+                <div>
+                  <h2 class="text-2xl font-black text-slate-900 tracking-tight leading-tight">مركز إدارة الحالة والتصنيف
+                    المتقدم</h2>
+                  <p class="text-sm text-slate-400 font-bold">إدارة ذكية لـ 15 حالة مختلفة مع أرشفة تاريخية متكاملة لكل
+                    تغيير</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-4">
+                <button (click)="loadAllCategoryHistories(selectedFile?.id || selectedPerson?.code, true)"
+                  class="p-3 rounded-2xl bg-slate-50 text-slate-400 hover:bg-slate-100 transition-all"
+                  title="تحديث السجلات">
+                  <span class="text-lg">🔄</span>
+                </button>
+                <button (click)="saveAllClassifications()" [disabled]="loading"
+                  class="premium-btn premium-btn-primary flex items-center gap-3 px-10 py-4 shadow-2xl shadow-indigo-500/30 hover:-translate-y-1 active:translate-y-0 transition-all rounded-2xl">
+                  <span *ngIf="loading"
+                    class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  <span>💾</span>
+                  <span class="text-lg font-black leading-none">حفظ الكل</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 15-Card Grid: 3 Boxes per Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+
+              <!-- Card: Client Status -->
+              <div class="distinguished-card accent-amber">
+                <div class="status-card-header">
+                  <div class="flex items-center gap-3">
+                    <div class="status-icon-box bg-white/10 text-white shadow-sm">👥</div>
+                    <div>
+                      <div class="status-label-main">حالة العميل</div>
+                      <div class="status-sub-label">Client Status</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-2.5 space-y-2">
+                  <div class="flex gap-2 items-center">
+                    <select class="premium-input bg-white shadow-sm flex-grow"
+                      [(ngModel)]="selectedPerson.classification.clientStatusId">
+                      <option [ngValue]="null">اختر...</option>
+                      <option *ngFor="let item of lookupLists.client" [ngValue]="item.id">{{item.name}}</option>
+                    </select>
+                    <button
+                      class="mini-save-btn text-primary border border-primary/20 bg-primary/5 hover:bg-primary hover:text-white"
+                      [disabled]="fieldLoading['client']"
+                      (click)="updateField('client', selectedPerson.classification.clientStatusId)" title="حفظ">
+                      <span *ngIf="!fieldLoading['client']">💾</span>
+                      <div *ngIf="fieldLoading['client']" class="spinner-mini !border-primary"></div>
+                    </button>
+                  </div>
+
+                  <div class="status-history-area border-t border-slate-100 pt-3 mt-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">السجل التاريخي</h4>
+
+                    </div>
+                    <div class="micro-history-container custom-scrollbar transition-all"
+                      [style.max-height]="showAllClientMode ? '250px' : '90px'">
+                      <table class="micro-history-table">
+                        <thead>
+                          <tr>
+                            <th>التاريخ</th>
+                            <th>الموظف</th>
+                            <th>الحالة</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let h of categoryHistories['client']">
+                            <td>{{h.dateAdded | date:'dd/MM HH:mm'}}</td>
+                            <td class="truncate max-w-[50px]">{{h.userName}}</td>
+                            <td><span class="status-badge-mini">{{h.statusName || "تحديث"}}</span></td>
+                          </tr>
+                          <tr *ngIf="!categoryHistories['client']?.length">
+                            <td colspan="3" class="text-center py-2 text-[9px] text-slate-400 italic">لا يوجد سجل</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card: Claim Status -->
+              <div class="distinguished-card accent-amber">
+                <div class="status-card-header">
+                  <div class="flex items-center gap-3">
+                    <div class="status-icon-box bg-white/10 text-white shadow-sm">📄</div>
+                    <div>
+                      <div class="status-label-main">حالة المديونية</div>
+                      <div class="status-sub-label">Claim Status</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-2.5 space-y-2">
+                  <div class="flex gap-2 items-center">
+                    <select class="premium-input bg-white shadow-sm flex-grow"
+                      [(ngModel)]="selectedPerson.classification.claimStatusId">
+                      <option [ngValue]="null">اختر...</option>
+                      <option *ngFor="let item of lookupLists.claim" [ngValue]="item.id">{{item.name}}</option>
+                    </select>
+                    <button
+                      class="mini-save-btn text-primary border border-primary/20 bg-primary/5 hover:bg-primary hover:text-white"
+                      [disabled]="fieldLoading['claim']"
+                      (click)="updateField('claim', selectedPerson.classification.claimStatusId)" title="حفظ">
+                      <span *ngIf="!fieldLoading['claim']">💾</span>
+                      <div *ngIf="fieldLoading['claim']" class="spinner-mini !border-primary"></div>
+                    </button>
+                  </div>
+
+                  <div class="status-history-area border-t border-slate-100 pt-3 mt-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">السجل التاريخي</h4>
+
+                    </div>
+                    <div class="micro-history-container custom-scrollbar transition-all"
+                      [style.max-height]="showAllClaimMode ? '250px' : '90px'">
+                      <table class="micro-history-table">
+                        <thead>
+                          <tr>
+                            <th>التاريخ</th>
+                            <th>الموظف</th>
+                            <th>الحالة</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let h of categoryHistories['claim']">
+                            <td>{{h.dateAdded | date:'dd/MM HH:mm'}}</td>
+                            <td class="truncate max-w-[50px]">{{h.userName}}</td>
+                            <td><span class="status-badge-mini">{{h.statusName || "تحديث"}}</span></td>
+                          </tr>
+                          <tr *ngIf="!categoryHistories['claim']?.length">
+                            <td colspan="3" class="text-center py-2 text-[9px] text-slate-400 italic">لا يوجد سجل</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card: File Status -->
+              <div class="distinguished-card accent-slate">
+                <div class="status-card-header">
+                  <div class="flex items-center gap-3">
+                    <div class="status-icon-box bg-white/10 text-white shadow-sm">📂</div>
+                    <div>
+                      <div class="status-label-main">حالة الملف</div>
+                      <div class="status-sub-label">File Status</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-2.5 space-y-2">
+                  <div class="flex gap-2 items-center">
+                    <select class="premium-input bg-white shadow-sm flex-grow"
+                      [(ngModel)]="selectedPerson.classification.fileStatusId">
+                      <option [ngValue]="null">اختر...</option>
+                      <option *ngFor="let item of lookupLists.file" [ngValue]="item.id">{{item.name}}</option>
+                    </select>
+                    <button
+                      class="mini-save-btn text-primary border border-primary/20 bg-primary/5 hover:bg-primary hover:text-white"
+                      [disabled]="fieldLoading['file']"
+                      (click)="updateField('file', selectedPerson.classification.fileStatusId)" title="حفظ">
+                      <span *ngIf="!fieldLoading['file']">💾</span>
+                      <div *ngIf="fieldLoading['file']" class="spinner-mini !border-primary"></div>
+                    </button>
+                  </div>
+
+                  <div class="status-history-area border-t border-slate-100 pt-3 mt-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">السجل التاريخي</h4>
+
+                    </div>
+                    <div class="micro-history-container custom-scrollbar transition-all"
+                      [style.max-height]="showAllFileMode ? '250px' : '90px'">
+                      <table class="micro-history-table">
+                        <thead>
+                          <tr>
+                            <th>التاريخ</th>
+                            <th>الموظف</th>
+                            <th>الحالة</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let h of categoryHistories['file']">
+                            <td>{{h.dateAdded | date:'dd/MM HH:mm'}}</td>
+                            <td class="truncate max-w-[50px]">{{h.userName}}</td>
+                            <td><span class="status-badge-mini">{{h.statusName || "تحديث"}}</span></td>
+                          </tr>
+                          <tr *ngIf="!categoryHistories['file']?.length">
+                            <td colspan="3" class="text-center py-2 text-[9px] text-slate-400 italic">لا يوجد سجل</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card: Action Status -->
+              <div class="distinguished-card accent-slate">
+                <div class="status-card-header">
+                  <div class="flex items-center gap-3">
+                    <div class="status-icon-box bg-white/10 text-white shadow-sm">⚡</div>
+                    <div>
+                      <div class="status-label-main">حالة الإجراء</div>
+                      <div class="status-sub-label">Action Status</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-2.5 space-y-2">
+                  <div class="flex gap-2 items-center">
+                    <select class="premium-input bg-white shadow-sm flex-grow"
+                      [(ngModel)]="selectedPerson.classification.actionStatusId">
+                      <option [ngValue]="null">اختر...</option>
+                      <option *ngFor="let item of lookupLists.action" [ngValue]="item.id">{{item.name}}</option>
+                    </select>
+                    <button
+                      class="mini-save-btn text-primary border border-primary/20 bg-primary/5 hover:bg-primary hover:text-white"
+                      [disabled]="fieldLoading['action']"
+                      (click)="updateField('action', selectedPerson.classification.actionStatusId)" title="حفظ">
+                      <span *ngIf="!fieldLoading['action']">💾</span>
+                      <div *ngIf="fieldLoading['action']" class="spinner-mini !border-primary"></div>
+                    </button>
+                  </div>
+
+                  <div class="status-history-area border-t border-slate-100 pt-3 mt-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">السجل التاريخي</h4>
+
+                    </div>
+                    <div class="micro-history-container custom-scrollbar transition-all"
+                      [style.max-height]="showAllActionMode ? '250px' : '90px'">
+                      <table class="micro-history-table">
+                        <thead>
+                          <tr>
+                            <th>التاريخ</th>
+                            <th>الموظف</th>
+                            <th>الحالة</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let h of categoryHistories['action']">
+                            <td>{{h.dateAdded | date:'dd/MM HH:mm'}}</td>
+                            <td class="truncate max-w-[50px]">{{h.userName}}</td>
+                            <td><span class="status-badge-mini">{{h.statusName || "تحديث"}}</span></td>
+                          </tr>
+                          <tr *ngIf="!categoryHistories['action']?.length">
+                            <td colspan="3" class="text-center py-2 text-[9px] text-slate-400 italic">لا يوجد سجل</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card: Follow-up Status -->
+              <div class="distinguished-card accent-emerald">
+                <div class="status-card-header">
+                  <div class="flex items-center gap-3">
+                    <div class="status-icon-box bg-white/10 text-white shadow-sm">🔍</div>
+                    <div>
+                      <div class="status-label-main">حالة المراجعة</div>
+                      <div class="status-sub-label">Follow-up Status</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-2.5 space-y-2">
+                  <div class="flex gap-2 items-center">
+                    <select class="premium-input bg-white shadow-sm flex-grow"
+                      [(ngModel)]="selectedPerson.classification.followUpStatusId">
+                      <option [ngValue]="null">اختر...</option>
+                      <option *ngFor="let item of lookupLists.followup" [ngValue]="item.id">{{item.name}}</option>
+                    </select>
+                    <button
+                      class="mini-save-btn text-primary border border-primary/20 bg-primary/5 hover:bg-primary hover:text-white"
+                      [disabled]="fieldLoading['followup']"
+                      (click)="updateField('followup', selectedPerson.classification.followUpStatusId)" title="حفظ">
+                      <span *ngIf="!fieldLoading['followup']">💾</span>
+                      <div *ngIf="fieldLoading['followup']" class="spinner-mini !border-primary"></div>
+                    </button>
+                  </div>
+
+                  <div class="status-history-area border-t border-slate-100 pt-3 mt-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">السجل التاريخي</h4>
+
+                    </div>
+                    <div class="micro-history-container custom-scrollbar transition-all"
+                      [style.max-height]="showAllFollowupMode ? '250px' : '90px'">
+                      <table class="micro-history-table">
+                        <thead>
+                          <tr>
+                            <th>التاريخ</th>
+                            <th>الموظف</th>
+                            <th>الحالة</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let h of categoryHistories['followup']">
+                            <td>{{h.dateAdded | date:'dd/MM HH:mm'}}</td>
+                            <td class="truncate max-w-[50px]">{{h.userName}}</td>
+                            <td><span class="status-badge-mini">{{h.statusName || "تحديث"}}</span></td>
+                          </tr>
+                          <tr *ngIf="!categoryHistories['followup']?.length">
+                            <td colspan="3" class="text-center py-2 text-[9px] text-slate-400 italic">لا يوجد سجل</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card: Internal Status -->
+              <div class="distinguished-card accent-emerald">
+                <div class="status-card-header">
+                  <div class="flex items-center gap-3">
+                    <div class="status-icon-box bg-white/10 text-white shadow-sm">🏢</div>
+                    <div>
+                      <div class="status-label-main">الحالة الداخلية</div>
+                      <div class="status-sub-label">Internal Status</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-2.5 space-y-2">
+                  <div class="flex gap-2 items-center">
+                    <select class="premium-input bg-white shadow-sm flex-grow"
+                      [(ngModel)]="selectedPerson.classification.internalStatusId">
+                      <option [ngValue]="null">اختر...</option>
+                      <option *ngFor="let item of lookupLists.interior" [ngValue]="item.id">{{item.name}}</option>
+                    </select>
+                    <button
+                      class="mini-save-btn text-primary border border-primary/20 bg-primary/5 hover:bg-primary hover:text-white"
+                      [disabled]="fieldLoading['internal']"
+                      (click)="updateField('internal', selectedPerson.classification.internalStatusId)" title="حفظ">
+                      <span *ngIf="!fieldLoading['internal']">💾</span>
+                      <div *ngIf="fieldLoading['internal']" class="spinner-mini !border-primary"></div>
+                    </button>
+                  </div>
+
+                  <div class="status-history-area border-t border-slate-100 pt-3 mt-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">السجل التاريخي</h4>
+
+                    </div>
+                    <div class="micro-history-container custom-scrollbar transition-all"
+                      [style.max-height]="showAllInternalMode ? '250px' : '90px'">
+                      <table class="micro-history-table">
+                        <thead>
+                          <tr>
+                            <th>التاريخ</th>
+                            <th>الموظف</th>
+                            <th>الحالة</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let h of categoryHistories['internal']">
+                            <td>{{h.dateAdded | date:'dd/MM HH:mm'}}</td>
+                            <td class="truncate max-w-[50px]">{{h.userName}}</td>
+                            <td><span class="status-badge-mini">{{h.statusName || "تحديث"}}</span></td>
+                          </tr>
+                          <tr *ngIf="!categoryHistories['internal']?.length">
+                            <td colspan="3" class="text-center py-2 text-[9px] text-slate-400 italic">لا يوجد سجل</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card: Civil Status -->
+              <div class="distinguished-card accent-emerald">
+                <div class="status-card-header">
+                  <div class="flex items-center gap-3">
+                    <div class="status-icon-box bg-white/10 text-white shadow-sm">⚖️</div>
+                    <div>
+                      <div class="status-label-main">الحالة المدنية</div>
+                      <div class="status-sub-label">Civil Status</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-2.5 space-y-2">
+                  <div class="flex gap-2 items-center">
+                    <select class="premium-input bg-white shadow-sm flex-grow"
+                      [(ngModel)]="selectedPerson.classification.civilStatusId">
+                      <option [ngValue]="null">اختر...</option>
+                      <option *ngFor="let item of lookupLists.civil" [ngValue]="item.id">{{item.name}}</option>
+                    </select>
+                    <button
+                      class="mini-save-btn text-primary border border-primary/20 bg-primary/5 hover:bg-primary hover:text-white"
+                      [disabled]="fieldLoading['civil']"
+                      (click)="updateField('civil', selectedPerson.classification.civilStatusId)" title="حفظ">
+                      <span *ngIf="!fieldLoading['civil']">💾</span>
+                      <div *ngIf="fieldLoading['civil']" class="spinner-mini !border-primary"></div>
+                    </button>
+                  </div>
+
+                  <div class="status-history-area border-t border-slate-100 pt-3 mt-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">السجل التاريخي</h4>
+
+                    </div>
+                    <div class="micro-history-container custom-scrollbar transition-all"
+                      [style.max-height]="showAllCivilMode ? '250px' : '90px'">
+                      <table class="micro-history-table">
+                        <thead>
+                          <tr>
+                            <th>التاريخ</th>
+                            <th>الموظف</th>
+                            <th>الحالة</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let h of categoryHistories['civil']">
+                            <td>{{h.dateAdded | date:'dd/MM HH:mm'}}</td>
+                            <td class="truncate max-w-[50px]">{{h.userName}}</td>
+                            <td><span class="status-badge-mini">{{h.statusName || "تحديث"}}</span></td>
+                          </tr>
+                          <tr *ngIf="!categoryHistories['civil']?.length">
+                            <td colspan="3" class="text-center py-2 text-[9px] text-slate-400 italic">لا يوجد سجل</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card: Contact Status -->
+              <div class="distinguished-card accent-emerald">
+                <div class="status-card-header">
+                  <div class="flex items-center gap-3">
+                    <div class="status-icon-box bg-white/10 text-white shadow-sm">📞</div>
+                    <div>
+                      <div class="status-label-main">حالة التواصل</div>
+                      <div class="status-sub-label">Contact Status</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-2.5 space-y-2">
+                  <div class="flex gap-2 items-center">
+                    <select class="premium-input bg-white shadow-sm flex-grow"
+                      [(ngModel)]="selectedPerson.classification.contactStatusId">
+                      <option [ngValue]="null">اختر...</option>
+                      <option *ngFor="let item of lookupLists.contact" [ngValue]="item.id">{{item.name}}</option>
+                    </select>
+                    <button
+                      class="mini-save-btn text-primary border border-primary/20 bg-primary/5 hover:bg-primary hover:text-white"
+                      [disabled]="fieldLoading['contact']"
+                      (click)="updateField('contact', selectedPerson.classification.contactStatusId)" title="حفظ">
+                      <span *ngIf="!fieldLoading['contact']">💾</span>
+                      <div *ngIf="fieldLoading['contact']" class="spinner-mini !border-primary"></div>
+                    </button>
+                  </div>
+
+                  <div class="status-history-area border-t border-slate-100 pt-3 mt-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">السجل التاريخي</h4>
+
+                    </div>
+                    <div class="micro-history-container custom-scrollbar transition-all"
+                      [style.max-height]="showAllContactMode ? '250px' : '90px'">
+                      <table class="micro-history-table">
+                        <thead>
+                          <tr>
+                            <th>التاريخ</th>
+                            <th>الموظف</th>
+                            <th>الحالة</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let h of categoryHistories['contact']">
+                            <td>{{h.dateAdded | date:'dd/MM HH:mm'}}</td>
+                            <td class="truncate max-w-[50px]">{{h.userName}}</td>
+                            <td><span class="status-badge-mini">{{h.statusName || "تحديث"}}</span></td>
+                          </tr>
+                          <tr *ngIf="!categoryHistories['contact']?.length">
+                            <td colspan="3" class="text-center py-2 text-[9px] text-slate-400 italic">لا يوجد سجل</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card: Cooperation Status -->
+              <div class="distinguished-card accent-emerald">
+                <div class="status-card-header">
+                  <div class="flex items-center gap-3">
+                    <div class="status-icon-box bg-white/10 text-white shadow-sm">🤝</div>
+                    <div>
+                      <div class="status-label-main">حالة التعاون</div>
+                      <div class="status-sub-label">Cooperation Status</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-2.5 space-y-2">
+                  <div class="flex gap-2 items-center">
+                    <select class="premium-input bg-white shadow-sm flex-grow"
+                      [(ngModel)]="selectedPerson.classification.cooperationStatusId">
+                      <option [ngValue]="null">اختر...</option>
+                      <option *ngFor="let item of lookupLists.cooperation" [ngValue]="item.id">{{item.name}}</option>
+                    </select>
+                    <button
+                      class="mini-save-btn text-primary border border-primary/20 bg-primary/5 hover:bg-primary hover:text-white"
+                      (click)="updateField('cooperation', selectedPerson.classification.cooperationStatusId)"
+                      title="حفظ">
+                      <span>💾</span>
+                    </button>
+                  </div>
+
+                  <div class="status-history-area border-t border-slate-100 pt-3 mt-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">السجل التاريخي</h4>
+
+                    </div>
+                    <div class="micro-history-container custom-scrollbar transition-all"
+                      [style.max-height]="showAllCooperationMode ? '250px' : '90px'">
+                      <table class="micro-history-table">
+                        <thead>
+                          <tr>
+                            <th>التاريخ</th>
+                            <th>الموظف</th>
+                            <th>الحالة</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let h of categoryHistories['cooperation']">
+                            <td>{{h.dateAdded | date:'dd/MM HH:mm'}}</td>
+                            <td class="truncate max-w-[50px]">{{h.userName}}</td>
+                            <td><span class="status-badge-mini">{{h.statusName || "تحديث"}}</span></td>
+                          </tr>
+                          <tr *ngIf="!categoryHistories['cooperation']?.length">
+                            <td colspan="3" class="text-center py-2 text-[9px] text-slate-400 italic">لا يوجد سجل</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <!-- Merged Card 1: الخصم والقبول -->
+              <div class="distinguished-card">
+                <div class="status-card-header">
+                  <div class="flex items-center gap-3">
+                    <div class="status-icon-box bg-slate-100 text-slate-600 shadow-sm">
+                      <i class="pi pi-percentage"></i>
+                    </div>
+                    <div>
+                      <div class="status-label-main">الخصم والقبول</div>
+                      <div class="status-sub-label">Discount & Acceptance</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-2.5 space-y-3">
+                  <div class="grid grid-cols-2 gap-2">
+                    <div class="relative">
+                      <input type="number" class="premium-input-mini w-full"
+                        [(ngModel)]="selectedPerson.classification.discount" placeholder="الخصم %" />
+                      <span
+                        class="absolute right-2 top-1/2 -translate-y-1/2 text-[8px] text-slate-400 font-bold">%</span>
+                    </div>
+                    <select class="premium-input-mini w-full appearance-none bg-white text-xs py-1"
+                      [(ngModel)]="selectedPerson.classification.acceptance">
+                      <option [value]="undefined" disabled selected>القبول...</option>
+                      <option *ngFor="let opt of acceptanceOptions" [value]="opt">{{opt}}</option>
+                    </select>
+                  </div>
+
+                  <div class="flex flex-col gap-1 px-1">
+                    <div class="flex justify-between items-center text-[10px]">
+                      <span class="text-slate-500">قيمة الخصم:</span>
+                      <span class="font-bold text-emerald-600">{{calculatedDiscountValue | number:'1.3-3'}} د.ك</span>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px]">
+                      <span class="text-slate-500">المتبقي بعد الخصم:</span>
+                      <span class="font-bold text-slate-900">{{remainingAfterDiscount | number:'1.3-3'}} د.ك</span>
+                    </div>
+                  </div>
+
+                  <button class="btn-save-premium mt-2" [disabled]="loadingDiscount"
+                    (click)="saveDiscountAcceptance()">
+                    <span *ngIf="!loadingDiscount">حفظ الخصم والقبول</span>
+                    <div *ngIf="loadingDiscount" class="spinner-mini"></div>
+                  </button>
+
+                  <div class="status-history-area border-t border-slate-100 pt-3 mt-1">
+                    <h4
+                      class="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-2 italic underline decoration-slate-200 underline-offset-2">
+                      السجل التاريخي</h4>
+                    <div class="micro-history-container custom-scrollbar transition-all" style="max-height: 100px">
+                      <table class="micro-history-table">
+                        <thead>
+                          <tr>
+                            <th>التاريخ</th>
+                            <th>الموظف</th>
+                            <th>الحالة</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let h of discountAcceptanceHistory">
+                            <td>{{h.dateAdded | date:'dd/MM HH:mm'}}</td>
+                            <td class="truncate max-w-[85px] text-indigo-700 font-bold" [title]="h.userName">{{h.userName}}</td>
+                            <td><span class="status-badge-mini">{{h.statusName || 'تحديث'}}</span></td>
+                          </tr>
+                          <tr *ngIf="!discountAcceptanceHistory?.length">
+                            <td colspan="3" class="text-center py-2 text-[9px] text-slate-400 italic">لا يوجد سجل</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div><!-- Merged Card 2: جهة العمل -->
+              <div class="distinguished-card">
+                <div class="status-card-header">
+                  <div class="flex items-center gap-3">
+                    <div class="status-icon-box bg-slate-100 text-slate-600 shadow-sm">
+                      <i class="pi pi-briefcase"></i>
+                    </div>
+                    <div>
+                      <div class="status-label-main">جهة العمل</div>
+                      <div class="status-sub-label">Job Information</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-2.5 space-y-3">
+                  <input type="text" class="premium-input-mini w-full" [(ngModel)]="selectedPerson.work"
+                    placeholder="أدخل جهة العمل..." />
+
+                  <button class="btn-save-premium mt-2" [disabled]="loadingJob"
+                    (click)="saveJobInfo()">
+                    <span *ngIf="!loadingJob">حفظ جهة العمل</span>
+                    <div *ngIf="loadingJob" class="spinner-mini"></div>
+                  </button>
+
+                  <div class="status-history-area border-t border-slate-100 pt-3 mt-1">
+                    <h4
+                      class="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-2 italic underline decoration-slate-200 underline-offset-2">
+                      السجل التاريخي</h4>
+                    <div class="micro-history-container custom-scrollbar transition-all" style="max-height: 120px">
+                      <table class="micro-history-table">
+                        <thead>
+                          <tr>
+                            <th>التاريخ</th>
+                            <th>الموظف</th>
+                            <th>الحالة</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let h of jobInfoHistory">
+                            <td>{{h.dateAdded | date:'dd/MM HH:mm'}}</td>
+                            <td class="truncate max-w-[85px] text-indigo-700 font-bold" [title]="h.userName">{{h.userName}}</td>
+                            <td><span class="status-badge-mini">{{h.statusName}}</span></td>
+                          </tr>
+                          <tr *ngIf="!jobInfoHistory?.length">
+                            <td colspan="3" class="text-center py-2 text-[9px] text-slate-400 italic">لا يوجد سجل</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- Merged Card 3: الراتب والدخل -->
+              <div class="distinguished-card">
+                <div class="status-card-header">
+                  <div class="flex items-center gap-3">
+                    <div class="status-icon-box bg-slate-100 text-slate-600 shadow-sm">
+                      <i class="pi pi-calendar"></i>
+                    </div>
+                    <div>
+                      <div class="status-label-main">الراتب والدخل</div>
+                      <div class="status-sub-label">Salary & Income</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-2.5 space-y-3">
+                  <div class="flex flex-col gap-1">
+                    <span class="text-[8px] text-slate-400 font-bold px-1">تاريخ الراتب</span>
+                    <input type="date" class="premium-input-mini w-full"
+                      [(ngModel)]="selectedPerson.classification.salaryDate" />
+                  </div>
+
+                  <div class="flex flex-col gap-1">
+                    <span class="text-[8px] text-slate-400 font-bold px-1">ملاحظات الدخل</span>
+                    <input type="text" class="premium-input-mini w-full"
+                      [(ngModel)]="selectedPerson.classification.incomeNotes" placeholder="ملاحظات الدخل..." />
+                  </div>
+
+                  <button class="btn-save-premium mt-2" [disabled]="loadingIncome"
+                    (click)="saveIncomeSalary()">
+                    <span *ngIf="!loadingIncome">حفظ الراتب والدخل</span>
+                    <div *ngIf="loadingIncome" class="spinner-mini"></div>
+                  </button>
+
+                  <div class="status-history-area border-t border-slate-100 pt-3 mt-1">
+                    <h4
+                      class="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-2 italic underline decoration-slate-200 underline-offset-2">
+                      السجل التاريخي</h4>
+                    <div class="micro-history-container custom-scrollbar transition-all" style="max-height: 100px">
+                      <table class="micro-history-table">
+                        <thead>
+                          <tr>
+                            <th>التاريخ</th>
+                            <th>الموظف</th>
+                            <th>الحالة</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let h of incomeSalaryHistory">
+                            <td>{{h.dateAdded | date:'dd/MM HH:mm'}}</td>
+                            <td class="truncate max-w-[85px] text-indigo-700 font-bold" [title]="h.userName">{{h.userName}}</td>
+                            <td><span class="status-badge-mini">{{h.statusName || 'تحديث'}}</span></td>
+                          </tr>
+                          <tr *ngIf="!incomeSalaryHistory?.length">
+                            <td colspan="3" class="text-center py-2 text-[9px] text-slate-400 italic">لا يوجد سجل</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+            </div>
+
+          </div>
+
 
           <div *ngIf="activeSubTab === 'main'">
             <!-- Removed style="display: block;" which was breaking the grid -->
@@ -300,11 +1070,14 @@
 
                   <!-- النوع + اللغة -->
                   <div class="flex flex-col gap-4" style="flex: 1;">
+
+
                     <div class="premium-card p-4" style="margin-bottom: 0 !important;">
                       <div class="card-body p-0">
-                        <label class="form-label mb-3">لغة التواصل</label>
-                        <div class="premium-radio-group">
-                          <label *ngFor="let item of lookupLists.comms_lang" class="premium-radio-item"
+                        <label class="form-label mb-3">لغة التواصل (تحديث تلقائي)</label>
+                        <div class="premium-radio-group flex flex-wrap gap-2">
+                          <label *ngFor="let item of lookupLists.comms_lang"
+                            class="premium-radio-item px-4 py-2 min-w-[80px] text-center"
                             [class.active]="selectedPerson?.classification?.communicationLanguageId === item.id"
                             (click)="onLookupSelected(item, 'comms_lang')">
                             <input type="radio" name="comms_lang" [value]="item.id"
@@ -315,11 +1088,13 @@
                       </div>
                     </div>
 
+
                     <div class="premium-card p-4" style="margin-bottom: 0 !important;">
                       <div class="card-body p-0">
-                        <label class="form-label mb-3">النوع</label>
-                        <div class="premium-radio-group">
-                          <label *ngFor="let item of lookupLists.gender" class="premium-radio-item"
+                        <label class="form-label mb-3">النوع (الذكر / الأنثى)</label>
+                        <div class="premium-radio-group flex flex-wrap gap-2">
+                          <label *ngFor="let item of lookupLists.gender"
+                            class="premium-radio-item px-4 py-2 min-w-[80px] text-center"
                             [class.active]="selectedPerson?.classification?.genderId === item.id"
                             (click)="onLookupSelected(item, 'gender')">
                             <input type="radio" name="gender" [value]="item.id"
@@ -378,35 +1153,42 @@
           <!-- (NEW) اجمالي الملفات -->
           <div *ngIf="activeSubTab === 'totalFiles'" class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4" dir="rtl">
-              
+
               <!-- Column 1: All Files -->
               <div class="space-y-4">
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-indigo-600 bg-slate-50/50" [value]="totals.claimAll | number:'1.3-3'" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-indigo-600 bg-slate-50/50"
+                    [value]="totals.claimAll | number:'1.3-3'" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">المطالبة لكل الملفات</label>
                 </div>
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-emerald-600 bg-slate-50/50" [value]="totals.paidAll | number:'1.3-3'" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-emerald-600 bg-slate-50/50"
+                    [value]="totals.paidAll | number:'1.3-3'" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">المسدد لكل الملفات</label>
                 </div>
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-rose-600 bg-slate-50/50" [value]="totals.remainingAll | number:'1.3-3'" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-rose-600 bg-slate-50/50"
+                    [value]="totals.remainingAll | number:'1.3-3'" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي لكل الملفات</label>
                 </div>
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-slate-600 bg-slate-50/50" [value]="totals.feesAll | number:'1.3-3'" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-slate-600 bg-slate-50/50"
+                    [value]="totals.feesAll | number:'1.3-3'" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">الرسوم لكل الملفات</label>
                 </div>
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-indigo-800 bg-slate-50/50" [value]="(totals.remainingAll + totals.feesAll) | number:'1.3-3'" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-indigo-800 bg-slate-50/50"
+                    [value]="(totals.remainingAll + totals.feesAll) | number:'1.3-3'" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي شامل الرسوم</label>
                 </div>
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-slate-500 bg-slate-50/50" [value]="totals.proceduresAll" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-slate-500 bg-slate-50/50"
+                    [value]="totals.proceduresAll" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">الاجراءات لكل الملفات</label>
                 </div>
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-rose-800 bg-slate-50/50" [value]="totals.remainingAll | number:'1.3-3'" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-rose-800 bg-slate-50/50"
+                    [value]="totals.remainingAll | number:'1.3-3'" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي لكل الملفات</label>
                 </div>
               </div>
@@ -414,31 +1196,38 @@
               <!-- Column 2: Current Company -->
               <div class="space-y-4">
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-indigo-600 bg-slate-50/50" [value]="(selectedFile?.claim || 0) | number:'1.3-3'" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-indigo-600 bg-slate-50/50"
+                    [value]="(selectedFile?.claim || 0) | number:'1.3-3'" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">المطالبة للشركة الحالية</label>
                 </div>
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-emerald-600 bg-slate-50/50" [value]="(selectedFile?.paid || 0) | number:'1.3-3'" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-emerald-600 bg-slate-50/50"
+                    [value]="(selectedFile?.paid || 0) | number:'1.3-3'" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">المسدد للشركة الحالية</label>
                 </div>
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-rose-600 bg-slate-50/50" [value]="(selectedFile?.remaining || 0) | number:'1.3-3'" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-rose-600 bg-slate-50/50"
+                    [value]="(selectedFile?.remaining || 0) | number:'1.3-3'" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي للشركة الحالية</label>
                 </div>
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-slate-600 bg-slate-50/50" [value]="(selectedFile?.fees || 0) | number:'1.3-3'" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-slate-600 bg-slate-50/50"
+                    [value]="(selectedFile?.fees || 0) | number:'1.3-3'" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">الرسوم للشركة الحالية</label>
                 </div>
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-indigo-800 bg-slate-50/50" [value]="((selectedFile?.remaining || 0) + (selectedFile?.fees || 0)) | number:'1.3-3'" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-indigo-800 bg-slate-50/50"
+                    [value]="((selectedFile?.remaining || 0) + (selectedFile?.fees || 0)) | number:'1.3-3'" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي شامل الرسوم</label>
                 </div>
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-slate-500 bg-slate-50/50" [value]="0" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-slate-500 bg-slate-50/50"
+                    [value]="0" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">الاجراءات للشركة الحالية</label>
                 </div>
                 <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-rose-800 bg-slate-50/50" [value]="(selectedFile?.remaining || 0) | number:'1.3-3'" readonly />
+                  <input type="text" class="premium-input text-center font-bold text-rose-800 bg-slate-50/50"
+                    [value]="(selectedFile?.remaining || 0) | number:'1.3-3'" readonly />
                   <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي للشركة الحالية</label>
                 </div>
               </div>
@@ -452,8 +1241,10 @@
             <div class="flex items-center justify-between border-b border-slate-100 pb-4">
               <div class="flex items-center gap-3">
                 <div class="p-2 bg-indigo-50 rounded-xl">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.826c.001-.001 0-1.101 0-1.101m0 0l4-4a4 4 0 015.656 5.656l-1.1 1.1" />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-600" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.826c.001-.001 0-1.101 0-1.101m0 0l4-4a4 4 0 015.656 5.656l-1.1 1.1" />
                   </svg>
                 </div>
                 <div>
@@ -462,8 +1253,7 @@
                 </div>
               </div>
               <div class="flex gap-2">
-                <button 
-                  class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all"
+                <button class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all"
                   [class.bg-indigo-600]="paymentForm.type === 'company'"
                   [class.text-white]="paymentForm.type === 'company'"
                   [class.bg-slate-100]="paymentForm.type !== 'company'"
@@ -471,8 +1261,7 @@
                   (click)="paymentForm.type = 'company'; generateLink()">
                   رابط الشركة
                 </button>
-                <button 
-                  class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all"
+                <button class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all"
                   [class.bg-indigo-600]="paymentForm.type === 'office'"
                   [class.text-white]="paymentForm.type === 'office'"
                   [class.bg-slate-100]="paymentForm.type !== 'office'"
@@ -490,11 +1279,13 @@
                 <div class="grid grid-cols-2 gap-4">
                   <div class="space-y-1">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">كود الملف</label>
-                    <input type="text" class="premium-input bg-slate-50 font-bold" [value]="paymentForm.code" readonly />
+                    <input type="text" class="premium-input bg-slate-50 font-bold" [value]="paymentForm.code"
+                      readonly />
                   </div>
                   <div class="space-y-1">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">الرقم المدني</label>
-                    <input type="text" class="premium-input bg-slate-50 font-mono" [value]="paymentForm.civilId" readonly />
+                    <input type="text" class="premium-input bg-slate-50 font-mono" [value]="paymentForm.civilId"
+                      readonly />
                   </div>
                 </div>
 
@@ -506,7 +1297,8 @@
                 <div class="grid grid-cols-2 gap-4">
                   <div class="space-y-1">
                     <label class="text-[10px] font-black text-indigo-500 uppercase tracking-widest">المبلغ (د.ك)</label>
-                    <input type="number" class="premium-input bg-indigo-50/50 border-indigo-200 text-indigo-700 font-black text-lg" 
+                    <input type="number"
+                      class="premium-input bg-indigo-50/50 border-indigo-200 text-indigo-700 font-black text-lg"
                       [(ngModel)]="paymentForm.amount" (ngModelChange)="generateLink()" />
                   </div>
                   <div class="space-y-1">
@@ -521,10 +1313,13 @@
                 <div class="space-y-1">
                   <label class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">رقم الواتساب</label>
                   <div class="relative">
-                    <input type="text" class="premium-input pl-10 bg-emerald-50/30 border-emerald-100 text-emerald-700 font-bold" 
+                    <input type="text"
+                      class="premium-input pl-10 bg-emerald-50/30 border-emerald-100 text-emerald-700 font-bold"
                       [(ngModel)]="paymentForm.whatsapp" />
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 absolute left-3 top-2.5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.44-9.89 9.886-.001 2.15.614 3.735 1.648 5.41l-.999 3.647 3.841-.986zm11.387-5.477c-.31-.156-1.834-.905-2.112-1.006-.277-.101-.48-.151-.68.151-.202.303-.778 1.006-.955 1.208-.177.202-.355.226-.665.071-1.297-.648-2.13-1.153-2.969-2.585-.23-.393-.23-.393.103-.79.314-.374.68-.813.882-1.006l.325-.494c.156-.303.078-.567-.039-.79-.117-.224-.68-1.641-.933-2.25-.246-.591-.497-.504-.68-.514l-.578-.01c-.202 0-.528.077-.803.376-.276.301-1.054 1.03-1.054 2.513 0 1.485 1.079 2.918 1.229 3.12.151.201 2.126 3.245 5.15 4.549 3.023 1.305 3.023.87 3.578.82.555-.05 1.833-.749 2.091-1.478.257-.73.257-1.359.18-1.484-.076-.126-.28-.203-.591-.359z"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 absolute left-3 top-2.5 text-emerald-400"
+                      fill="currentColor" viewBox="0 0 24 24">
+                      <path
+                        d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.44-9.89 9.886-.001 2.15.614 3.735 1.648 5.41l-.999 3.647 3.841-.986zm11.387-5.477c-.31-.156-1.834-.905-2.112-1.006-.277-.101-.48-.151-.68.151-.202.303-.778 1.006-.955 1.208-.177.202-.355.226-.665.071-1.297-.648-2.13-1.153-2.969-2.585-.23-.393-.23-.393.103-.79.314-.374.68-.813.882-1.006l.325-.494c.156-.303.078-.567-.039-.79-.117-.224-.68-1.641-.933-2.25-.246-.591-.497-.504-.68-.514l-.578-.01c-.202 0-.528.077-.803.376-.276.301-1.054 1.03-1.054 2.513 0 1.485 1.079 2.918 1.229 3.12.151.201 2.126 3.245 5.15 4.549 3.023 1.305 3.023.87 3.578.82.555-.05 1.833-.749 2.091-1.478.257-.73.257-1.359.18-1.484-.076-.126-.28-.203-.591-.359z" />
                     </svg>
                   </div>
                 </div>
@@ -554,11 +1349,14 @@
                 <div class="space-y-1 pt-2">
                   <label class="text-[10px] font-black text-indigo-500 uppercase tracking-widest">الرابط المولد</label>
                   <div class="flex gap-2">
-                    <input type="text" class="premium-input bg-slate-50 text-xs font-mono text-indigo-600 flex-1" 
+                    <input type="text" class="premium-input bg-slate-50 text-xs font-mono text-indigo-600 flex-1"
                       [value]="companyLink" readonly />
-                    <button class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors" (click)="copyLink()" title="نسخ الرابط">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 00 2 2h10a2 2 0 00 2-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                    <button class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors"
+                      (click)="copyLink()" title="نسخ الرابط">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 5H6a2 2 0 00-2 2v12a2 2 0 00 2 2h10a2 2 0 00 2-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                       </svg>
                     </button>
                   </div>
@@ -569,19 +1367,19 @@
             <!-- Message Area -->
             <div class="space-y-2">
               <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">نص الرسالة</label>
-              <textarea 
-                class="premium-input w-full min-h-[120px] bg-slate-50 text-sm leading-relaxed" 
+              <textarea class="premium-input w-full min-h-[120px] bg-slate-50 text-sm leading-relaxed"
                 [(ngModel)]="paymentForm.message"></textarea>
             </div>
 
             <!-- Action Buttons -->
             <div class="flex justify-end gap-3 pt-4">
-              <button 
+              <button
                 class="premium-btn bg-emerald-600 hover:bg-emerald-700 text-white border-none py-3 px-10 shadow-lg shadow-emerald-200"
                 (click)="sendWhatsApp()">
                 <div class="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.44-9.89 9.886-.001 2.15.614 3.735 1.648 5.41l-.999 3.647 3.841-.986zm11.387-5.477c-.31-.156-1.834-.905-2.112-1.006-.277-.101-.48-.151-.68.151-.202.303-.778 1.006-.955 1.208-.177.202-.355.226-.665.071-1.297-.648-2.13-1.153-2.969-2.585-.23-.393-.23-.393.103-.79.314-.374.68-.813.882-1.006l.325-.494c.156-.303.078-.567-.039-.79-.117-.224-.68-1.641-.933-2.25-.246-.591-.497-.504-.68-.514l-.578-.01c-.202 0-.528.077-.803.376-.276.301-1.054 1.03-1.054 2.513 0 1.485 1.079 2.918 1.229 3.12.151.201 2.126 3.245 5.15 4.549 3.023 1.305 3.023.87 3.578.82.555-.05 1.833-.749 2.091-1.478.257-.73.257-1.359.18-1.484-.076-.126-.28-.203-.591-.359z"/>
+                    <path
+                      d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.44-9.89 9.886-.001 2.15.614 3.735 1.648 5.41l-.999 3.647 3.841-.986zm11.387-5.477c-.31-.156-1.834-.905-2.112-1.006-.277-.101-.48-.151-.68.151-.202.303-.778 1.006-.955 1.208-.177.202-.355.226-.665.071-1.297-.648-2.13-1.153-2.969-2.585-.23-.393-.23-.393.103-.79.314-.374.68-.813.882-1.006l.325-.494c.156-.303.078-.567-.039-.79-.117-.224-.68-1.641-.933-2.25-.246-.591-.497-.504-.68-.514l-.578-.01c-.202 0-.528.077-.803.376-.276.301-1.054 1.03-1.054 2.513 0 1.485 1.079 2.918 1.229 3.12.151.201 2.126 3.245 5.15 4.549 3.023 1.305 3.023.87 3.578.82.555-.05 1.833-.749 2.091-1.478.257-.73.257-1.359.18-1.484-.076-.126-.28-.203-.591-.359z" />
                   </svg>
                   <span>إرسال عبر واتساب</span>
                 </div>
@@ -906,248 +1704,7 @@
           </div>
 
           <!-- (8) تصنيف (Classification Tab Modernized) -->
-          <div *ngIf="activeSubTab === 'classification'" class="p-4 animate-in fade-in duration-500 min-h-[400px]">
-            <!-- Action Header -->
-            <div class="flex items-center justify-between mb-8">
-              <div class="flex items-center gap-4">
-                <div
-                  class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
-                  🏷️
-                </div>
-                <div>
-                  <h2 class="text-xl font-black text-slate-800 tracking-tight font-sans">تصنيف الملف القانوني</h2>
-                  <p class="text-xs text-slate-400 font-bold">إدارة حالات الملف، الخصومات، وبيانات الدخل</p>
-                </div>
-              </div>
 
-              <div class="flex items-center gap-2">
-                <button (click)="saveAllClassifications()" [disabled]="loading"
-                  class="premium-btn premium-btn-primary flex items-center gap-2 px-8 py-3 group">
-                  <span *ngIf="loading"
-                    class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                  <span *ngIf="!loading">💾</span>
-                  <span>حفظ التصنيف الكلي</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-12 gap-6">
-
-              <!-- Left Column: Status Grid -->
-              <div class="col-span-12 lg:col-span-8 space-y-6">
-
-                <!-- Status Row 1 -->
-                <div class="premium-card p-6">
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="form-field">
-                      <label class="form-label text-slate-500 font-bold mb-2 block font-sans text-xs">حالة
-                        العميل</label>
-                      <select class="premium-input bg-white/50 border-slate-200 text-xs font-bold"
-                        [(ngModel)]="selectedPerson.classification.clientStatusId"
-                        (change)="onLookupSelected({id: selectedPerson.classification.clientStatusId, name: ''}, 'client')">
-                        <option [ngValue]="null">اختر الحالة...</option>
-                        <option *ngFor="let item of lookupLists.client" [ngValue]="item.id">{{item.name}}</option>
-                      </select>
-                    </div>
-                    <div class="form-field">
-                      <label class="form-label text-slate-500 font-bold mb-2 block font-sans text-xs">حالة
-                        المطالبة</label>
-                      <select class="premium-input bg-white/50 border-slate-200 text-xs font-bold"
-                        [(ngModel)]="selectedPerson.classification.claimStatusId"
-                        (change)="onLookupSelected({id: selectedPerson.classification.claimStatusId, name: ''}, 'claim')">
-                        <option [ngValue]="null">اختر الحالة...</option>
-                        <option *ngFor="let item of lookupLists.claim" [ngValue]="item.id">{{item.name}}</option>
-                      </select>
-                    </div>
-                    <div class="form-field">
-                      <label class="form-label text-slate-500 font-bold mb-2 block font-sans text-xs">حالة
-                        السداد</label>
-                      <select class="premium-input bg-white/50 border-slate-200 text-xs font-bold"
-                        [(ngModel)]="selectedPerson.classification.paymentStatusId"
-                        (change)="onLookupSelected({id: selectedPerson.classification.paymentStatusId, name: ''}, 'payment')">
-                        <option [ngValue]="null">اختر الحالة...</option>
-                        <option *ngFor="let item of lookupLists.payment" [ngValue]="item.id">{{item.name}}</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Status Row 2 -->
-                <div class="premium-card p-6">
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="form-field">
-                      <label class="form-label text-slate-500 font-bold mb-2 block font-sans text-xs">حالة الملف</label>
-                      <select class="premium-input bg-white/50 border-slate-200 text-xs font-bold"
-                        [(ngModel)]="selectedPerson.classification.fileStatusId"
-                        (change)="onLookupSelected({id: selectedPerson.classification.fileStatusId, name: ''}, 'file')">
-                        <option [ngValue]="null">اختر الحالة...</option>
-                        <option *ngFor="let item of lookupLists.file" [ngValue]="item.id">{{item.name}}</option>
-                      </select>
-                    </div>
-                    <div class="form-field">
-                      <label class="form-label text-slate-500 font-bold mb-2 block font-sans text-xs">حالة
-                        الاجراءات</label>
-                      <select class="premium-input bg-white/50 border-slate-200 text-xs font-bold"
-                        [(ngModel)]="selectedPerson.classification.actionStatusId"
-                        (change)="onLookupSelected({id: selectedPerson.classification.actionStatusId, name: ''}, 'action')">
-                        <option [ngValue]="null">اختر الحالة...</option>
-                        <option *ngFor="let item of lookupLists.action" [ngValue]="item.id">{{item.name}}</option>
-                      </select>
-                    </div>
-                    <div class="form-field">
-                      <label class="form-label text-slate-500 font-bold mb-2 block font-sans text-xs">حالة
-                        المتابعة</label>
-                      <select class="premium-input bg-white/50 border-slate-200 text-xs font-bold"
-                        [(ngModel)]="selectedPerson.classification.followUpStatusId"
-                        (change)="onLookupSelected({id: selectedPerson.classification.followUpStatusId, name: ''}, 'followup')">
-                        <option [ngValue]="null">اختر الحالة...</option>
-                        <option *ngFor="let item of lookupLists.followup" [ngValue]="item.id">{{item.name}}</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Financial & Acceptance -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div class="premium-card p-6 h-full flex flex-col border-t-4 border-t-amber-400">
-                    <h3 class="text-sm font-bold text-amber-600 mb-4 flex items-center gap-2 font-sans">
-                      <span class="w-2 h-4 bg-amber-400 rounded-full"></span>
-                      الخصم والقبول
-                    </h3>
-                    <div class="space-y-4 flex-grow">
-                      <div class="form-field">
-                        <label class="form-label text-slate-400 text-[10px] font-bold uppercase">الخصم %</label>
-                        <div class="relative">
-                          <input type="number" class="premium-input pr-12 text-lg font-black text-slate-700"
-                            [(ngModel)]="selectedPerson.classification.discount"
-                            (change)="updateField('discount', selectedPerson.classification.discount)" />
-                          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
-                        </div>
-                      </div>
-                      <div class="form-field">
-                        <label class="form-label text-slate-400 text-[10px] font-bold uppercase">القبول</label>
-                        <select class="premium-input font-bold text-sm"
-                          [(ngModel)]="selectedPerson.classification.acceptance"
-                          (change)="updateField('acceptance', selectedPerson.classification.acceptance)">
-                          <option value="">لا يوجد خصم</option>
-                          <option value="قبول">✅ قبول</option>
-                          <option value="رفض">❌ رفض</option>
-                          <option value="معلق">⏳ معلق</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="premium-card p-6 h-full flex flex-col border-t-4 border-t-blue-400">
-                    <h3 class="text-sm font-bold text-blue-600 mb-4 flex items-center gap-2 font-sans">
-                      <span class="w-2 h-4 bg-blue-400 rounded-full"></span>
-                      مصدر الدخل
-                    </h3>
-                    <div class="space-y-4 flex-grow">
-                      <div class="form-field">
-                        <label class="form-label text-slate-400 text-[10px] font-bold uppercase">الدوام /
-                          الوظيفة</label>
-                        <input type="text" class="premium-input font-bold text-sm" [(ngModel)]="selectedPerson.work"
-                          (blur)="updateField('work', selectedPerson.work)" placeholder="ادخل وظيفة العميل..." />
-                      </div>
-                      <div class="form-field">
-                        <label class="form-label text-slate-400 text-[10px] font-bold uppercase">تاريخ الراتب</label>
-                        <input type="date" class="premium-input font-bold text-xs"
-                          [(ngModel)]="selectedPerson.classification.salaryDate"
-                          (change)="updateField('salarydate', selectedPerson.classification.salaryDate)" />
-                      </div>
-                      <div class="form-field">
-                        <label class="form-label text-slate-400 text-[10px] font-bold uppercase">ملاحظات الدخل</label>
-                        <textarea class="premium-input text-xs" rows="2"
-                          [(ngModel)]="selectedPerson.classification.incomeNotes"
-                          (blur)="updateField('incomenotes', selectedPerson.classification.incomeNotes)"
-                          placeholder="اي ملاحظات اضافية..."></textarea>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              <!-- Right Column: Secondary Statuses Stack -->
-              <div class="col-span-12 lg:col-span-4">
-                <div class="premium-card p-6 h-full bg-slate-50/30">
-                  <h3
-                    class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2 font-sans">
-                    <span class="w-1.5 h-5 bg-primary rounded-full"></span>
-                    تصنيفات إضافية
-                  </h3>
-                  <div class="space-y-4">
-                    <!-- Internal Status -->
-                    <div
-                      class="p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/30 transition-all group shadow-sm">
-                      <label
-                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 block font-sans">حالة
-                        الداخلية</label>
-                      <select class="premium-input bg-slate-50/50 border-none text-xs font-black p-0 h-auto"
-                        [(ngModel)]="selectedPerson.classification.internalStatusId"
-                        (change)="onLookupSelected({id: selectedPerson.classification.internalStatusId, name: ''}, 'internal')">
-                        <option *ngFor="let item of lookupLists.interior" [ngValue]="item.id">{{item.name}}</option>
-                      </select>
-                    </div>
-
-                    <!-- Civil Status -->
-                    <div
-                      class="p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/30 transition-all group shadow-sm">
-                      <label
-                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 block font-sans">حالة
-                        المدنية</label>
-                      <select class="premium-input bg-slate-50/50 border-none text-xs font-black p-0 h-auto"
-                        [(ngModel)]="selectedPerson.classification.civilStatusId"
-                        (change)="onLookupSelected({id: selectedPerson.classification.civilStatusId, name: ''}, 'civil')">
-                        <option *ngFor="let item of lookupLists.civil" [ngValue]="item.id">{{item.name}}</option>
-                      </select>
-                    </div>
-
-                    <!-- Contact Status -->
-                    <div
-                      class="p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/30 transition-all group shadow-sm">
-                      <label
-                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 block font-sans">حالة
-                        التواصل</label>
-                      <select class="premium-input bg-slate-50/50 border-none text-xs font-black p-0 h-auto"
-                        [(ngModel)]="selectedPerson.classification.contactStatusId"
-                        (change)="onLookupSelected({id: selectedPerson.classification.contactStatusId, name: ''}, 'contact')">
-                        <option *ngFor="let item of lookupLists.contact" [ngValue]="item.id">{{item.name}}</option>
-                      </select>
-                    </div>
-
-                    <!-- Cooperation Status -->
-                    <div
-                      class="p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/30 transition-all group shadow-sm">
-                      <label
-                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 block font-sans">حالة
-                        التعاون</label>
-                      <select class="premium-input bg-slate-50/50 border-none text-xs font-black p-0 h-auto"
-                        [(ngModel)]="selectedPerson.classification.cooperationStatusId"
-                        (change)="onLookupSelected({id: selectedPerson.classification.cooperationStatusId, name: ''}, 'cooperation')">
-                        <option *ngFor="let item of lookupLists.cooperation" [ngValue]="item.id">{{item.name}}</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <!-- Summary Sticker -->
-                  <div
-                    class="mt-8 p-6 rounded-3xl bg-primary text-white relative overflow-hidden shadow-xl shadow-primary/20">
-                    <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/20 rounded-full blur-2xl"></div>
-                    <div class="relative z-10">
-                      <div class="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-1 font-sans">ملخص
-                        التصنيف
-                      </div>
-                      <div class="text-xl font-black">{{selectedPerson?.clientStatus || 'معلق'}}</div>
-                      <div class="text-[10px] text-white/50 mt-1 font-bold">تحديث دوري نشط</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
 
         </div>
 
@@ -1286,7 +1843,7 @@
   <div class="grid grid-cols-12 gap-4 mt-6">
 
     <!-- Negotiation Method & Review -->
-    <div class="col-span-12 lg:col-span-4 premium-card p-0">
+    <div class="col-span-12 lg:col-span-3 premium-card p-0">
       <div class="card-header py-2 px-3">
         <h3 class="text-sm font-bold">وسيلة التفاوض</h3>
       </div>
@@ -1324,7 +1881,7 @@
     </div>
 
     <!-- Negotiation Outcome -->
-    <div class="col-span-12 lg:col-span-8 premium-card p-0">
+    <div class="col-span-12 lg:col-span-9 premium-card p-0">
       <div class="card-header py-2 px-3">
         <h3 class="text-sm font-bold w-full text-center">نتيجة التفاوض</h3>
       </div>
@@ -2182,8 +2739,8 @@
       </div>
     </div>
 
-    </div>
   </div>
+</div>
 
 
 <!-- searchNumbers -->
