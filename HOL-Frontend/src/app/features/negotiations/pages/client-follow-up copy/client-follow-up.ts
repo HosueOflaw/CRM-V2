@@ -406,7 +406,7 @@ export class ClientFollowUp implements OnInit {
       clientName: client.name || client.Name || '',
       customerName: client.name || client.Name || '',
       nationalId: cid || '',
-      status: client.archive ? 'مؤرشف' : 'نشط',
+      status: client.status || client.Status || (client.archive ? 'مؤرشف' : 'نشط'),
       nationality: client.nationality || client.Nationality || '',
       contract: code?.toString() || '',
       debt: '',
@@ -424,6 +424,7 @@ export class ClientFollowUp implements OnInit {
       gender: this.getLookupName('gender', classification.genderId) || client.gender || '',
       communicationLanguage: this.getLookupName('comms_lang', classification.communicationLanguageId) || client.communicationLanguage || '',
       incomeNotes: classification.incomeNotes || '',
+      membership: client.membership || client.Membership || '',
       classification: client.classification ? {
         ...client.classification,
         salaryDate: client.classification.salaryDate ? client.classification.salaryDate.split('T')[0] : null
@@ -436,7 +437,7 @@ export class ClientFollowUp implements OnInit {
   resetAllData() {
     this.selectedPerson = {
       clientName: '', customerName: '', nationalId: '', status: '', nationality: '', classification: '', contract: '',
-      debt: '', autoNumbers: '', batch: '', address: '', clientStatus: '', claimStatus: '', paymentStatus: '', discount: '', acceptance: '', jobType: '', incomeNotes: '', salaryDate: ''
+      debt: '', autoNumbers: '', batch: '', address: '', clientStatus: '', claimStatus: '', paymentStatus: '', discount: '', acceptance: '', jobType: '', incomeNotes: '', salaryDate: '', membership: ''
     };
     this.financial = { claimValue: 0, fees: 0, lawFees: 0 };
     this.dashboardStats = { totalClients: 0, totalStatements: 0, todayStatements: 0, monthStatements: 0 };

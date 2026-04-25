@@ -19,12 +19,25 @@ export class CovenantReview implements OnInit {
   employeeSearch = '';
   selectedUser: any = null;
   rows: CustodyStatement[] = [];
+  isLoading = false;
+
+  // Pagination
+  currentPage = 1;
+  pageSize = 10;
+  totalCount = 0;
+  Math = Math;
+
+  // Filters
+  fromDate: string = '';
+  toDate: string = '';
+  statusFilter: string = ''; // '', 'true', 'false'
+  searchText: string = '';
 
   @ViewChild('lookup') lookup!: LookupModal;
 
   lookupConfig = {
     title: 'اختر الموظف',
-    columns: ['الرقم', 'الاسم'],
+    columns: ['id', 'fullName'],
     data: [] as any[],
     targetField: 'fullName'
   };
@@ -67,13 +80,134 @@ export class CovenantReview implements OnInit {
       return;
     }
 
-    this.custodyService.getByUserId(this.selectedUser.id).subscribe({
-      next: (data) => {
-        this.rows = data;
+    this.isLoading = true;
+    const filters = {
+      fromDate: this.fromDate,
+      toDate: this.toDate,
+      isReceived: this.statusFilter
+    };
+
+    this.custodyService.getByUserId(this.selectedUser.id, this.currentPage, this.pageSize, filters).subscribe({
+      next: (res: any) => {
+        // Handle both old array format and new paginated object format
+        if (Array.isArray(res)) {
+          this.rows = res;
+          this.totalCount = res.length;
+        } else {
+          this.rows = res.items || [];
+          this.totalCount = res.totalCount || 0;
+        }
+        this.isLoading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error fetching custody statements', err);
         Swal.fire('خطأ', 'فشل في جلب البيانات', 'error');
+        this.isLoading = false;
+      }
+    });
+  }
+
+  getReceivedCount() {
+    return this.rows.filter(r => r.receiveAcc).length;
+  }
+
+  get totalAmount() {
+    return this.rows.reduce((sum, r) => sum + (r.amount || 0), 0);
+  }
+
+  resetFilters() {
+    this.fromDate = '';
+    this.toDate = '';
+    this.statusFilter = '';
+    this.searchText = '';
+    this.currentPage = 1;
+    this.rows = [];
+    this.totalCount = 0;
+    this.selectedUser = null;
+    this.employeeSearch = '';
+  }
+
+  // Check if employee is selected before allowing filter changes
+  validateSelection() {
+    if (!this.selectedUser) {
+      Swal.fire('تنبيه', 'يرجى اختيار الموظف أولاً لتتمكن من استخدام الفلاتر', 'warning');
+      return false;
+    }
+    return true;
+  }
+
+  // Local filtering for search text, status, and dates
+  get filteredRows() {
+    let filtered = [...this.rows];
+
+    // Status Filter
+    if (this.statusFilter === 'true') {
+      filtered = filtered.filter(r => r.receiveAcc === true);
+    } else if (this.statusFilter === 'false') {
+      filtered = filtered.filter(r => r.receiveAcc === false);
+    }
+
+    // Date Filter
+    if (this.fromDate) {
+      const from = new Date(this.fromDate);
+      from.setHours(0, 0, 0, 0);
+      filtered = filtered.filter(r => r.dateAdded && new Date(r.dateAdded) >= from);
+    }
+    if (this.toDate) {
+      const to = new Date(this.toDate);
+      to.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(r => r.dateAdded && new Date(r.dateAdded) <= to);
+    }
+
+    // Search Text
+    if (this.searchText) {
+      const search = this.searchText.toLowerCase();
+      filtered = filtered.filter(r => 
+        (r.statementNo && r.statementNo.toLowerCase().includes(search)) ||
+        (r.clientName && r.clientName.toLowerCase().includes(search)) ||
+        (r.personName && r.personName.toLowerCase().includes(search))
+      );
+    }
+
+    return filtered;
+  }
+
+  nextPage() {
+    if (this.currentPage < Math.ceil(this.totalCount / this.pageSize)) {
+      this.currentPage++;
+      this.fetchData();
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.fetchData();
+    }
+  }
+
+  receiveStatement(row: any) {
+    Swal.fire({
+      title: 'هل أنت متأكد؟',
+      text: "سيتم تغيير حالة العهدة إلى (مستلمة)",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#28a745',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'نعم، استلام',
+      cancelButtonText: 'إلغاء'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.custodyService.receiveAcc(row.id).subscribe({
+          next: () => {
+            row.receiveAcc = true;
+            Swal.fire('تم!', 'تم استلام العهدة بنجاح', 'success');
+          },
+          error: (err: any) => {
+            console.error('Error receiving statement', err);
+            Swal.fire('خطأ', 'فشل في استلام العهدة', 'error');
+          }
+        });
       }
     });
   }
@@ -100,7 +234,4 @@ export class CovenantReview implements OnInit {
     }
   }
 
-  get totalAmount() {
-    return this.rows.reduce((sum, r) => sum + (r.amount || 0), 0);
-  }
 }

@@ -21,6 +21,9 @@
     <div class="tab-link" [class.active]="activeTab === 'stopped'" (click)="setActiveTab('stopped')">
       <i class="fas fa-pause-circle"></i> الموقوف
     </div>
+    <div class="tab-link" [class.active]="activeTab === 'transferred'" (click)="setActiveTab('transferred')">
+      <i class="fas fa-paper-plane"></i> العهد المرحلة
+    </div>
   </div>
 
   <!-- Page Content -->
@@ -28,5 +31,6 @@
     <app-add-a-statement *ngIf="activeTab === 'add'"></app-add-a-statement>
     <app-inquiry-about-rejected *ngIf="activeTab === 'stopped'"></app-inquiry-about-rejected>
     <app-inquiry-about-statement *ngIf="activeTab === 'report'"></app-inquiry-about-statement>
+    <app-transferred-statements *ngIf="activeTab === 'transferred'"></app-transferred-statements>
   </div>
 </div>

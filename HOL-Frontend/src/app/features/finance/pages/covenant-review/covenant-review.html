@@ -1,26 +1,100 @@
-<div class="page-container">
-  <!-- Search Section -->
-  <div class="search-section">
-    <div class="search-filters">
-      <div class="form-field cursor-pointer" (click)="openModal()">
-        <label class="form-label">الموظف</label>
-        <div class="relative">
-          <input type="text" class="form-input pointer-events-none" placeholder="اختر الموظف..."
-            [(ngModel)]="employeeSearch" name="employeeSearch" readonly />
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-            <i class="fas fa-search"></i>
-          </span>
-        </div>
+  <!-- Compact Stats Bar -->
+  <div class="flex flex-wrap gap-4 mb-6">
+    <div class="flex-1 min-w-[200px] bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+        <i class="fas fa-file-invoice-dollar text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[9px] font-bold text-slate-400 uppercase">إجمالي العهد</p>
+        <p class="text-sm font-black text-slate-700">{{ totalCount }}</p>
       </div>
     </div>
 
-    <div class="search-actions flex items-end pb-1">
-      <button class="form-button form-button-primary shadow-lg shadow-primary/20 active:scale-95 transition-all"
-        (click)="fetchData()" [disabled]="!selectedUser">
-        <i class="fas fa-search ml-2"></i> بحث
-      </button>
-      <button class="form-button form-button-success">تم الاستلام</button>
-      <button class="form-button form-button-outline">نتيجة المصروف</button>
+    <div class="flex-1 min-w-[200px] bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+        <i class="fas fa-check-double text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[9px] font-bold text-slate-400 uppercase">مستلمة</p>
+        <p class="text-sm font-black text-slate-700">{{ getReceivedCount() }}</p>
+      </div>
+    </div>
+
+    <div class="flex-1 min-w-[200px] bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
+        <i class="fas fa-clock text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[9px] font-bold text-slate-400 uppercase">قيد الانتظار</p>
+        <p class="text-sm font-black text-slate-700">{{ totalCount - getReceivedCount() }}</p>
+      </div>
+    </div>
+
+    <div class="flex-1 min-w-[200px] bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+        <i class="fas fa-coins text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[9px] font-bold text-slate-400 uppercase">إجمالي المبالغ</p>
+        <p class="text-sm font-black text-slate-700">{{ totalAmount | number:'1.0-0' }} <span class="text-[9px] font-normal">د.ك</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filter Section -->
+  <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-6">
+    <div class="flex flex-col gap-6">
+      <!-- Row 1: Employee & Dates -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="form-field cursor-pointer" (click)="openModal()">
+          <label class="text-[11px] font-bold text-slate-500 mb-1 block">الموظف</label>
+          <div class="relative">
+            <input type="text" class="w-full bg-slate-50 border-none rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 pointer-events-none" 
+                   placeholder="اختر الموظف..." [(ngModel)]="employeeSearch" readonly />
+            <i class="fas fa-user-tie absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-bold text-slate-500 mb-1 block">من تاريخ</label>
+          <input type="date" [(ngModel)]="fromDate" (change)="validateSelection()" class="w-full bg-slate-50 border-none rounded-xl px-4 py-2 text-sm font-bold text-slate-700" />
+        </div>
+
+        <div>
+          <label class="text-[11px] font-bold text-slate-500 mb-1 block">إلى تاريخ</label>
+          <input type="date" [(ngModel)]="toDate" (change)="validateSelection()" class="w-full bg-slate-50 border-none rounded-xl px-4 py-2 text-sm font-bold text-slate-700" />
+        </div>
+
+        <div>
+          <label class="text-[11px] font-bold text-slate-500 mb-1 block">الحالة</label>
+          <select [(ngModel)]="statusFilter" (change)="validateSelection()" class="w-full bg-slate-50 border-none rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700">
+            <option value="">الكل</option>
+            <option value="true">مستلمة</option>
+            <option value="false">غير مستلمة</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Row 2: Search Text & Actions -->
+      <div class="flex flex-wrap items-end justify-between gap-4 pt-4 border-t border-slate-50">
+        <div class="flex-1 min-w-[300px]">
+          <div class="relative">
+            <input type="text" [(ngModel)]="searchText" placeholder="بحث برقم الكشف أو الاسم..." 
+                   class="w-full bg-slate-50 border-none rounded-xl pl-12 pr-4 py-2.5 text-sm font-bold text-slate-700 shadow-inner" />
+            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <button (click)="resetFilters()" class="px-6 py-2.5 bg-slate-100 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-200 transition-all">
+            <i class="fas fa-undo ml-2"></i> إعادة ضبط
+          </button>
+          <button (click)="fetchData()" [disabled]="!selectedUser" 
+                  class="px-8 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all">
+            <i class="fas fa-filter ml-2"></i> تطبيق الفلتر
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -42,12 +116,13 @@
             <th>التاريخ</th>
             <th>المبلغ</th>
             <th>المرفقات</th>
+            <th class="text-center">الإجراءات</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr *ngFor="let row of rows; let i = index">
-            <td>{{ i + 1 }}</td>
+          <tr *ngFor="let row of filteredRows; let i = index">
+            <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
             <td>{{ row.statementNo }}</td>
             <td>{{ row.clientName }}</td>
             <td>{{ row.personName || '---' }}</td>
@@ -60,24 +135,63 @@
             <td>
               <div class="flex gap-2 justify-center">
                 <button *ngFor="let attach of row.attachments; let j = index" (click)="viewAttachment(attach)"
-                  class="btn btn-xs btn-primary btn-outline" title="عرض المرفق">
+                  class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm" 
+                  title="عرض المرفق">
                   <i class="fas fa-file-pdf"></i>
-                  {{ j + 1 }}
                 </button>
-                <span *ngIf="!row.attachments || row.attachments.length === 0" class="text-xs text-gray-400">لا
-                  يوجد</span>
+                <span *ngIf="!row.attachments || row.attachments.length === 0" class="text-[10px] text-gray-400 font-bold">لا يوجد</span>
+              </div>
+            </td>
+            <td>
+              <div class="flex justify-center gap-2">
+                <button *ngIf="!row.receiveAcc" 
+                        class="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-bold rounded-lg shadow-md shadow-emerald-200 active:scale-95 transition-all flex items-center gap-1"
+                        (click)="receiveStatement(row)">
+                  <i class="fas fa-check-circle"></i> استلام
+                </button>
+                <div *ngIf="row.receiveAcc" 
+                      class="px-4 py-1.5 bg-blue-50 text-blue-600 text-[11px] font-bold rounded-lg border border-blue-100 flex items-center gap-1">
+                  <i class="fas fa-check-double"></i> تم الاستلام
+                </div>
               </div>
             </td>
           </tr>
 
-          <tr *ngIf="rows.length === 0">
-            <td colspan="11" class="text-center text-gray-400 py-10">
+          <!-- Loading State -->
+          <tr *ngIf="isLoading">
+            <td colspan="12" class="text-center py-20">
+              <div class="loading loading-spinner loading-lg text-primary"></div>
+              <p class="text-xs text-slate-400 mt-2 font-bold">جاري تحميل البيانات...</p>
+            </td>
+          </tr>
+
+          <tr *ngIf="rows.length === 0 && !isLoading">
+            <td colspan="12" class="text-center text-gray-400 py-10 font-bold">
               لا توجد بيانات لهذا الموظف
             </td>
           </tr>
         </tbody>
       </table>
 
+      <!-- Pagination Footer -->
+      <div class="p-4 bg-white border-t border-slate-100 flex justify-between items-center" *ngIf="totalCount > 0">
+        <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+          Showing {{ rows.length }} of {{ totalCount }} records
+        </div>
+        <div class="flex gap-2">
+          <button (click)="prevPage()" [disabled]="currentPage === 1"
+            class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-30">
+            السابق
+          </button>
+          <div class="px-4 py-2 bg-blue-600 rounded-lg text-xs font-bold text-white shadow-md">
+            {{ currentPage }} / {{ Math.ceil(totalCount / pageSize) }}
+          </div>
+          <button (click)="nextPage()" [disabled]="currentPage === Math.ceil(totalCount / pageSize)"
+            class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-30">
+            التالي
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Footer -->

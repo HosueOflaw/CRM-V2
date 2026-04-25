@@ -27,6 +27,12 @@ export class StatementForm implements OnInit {
   selectedFiles: File[] = [];
   isUploading = false;
   previewUrl: SafeResourceUrl | null = null;
+  
+  // ✅ Pagination properties
+  currentPage = 1;
+  pageSize = 5;
+  totalCount = 0;
+  Math = Math;
 
   private fb = inject(FormBuilder);
   private custodyService = inject(CustodyService);
@@ -78,7 +84,7 @@ export class StatementForm implements OnInit {
       id: [null],
       fileCode: [null],
       deptCode: [null],
-      codeAutoNo: ['', [Validators.required]],
+      codeAutoNo: ['', [Validators.required, Validators.pattern(/^[0-9]*$/)]],
       statementNo: ['', [Validators.required]],
       codeAttach: [''],
       codeExpense: [null, [Validators.required]],
@@ -109,6 +115,7 @@ export class StatementForm implements OnInit {
     this.loadClients();
     if (this.mode === 'add') {
       this.fetchNextStatementNo();
+      this.fetchPendingStatements();
     }
   }
 
@@ -120,6 +127,28 @@ export class StatementForm implements OnInit {
         }
       },
       error: (err) => console.error('Failed to fetch next statement no', err)
+    });
+  }
+
+  fetchPendingStatements() {
+    this.isLoading = true;
+    this.custodyService.getPending(this.currentPage, this.pageSize).subscribe({
+      next: (res: any) => {
+        console.log('Pending statements fetched:', res);
+        if (Array.isArray(res)) {
+          this.statements.splice(0, this.statements.length, ...res);
+          this.totalCount = res.length;
+        } else if (res && res.items) {
+          this.statements.splice(0, this.statements.length, ...res.items);
+          this.totalCount = res.totalCount;
+        }
+        this.statementsChange.emit(this.statements);
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to fetch pending statements', err);
+        this.isLoading = false;
+      }
     });
   }
 
@@ -165,7 +194,7 @@ export class StatementForm implements OnInit {
     this.custodyService.getByStatementNo(stmtNo).subscribe({
       next: (res) => {
         if (res && res.length > 0) {
-          this.statements = res;
+          this.statements.splice(0, this.statements.length, ...res);
           this.statementsChange.emit(this.statements);
         }
         this.isLoading = false;
@@ -219,7 +248,6 @@ export class StatementForm implements OnInit {
     }
   }
 
-  // ✅ البحث برقم الكشف (للتعديل أو العرض)
   searchByStatementNo(): void {
     const stmtNo = this.statementForm.get('statementNo')?.value;
     if (!stmtNo) {
@@ -247,7 +275,6 @@ export class StatementForm implements OnInit {
     });
   }
 
-  // ✅ حفظ
   async save() {
     if (this.statementForm.invalid) {
       this.statementForm.markAllAsTouched();
@@ -255,26 +282,29 @@ export class StatementForm implements OnInit {
     }
 
     const data = this.statementForm.getRawValue();
+    const statementId = data.id;
     this.isLoading = true;
 
     try {
-      const res: any = await this.custodyService.create(data).toPromise();
-      if (res) {
-        this.statements.push(res);
-        this.statementsChange.emit(this.statements);
-        // Keep statementNo for batch entry but reset others
-        const currentStmtNo = this.statementForm.get('statementNo')?.value;
-        this.statementForm.reset({
-          statementNo: currentStmtNo,
-          amount: 0,
-          sendToACC: false,
-          dateAdded: new Date().toISOString().split('T')[0]
-        });
-        Swal.fire('نجاح', 'تم حفظ السجل بنجاح', 'success');
+      if (statementId) {
+        // ✅ Update Mode
+        await this.custodyService.updateStatement(statementId, data).toPromise();
+        Swal.fire('تم التحديث', 'تم تحديث البيانات بنجاح', 'success');
+        this.fetchPendingStatements();
+        this.reset();
+      } else {
+        // ✅ Create Mode
+        const res: any = await this.custodyService.create(data).toPromise();
+        if (res) {
+          this.statements.unshift(res);
+          this.statementsChange.emit(this.statements);
+          this.reset();
+          Swal.fire('تم الحفظ', 'تم حفظ السجل بنجاح', 'success');
+        }
       }
     } catch (err) {
       console.error(err);
-      Swal.fire('خطأ', 'فشل حفظ السجل', 'error');
+      Swal.fire('خطأ', 'حدث خطأ أثناء تنفيذ العملية', 'error');
     } finally {
       this.isLoading = false;
     }
@@ -339,33 +369,87 @@ export class StatementForm implements OnInit {
     }
   }
 
-  // ✅ حذف عنصر من الجدول
-  deleteStatement(i: number) {
-    const stmt = this.statements[i];
-    if (stmt.id) {
-      Swal.fire({
-        title: 'هل أنت متأكد؟',
-        text: 'سيتم حذف السجل نهائياً من النظام',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'حذف',
-        cancelButtonText: 'إلغاء'
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            await this.custodyService.delete(stmt.id!).toPromise();
-            this.statements.splice(i, 1);
-            this.statementsChange.emit(this.statements);
-            Swal.fire('نجاح', 'تم حذف السجل', 'success');
-          } catch (err) {
-            Swal.fire('خطأ', 'فشل حذف السجل', 'error');
-          }
-        }
-      });
-    } else {
-      this.statements.splice(i, 1);
-      this.statementsChange.emit(this.statements);
+  // ✅ Pagination Logic (Server-side)
+  get pagedStatements() {
+    return this.statements; // Now the server only returns current page records
+  }
+
+  get totalPages() {
+    return Math.ceil(this.totalCount / this.pageSize);
+  }
+
+  get pages() {
+    const total = this.totalPages;
+    if (total <= 1) return [];
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  setPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.fetchPendingStatements(); // Fetch new page from server
     }
+  }
+
+  // ✅ Table Actions Logic
+  editStatement(s: CustodyStatement) {
+    this.statementForm.patchValue(s);
+    // Scroll to top smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  deleteStatement(s: CustodyStatement) {
+    if (!s.id) return;
+    
+    Swal.fire({
+      title: 'هل أنت متأكد؟',
+      text: "سيتم حذف هذا السجل نهائياً!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'نعم، احذف',
+      cancelButtonText: 'إلغاء'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.custodyService.deleteStatement(s.id!).subscribe({
+          next: () => {
+            Swal.fire('تم الحذف!', 'تم حذف السجل بنجاح.', 'success');
+            this.fetchPendingStatements();
+          },
+          error: (err) => {
+            console.error('Failed to delete statement', err);
+            Swal.fire('خطأ', 'فشل في حذف السجل', 'error');
+          }
+        });
+      }
+    });
+  }
+
+  transferSingle(s: CustodyStatement) {
+    if (!s.id) return;
+    
+    Swal.fire({
+      title: 'ترحيل السجل؟',
+      text: "سيتم إرسال هذا السجل للمحاسبة فوراً.",
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'ترحيل',
+      cancelButtonText: 'إلغاء'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.custodyService.sendToAcc(s.id!).subscribe({
+          next: () => {
+            Swal.fire('تم الترحيل!', 'تم إرسال السجل للمحاسبة.', 'success');
+            this.fetchPendingStatements();
+          },
+          error: (err) => {
+            console.error('Failed to transfer statement', err);
+            Swal.fire('خطأ', 'فشل في ترحيل السجل', 'error');
+          }
+        });
+      }
+    });
   }
 
   cancel() {

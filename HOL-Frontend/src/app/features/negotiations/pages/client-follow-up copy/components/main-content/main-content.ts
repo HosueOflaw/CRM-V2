@@ -235,6 +235,43 @@ export class MainContent {
     comms_lang: [{ id: 1, name: 'العربية' }, { id: 2, name: 'English' }],
     gender: [{ id: 1, name: 'ذكر' }, { id: 2, name: 'أنثى' }]
   };
+  
+  classificationSummaryConfig = [
+    { label: 'حالة العميل', listKey: 'client', idKey: 'clientStatusId', historyKey: 'client', icon: '👤', color: 'amber' },
+    { label: 'المديونية', listKey: 'claim', idKey: 'claimStatusId', historyKey: 'claim', icon: '📄', color: 'amber' },
+    { label: 'حالة الملف', listKey: 'file', idKey: 'fileStatusId', historyKey: 'file', icon: '📂', color: 'slate' },
+    { label: 'حالة الإجراء', listKey: 'action', idKey: 'actionStatusId', historyKey: 'action', icon: '⚡', color: 'slate' },
+    { label: 'حالة المراجعة', listKey: 'followup', idKey: 'followUpStatusId', historyKey: 'followup', icon: '🔍', color: 'emerald' },
+    { label: 'الداخلية', listKey: 'interior', idKey: 'internalStatusId', historyKey: 'internal', icon: '🏢', color: 'emerald' },
+    { label: 'المدنية', listKey: 'civil', idKey: 'civilStatusId', historyKey: 'civil', icon: '⚖️', color: 'emerald' },
+    { label: 'التواصل', listKey: 'contact', idKey: 'contactStatusId', historyKey: 'contact', icon: '📞', color: 'emerald' },
+    { label: 'التعاون', listKey: 'cooperation', idKey: 'cooperationStatusId', historyKey: 'cooperation', icon: '🤝', color: 'emerald' }
+  ];
+
+  getLookupName(listKey: string, id: any): string {
+    if (id === null || id === undefined) return 'غير محدد';
+    const list = this.lookupLists[listKey];
+    if (!list) return 'غير محدد';
+    const item = list.find((x: any) => x.id === id || x.id == id); // Loose equality for safety
+    return item ? item.name : 'غير محدد';
+  }
+
+  getLatestStatusName(item: any): string {
+    const currentId = this.selectedPerson?.classification?.[item.idKey];
+    const currentName = this.getLookupName(item.listKey, currentId);
+    
+    if (currentName !== 'غير محدد') {
+      return currentName;
+    }
+    
+    // Fallback to latest history
+    const history = this.categoryHistories[item.historyKey];
+    if (history && history.length > 0) {
+      return history[0].statusName || 'غير محدد';
+    }
+    
+    return 'غير محدد';
+  }
 
   // Category-specific history storage
   categoryHistories: { [key: string]: any[] } = {
@@ -480,7 +517,9 @@ export class MainContent {
       { key: 'contact', type: 'CONTACT' },
       { key: 'cooperation', type: 'COOPERATION' },
       { key: 'comms_lang', type: 'COMMS_LANG' },
-      { key: 'gender', type: 'GENDER' }
+      { key: 'gender', type: 'GENDER' },
+      { key: 'membership', type: 'MEMBERSHIP' },
+      { key: 'status', type: 'STATUS' }
     ];
 
     types.forEach(item => {
@@ -645,6 +684,9 @@ export class MainContent {
     status: 'نشط'
   };
 
+  relationOptions: string[] = ['صاحب الرقم', 'أب', 'أم', 'أخ', 'أخت', 'ابن', 'ابنة', 'زوج', 'زوجة', 'قريب', 'أخرى'];
+  customRelation: string = '';
+
   @Output() contactAdded = new EventEmitter<void>();
 
   saveNumber() {
@@ -660,12 +702,20 @@ export class MainContent {
     }
 
     this.loading = true;
-    this.negotiationsService.addContact(cid, this.addForm).subscribe({
+
+    // Use custom relation if "Other" is selected
+    const payload = { ...this.addForm };
+    if (payload.relation === 'أخرى') {
+      payload.relation = this.customRelation;
+    }
+
+    this.negotiationsService.addContact(cid, payload).subscribe({
       next: () => {
         this.loading = false;
         Swal.fire('تم الحفظ', 'تم إضافة الرقم بنجاح', 'success');
         this.activeTab = 'numbers';
         this.addForm = { phone: '', relation: '', source: '', status: 'نشط' };
+        this.customRelation = '';
         this.contactAdded.emit();
       },
       error: (err) => {
@@ -801,6 +851,37 @@ export class MainContent {
     this.currentField = field;
     let type = '';
 
+    const classificationFallbackData = [
+      { id: 1, name: 'باتش جديد' }, { id: 2, name: 'ترسيم فقط' }, { id: 3, name: 'قيد الخصم' },
+      { id: 4, name: 'تحت السن' }, { id: 5, name: 'VIP' }, { id: 6, name: 'قليل القيمة' },
+      { id: 7, name: 'الملف متقادم' }, { id: 8, name: 'قضائى' }, { id: 9, name: 'ودى فقط' },
+      { id: 10, name: 'اونلاين' }, { id: 11, name: 'رسوم' }, { id: 12, name: 'تنفيذ' },
+      { id: 13, name: 'متداول فقط' }, { id: 14, name: 'تزوير' }, { id: 15, name: 'جلسات' }
+    ];
+
+    const statusFallbackData = [
+      { id: 1, name: 'سداد جزئى' }, { id: 2, name: 'تحصيل ودى' }, { id: 3, name: 'خارج البلاد' },
+      { id: 4, name: 'مغادر نهائى' }, { id: 5, name: 'حفظ' }, { id: 6, name: 'سداد مكتب' },
+      { id: 7, name: 'تنفيذ' }, { id: 8, name: 'SOFT_COLLECTION' }, { id: 9, name: 'تقسيط مع الشركة' },
+      { id: 10, name: 'اون لاين' }, { id: 11, name: 'بدون اجراءات' }, { id: 12, name: 'تزوير' },
+      { id: 14, name: 'حفظ مؤقت من الشركة' }, { id: 15, name: 'حفظ مؤقت من المكتب' }, { id: 16, name: 'سحب ادارى' },
+      { id: 17, name: 'سداد بمعرفة الشركة' }, { id: 18, name: 'سداد محكمه' }, { id: 20, name: 'سداد جزئي مكتب' },
+      { id: 22, name: 'محكمة فقط' }, { id: 23, name: 'مسحوب سوفت' }, { id: 24, name: 'منع سفر فقط' },
+      { id: 25, name: 'موكل' }, { id: 26, name: 'ودي فقط' }, { id: 27, name: 'وفاة' },
+      { id: 28, name: 'وقف' }, { id: 29, name: 'VIP' }, { id: 30, name: 'تخفيض من الشركة' },
+      { id: 32, name: 'R55' }, { id: 33, name: 'مراجعة الادارة' }, { id: 34, name: 'طلب خاص' },
+      { id: 35, name: 'ملغى' }, { id: 36, name: 'متابعة مع الشركة' }, { id: 37, name: 'حفظ و تنفيذ' },
+      { id: 38, name: 'ايجارات' }, { id: 39, name: 'مكرر' }, { id: 40, name: 'تنفيذ قيد الرفع' },
+      { id: 41, name: 'سيارات' }, { id: 42, name: 'محول الى وفره العقارية' }, { id: 43, name: 'ملغي للتكرار' },
+      { id: 44, name: 'قليل القيمة' }, { id: 45, name: 'SACT' }, { id: 46, name: 'مرفوض' },
+      { id: 47, name: 'وفرة الى المتحدة' }, { id: 48, name: 'جلسات' }, { id: 49, name: 'قضائى' },
+      { id: 50, name: 'قيد الخصم' }, { id: 51, name: 'رسوم' }, { id: 52, name: 'تنفيذ جديد' },
+      { id: 53, name: 'سدد قبل التحويل' }, { id: 54, name: 'المتبقى قليل' }, { id: 0, name: 'غير محدد' },
+      { id: 55, name: 'متداول فقط' }, { id: 56, name: 'تنفيذ جديد 1' }, { id: 57, name: 'تنفيذ جزائى' },
+      { id: 58, name: 'تسوية' }, { id: 59, name: 'مخفر ونيابة' }, { id: 60, name: 'X Tanfeez' },
+      { id: 61, name: 'مخالف اقامة' }
+    ];
+
     switch (field.toLowerCase()) {
       case 'cooperation': type = 'COOPERATION'; break;
       case 'contact': type = 'CONTACT'; break;
@@ -815,17 +896,51 @@ export class MainContent {
       case 'followup': type = 'FOLLOWUP_STATUS'; break;
       case 'comms_lang': type = 'COMMS_LANG'; break;
       case 'gender': type = 'GENDER'; break;
+      case 'membership': type = 'MEMBERSHIP'; break;
+      case 'status': type = 'STATUS'; break;
       default: return;
     }
 
     this.loading = true;
     (this.negotiationsService as any).getLookups(type).subscribe({
       next: (data: any[]) => {
+        if (type === 'MEMBERSHIP' && (!data || data.length === 0)) {
+           console.log('MainContent: Using membership fallback data');
+           data = classificationFallbackData;
+        }
+        if (type === 'STATUS' && (!data || data.length === 0)) {
+           console.log('MainContent: Using status fallback data');
+           data = statusFallbackData;
+        }
         this.lookupData = data;
+        this.lookupModal.title = type === 'MEMBERSHIP' ? 'التصنيف' : type === 'STATUS' ? 'الحالة' : 'اختيار ' + field;
+        this.lookupModal.columns = ['id', 'name'];
+        this.lookupModal.data = data;
+        this.lookupModal.modalMaxWidth = (type === 'MEMBERSHIP' || type === 'STATUS') ? '448px' : '768px';
         this.loading = false;
         this.lookupModal.open();
       },
       error: (err: any) => {
+        if (type === 'MEMBERSHIP') {
+           this.lookupData = classificationFallbackData;
+           this.lookupModal.title = 'التصنيف';
+           this.lookupModal.columns = ['id', 'name'];
+           this.lookupModal.data = classificationFallbackData;
+           this.lookupModal.modalMaxWidth = '448px';
+           this.loading = false;
+           this.lookupModal.open();
+           return;
+        }
+        if (type === 'STATUS') {
+           this.lookupData = statusFallbackData;
+           this.lookupModal.title = 'الحالة';
+           this.lookupModal.columns = ['id', 'name'];
+           this.lookupModal.data = statusFallbackData;
+           this.lookupModal.modalMaxWidth = '448px';
+           this.loading = false;
+           this.lookupModal.open();
+           return;
+        }
         this.loading = false;
         Swal.fire('خطأ', 'فشل جلب البيانات', 'error');
       }
@@ -844,7 +959,8 @@ export class MainContent {
     this.negotiationsService.updateClientStatus(
       this.selectedPerson.id,
       field,
-      item.id
+      item.id,
+      item.name
     ).subscribe({
       next: (res: any) => {
         this.loading = false;
@@ -879,6 +995,8 @@ export class MainContent {
         if (fieldKey === 'followup') this.selectedPerson.followUpStatus = name;
         if (fieldKey === 'comms_lang') this.selectedPerson.communicationLanguage = name;
         if (fieldKey === 'gender') this.selectedPerson.gender = name;
+        if (fieldKey === 'membership') this.selectedPerson.membership = name;
+        if (fieldKey === 'status') this.selectedPerson.status = name;
 
         // Sync change with clientRows
         this.syncLocalStatusDisplay();
@@ -893,7 +1011,7 @@ export class MainContent {
 
         Swal.fire({
           title: 'تم التحديث',
-          text: `تم تغيير التصنيف بنجاح`,
+          text: `تم تغيير ${fieldKey === 'membership' ? 'التصنيف' : fieldKey === 'status' ? 'الحالة' : 'البيانات'} بنجاح`,
           icon: 'success',
           toast: true,
           position: 'top-end',
@@ -1777,15 +1895,64 @@ export class MainContent {
     }
   }
 
+  // Inactive status definitions for partitioning file summary
+  readonly INACTIVE_STATUSES = ['مغلق', 'منتهي', 'ملغى', 'مؤرشف', 'Closed', 'Finished', 'Cancelled', 'Archived'];
+
   // Getters for Total Files Summary
   get totals() {
+    const claimAll = this.clientRows.reduce((sum, r) => sum + (r.claim || 0), 0);
+    const paidAll = this.clientRows.reduce((sum, r) => sum + (r.paid || 0), 0);
+    const discountPercent = this.selectedPerson?.classification?.discount || 0;
+    const discountAll = (claimAll * discountPercent) / 100;
+
     return {
-      claimAll: this.clientRows.reduce((sum, r) => sum + (r.claim || 0), 0),
-      paidAll: this.clientRows.reduce((sum, r) => sum + (r.paid || 0), 0),
+      claimAll,
+      paidAll,
       remainingAll: this.clientRows.reduce((sum, r) => sum + (r.remaining || 0), 0),
+      discountAll,
+      remainingNet: claimAll - paidAll - discountAll,
       feesAll: (this.financialData?.fees || 0) + (this.financialData?.lawFees || 0),
-      proceduresAll: this.auditsTotal || 0
+      proceduresAll: this.auditsTotal || 0,
+      totalCount: this.clientRows.length,
+      collectionRate: claimAll > 0 ? (paidAll / claimAll) * 100 : 0
     };
+  }
+
+  get activityGroups() {
+    const active = { count: 0, claim: 0, paid: 0, remaining: 0, groups: [] as any[] };
+    const inactive = { count: 0, claim: 0, paid: 0, remaining: 0, groups: [] as any[] };
+
+    const statusGroups: { [key: string]: { count: number, claim: number, paid: number, remaining: number, status: string } } = {};
+
+    this.clientRows.forEach(row => {
+      const status = row.fileStatus || 'غير محدد';
+      const isInactive = this.INACTIVE_STATUSES.includes(status);
+      const target = isInactive ? inactive : active;
+
+      target.count++;
+      target.claim += (row.claim || 0);
+      target.paid += (row.paid || 0);
+      target.remaining += (row.remaining || 0);
+
+      if (!statusGroups[status]) {
+        statusGroups[status] = { count: 0, claim: 0, paid: 0, remaining: 0, status };
+      }
+      statusGroups[status].count++;
+      statusGroups[status].claim += (row.claim || 0);
+      statusGroups[status].paid += (row.paid || 0);
+      statusGroups[status].remaining += (row.remaining || 0);
+    });
+
+    // Partition groups into active and inactive buckets
+    Object.values(statusGroups).forEach(group => {
+      if (this.INACTIVE_STATUSES.includes(group.status)) {
+        inactive.groups.push(group);
+      } else {
+        active.groups.push(group);
+      }
+    });
+
+    return { active, inactive };
   }
 
   get discountAcceptanceHistory() {

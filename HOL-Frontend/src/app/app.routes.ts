@@ -6,6 +6,7 @@ import { ErrorPage } from './shared/pages/404/error-page/error-page';
 import NegotiationsDashboard from './features/negotiations/pages/negotiations-dashboard/negotiations-dashboard';
 import { MainLayout } from './features/execution/pages/main/main-layout/main-layout';
 import { authGuard } from './guards/auth.guard';
+import { guestGuard } from './guards/guest.guard';
 import { departmentGuard } from './guards/department.guard';
 import { PrintPage } from './shared/pages/print-page/print-page';
 
@@ -16,27 +17,31 @@ export const routes: Routes = [
     component: PrintPage,
     data: { title: 'طباعة التقرير' }
   },
-  // Login Routes (without guard)
+  // Login Routes (with guest guard to prevent re-login when already logged in)
   {
     path: 'login',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/core/pages/login/login-selector/login-selector').then((m) => m.LoginSelectorComponent),
     data: { title: 'تسجيل الدخول' },
   },
   {
     path: 'login/employee',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/core/pages/login/login-employee/login-employee').then((m) => m.LoginEmployeeComponent),
     data: { title: 'تسجيل دخول الموظفين' },
   },
   {
     path: 'login/client',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/core/pages/login/login-client/login-client').then((m) => m.LoginClientComponent),
     data: { title: 'تسجيل دخول العملاء' },
   },
   {
     path: 'login/public',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/core/pages/login/login-public/login-public').then((m) => m.LoginPublicComponent),
     data: { title: 'تسجيل الدخول العام' },

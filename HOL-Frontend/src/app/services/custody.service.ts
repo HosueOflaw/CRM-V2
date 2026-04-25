@@ -51,16 +51,52 @@ export class CustodyService {
         return this.http.post<CustodyStatement>(this.apiUrl, statement);
     }
 
+    updateStatement(id: number, statement: CustodyStatement): Observable<void> {
+        return this.http.post<void>(`${this.apiUrl}/update/${id}`, statement);
+    }
+
+    getPending(page: number = 1, pageSize: number = 5): Observable<{ items: CustodyStatement[], totalCount: number }> {
+        return this.http.get<{ items: CustodyStatement[], totalCount: number }>(`${this.apiUrl}/pending`, {
+            params: { page: page.toString(), pageSize: pageSize.toString() }
+        });
+    }
+
+    getTransferred(page: number = 1, pageSize: number = 5): Observable<{ items: CustodyStatement[], totalCount: number }> {
+        return this.http.get<{ items: CustodyStatement[], totalCount: number }>(`${this.apiUrl}/transferred`, {
+            params: { page: page.toString(), pageSize: pageSize.toString() }
+        });
+    }
+
     getByStatementNo(statementNo: string): Observable<CustodyStatement[]> {
         return this.http.get<CustodyStatement[]>(`${this.apiUrl}/statement/${statementNo}`);
     }
 
     getByAutoNo(autoNo: number | string): Observable<CustodyStatement[]> {
-        return this.http.get<CustodyStatement[]>(`${this.apiUrl}/auto-number/${autoNo}`);
+        return this.http.get<CustodyStatement[]>(`${this.apiUrl}/by-auto/${autoNo}`);
     }
 
-    getByUserId(userId: number): Observable<CustodyStatement[]> {
-        return this.http.get<CustodyStatement[]>(`${this.apiUrl}/by-user/${userId}`);
+    deleteStatement(id: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    }
+
+    sendToAcc(id: number): Observable<void> {
+        return this.http.post<void>(`${this.apiUrl}/${id}/send-to-acc`, {});
+    }
+
+    receiveAcc(id: number): Observable<void> {
+        return this.http.post<void>(`${this.apiUrl}/${id}/receive-acc`, {});
+    }
+
+    getByUserId(userId: number, page: number = 1, pageSize: number = 10, filters: any = {}): Observable<{ items: CustodyStatement[], totalCount: number }> {
+        let params: any = { page: page.toString(), pageSize: pageSize.toString() };
+        if (filters.fromDate) params.fromDate = filters.fromDate;
+        if (filters.toDate) params.toDate = filters.toDate;
+        if (filters.isReceived !== undefined && filters.isReceived !== null && filters.isReceived !== '') 
+            params.isReceived = filters.isReceived.toString();
+
+        return this.http.get<{ items: CustodyStatement[], totalCount: number }>(`${this.apiUrl}/by-user/${userId}`, {
+            params: params
+        });
     }
 
     getNextStatementNo(): Observable<{ statementNo: string }> {
@@ -80,14 +116,6 @@ export class CustodyService {
 
     downloadZip(ids: number[]): Observable<Blob> {
         return this.http.post(`${this.apiUrl}/download-zip`, ids, { responseType: 'blob' });
-    }
-
-    sendToAcc(id: number): Observable<any> {
-        return this.http.put(`${this.apiUrl}/${id}/send-to-acc`, {});
-    }
-
-    delete(id: number): Observable<any> {
-        return this.http.delete(`${this.apiUrl}/${id}`);
     }
 
     uploadAttachment(files: File[], fileCode?: number, deptCode?: number): Observable<{ code: string }> {

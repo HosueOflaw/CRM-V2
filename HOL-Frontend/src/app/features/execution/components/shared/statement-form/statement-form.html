@@ -43,8 +43,7 @@
           <div class="form-control highlight-field">
             <label class="label-text-premium">رقم الكشف</label>
             <div class="relative group">
-              <input type="text" formControlName="statementNo" class="input premium-input w-full pr-11"
-                [readonly]="mode === 'add'" />
+              <input type="text" formControlName="statementNo" class="input premium-input w-full pr-11" />
               <i
                 class="fas fa-hashtag absolute right-4 top-1/2 -translate-y-1/2 text-blue-400 group-focus-within:text-blue-600"></i>
               <button *ngIf="mode === 'inquiry'" type="button"
@@ -122,6 +121,9 @@
                 placeholder="أدخل الرقم الآلي..." />
               <i class="fas fa-fingerprint absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
             </div>
+            <div *ngIf="statementForm.get('codeAutoNo')?.errors?.['pattern']" class="text-[10px] text-red-500 font-bold mt-1">
+              يجب إدخال أرقام فقط في هذا الحقل
+            </div>
           </div>
 
           <div class="form-control">
@@ -192,12 +194,22 @@
             <i class="fas fa-undo-alt opacity-50"></i>
             إعادة تعيين الحقول
           </button>
+          <button type="button" *ngIf="statementForm.get('id')?.value"
+            class="premium-btn bg-slate-500 text-white hover:bg-slate-600 px-8 shadow-lg"
+            (click)="reset()">
+            إلغاء التعديل
+          </button>
           <button type="button"
-            class="premium-btn bg-blue-600 text-white hover:bg-blue-700 px-12 shadow-lg shadow-blue-500/20"
+            [ngClass]="statementForm.get('id')?.value ? 'bg-orange-500 hover:bg-orange-600 shadow-orange-500/20' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20'"
+            class="premium-btn text-white px-12 shadow-lg transition-all"
             (click)="save()" [disabled]="isLoading || statementForm.invalid">
-            <span *ngIf="!isLoading">تأكيد وحفظ السجل</span>
+            <span *ngIf="!isLoading">
+              {{ statementForm.get('id')?.value ? 'تحديث بيانات السجل' : 'تأكيد وحفظ السجل' }}
+            </span>
             <span *ngIf="isLoading" class="loading loading-spinner loading-xs"></span>
-            <i class="fas fa-check-double" *ngIf="!isLoading"></i>
+            <svg *ngIf="!isLoading" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
           </button>
         </div>
       </div>
@@ -337,7 +349,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let s of statements; let i = index" class="animate-fade-in"
+              <tr *ngFor="let s of pagedStatements; let i = index" class="animate-fade-in"
                 [style.animation-delay]="i * 40 + 'ms'">
                 <td class="text-slate-300 font-black text-xs">{{ i + 1 }}</td>
                 <td class="font-black text-slate-900">{{ s.codeAutoNo }}</td>
@@ -375,12 +387,33 @@
                     {{ s.sendToACC ? 'Done' : 'Hold' }}
                   </div>
                 </td>
-                <td class="text-center">
-                  <div class="flex justify-center gap-1">
-                    <button
-                      class="w-8 h-8 rounded-full flex items-center justify-center text-slate-300 hover:text-red-600 hover:bg-red-50 transition-colors"
-                      (click)="deleteStatement(i)">
-                      <i class="fas fa-trash-alt text-xs"></i>
+                <td class="text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <!-- Edit -->
+                    <button type="button" (click)="editStatement(s)"
+                      class="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm group"
+                      title="تعديل">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </button>
+
+                    <!-- Delete -->
+                    <button type="button" (click)="deleteStatement(s)"
+                      class="w-10 h-10 rounded-xl flex items-center justify-center bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all shadow-sm group"
+                      title="حذف">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+
+                    <!-- Transfer -->
+                    <button type="button" (click)="transferSingle(s)"
+                      class="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all shadow-sm group"
+                      title="ترحيل للمحاسبة">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                      </svg>
                     </button>
                   </div>
                 </td>
@@ -404,6 +437,31 @@
               </tr>
             </tbody>
           </table>
+        </div>
+        <div class="p-6 border-t border-slate-100 flex flex-wrap justify-between items-center bg-slate-50/30 gap-4" *ngIf="totalCount > pageSize">
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            عرض {{ (currentPage - 1) * pageSize + 1 }} إلى {{ Math.min(currentPage * pageSize, totalCount) }} من أصل {{ totalCount }} سجل
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-xs hover:bg-blue-600 hover:text-white transition-all disabled:opacity-30 shadow-sm"
+              [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+              <i class="fas fa-chevron-right text-[10px]"></i>
+              <span>السابق</span>
+            </button>
+            <div class="flex items-center gap-1">
+              <button *ngFor="let p of pages" 
+                class="w-10 h-10 rounded-xl font-black text-xs transition-all shadow-sm"
+                [ngClass]="currentPage === p ? 'bg-blue-600 text-white shadow-blue-200' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                (click)="setPage(p)">
+                {{ p }}
+              </button>
+            </div>
+            <button class="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-xs hover:bg-blue-600 hover:text-white transition-all disabled:opacity-30 shadow-sm"
+              [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+              <span>التالي</span>
+              <i class="fas fa-chevron-left text-[10px]"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>

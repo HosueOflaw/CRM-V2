@@ -13,6 +13,7 @@ export class LookupModal {
   @Input() title = '';
   @Input() columns: string[] = [];
   @Input() data: any[] = [];
+  @Input() modalMaxWidth = '768px';
   @Output() itemSelected = new EventEmitter<any>();
 
   search = '';

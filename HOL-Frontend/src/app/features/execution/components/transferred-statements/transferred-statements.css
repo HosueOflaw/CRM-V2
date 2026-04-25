@@ -1,0 +1,51 @@
+/* Transferred Statements Styles */
+:host {
+    display: block;
+    width: 100%;
+}
+
+.premium-card {
+    background: white;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+}
+
+.premium-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.premium-table th {
+    padding: 1.25rem 1.5rem;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: right;
+}
+
+.premium-table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}

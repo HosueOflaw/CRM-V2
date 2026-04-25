@@ -4,12 +4,13 @@ import { AddAStatement } from "../../components/add-a-statement/add-a-statement"
 import { CommonModule } from '@angular/common';
 import { InquiryAboutRejected } from '../../components/inquiry-about-rejected/inquiry-about-rejected';
 import { InquiryAboutStatement } from '../../components/inquiry-about-statement/inquiry-about-statement';
+import { TransferredStatements } from '../../components/transferred-statements/transferred-statements';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GoBack } from '../../../../shared/components/go-back/go-back';
 
 @Component({
   selector: 'app-custody-page',
-  imports: [CommonModule, AddAStatement, InquiryAboutRejected, InquiryAboutStatement, GoBack],
+  imports: [CommonModule, AddAStatement, InquiryAboutRejected, InquiryAboutStatement, TransferredStatements, GoBack],
   templateUrl: './custody-page.html',
   styleUrl: './custody-page.css'
 })

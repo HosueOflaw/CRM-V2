@@ -120,7 +120,15 @@
             </div>
             <div class="form-field">
               <label class="form-label">الحالة</label>
-              <input type="text" class="form-input" [value]="selectedPerson?.status || 'غير موجود'" readonly />
+              <div class="relative w-full group">
+                <input type="text" class="form-input w-full pl-12 cursor-pointer bg-slate-50/50 hover:bg-slate-50 dark:bg-slate-900/30 dark:hover:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition-all font-semibold text-indigo-900 dark:text-indigo-300 placeholder:text-slate-400"
+                  [value]="selectedPerson?.status || 'اختر الحالة...'" readonly
+                  (click)="openLookup('status')" />
+                <button (click)="openLookup('status')" 
+                  class="absolute left-1.5 top-1/2 -translate-y-1/2 h-7 w-8 flex items-center justify-center rounded bg-indigo-100 hover:bg-indigo-500 text-indigo-600 hover:text-white dark:bg-indigo-500/20 dark:hover:bg-indigo-500 dark:text-indigo-400 dark:hover:text-white transition-all shadow-sm">
+                  <i class="fas fa-list-ul text-xs"></i>
+                </button>
+              </div>
             </div>
             <div class="form-field">
               <label class="form-label">الجنسية</label>
@@ -128,8 +136,15 @@
             </div>
             <div class="form-field">
               <label class="form-label">التصنيف</label>
-              <input type="text" class="form-input"
-                [value]="selectedPerson?.classification?.classification || 'غير موجود'" readonly />
+              <div class="relative w-full group">
+                <input type="text" class="form-input w-full pl-12 cursor-pointer bg-slate-50/50 hover:bg-slate-50 dark:bg-slate-900/30 dark:hover:bg-slate-900/60 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition-all font-semibold text-indigo-900 dark:text-indigo-300 placeholder:text-slate-400"
+                  [value]="selectedPerson?.membership || 'اختر التصنيف...'" readonly
+                  (click)="openLookup('membership')" />
+                <button (click)="openLookup('membership')" 
+                  class="absolute left-1.5 top-1/2 -translate-y-1/2 h-7 w-8 flex items-center justify-center rounded bg-indigo-100 hover:bg-indigo-500 text-indigo-600 hover:text-white dark:bg-indigo-500/20 dark:hover:bg-indigo-500 dark:text-indigo-400 dark:hover:text-white transition-all shadow-sm">
+                  <i class="fas fa-list-ul text-xs"></i>
+                </button>
+              </div>
             </div>
             <div class="form-field">
               <label class="form-label">العقد</label>
@@ -244,6 +259,48 @@
                   <span>💾</span>
                   <span class="text-lg font-black leading-none">حفظ الكل</span>
                 </button>
+              </div>
+            </div>
+
+            <!-- Classification Summary Bar -->
+            <div class="mb-10 overflow-x-auto pb-4 custom-scrollbar-horizontal" dir="rtl">
+              <div class="flex items-center gap-4 min-w-max px-2">
+                <div *ngFor="let item of classificationSummaryConfig" 
+                  class="flex flex-col gap-2 p-4 rounded-3xl bg-white border border-slate-100 shadow-xl shadow-slate-200/40 min-w-[170px] transition-all hover:shadow-2xl hover:-translate-y-1 group relative overflow-hidden">
+                  
+                  <!-- Background Accent -->
+                  <div class="absolute top-0 right-0 w-1.5 h-full opacity-70"
+                    [ngClass]="{
+                      'bg-amber-400': item.color === 'amber',
+                      'bg-slate-400': item.color === 'slate',
+                      'bg-emerald-400': item.color === 'emerald'
+                    }"></div>
+
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-2xl flex items-center justify-center text-xl bg-slate-50 group-hover:bg-indigo-50 transition-all duration-300">
+                      {{item.icon}}
+                    </div>
+                    <div>
+                      <span class="text-[9px] font-black text-slate-400 uppercase tracking-tighter block leading-none mb-1">{{item.label}}</span>
+                      <div class="text-[11px] font-black text-slate-800 truncate group-hover:text-indigo-600 transition-colors" 
+                        [title]="getLatestStatusName(item)">
+                        {{ getLatestStatusName(item) }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Mini Progress Indicator -->
+                  <div class="w-full h-1 bg-slate-50 rounded-full mt-2 overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-1000 ease-out" 
+                      [ngClass]="{
+                        'bg-amber-400': item.color === 'amber',
+                        'bg-slate-400': item.color === 'slate',
+                        'bg-emerald-400': item.color === 'emerald'
+                      }"
+                      [style.width]="(selectedPerson?.classification?.[item.idKey] || (categoryHistories[item.historyKey] && categoryHistories[item.historyKey].length > 0)) ? '100%' : '15%'">
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1071,7 +1128,6 @@
                   <!-- النوع + اللغة -->
                   <div class="flex flex-col gap-4" style="flex: 1;">
 
-
                     <div class="premium-card p-4" style="margin-bottom: 0 !important;">
                       <div class="card-body p-0">
                         <label class="form-label mb-3">لغة التواصل (تحديث تلقائي)</label>
@@ -1088,7 +1144,6 @@
                       </div>
                     </div>
 
-
                     <div class="premium-card p-4" style="margin-bottom: 0 !important;">
                       <div class="card-body p-0">
                         <label class="form-label mb-3">النوع (الذكر / الأنثى)</label>
@@ -1104,8 +1159,8 @@
                         </div>
                       </div>
                     </div>
-                  </div>
 
+                  </div>
                 </div>
 
               </div>
@@ -1115,7 +1170,7 @@
               <!-- ========================= -->
               <div class="col-span-12 lg:col-span-4 space-y-6">
 
-                <!-- المحكمة + الداخلية + المدنية -->
+                <!-- المحكمة -->
                 <div class="premium-card p-4">
                   <div class="form-grid grid-cols-1">
                     <div class="form-field">
@@ -1126,7 +1181,6 @@
                         <button class="premium-btn premium-btn-outline px-4" (click)="openLookup('court')">🔍</button>
                       </div>
                     </div>
-
                   </div>
                 </div>
 
@@ -1139,96 +1193,205 @@
                     <button class="premium-btn premium-btn-secondary w-full">كشف حساب سيارات</button>
                     <button class="premium-btn premium-btn-secondary w-full">براءة ذمة</button>
                     <button class="premium-btn premium-btn-secondary w-full">استمارة العميل</button>
-                    <button class="premium-btn premium-btn-secondary w-full">تصنيف العميل</button>
+                    <button class="premium-btn premium-btn-secondary w-full">تحديث بيانات</button>
                   </div>
                 </div>
 
               </div>
-
             </div>
-
-
           </div>
 
-          <!-- (NEW) اجمالي الملفات -->
-          <div *ngIf="activeSubTab === 'totalFiles'" class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4" dir="rtl">
-
-              <!-- Column 1: All Files -->
-              <div class="space-y-4">
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-indigo-600 bg-slate-50/50"
-                    [value]="totals.claimAll | number:'1.3-3'" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المطالبة لكل الملفات</label>
-                </div>
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-emerald-600 bg-slate-50/50"
-                    [value]="totals.paidAll | number:'1.3-3'" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المسدد لكل الملفات</label>
-                </div>
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-rose-600 bg-slate-50/50"
-                    [value]="totals.remainingAll | number:'1.3-3'" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي لكل الملفات</label>
-                </div>
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-slate-600 bg-slate-50/50"
-                    [value]="totals.feesAll | number:'1.3-3'" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">الرسوم لكل الملفات</label>
-                </div>
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-indigo-800 bg-slate-50/50"
-                    [value]="(totals.remainingAll + totals.feesAll) | number:'1.3-3'" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي شامل الرسوم</label>
-                </div>
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-slate-500 bg-slate-50/50"
-                    [value]="totals.proceduresAll" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">الاجراءات لكل الملفات</label>
-                </div>
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-rose-800 bg-slate-50/50"
-                    [value]="totals.remainingAll | number:'1.3-3'" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي لكل الملفات</label>
+          <!-- (NEW) اجمالي الملفات - Redesigned with Expanded Fields (الخانات) -->
+          <div *ngIf="activeSubTab === 'totalFiles'" class="p-8 space-y-12 animate-in fade-in duration-500" dir="rtl">
+            
+            <!-- Expanded Global Summary Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              
+              <!-- 1. Total Files Count -->
+              <div class="p-5 rounded-3xl bg-slate-800 text-white shadow-xl flex flex-col justify-between">
+                <div class="text-[10px] font-black uppercase opacity-60 tracking-widest">إجمالي عدد الملفات</div>
+                <div class="mt-4">
+                  <div class="text-3xl font-black leading-none">{{totals.totalCount}}</div>
+                  <div class="text-[10px] opacity-60 mt-1">ملف مسجل</div>
                 </div>
               </div>
 
-              <!-- Column 2: Current Company -->
-              <div class="space-y-4">
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-indigo-600 bg-slate-50/50"
-                    [value]="(selectedFile?.claim || 0) | number:'1.3-3'" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المطالبة للشركة الحالية</label>
+              <!-- 2. Total Claim -->
+              <div class="p-5 rounded-3xl bg-indigo-600 text-white shadow-xl shadow-indigo-100 flex flex-col justify-between">
+                <div class="text-[10px] font-black uppercase opacity-60 tracking-widest">إجمالي المديونية</div>
+                <div class="mt-4">
+                  <div class="text-3xl font-black leading-none">{{totals.claimAll | number:'1.3-3'}}</div>
+                  <div class="text-[10px] opacity-60 mt-1">قيمة المطالبات الكلية</div>
                 </div>
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-emerald-600 bg-slate-50/50"
-                    [value]="(selectedFile?.paid || 0) | number:'1.3-3'" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المسدد للشركة الحالية</label>
+              </div>
+
+              <!-- 3. Total Paid -->
+              <div class="p-5 rounded-3xl bg-white border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col justify-between">
+                <div class="text-[10px] font-black uppercase text-emerald-500 tracking-widest">إجمالي المسدد</div>
+                <div class="mt-4">
+                  <div class="text-3xl font-black text-emerald-600 leading-none">{{totals.paidAll | number:'1.3-3'}}</div>
+                  <div class="flex items-center gap-2 mt-2">
+                    <div class="flex-1 bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                      <div class="bg-emerald-500 h-full" [style.width]="totals.collectionRate + '%'"></div>
+                    </div>
+                    <span class="text-[10px] font-black text-emerald-600">{{totals.collectionRate | number:'1.0-1'}}%</span>
+                  </div>
                 </div>
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-rose-600 bg-slate-50/50"
-                    [value]="(selectedFile?.remaining || 0) | number:'1.3-3'" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي للشركة الحالية</label>
+              </div>
+
+              <!-- 4. Expected Discount -->
+              <div class="p-5 rounded-3xl bg-white border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col justify-between">
+                <div class="text-[10px] font-black uppercase text-amber-500 tracking-widest">إجمالي الخصم المتوقع</div>
+                <div class="mt-4">
+                  <div class="text-3xl font-black text-amber-600 leading-none">{{totals.discountAll | number:'1.3-3'}}</div>
+                  <div class="text-[10px] text-slate-400 mt-1 font-bold">بناءً على نسبة الخصم المعتمدة</div>
                 </div>
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-slate-600 bg-slate-50/50"
-                    [value]="(selectedFile?.fees || 0) | number:'1.3-3'" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">الرسوم للشركة الحالية</label>
+              </div>
+
+              <!-- 5. Total Remaining (Net) -->
+              <div class="p-5 rounded-3xl bg-white border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col justify-between border-b-rose-500 border-b-4">
+                <div class="text-[10px] font-black uppercase text-rose-500 tracking-widest">المتبقي الصافي</div>
+                <div class="mt-4">
+                  <div class="text-3xl font-black text-rose-600 leading-none">{{totals.remainingNet | number:'1.3-3'}}</div>
+                  <div class="text-[10px] text-slate-400 mt-1 font-bold">بعد خصم المسدد والخصومات</div>
                 </div>
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-indigo-800 bg-slate-50/50"
-                    [value]="((selectedFile?.remaining || 0) + (selectedFile?.fees || 0)) | number:'1.3-3'" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي شامل الرسوم</label>
+              </div>
+
+              <!-- 6. Total Remaining (Gross) -->
+              <div class="p-5 rounded-3xl bg-white border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col justify-between">
+                <div class="text-[10px] font-black uppercase text-slate-500 tracking-widest">المتبقي الكلي (دفتري)</div>
+                <div class="mt-4">
+                  <div class="text-3xl font-black text-slate-600 leading-none">{{totals.remainingAll | number:'1.3-3'}}</div>
+                  <div class="text-[10px] text-slate-400 mt-1 font-bold">إجمالي الرصيد الحالي</div>
                 </div>
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-slate-500 bg-slate-50/50"
-                    [value]="0" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">الاجراءات للشركة الحالية</label>
+              </div>
+
+              <!-- 7. Fees -->
+              <div class="p-5 rounded-3xl bg-white border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col justify-between">
+                <div class="text-[10px] font-black uppercase text-indigo-500 tracking-widest">إجمالي الرسوم</div>
+                <div class="mt-4">
+                  <div class="text-3xl font-black text-indigo-600 leading-none">{{totals.feesAll | number:'1.3-3'}}</div>
+                  <div class="text-[10px] text-slate-400 mt-1 font-bold">رسوم قضائية وإدارية</div>
                 </div>
-                <div class="flex items-center justify-between gap-4">
-                  <input type="text" class="premium-input text-center font-bold text-rose-800 bg-slate-50/50"
-                    [value]="(selectedFile?.remaining || 0) | number:'1.3-3'" readonly />
-                  <label class="text-sm font-bold text-slate-700 w-40 text-right">المتبقي للشركة الحالية</label>
+              </div>
+
+              <!-- 8. Procedures Count -->
+              <div class="p-5 rounded-3xl bg-white border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col justify-between border-r-amber-400 border-r-4">
+                <div class="text-[10px] font-black uppercase text-amber-600 tracking-widest">عدد الإجراءات</div>
+                <div class="mt-4">
+                  <div class="text-3xl font-black text-amber-600 leading-none">{{totals.proceduresAll}}</div>
+                  <div class="text-[10px] text-slate-400 mt-1 font-bold">إجماي عمليات السكرتارية</div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              
+              <!-- Active Files Side -->
+              <div class="space-y-6">
+                <div class="flex items-center justify-between px-6 py-4 bg-emerald-50 rounded-3xl border border-emerald-100 shadow-sm transition-all hover:shadow-md">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-2xl shadow-lg shadow-emerald-200">🔥</div>
+                    <div>
+                      <h3 class="text-xl font-black text-slate-800 leading-none">الملفات النشطة</h3>
+                      <p class="text-xs text-slate-500 mt-1">جاري العمل عليها ({{ totals.totalCount > 0 ? ((activityGroups.active.count / totals.totalCount * 100) | number:'1.0-0') : 0 }}% من المحفظة)</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xl font-black text-emerald-600 leading-none">{{activityGroups.active.remaining | number:'1.3-3'}}</div>
+                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">إجمالي المتبقي النشط</div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                  <div *ngFor="let group of activityGroups.active.groups" 
+                    class="p-6 rounded-3xl bg-white border border-slate-100 hover:shadow-2xl hover:shadow-emerald-100/30 transition-all duration-500 group relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-5">
+                      <div class="flex items-center gap-3">
+                        <div class="w-2.5 h-7 rounded-full bg-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.4)]"></div>
+                        <div>
+                          <span class="text-base font-black text-slate-700 group-hover:text-emerald-600 transition-colors">{{group.status}}</span>
+                          <div class="text-[10px] text-slate-400 font-bold">{{ (group.count / totals.totalCount * 100) | number:'1.0-1' }}% من إجمالي الملفات</div>
+                        </div>
+                      </div>
+                      <span class="px-4 py-1.5 rounded-2xl bg-slate-50 text-slate-600 text-xs font-black border border-slate-100 shadow-sm">{{group.count}} ملف</span>
+                    </div>
+                    
+                    <!-- Proportions Grid -->
+                    <div class="grid grid-cols-3 gap-6 border-t border-slate-50 pt-5">
+                      <div class="space-y-1">
+                        <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">المطالبة</div>
+                        <div class="text-sm font-black text-slate-800">{{group.claim | number:'1.3-3'}}</div>
+                      </div>
+                      <div class="space-y-1">
+                        <div class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">المسدد</div>
+                        <div class="text-sm font-black text-emerald-600">{{group.paid | number:'1.3-3'}}</div>
+                        <div class="text-[9px] text-emerald-500 font-black">تحصيل {{ (group.claim > 0 ? (group.paid / group.claim * 100) : 0) | number:'1.0-0' }}%</div>
+                      </div>
+                      <div class="space-y-1">
+                        <div class="text-[10px] font-black text-rose-400 uppercase tracking-widest">المتبقي</div>
+                        <div class="text-sm font-black text-rose-600">{{group.remaining | number:'1.3-3'}}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div *ngIf="activityGroups.active.groups.length === 0" class="text-center py-16 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200 text-slate-400 font-bold text-sm">
+                    لا توجد ملفات نشطة حالياً
+                  </div>
+                </div>
+              </div>
+
+              <!-- Inactive Files Side -->
+              <div class="space-y-6">
+                <div class="flex items-center justify-between px-6 py-4 bg-slate-100 rounded-3xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-500 text-white flex items-center justify-center text-2xl shadow-lg shadow-slate-300">🧊</div>
+                    <div>
+                      <h3 class="text-xl font-black text-slate-700 leading-none">الملفات غير النشطة</h3>
+                      <p class="text-xs text-slate-500 mt-1">مكتملة أو مؤرشفة ({{ totals.totalCount > 0 ? ((activityGroups.inactive.count / totals.totalCount * 100) | number:'1.0-0') : 0 }}% من المحفظة)</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xl font-black text-slate-600 leading-none">{{activityGroups.inactive.paid | number:'1.3-3'}}</div>
+                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">إجمالي التحصيل المنجز</div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                  <div *ngFor="let group of activityGroups.inactive.groups" 
+                    class="p-6 rounded-3xl bg-white border border-slate-100 hover:shadow-xl transition-all duration-300 opacity-90 hover:opacity-100 border-r-4 border-r-slate-300">
+                    <div class="flex items-center justify-between mb-5">
+                      <div class="flex items-center gap-3">
+                        <div class="w-2.5 h-7 rounded-full bg-slate-300"></div>
+                        <div>
+                          <span class="text-base font-black text-slate-600">{{group.status}}</span>
+                          <div class="text-[10px] text-slate-400 font-bold">{{ (group.count / totals.totalCount * 100) | number:'1.0-1' }}% من إجمالي الملفات</div>
+                        </div>
+                      </div>
+                      <span class="px-4 py-1.5 rounded-2xl bg-slate-50 text-slate-400 text-xs font-black border border-slate-100">{{group.count}} ملف</span>
+                    </div>
+
+                    <!-- Proportions Grid -->
+                    <div class="grid grid-cols-3 gap-6 border-t border-slate-50 pt-5">
+                      <div class="space-y-1">
+                        <div class="text-[10px] font-black text-slate-300 uppercase tracking-widest">المطالبة</div>
+                        <div class="text-sm font-black text-slate-600">{{group.claim | number:'1.3-3'}}</div>
+                      </div>
+                      <div class="space-y-1">
+                        <div class="text-[10px] font-black text-slate-300 uppercase tracking-widest">المسدد</div>
+                        <div class="text-sm font-black text-slate-600">{{group.paid | number:'1.3-3'}}</div>
+                      </div>
+                      <div class="space-y-1">
+                        <div class="text-[10px] font-black text-slate-300 uppercase tracking-widest">المتبقي</div>
+                        <div class="text-sm font-black text-slate-600">{{group.remaining | number:'1.3-3'}}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="activityGroups.inactive.groups.length === 0" class="text-center py-16 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200 text-slate-400 font-bold text-sm">
+                    لا توجد ملفات غير نشطة حالياً
+                  </div>
                 </div>
               </div>
 
@@ -1809,8 +1972,15 @@
               </div>
               <div class="form-field">
                 <label class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">العلاقة</label>
-                <input type="text" class="premium-input" [(ngModel)]="addForm.relation" name="relation"
-                  placeholder="مثل: صاحب الرقم، أخ، أب..." />
+                <select class="premium-input bg-white cursor-pointer" [(ngModel)]="addForm.relation" name="relation">
+                  <option value="" disabled selected>اختر العلاقة...</option>
+                  <option *ngFor="let opt of relationOptions" [value]="opt">{{opt}}</option>
+                </select>
+              </div>
+              <div class="form-field animate-in fade-in slide-in-from-top-1 duration-300" *ngIf="addForm.relation === 'أخرى'">
+                <label class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">نوع العلاقة</label>
+                <input type="text" class="premium-input" [(ngModel)]="customRelation" name="customRelation"
+                  placeholder="اكتب نوع العلاقة..." />
               </div>
               <div class="form-field">
                 <label class="form-label text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">المصدر</label>
