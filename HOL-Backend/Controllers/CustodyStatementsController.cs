@@ -20,54 +20,89 @@ public class CustodyStatementsController : ControllerBase
         _logger = logger;
     }
 
-    [HttpPost]
-    public async Task<ActionResult<CustodyStatementDto>> Create(CreateCustodyStatementDto dto)
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<CustodyStatementDto>>> GetAll()
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        var result = await _service.CreateAsync(dto, userId);
-        return CreatedAtAction(nameof(GetByStatementNo), new { statementNo = result.StatementNo }, result);
-    }
-
-    [HttpGet("statement/{statementNo}")]
-    public async Task<ActionResult<IEnumerable<CustodyStatementDto>>> GetByStatementNo(string statementNo)
-    {
-        var result = await _service.GetByStatementNoAsync(statementNo);
+        var result = await _service.GetReportDataAsync(null, null);
         return Ok(result);
     }
 
-    [HttpGet("auto-number/{autoNo}")]
-    public async Task<ActionResult<IEnumerable<CustodyStatementDto>>> GetByAutoNo(long autoNo)
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<CustodyStatementDto>> GetById(int id)
     {
-        var result = await _service.GetByAutoNoAsync(autoNo);
+        var result = await _service.GetByIdAsync(id);
+        if (result == null) return NotFound();
         return Ok(result);
     }
 
-    [HttpPut("{id}/send-to-acc")]
-    public async Task<IActionResult> SendToAcc(int id)
+    [HttpGet("pending")]
+    public async Task<ActionResult<IEnumerable<CustodyStatementDto>>> GetPending(int page = 1, int pageSize = 5)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        var success = await _service.SendToAccAsync(id, userId);
-        if (!success) return NotFound();
-        return NoContent();
+        var (items, totalCount) = await _service.GetPendingAsync(userId, page, pageSize);
+        
+        return Ok(new { items, totalCount });
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    [HttpGet("transferred")]
+    public async Task<ActionResult<IEnumerable<CustodyStatementDto>>> GetTransferred(int page = 1, int pageSize = 5)
     {
-        var success = await _service.DeleteAsync(id);
-        if (!success) return NotFound();
-        return NoContent();
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var (items, totalCount) = await _service.GetTransferredAsync(userId, page, pageSize);
+        
+        return Ok(new { items, totalCount });
     }
 
     [HttpGet("by-user/{userId:int}")]
-    public async Task<ActionResult<IEnumerable<CustodyStatementDto>>> GetByUserAdded(int userId)
+    public async Task<ActionResult<object>> GetByUserId(int userId, int page = 1, int pageSize = 10, DateTime? fromDate = null, DateTime? toDate = null, bool? isReceived = null)
     {
-        var result = await _service.GetByUserAddedAsync(userId);
-        return Ok(result);
+        var (items, totalCount) = await _service.GetTransferredAsync(userId, page, pageSize, fromDate, toDate, isReceived);
+        return Ok(new { items, totalCount });
+    }
+
+    [HttpPost("{id:int}/send-to-acc")]
+    public async Task<IActionResult> SendToAcc(int id)
+    {
+        var success = await _service.UpdateSendToAccAsync(id, true);
+        if (!success) return NotFound();
+        return NoContent();
+    }
+
+    [HttpPost("{id:int}/receive-acc")]
+    public async Task<IActionResult> ReceiveAcc(int id)
+    {
+        var success = await _service.UpdateReceiveAccAsync(id, true);
+        if (!success) return NotFound();
+        return NoContent();
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<CustodyStatementDto>> Create([FromBody] CreateCustodyStatementDto dto)
+    {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var result = await _service.CreateAsync(dto, userId);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+    }
+
+    [HttpPost("update/{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] CreateCustodyStatementDto dto)
+    {
+        var success = await _service.UpdateAsync(id, dto);
+        if (!success) return BadRequest("Failed to update record");
+        return NoContent();
+    }
+
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var success = await _service.DeleteAsync(id);
+        if (!success) return BadRequest("Failed to delete record");
+        return NoContent();
     }
 
     [HttpGet("next-statement-no")]
-    public async Task<ActionResult<string>> GetNextStatementNo()
+    public async Task<ActionResult<object>> GetNextStatementNo()
     {
         var result = await _service.GetNextStatementNoAsync();
         return Ok(new { statementNo = result });

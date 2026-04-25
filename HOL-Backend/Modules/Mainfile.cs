@@ -28,6 +28,9 @@ public class Mainfile
   [Column("archive")]
   public bool? Archive { get; set; }
 
+  [Column("status")]
+  public string Status { get; set; }
+
   [Column("note_")]
   public string Note { get; set; }
 

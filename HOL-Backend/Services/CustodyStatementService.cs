@@ -1,6 +1,9 @@
+#nullable enable
 using Microsoft.AspNetCore.Hosting;
 using System.IO.Compression;
 using House_of_law_api.DTOs;
+using House_of_law_api.Interfaces;
+using House_of_law_api.Modules;
 
 namespace House_of_law_api.Services;
 
@@ -78,6 +81,60 @@ public class CustodyStatementService : ICustodyStatementService
     var created = await _repository.AddAsync(entity);
     return MapToDto(created);
   }
+  
+  public async Task<CustodyStatementDto?> GetByIdAsync(int id)
+  {
+    var entity = await _repository.GetByIdAsync(id);
+    return entity != null ? MapToDto(entity) : null;
+  }
+
+  public async Task<(IEnumerable<CustodyStatementDto> Items, int TotalCount)> GetPendingAsync(int userId, int page, int pageSize)
+  {
+    var (entities, totalCount) = await _repository.GetPendingAsync(userId, page, pageSize);
+    var dtos = entities.Select(MapToDto).ToList();
+    
+    foreach (var dto in dtos)
+    {
+      await PopulateAttachmentsAsync(dto);
+    }
+    
+    return (dtos, totalCount);
+  }
+
+  public async Task<(IEnumerable<CustodyStatementDto> Items, int TotalCount)> GetTransferredAsync(int userId, int page, int pageSize, DateTime? fromDate = null, DateTime? toDate = null, bool? isReceived = null)
+  {
+    var (entities, totalCount) = await _repository.GetTransferredAsync(userId, page, pageSize, fromDate, toDate, isReceived);
+    var dtos = entities.Select(MapToDto).ToList();
+
+    foreach (var dto in dtos)
+    {
+      await PopulateAttachmentsAsync(dto);
+    }
+
+    return (dtos, totalCount);
+  }
+
+  private async Task PopulateAttachmentsAsync(CustodyStatementDto dto)
+  {
+    if (string.IsNullOrEmpty(dto.CodeAttach)) return;
+
+    var codes = dto.CodeAttach.Split(',', StringSplitOptions.RemoveEmptyEntries);
+    
+    foreach (var code in codes)
+    {
+      var mongoAttach = await _mongoAttachmentRepository.GetByCodeAsync(code);
+      if (mongoAttach != null)
+      {
+        dto.Attachments.Add(new AttachmentDto
+        {
+          Id = 0,
+          AttachCode = mongoAttach.Code,
+          AttachType = "custody",
+          FileContent = mongoAttach.Content
+        });
+      }
+    }
+  }
 
   public async Task<IEnumerable<CustodyStatementDto>> GetByStatementNoAsync(string statementNo)
   {
@@ -124,6 +181,33 @@ public class CustodyStatementService : ICustodyStatementService
     entity.SendToACC = true;
     entity.UserSec = userId;
     // Logic for setting other flags or dates can go here
+
+    await _repository.UpdateAsync(entity);
+    return true;
+  }
+
+  public async Task<bool> UpdateAsync(int id, CreateCustodyStatementDto dto)
+  {
+    var entity = await _repository.GetByIdAsync(id);
+    if (entity == null) return false;
+
+    entity.FileCode = dto.FileCode;
+    entity.DeptCode = dto.DeptCode;
+    entity.CodeAttach = dto.CodeAttach;
+    entity.CodeExpense = dto.CodeExpense;
+    entity.StatementNo = dto.StatementNo;
+    entity.Amount = dto.Amount;
+    entity.CodeAutoNo = dto.CodeAutoNo;
+    entity.CodeStatus = dto.CodeStatus;
+    entity.Notes = dto.Notes;
+    entity.ClientName = dto.ClientName;
+    entity.CompanyOrOffice = dto.CompanyOrOffice;
+    entity.CompanyCode = dto.CompanyCode;
+    entity.CivilId = dto.CivilId;
+    entity.PhoneNumber = dto.PhoneNumber;
+    entity.Court = dto.Court;
+    entity.ContractNo = dto.ContractNo;
+    entity.PersonName = dto.PersonName;
 
     await _repository.UpdateAsync(entity);
     return true;
@@ -263,6 +347,26 @@ public class CustodyStatementService : ICustodyStatementService
   }
 
 
+  public async Task<bool> UpdateSendToAccAsync(int id, bool sendToAcc)
+  {
+    var entity = await _repository.GetByIdAsync(id);
+    if (entity == null) return false;
+
+    entity.SendToACC = sendToAcc;
+    await _repository.UpdateAsync(entity);
+    return true;
+  }
+
+  public async Task<bool> UpdateReceiveAccAsync(int id, bool receiveAcc)
+  {
+    var entity = await _repository.GetByIdAsync(id);
+    if (entity == null) return false;
+
+    entity.ReceiveAcc = receiveAcc;
+    await _repository.UpdateAsync(entity);
+    return true;
+  }
+
   public async Task<bool> UpdateStatusBulkAsync(List<int> ids, bool toCompany, bool toOffice)
   {
     if (ids == null || !ids.Any()) return false;
@@ -331,6 +435,13 @@ public class CustodyStatementService : ICustodyStatementService
       UserAdded = entity.UserAdded,
       ClientName = entity.ClientName,
       Notes = entity.Notes,
+      CompanyOrOffice = entity.CompanyOrOffice,
+      CompanyCode = entity.CompanyCode,
+      CivilId = entity.CivilId,
+      PhoneNumber = entity.PhoneNumber,
+      Court = entity.Court,
+      ContractNo = entity.ContractNo,
+      PersonName = entity.PersonName,
       ExpenseName = entity.CodeExpense.HasValue && _expenseTypes.ContainsKey(entity.CodeExpense.Value)
             ? _expenseTypes[entity.CodeExpense.Value]
             : "غير معروف"

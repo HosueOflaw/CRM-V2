@@ -44,6 +44,7 @@ public class MainfileRepository : BaseRepository<Mainfile>, IMainfileRepository
                    RegisterType = m.RegisterType,
                    AddedBy = m.AddedBy,
                    ImportJobId = m.ImportJobId,
+                   Status = m.Status,
                    
                    // Form Classification Table
                    InternalStatus = i != null ? i.Name : null,

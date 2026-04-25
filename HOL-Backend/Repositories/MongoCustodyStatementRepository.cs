@@ -148,6 +148,52 @@ public class MongoCustodyStatementRepository : ICustodyStatementRepository
                                 .ToListAsync();
     }
 
+    public async Task<(IEnumerable<CustodyStatement> Items, int TotalCount)> GetPendingAsync(int userId, int page, int pageSize)
+    {
+        var filter = Builders<CustodyStatement>.Filter.And(
+            Builders<CustodyStatement>.Filter.Eq(x => x.UserAdded, userId),
+            Builders<CustodyStatement>.Filter.Eq(x => x.Enabled, true),
+            Builders<CustodyStatement>.Filter.Eq(x => x.SendToACC, false)
+        );
+
+        var totalCount = (int)await _collection.CountDocumentsAsync(filter);
+        var items = await _collection.Find(filter)
+                                    .SortByDescending(x => x.DateAdded)
+                                    .Skip((page - 1) * pageSize)
+                                    .Limit(pageSize)
+                                    .ToListAsync();
+
+        return (items, totalCount);
+    }
+
+    public async Task<(IEnumerable<CustodyStatement> Items, int TotalCount)> GetTransferredAsync(int userId, int page, int pageSize, DateTime? fromDate = null, DateTime? toDate = null, bool? isReceived = null)
+    {
+        var filterBuilder = Builders<CustodyStatement>.Filter;
+        var filter = filterBuilder.And(
+            filterBuilder.Eq(x => x.UserAdded, userId),
+            filterBuilder.Eq(x => x.Enabled, true),
+            filterBuilder.Eq(x => x.SendToACC, true)
+        );
+
+        if (fromDate.HasValue)
+            filter = filterBuilder.And(filter, filterBuilder.Gte(x => x.DateAdded, fromDate.Value.Date));
+            
+        if (toDate.HasValue)
+            filter = filterBuilder.And(filter, filterBuilder.Lt(x => x.DateAdded, toDate.Value.Date.AddDays(1)));
+            
+        if (isReceived.HasValue)
+            filter = filterBuilder.And(filter, filterBuilder.Eq(x => x.ReceiveAcc, isReceived.Value));
+
+        var totalCount = (int)await _collection.CountDocumentsAsync(filter);
+        var items = await _collection.Find(filter)
+                                    .SortByDescending(x => x.DateAdded)
+                                    .Skip((page - 1) * pageSize)
+                                    .Limit(pageSize)
+                                    .ToListAsync();
+
+        return (items, totalCount);
+    }
+
     public async Task<string> GetLastStatementNoAsync()
     {
         var last = await _collection.Find(x => x.StatementNo != null)

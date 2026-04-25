@@ -55,6 +55,42 @@ public class CustodyStatementRepository : BaseRepository<CustodyStatement>, ICus
             .ToListAsync();
     }
 
+    public async Task<(IEnumerable<CustodyStatement> Items, int TotalCount)> GetPendingAsync(int userId, int page, int pageSize)
+    {
+        var query = _dbSet.Where(x => x.UserAdded == userId && x.Enabled && !x.SendToACC);
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(x => x.DateAdded)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
+    public async Task<(IEnumerable<CustodyStatement> Items, int TotalCount)> GetTransferredAsync(int userId, int page, int pageSize, DateTime? fromDate = null, DateTime? toDate = null, bool? isReceived = null)
+    {
+        var query = _dbSet.Where(x => x.UserAdded == userId && x.Enabled && x.SendToACC);
+        
+        if (fromDate.HasValue)
+            query = query.Where(x => x.DateAdded >= fromDate.Value.Date);
+        
+        if (toDate.HasValue)
+            query = query.Where(x => x.DateAdded < toDate.Value.Date.AddDays(1));
+            
+        if (isReceived.HasValue)
+            query = query.Where(x => x.ReceiveAcc == isReceived.Value);
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(x => x.DateAdded)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
     public async Task<string> GetLastStatementNoAsync()
     {
         return await _dbSet

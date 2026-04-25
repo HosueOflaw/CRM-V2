@@ -211,6 +211,11 @@ public class MainfilesController : ControllerBase
 
     switch (fieldName)
     {
+      case "status":
+        previousValue = existing.Status;
+        existing.Status = request.NewValueText;
+        newValue = request.NewValueText;
+        break;
       case "client":
         previousValue = classification.ClientStatusId;
         classification.ClientStatusId = request.NewValueId;
@@ -285,6 +290,11 @@ public class MainfilesController : ControllerBase
         classification.Acceptance = request.NewValueText;
         newValue = request.NewValueText;
         break;
+      case "membership":
+        previousValue = existing.Membership;
+        existing.Membership = request.NewValueText;
+        newValue = request.NewValueText;
+        break;
       case "salarydate":
         previousValue = classification.SalaryDate;
         if (DateTime.TryParse(request.NewValueText, out DateTime dt)) { classification.SalaryDate = dt; newValue = dt; }
@@ -340,6 +350,8 @@ public class MainfilesController : ControllerBase
       "work" => "الدوام",
       "incomenotes" => "ملاحظات الدخل",
       "classification" => "التصنيف",
+      "membership" => "التصنيف",
+      "status" => "الحالة",
       _ => request.Field
     };
 
@@ -456,6 +468,15 @@ public class MainfilesController : ControllerBase
       "cooperation" => id switch { 1 => "غير مصنف", 2 => "وعد بالسداد", 3 => "تقسيط", 4 => "متعاون", 5 => "غير متعاون", 6 => "مماطل", 7 => "متردد", 8 => "غير قادر", 9 => "وعد ضعيف", 10 => "وعد قوي", 11 => "رافض السداد", 12 => "لم نصل اليه", _ => id.ToString() },
       "comms_lang" => id switch { 1 => "غير مصنف", 2 => "عربي", 3 => "إنجليزي", 4 => "أوردو", 5 => "هندي", 6 => "تاغالوغ", _ => id.ToString() },
       "gender" => id switch { 1 => "غير مصنف", 2 => "ذكر", 3 => "أنثى", _ => id.ToString() },
+      "status" => id switch 
+      { 
+        1 => "سداد جزئى", 2 => "تحصيل ودى", 3 => "خارج البلاد", 4 => "مغادر نهائى", 
+        5 => "حفظ", 6 => "سداد مكتب", 7 => "تنفيذ", 14 => "حفظ مؤقت من الشركة",
+        15 => "حفظ مؤقت من المكتب", 16 => "سحب ادارى", 17 => "سداد بمعرفة الشركة",
+        18 => "سداد محكمه", 22 => "محكمة فقط", 25 => "موكل", 26 => "ودي فقط",
+        27 => "وفاة", 28 => "وقف", 35 => "ملغى", 46 => "مرفوض", 58 => "تسوية",
+        _ => id.ToString() 
+      },
       _ => id.ToString()
     };
   }
